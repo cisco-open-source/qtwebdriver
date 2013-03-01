@@ -2,6 +2,7 @@
 
 cd ../src
 
+#Output directory
 OUT_DIR=../
 
 ###### ST40 #######
@@ -20,14 +21,22 @@ OUT_DIR=../
 # QTINC=../../../WEBKITQT48/cisco-4.8-cmc-openmha-qt4.8.4.2-wk116000.9_d_WEBKITQT48_MAIN_MHA_Int/BCM_LNX_1_0_2/release/include/
 # OUT_DIR=../../BCM_LNX_1_0_2/
 
+###### LINUX (default) #######
+GCC=gcc
+G=g++
+QTLIB=/opt/qt4_nds/linux2_2/release/lib/
+QTINC=/opt/qt4_nds/linux2_2/release/lib/include/
+
+#directory with output libraries
 OUT_LIB_DIR=${OUT_DIR}/lib
 
 rm -rf ${OUT_LIB_DIR}
-mkdir -p ${OUT_DIR}
 mkdir -p ${OUT_LIB_DIR}
 make clean
 make
  # CC=${GCC} CXX=${G} QT_LIB_PATH=${QTLIB} QT_INC_PATH=${QTINC} OUTLIBDIR=${OUT_LIB_DIR}
 # cp ../mhap.mk ${OUT_DIR}/mhap.mk
+
+##### copy in directory in wich MVM looking for WD library
 cp -r ../inc /opt/webdriver/linux2_2/release
 cp -r ../lib /opt/webdriver/linux2_2/release
