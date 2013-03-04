@@ -37,6 +37,8 @@ class SessionManager {
   void set_url_base(const std::string& url_base);
   std::string url_base() const;
 
+  std::map<std::string, Session*> GetSessions();
+
  private:
   SessionManager();
   ~SessionManager();

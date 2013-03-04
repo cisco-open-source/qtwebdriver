@@ -50,6 +50,7 @@
 #include "chrome/test/webdriver/commands/mouse_commands.h"
 #include "chrome/test/webdriver/commands/screenshot_command.h"
 #include "chrome/test/webdriver/commands/session_with_id.h"
+#include "chrome/test/webdriver/commands/sessions.h"
 #include "chrome/test/webdriver/commands/set_timeout_commands.h"
 #include "chrome/test/webdriver/commands/source_command.h"
 #include "chrome/test/webdriver/commands/target_locator_commands.h"
@@ -90,6 +91,8 @@ void InitCallbacks(Dispatcher* dispatcher,
   dispatcher->AddLog("/log");
 
   dispatcher->Add<CreateSession>("/session");
+
+  dispatcher->Add<Sessions>("/sessions");
 
   // WebElement commands
   dispatcher->Add<FindOneElementCommand>(  "/session/*/element");

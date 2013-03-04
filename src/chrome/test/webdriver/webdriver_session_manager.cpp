@@ -49,6 +49,11 @@ std::string SessionManager::url_base() const {
   return url_base_;
 }
 
+std::map<std::string, Session*> SessionManager::GetSessions()
+{
+    return map_;
+}
+
 SessionManager::SessionManager() : port_(""), url_base_("") {}
 
 SessionManager::~SessionManager() {}
