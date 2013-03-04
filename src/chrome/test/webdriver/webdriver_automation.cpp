@@ -96,7 +96,8 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         foreach(QWidget* pWidget, qApp->allWidgets())
         {
             qDebug()<<pWidget<<pWidget->windowTitle();
-            if (options.browser_start_window == pWidget->windowTitle().toStdString())
+
+            if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
             {
                 QWebView* pView = qobject_cast<QWebView*>(pWidget);
                 //check found widget if it is QWebView or ancestor; and if it don't belong to any session
