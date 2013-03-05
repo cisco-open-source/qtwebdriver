@@ -45,8 +45,8 @@ cp -r ../lib /opt/webdriver/linux2_2/release
 ###### LINUX (desktop) build an test application #######
 GCC=gcc
 G=g++
-QTLIB=/home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/lib
-QTINC=/home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include
+QTLIB=~/QtSDK/Desktop/Qt/4.8.1/gcc/lib
+QTINC=~/QtSDK/Desktop/Qt/4.8.1/gcc/include
 
 rm -rf ${OUT_LIB_DIR}
 mkdir -p ${OUT_LIB_DIR}

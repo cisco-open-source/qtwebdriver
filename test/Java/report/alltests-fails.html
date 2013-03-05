@@ -1,0 +1,102 @@
+<html xmlns:stringutils="xalan://org.apache.tools.ant.util.StringUtils" xmlns:lxslt="http://xml.apache.org/xslt">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Unit Test Results: All Failures</title>
+<link title="Style" type="text/css" rel="stylesheet" href="stylesheet.css">
+</head>
+<body onload="open('allclasses-frame.html','classListFrame')">
+<h1>Unit Test Results.</h1>
+<table width="100%">
+<tr>
+<td align="left"></td><td align="right">Designed for use with <a href="http://www.junit.org/">JUnit</a> and <a href="http://ant.apache.org/">Ant</a>.</td>
+</tr>
+</table>
+<hr size="1">
+<h2>All Failures</h2>
+<table width="95%" cellspacing="2" cellpadding="5" border="0" class="details">
+<tr valign="top">
+<th>Class</th><th>Name</th><th>Status</th><th width="80%">Type</th><th nowrap>Time(s)</th>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testShouldWalkThePathToDeleteACookie"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testShouldWalkThePathToDeleteACookie">testShouldWalkThePathToDeleteACookie</a></td><td>Failure</td><td>expected:&lt;2&gt; but was:&lt;1&gt;<br>
+<br>
+<code>junit.framework.AssertionFailedError: expected:&lt;2&gt; but was:&lt;1&gt;<br>	at org.openqa.selenium.CookieImplementationTest.testShouldWalkThePathToDeleteACookie(CookieImplementationTest.java:294)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.091</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testCookieEqualityAfterSetAndGet"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testCookieEqualityAfterSetAndGet">testCookieEqualityAfterSetAndGet</a></td><td>Failure</td><td>Cookie was null<br>
+<br>
+<code>junit.framework.AssertionFailedError: Cookie was null<br>	at org.openqa.selenium.CookieImplementationTest.testCookieEqualityAfterSetAndGet(CookieImplementationTest.java:341)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.064</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testRefreshShouldBlockUntilPageLoads"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testRefreshShouldBlockUntilPageLoads">testRefreshShouldBlockUntilPageLoads</a></td><td>Failure</td><td>3000ms should have elapsed, but was: 2<br>
+<br>
+<code>junit.framework.AssertionFailedError: 3000ms should have elapsed, but was: 2<br>	at org.openqa.selenium.SlowLoadingPageTest.assertElapsed(SlowLoadingPageTest.java:66)<br>	at org.openqa.selenium.SlowLoadingPageTest.testRefreshShouldBlockUntilPageLoads(SlowLoadingPageTest.java:62)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>3.008</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testNumericShiftKeys"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testNumericShiftKeys">testNumericShiftKeys</a></td><td>Failure</td><td>
+Expected: a string containing " up: 16"
+     got: "down: 0 press: 126 up: 0"
+<br>
+<br>
+<code>junit.framework.AssertionFailedError: <br>Expected: a string containing " up: 16"<br>     got: "down: 0 press: 126 up: 0"<br>
+<br>	at org.openqa.selenium.TypingTest.testNumericShiftKeys(TypingTest.java:363)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.611</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testUppercaseAlphaKeys"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testUppercaseAlphaKeys">testUppercaseAlphaKeys</a></td><td>Failure</td><td>
+Expected: a string containing " up: 16"
+     got: "down: 0 press: 90 up: 0"
+<br>
+<br>
+<code>junit.framework.AssertionFailedError: <br>Expected: a string containing " up: 16"<br>     got: "down: 0 press: 90 up: 0"<br>
+<br>	at org.openqa.selenium.TypingTest.testUppercaseAlphaKeys(TypingTest.java:394)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.592</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testAllPrintableKeys"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testAllPrintableKeys">testAllPrintableKeys</a></td><td>Failure</td><td>
+Expected: a string containing " up: 16"
+     got: "down: 0 press: 126 up: 0"
+<br>
+<br>
+<code>junit.framework.AssertionFailedError: <br>Expected: a string containing " up: 16"<br>     got: "down: 0 press: 126 up: 0"<br>
+<br>	at org.openqa.selenium.TypingTest.testAllPrintableKeys(TypingTest.java:414)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.638</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testNumberpadKeys"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testNumberpadKeys">testNumberpadKeys</a></td><td>Failure</td><td>
+Expected: is "abcd*-+.,09+;=/3abcd"
+     got: "abcd8&frac12;&raquo;&frac34;&frac14;09&raquo;&ordm;&raquo;&iquest;3abcd"
+<br>
+<br>
+<code>junit.framework.AssertionFailedError: <br>Expected: is "abcd*-+.,09+;=/3abcd"<br>     got: "abcd8&frac12;&raquo;&frac34;&frac14;09&raquo;&ordm;&raquo;&iquest;3abcd"<br>
+<br>	at org.openqa.selenium.TypingTest.testNumberpadKeys(TypingTest.java:494)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>0.430</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="testChordControlCutAndPaste"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#testChordControlCutAndPaste">testChordControlCutAndPaste</a></td><td>Failure</td><td>
+Expected: is ""
+     got: "!\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ ABCDEFG"
+<br>
+<br>
+<code>junit.framework.AssertionFailedError: <br>Expected: is ""<br>     got: "!\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ ABCDEFG"<br>
+<br>	at org.openqa.selenium.TypingTest.testChordControlCutAndPaste(TypingTest.java:615)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$2.run(ParallelSuite.java:40)<br>	at org.openqa.selenium.testing.ParallelSuite$ThreadPool$1.run(ParallelSuite.java:79)<br>
+</code></td><td>1.563</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="canStartWebDriverWithPos"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#canStartWebDriverWithPos">canStartWebDriverWithPos</a></td><td>Failure</td><td>Condition timed out: org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest$3@cec7c6<br>
+<br>
+<code>junit.framework.AssertionFailedError: Condition timed out: org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest$3@cec7c6<br>	at org.openqa.selenium.TestWaiter.waitFor(TestWaiter.java:84)<br>	at org.openqa.selenium.TestWaiter.waitFor(TestWaiter.java:43)<br>	at org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest.canStartWebDriverWithPos(QtWebDriverSwitchesTest.java:55)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>
+</code></td><td>5.102</td>
+</tr>
+<tr valign="top" class="Failure">
+<td><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html">QtWebkitDriverTest</a></td><td><a name="canStartWebDriverMaximized"></a><a href="org/openqa/selenium/qtwebkit/0_QtWebkitDriverTest.html#canStartWebDriverMaximized">canStartWebDriverMaximized</a></td><td>Failure</td><td>Condition timed out: org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest$1@b75fd9<br>
+<br>
+<code>junit.framework.AssertionFailedError: Condition timed out: org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest$1@b75fd9<br>	at org.openqa.selenium.TestWaiter.waitFor(TestWaiter.java:84)<br>	at org.openqa.selenium.TestWaiter.waitFor(TestWaiter.java:43)<br>	at org.openqa.selenium.qtwebkit.QtWebDriverSwitchesTest.canStartWebDriverMaximized(QtWebDriverSwitchesTest.java:114)<br>	at org.openqa.selenium.testing.SeleniumTestRunner$2.evaluate(SeleniumTestRunner.java:107)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:80)<br>	at org.openqa.selenium.testing.SeleniumTestRunner.runChild(SeleniumTestRunner.java:40)<br>
+</code></td><td>5.112</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="selenium" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <include name="**/?*.properties"/>
+    <include name="**/?*.xml"/>
+    <include name="**/?*.gif"/>
+    <include name="**/?*.png"/>
+    <include name="**/?*.jpeg"/>
+    <include name="**/?*.jpg"/>
+    <include name="**/?*.html"/>
+    <include name="**/?*.dtd"/>
+    <include name="**/?*.tld"/>
+    <include name="**/?*.ftl"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
+  <path id="jdk.classpath.1.6">
+    <fileset dir="${jdk.home.1.6}">
+      <include name="jre/lib/rhino.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/ext/gnome-java-bridge.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/pulse-java.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.6}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.commons-fileupload-1.2.2.classpath">
+    <pathelement location="${basedir}/third_party/java/commons-fileupload/commons-fileupload-1.2.2.jar"/>
+  </path>
+  
+  <path id="library.jetty-repacked-7.6.1.classpath">
+    <pathelement location="${basedir}/third_party/java/jetty/jetty-repacked-7.6.1.jar"/>
+  </path>
+  
+  <path id="library.servlet-api-2.5-6.1.9.classpath">
+    <pathelement location="${basedir}/third_party/java/servlet-api/servlet-api-2.5-6.1.9.jar"/>
+  </path>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/module_selenium.xml"/>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.selenium" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.selenium" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.webdriver:jar" value="${basedir}/out/artifacts/WebDriver_jar"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.Selenium.jar" value="${artifacts.temp.dir}/Selenium.jar"/>
+  </target>
+  
+  <target name="artifact.webdriver:jar" depends="init.artifacts, compile.module.selenium, compile.module.selenium" description="Build &#39;WebDriver:jar&#39; artifact">
+    <property name="artifact.temp.output.webdriver:jar" value="${artifacts.temp.dir}/WebDriver_jar"/>
+    <mkdir dir="${artifact.temp.output.webdriver:jar}"/>
+    <jar destfile="${temp.jar.path.Selenium.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset file="${basedir}/src/META-INF/MANIFEST.MF" prefix="META-INF"/>
+      <zipfileset dir="${selenium.output.dir}"/>
+      <zipfileset dir="${selenium.testoutput.dir}"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/selenium-java-2.25.0.jar"/>
+      <zipfileset src="${basedir}/lib/common.jar"/>
+      <zipfileset src="${basedir}/lib/my_lib.jar"/>
+      <zipfileset src="${basedir}/lib/junit/junit-dep-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/jmock-2.5.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/apache-mime4j-0.6.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/bsh-1.3.0.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/cglib-nodep-2.1_3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-codec-1.6.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-collections-3.2.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-exec-1.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-io-2.0.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-jxpath-1.3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-lang-2.6.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/commons-logging-1.1.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/cssparser-0.9.5.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/guava-12.0.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/hamcrest-core-1.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/hamcrest-library-1.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/htmlunit-2.9.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/htmlunit-core-js-2.9.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/httpclient-4.1.3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/httpcore-4.1.3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/httpmime-4.1.3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/ini4j-0.5.2.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/jcommander-1.13.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/jna-3.4.0.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/jna-platform-3.4.0.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/json-20080701.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/junit-dep-4.10.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/nekohtml-1.9.15.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/netty-3.2.7.Final.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/operadriver-0.14.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/protobuf-java-2.4.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/sac-1.3.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/serializer-2.7.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/testng-6.0.1-nobsh-noguice.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/webbit-0.4.8-SNAPSHOT.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/xalan-2.7.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/xercesImpl-2.9.1.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-2.25.0/libs/xml-apis-1.3.04.jar"/>
+      <zipfileset src="${basedir}/lib/guava-r05.jar"/>
+      <zipfileset src="${basedir}/lib/selenium-api-2.9.0.jar"/>
+      <zipfileset src="${basedir}/lib/jmock-junit4-2.4.0.jar"/>
+    </jar>
+    <copy file="${temp.jar.path.Selenium.jar}" tofile="${artifact.temp.output.webdriver:jar}/Selenium.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.webdriver:jar" description="Build all artifacts">
+    <mkdir dir="${artifact.output.webdriver:jar}"/>
+    <copy todir="${artifact.output.webdriver:jar}">
+      <fileset dir="${artifact.temp.output.webdriver:jar}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+
+    <property name="test.class.name" value="org.openqa.selenium.qtwebkit.QtWebkitDriverTest"/>
+
+    <path id="test.classpath">
+        <pathelement location="${basedir}/out/test" />
+        <pathelement location="${basedir}/lib/selenium-2.25.0/selenium-java-2.25.0.jar" />
+        <pathelement location="${basedir}/third_party/java/jetty/jetty-repacked-7.6.1.jar"/>
+        <pathelement location="${basedir}/third_party/java/commons-fileupload/commons-fileupload-1.2.2.jar"/>
+        <pathelement location="${basedir}/third_party/java/servlet-api/servlet-api-2.5-6.1.9.jar"/>
+        <fileset dir="${basedir}/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <property name="test.reports" value="${basedir}/report" />
+
+    <target name="test">
+        <junit fork="yes" printsummary="yes"  haltonfailure="no">
+            <test name="${test.class.name}" todir="${test.reports}" />
+            <formatter type="xml" />
+            <classpath refid="test.classpath" />
+        </junit>
+        <junitreport todir="${test.reports}">
+            <fileset dir="${test.reports}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${test.reports}" />
+        </junitreport>
+    </target>
+
+
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>
