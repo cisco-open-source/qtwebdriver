@@ -42,7 +42,7 @@ void Sessions::ExecuteGet(Response* const response) {
 
       // Standard capabilities defined at
       // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
-      capabilities_value->SetString("browserName", "chrome");
+      capabilities_value->SetString("browserName", "QtWebkit");
       capabilities_value->SetString("version", session->GetBrowserVersion());
 
     #if defined(OS_WIN)
