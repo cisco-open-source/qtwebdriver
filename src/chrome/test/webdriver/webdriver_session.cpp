@@ -912,13 +912,8 @@ Error* Session::AcceptOrDismissAlert(bool accept) {
 }
 
 std::string Session::GetBrowserVersion() {
-    std::string version;
-    //TODO: need return real version
-    version = "17";
-//  RunSessionTask(base::Bind(
-//      &Automation::GetBrowserVersion,
-//      base::Unretained(automation_.get()),
-//      &version));
+  std::string version;
+  version = QT_VERSION_STR;
   return version;
 }
 
