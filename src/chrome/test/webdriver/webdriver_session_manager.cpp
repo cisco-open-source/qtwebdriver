@@ -51,6 +51,7 @@ std::string SessionManager::url_base() const {
 
 std::map<std::string, Session*> SessionManager::GetSessions()
 {
+    base::AutoLock lock(map_lock_);
     return map_;
 }
 

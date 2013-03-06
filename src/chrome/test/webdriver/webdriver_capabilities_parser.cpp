@@ -13,6 +13,7 @@
 #include "chrome/test/webdriver/webdriver_error.h"
 #include "chrome/test/webdriver/webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_util.h"
+#include <QtCore/QDebug>
 
 using base::DictionaryValue;
 using base::Value;
@@ -40,7 +41,8 @@ Capabilities::Capabilities()
       local_state(new DictionaryValue()),
       native_events(false),
       no_website_testing_defaults(false),
-      prefs(new DictionaryValue()) {
+      prefs(new DictionaryValue()),
+      proxy(0) {
   log_levels[LogType::kDriver] = kAllLogLevel;
 }
 
@@ -338,7 +340,9 @@ Error* CapabilitiesParser::ParseProxy(const base::Value* option) {
                         proxy_type);
       return error;
     }
+
   }
+  caps_->proxy = options->DeepCopy();
   return NULL;
 }
 

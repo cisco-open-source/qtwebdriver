@@ -75,6 +75,9 @@ struct Capabilities {
   // Name of the window to use for connecting to an already running QWebView.
   std::string browserStartWindow;
 
+  // save proxy capabilities to return in "sessions" command
+  DictionaryValue *proxy;
+
 };
 
 // Parses the given capabilities dictionary to produce a |Capabilities|
