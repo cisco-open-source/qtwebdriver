@@ -80,7 +80,12 @@ void Sessions::ExecuteGet(Response* const response) {
           "chrome.nativeEvents",
           Value::CreateBooleanValue(session->capabilities().native_events));
 
+      if (session->capabilities().proxy != NULL)
+          capabilities_value->Set("proxy", session->capabilities().proxy->DeepCopy());
+
       session_value->Set("capabilities", capabilities_value);
+
+
 
       temp_value->Set(listCount, session_value);
       ++listCount;
