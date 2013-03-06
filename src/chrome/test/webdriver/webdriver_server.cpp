@@ -301,7 +301,7 @@ int RunChromeDriver() {
   options[args.size()] = NULL;
 
   // Initialize SHTTPD context.
-  // Listen on port 9515 or port specified on command line.
+  // Listen on port 9517 or port specified on command line.
   // TODO(jmikhail) Maybe add port 9516 as a secure connection.
   struct mg_context* ctx = mg_start(&ProcessHttpRequest,
                                     &dispatcher,

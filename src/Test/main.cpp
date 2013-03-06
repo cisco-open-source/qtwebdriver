@@ -3,6 +3,8 @@
 #include <QtCore/QTextCodec>
 #include <MhapWebDriver.h>
 #include <QtCore/QFuture>
+#include <QtCore/QObject>
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QtConcurrentRun>
 
 int main(int argc, char *argv[])
@@ -24,6 +26,10 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
+    QFutureWatcher<int> watcher;
+    QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
     QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
+    watcher.setFuture(future);
+
     return app.exec();
 }

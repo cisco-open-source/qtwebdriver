@@ -25,10 +25,14 @@ LINK          = $(CXX)
 LFLAGS        = -shared -Wl,-O1 
 LIBS          = -ldl -lrt -L/usr/X11R6/lib -lpthread -L$(QT_LIB_PATH) -lQtWebKit -lQtCore -lQtGui -lQtNetwork
 DEFINES       = -DOS_POSIX -DQT_NO_DEBUG -DQT_GUI_LIB -DQT_CORE_LIB -DQT_SHARED
-CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-# compile flags
-LDFLAGS = -g
+CFLAGS        = -pipe -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+
+# additional compiler flags for debug mode
+ifeq ($(mode),debug)
+	CFLAGS += -g -DNDEBUG
+	CXXFLAGS += -g -DNDEBUG
+endif
 
 # directory for object files
 OBJDIR=obj
@@ -189,6 +193,8 @@ SRC = third_party/mongoose/mongoose.c \
 		base/sys_info_posix.cpp \
 		base/sys_info_linux.cpp \
 		base/debug/alias.cpp \
+		base/debug/debugger.cc \
+		base/debug/debugger_posix.cc \
 		base/timer.cpp \
 		base/path_service.cpp \
 		base/base_paths.cpp \
@@ -211,7 +217,7 @@ SRC = third_party/mongoose/mongoose.c \
 		Test/main.cpp
 
 # Object files
-OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(patsubst %.c, $(OBJDIR)/%.o, $(patsubst %.cpp, $(OBJDIR)/%.o,  $(SRC))))
+OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(patsubst %.c, $(OBJDIR)/%.o, $(patsubst %.cc, $(OBJDIR)/%.o,  $(SRC))))
 
 OBJ_TEST = $(OBJDIR)/Test/main.o
 
@@ -545,6 +551,7 @@ chrome/test/webdriver/webdriver_dispatch.o: base/memory/scoped_ptr.h
 chrome/test/webdriver/webdriver_dispatch.o: /usr/include/assert.h base/move.h
 chrome/test/webdriver/webdriver_dispatch.o: base/template_util.h
 chrome/test/webdriver/webdriver_dispatch.o: base/logging.h
+chrome/test/webdriver/webdriver_dispatch.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_dispatch.o: base/string_split.h
 chrome/test/webdriver/webdriver_dispatch.o: base/string_util.h
 chrome/test/webdriver/webdriver_dispatch.o: /usr/include/ctype.h
@@ -611,6 +618,7 @@ chrome/test/webdriver/commands/response.o: base/base64.h base/string_piece.h
 chrome/test/webdriver/commands/response.o: base/hash_tables.h
 chrome/test/webdriver/commands/response.o: base/json/json_writer.h
 chrome/test/webdriver/commands/response.o: base/logging.h
+chrome/test/webdriver/commands/response.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_error.o: chrome/test/webdriver/webdriver_error.h
 chrome/test/webdriver/webdriver_error.o: base/basictypes.h
 chrome/test/webdriver/webdriver_error.o: /usr/include/limits.h
@@ -724,9 +732,9 @@ base/values.o: /usr/include/math.h /usr/include/bits/huge_val.h
 base/values.o: /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h
 base/values.o: /usr/include/bits/inf.h /usr/include/bits/nan.h
 base/values.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
-base/values.o: base/json/json_writer.h base/logging.h base/string_util.h
-base/values.o: /usr/include/ctype.h base/string_piece.h base/hash_tables.h
-base/values.o: base/utf_string_conversions.h
+base/values.o: base/json/json_writer.h base/logging.h base/debug/debugger.h
+base/values.o: base/string_util.h /usr/include/ctype.h base/string_piece.h
+base/values.o: base/hash_tables.h base/utf_string_conversions.h
 chrome/test/webdriver/webdriver_automation.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtGui/QApplication
 chrome/test/webdriver/webdriver_automation.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtGui/qapplication.h
 chrome/test/webdriver/webdriver_automation.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qcoreapplication.h
@@ -1228,16 +1236,16 @@ chrome/test/webdriver/webdriver_session.o: base/task_runner.h base/time.h
 chrome/test/webdriver/webdriver_session.o: base/message_pump.h
 chrome/test/webdriver/webdriver_session.o: base/observer_list.h
 chrome/test/webdriver/webdriver_session.o: base/logging.h
+chrome/test/webdriver/webdriver_session.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_session.o: base/memory/weak_ptr.h
 chrome/test/webdriver/webdriver_session.o: base/threading/thread_checker.h
-chrome/test/webdriver/webdriver_session.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/webdriver_session.o: base/synchronization/lock.h
-chrome/test/webdriver/webdriver_session.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/webdriver_session.o: base/threading/platform_thread.h
 chrome/test/webdriver/webdriver_session.o: base/pending_task.h
 chrome/test/webdriver/webdriver_session.o: base/callback.h
 chrome/test/webdriver/webdriver_session.o: base/callback_internal.h
 chrome/test/webdriver/webdriver_session.o: base/tracking_info.h
+chrome/test/webdriver/webdriver_session.o: base/synchronization/lock.h
+chrome/test/webdriver/webdriver_session.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/webdriver_session.o: base/threading/platform_thread.h
 chrome/test/webdriver/webdriver_session.o: chrome/common/automation_constants.h
 chrome/test/webdriver/webdriver_session.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/webdriver_session.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -1713,9 +1721,9 @@ chrome/test/webdriver/webdriver_session_manager.o: base/task_runner.h
 chrome/test/webdriver/webdriver_session_manager.o: base/message_pump.h
 chrome/test/webdriver/webdriver_session_manager.o: base/observer_list.h
 chrome/test/webdriver/webdriver_session_manager.o: base/logging.h
+chrome/test/webdriver/webdriver_session_manager.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_session_manager.o: base/memory/weak_ptr.h
 chrome/test/webdriver/webdriver_session_manager.o: base/threading/thread_checker.h
-chrome/test/webdriver/webdriver_session_manager.o: base/threading/thread_checker_impl.h
 chrome/test/webdriver/webdriver_session_manager.o: base/pending_task.h
 chrome/test/webdriver/webdriver_session_manager.o: base/tracking_info.h
 chrome/test/webdriver/webdriver_session_manager.o: chrome/common/automation_constants.h
@@ -2998,7 +3006,7 @@ base/string_number_conversions.o: /usr/include/bits/waitstatus.h
 base/string_number_conversions.o: /usr/include/sys/types.h
 base/string_number_conversions.o: /usr/include/time.h
 base/string_number_conversions.o: /usr/include/bits/pthreadtypes.h
-base/string_number_conversions.o: base/logging.h
+base/string_number_conversions.o: base/logging.h base/debug/debugger.h
 base/string_number_conversions.o: base/third_party/dmg_fp/dmg_fp.h
 base/string_number_conversions.o: base/utf_string_conversions.h
 base/utf_string_conversions.o: base/utf_string_conversions.h
@@ -3134,7 +3142,8 @@ base/json/json_writer.o: /usr/include/_G_config.h /usr/include/wchar.h
 base/json/json_writer.o: /usr/include/wctype.h /usr/include/endian.h
 base/json/json_writer.o: /usr/include/bits/endian.h
 base/json/json_writer.o: /usr/include/bits/sys_errlist.h base/logging.h
-base/json/json_writer.o: base/stringprintf.h base/compiler_specific.h
+base/json/json_writer.o: base/debug/debugger.h base/stringprintf.h
+base/json/json_writer.o: base/compiler_specific.h
 base/json/json_writer.o: base/string_number_conversions.h base/string_piece.h
 base/json/json_writer.o: base/hash_tables.h base/values.h
 base/json/json_writer.o: base/utf_string_conversions.h
@@ -3166,7 +3175,7 @@ base/json/json_reader.o: /usr/include/sys/types.h /usr/include/time.h
 base/json/json_reader.o: /usr/include/bits/pthreadtypes.h
 base/json/json_reader.o: base/compiler_specific.h base/move.h
 base/json/json_reader.o: base/template_util.h base/json/json_parser.h
-base/json/json_reader.o: base/logging.h
+base/json/json_reader.o: base/logging.h base/debug/debugger.h
 base/json/json_parser.o: base/json/json_parser.h base/base_export.h
 base/json/json_parser.o: base/basictypes.h /usr/include/limits.h
 base/json/json_parser.o: /usr/include/features.h /usr/include/sys/cdefs.h
@@ -3201,6 +3210,7 @@ base/json/json_parser.o: /usr/include/bits/huge_vall.h
 base/json/json_parser.o: /usr/include/bits/inf.h /usr/include/bits/nan.h
 base/json/json_parser.o: /usr/include/bits/mathdef.h
 base/json/json_parser.o: /usr/include/bits/mathcalls.h base/logging.h
+base/json/json_parser.o: base/debug/debugger.h
 base/json/json_parser.o: base/string_number_conversions.h base/string_util.h
 base/json/json_parser.o: /usr/include/ctype.h base/stringprintf.h
 base/json/json_parser.o: base/third_party/icu/icu_utf.h
@@ -3283,6 +3293,7 @@ chrome/test/webdriver/webdriver_element_id.o: /usr/include/endian.h
 chrome/test/webdriver/webdriver_element_id.o: /usr/include/bits/endian.h
 chrome/test/webdriver/webdriver_element_id.o: /usr/include/bits/sys_errlist.h
 chrome/test/webdriver/webdriver_element_id.o: base/logging.h
+chrome/test/webdriver/webdriver_element_id.o: base/debug/debugger.h
 chrome/test/automation/value_conversion_traits.o: chrome/test/automation/value_conversion_traits.h
 chrome/test/automation/value_conversion_traits.o: base/values.h
 chrome/test/automation/value_conversion_traits.o: base/base_export.h
@@ -3419,16 +3430,16 @@ chrome/test/webdriver/commands/create_session.o: base/time.h
 chrome/test/webdriver/commands/create_session.o: base/message_pump.h
 chrome/test/webdriver/commands/create_session.o: base/observer_list.h
 chrome/test/webdriver/commands/create_session.o: base/logging.h
+chrome/test/webdriver/commands/create_session.o: base/debug/debugger.h
 chrome/test/webdriver/commands/create_session.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/create_session.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/create_session.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/create_session.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/create_session.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/create_session.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/create_session.o: base/pending_task.h
 chrome/test/webdriver/commands/create_session.o: base/callback.h
 chrome/test/webdriver/commands/create_session.o: base/callback_internal.h
 chrome/test/webdriver/commands/create_session.o: base/tracking_info.h
+chrome/test/webdriver/commands/create_session.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/create_session.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/create_session.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/create_session.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/create_session.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/create_session.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -3836,6 +3847,7 @@ base/task_runner.o: base/compiler_specific.h
 base/task_runner.o: base/threading/thread_collision_warner.h base/time.h
 base/task_runner.o: /usr/include/time.h /usr/include/bits/types.h
 base/task_runner.o: /usr/include/bits/typesizes.h base/logging.h
+base/task_runner.o: base/debug/debugger.h
 base/task_runner.o: base/threading/post_task_and_reply_impl.h base/location.h
 base/threading/post_task_and_reply_impl.o: base/threading/post_task_and_reply_impl.h
 base/threading/post_task_and_reply_impl.o: base/callback_forward.h
@@ -3880,19 +3892,15 @@ base/threading/post_task_and_reply_impl.o: /usr/include/bits/pthreadtypes.h
 base/threading/post_task_and_reply_impl.o: base/move.h base/template_util.h
 base/threading/post_task_and_reply_impl.o: base/memory/weak_ptr.h
 base/threading/post_task_and_reply_impl.o: base/logging.h
+base/threading/post_task_and_reply_impl.o: base/debug/debugger.h
 base/threading/post_task_and_reply_impl.o: base/threading/thread_checker.h
-base/threading/post_task_and_reply_impl.o: base/threading/thread_checker_impl.h
-base/threading/post_task_and_reply_impl.o: base/synchronization/lock.h
-base/threading/post_task_and_reply_impl.o: base/synchronization/lock_impl.h
-base/threading/post_task_and_reply_impl.o: base/threading/platform_thread.h
-base/threading/post_task_and_reply_impl.o: base/time.h
 base/threading/post_task_and_reply_impl.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/threading/post_task_and_reply_impl.o: base/tuple.h
 base/threading/post_task_and_reply_impl.o: base/message_loop_proxy.h
 base/threading/post_task_and_reply_impl.o: base/single_thread_task_runner.h
 base/threading/post_task_and_reply_impl.o: base/sequenced_task_runner.h
 base/threading/post_task_and_reply_impl.o: base/sequenced_task_runner_helpers.h
-base/threading/post_task_and_reply_impl.o: base/task_runner.h
+base/threading/post_task_and_reply_impl.o: base/task_runner.h base/time.h
 base/memory/ref_counted.o: base/memory/ref_counted.h base/atomic_ref_count.h
 base/memory/ref_counted.o: base/atomicops.h base/basictypes.h
 base/memory/ref_counted.o: /usr/include/limits.h /usr/include/features.h
@@ -3912,7 +3920,7 @@ base/memory/ref_counted.o: /usr/include/bits/wchar.h
 base/memory/ref_counted.o: base/third_party/dynamic_annotations/dynamic_annotations.h
 base/memory/ref_counted.o: base/base_export.h base/compiler_specific.h
 base/memory/ref_counted.o: base/threading/thread_collision_warner.h
-base/memory/ref_counted.o: base/logging.h
+base/memory/ref_counted.o: base/logging.h base/debug/debugger.h
 base/callback_internal.o: base/callback_internal.h base/base_export.h
 base/callback_internal.o: base/memory/ref_counted.h base/atomic_ref_count.h
 base/callback_internal.o: base/atomicops.h base/basictypes.h
@@ -3939,6 +3947,7 @@ base/callback_internal.o: /usr/include/sys/types.h /usr/include/bits/types.h
 base/callback_internal.o: /usr/include/bits/typesizes.h /usr/include/time.h
 base/callback_internal.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/callback_internal.o: base/template_util.h base/logging.h
+base/callback_internal.o: base/debug/debugger.h
 base/message_loop_proxy.o: base/message_loop_proxy.h base/base_export.h
 base/message_loop_proxy.o: base/compiler_specific.h build/build_config.h
 base/message_loop_proxy.o: base/memory/ref_counted.h base/atomic_ref_count.h
@@ -3974,11 +3983,8 @@ base/message_loop_proxy.o: /usr/include/bits/waitstatus.h
 base/message_loop_proxy.o: /usr/include/sys/types.h
 base/message_loop_proxy.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/message_loop_proxy.o: base/template_util.h base/memory/weak_ptr.h
-base/message_loop_proxy.o: base/logging.h base/threading/thread_checker.h
-base/message_loop_proxy.o: base/threading/thread_checker_impl.h
-base/message_loop_proxy.o: base/synchronization/lock.h
-base/message_loop_proxy.o: base/synchronization/lock_impl.h
-base/message_loop_proxy.o: base/threading/platform_thread.h
+base/message_loop_proxy.o: base/logging.h base/debug/debugger.h
+base/message_loop_proxy.o: base/threading/thread_checker.h
 base/message_loop_proxy.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/message_loop_proxy.o: base/tuple.h
 base/atomicops_internals_x86_gcc.o: /usr/include/string.h
@@ -4019,6 +4025,7 @@ base/threading/thread_collision_warner.o: /usr/include/bits/wchar.h
 base/threading/thread_collision_warner.o: base/base_export.h
 base/threading/thread_collision_warner.o: base/compiler_specific.h
 base/threading/thread_collision_warner.o: base/logging.h
+base/threading/thread_collision_warner.o: base/debug/debugger.h
 base/threading/thread_collision_warner.o: base/threading/platform_thread.h
 base/threading/thread_collision_warner.o: base/time.h /usr/include/time.h
 base/threading/thread_collision_warner.o: /usr/include/bits/types.h
@@ -4053,6 +4060,7 @@ base/threading/platform_thread_posix.o: /usr/include/asm-generic/errno-base.h
 base/threading/platform_thread_posix.o: /usr/include/sched.h
 base/threading/platform_thread_posix.o: /usr/include/bits/sched.h
 base/threading/platform_thread_posix.o: base/lazy_instance.h base/logging.h
+base/threading/platform_thread_posix.o: base/debug/debugger.h
 base/threading/platform_thread_posix.o: base/memory/aligned_memory.h
 base/threading/platform_thread_posix.o: base/compiler_specific.h
 base/threading/platform_thread_posix.o: /usr/include/stdlib.h
@@ -4097,6 +4105,7 @@ base/time.o: /usr/include/bits/endian.h /usr/include/bits/sys_errlist.h
 base/time.o: base/string_piece.h base/hash_tables.h
 base/time.o: base/third_party/nspr/prtime.h base/third_party/nspr/prtypes.h
 base/time.o: base/third_party/nspr/prcpucfg.h base/logging.h
+base/time.o: base/debug/debugger.h
 base/third_party/nspr/prtime.o: base/logging.h base/base_export.h
 base/third_party/nspr/prtime.o: base/basictypes.h /usr/include/limits.h
 base/third_party/nspr/prtime.o: /usr/include/features.h
@@ -4113,6 +4122,7 @@ base/third_party/nspr/prtime.o: /usr/include/bits/stdio_lim.h
 base/third_party/nspr/prtime.o: /usr/include/string.h base/port.h
 base/third_party/nspr/prtime.o: build/build_config.h /usr/include/stdint.h
 base/third_party/nspr/prtime.o: /usr/include/bits/wchar.h
+base/third_party/nspr/prtime.o: base/debug/debugger.h
 base/third_party/nspr/prtime.o: base/third_party/nspr/prtime.h
 base/third_party/nspr/prtime.o: base/third_party/nspr/prtypes.h
 base/third_party/nspr/prtime.o: base/third_party/nspr/prcpucfg.h
@@ -4144,6 +4154,7 @@ base/time_posix.o: /usr/include/bits/environments.h
 base/time_posix.o: /usr/include/bits/confname.h /usr/include/getopt.h
 base/time_posix.o: /usr/include/ctype.h /usr/include/endian.h
 base/time_posix.o: /usr/include/bits/endian.h base/logging.h
+base/time_posix.o: base/debug/debugger.h
 base/message_loop_proxy_impl.o: base/message_loop_proxy_impl.h
 base/message_loop_proxy_impl.o: base/base_export.h base/message_loop.h
 base/message_loop_proxy_impl.o: base/basictypes.h /usr/include/limits.h
@@ -4175,13 +4186,9 @@ base/message_loop_proxy_impl.o: base/task_runner.h base/time.h
 base/message_loop_proxy_impl.o: /usr/include/time.h /usr/include/bits/types.h
 base/message_loop_proxy_impl.o: /usr/include/bits/typesizes.h
 base/message_loop_proxy_impl.o: base/message_pump.h base/observer_list.h
-base/message_loop_proxy_impl.o: base/logging.h base/memory/weak_ptr.h
-base/message_loop_proxy_impl.o: base/template_util.h
+base/message_loop_proxy_impl.o: base/logging.h base/debug/debugger.h
+base/message_loop_proxy_impl.o: base/memory/weak_ptr.h base/template_util.h
 base/message_loop_proxy_impl.o: base/threading/thread_checker.h
-base/message_loop_proxy_impl.o: base/threading/thread_checker_impl.h
-base/message_loop_proxy_impl.o: base/synchronization/lock.h
-base/message_loop_proxy_impl.o: base/synchronization/lock_impl.h
-base/message_loop_proxy_impl.o: base/threading/platform_thread.h
 base/message_loop_proxy_impl.o: base/pending_task.h base/callback.h
 base/message_loop_proxy_impl.o: base/callback_internal.h
 base/message_loop_proxy_impl.o: base/memory/scoped_ptr.h
@@ -4191,6 +4198,9 @@ base/message_loop_proxy_impl.o: /usr/include/bits/waitstatus.h
 base/message_loop_proxy_impl.o: /usr/include/sys/types.h
 base/message_loop_proxy_impl.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/message_loop_proxy_impl.o: base/tracking_info.h
+base/message_loop_proxy_impl.o: base/synchronization/lock.h
+base/message_loop_proxy_impl.o: base/synchronization/lock_impl.h
+base/message_loop_proxy_impl.o: base/threading/platform_thread.h
 base/message_loop_proxy_impl.o: base/threading/thread_restrictions.h
 base/threading/thread_restrictions.o: base/threading/thread_restrictions.h
 base/threading/thread_restrictions.o: base/base_export.h base/basictypes.h
@@ -4222,9 +4232,9 @@ base/lazy_instance.o: /usr/include/bits/xopen_lim.h
 base/lazy_instance.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
 base/lazy_instance.o: base/port.h build/build_config.h /usr/include/stdint.h
 base/lazy_instance.o: /usr/include/bits/wchar.h base/base_export.h
-base/lazy_instance.o: base/logging.h base/memory/aligned_memory.h
-base/lazy_instance.o: base/compiler_specific.h /usr/include/stdlib.h
-base/lazy_instance.o: /usr/include/bits/waitflags.h
+base/lazy_instance.o: base/logging.h base/debug/debugger.h
+base/lazy_instance.o: base/memory/aligned_memory.h base/compiler_specific.h
+base/lazy_instance.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 base/lazy_instance.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/lazy_instance.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
 base/lazy_instance.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
@@ -4267,7 +4277,7 @@ base/threading/thread_local_posix.o: /usr/include/time.h
 base/threading/thread_local_posix.o: /usr/include/bits/sched.h
 base/threading/thread_local_posix.o: /usr/include/bits/pthreadtypes.h
 base/threading/thread_local_posix.o: /usr/include/bits/setjmp.h
-base/threading/thread_local_posix.o: base/logging.h
+base/threading/thread_local_posix.o: base/logging.h base/debug/debugger.h
 base/tracked_objects.o: base/tracked_objects.h base/base_export.h
 base/tracked_objects.o: base/lazy_instance.h base/atomicops.h
 base/tracked_objects.o: base/basictypes.h /usr/include/limits.h
@@ -4282,9 +4292,9 @@ base/tracked_objects.o: /usr/include/bits/xopen_lim.h
 base/tracked_objects.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
 base/tracked_objects.o: base/port.h build/build_config.h
 base/tracked_objects.o: /usr/include/stdint.h /usr/include/bits/wchar.h
-base/tracked_objects.o: base/logging.h base/memory/aligned_memory.h
-base/tracked_objects.o: base/compiler_specific.h /usr/include/stdlib.h
-base/tracked_objects.o: /usr/include/bits/waitflags.h
+base/tracked_objects.o: base/logging.h base/debug/debugger.h
+base/tracked_objects.o: base/memory/aligned_memory.h base/compiler_specific.h
+base/tracked_objects.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 base/tracked_objects.o: /usr/include/bits/waitstatus.h
 base/tracked_objects.o: /usr/include/sys/types.h /usr/include/bits/types.h
 base/tracked_objects.o: /usr/include/bits/typesizes.h /usr/include/time.h
@@ -4329,7 +4339,7 @@ base/synchronization/lock_impl_posix.o: /usr/include/linux/errno.h
 base/synchronization/lock_impl_posix.o: /usr/include/asm/errno.h
 base/synchronization/lock_impl_posix.o: /usr/include/asm-generic/errno.h
 base/synchronization/lock_impl_posix.o: /usr/include/asm-generic/errno-base.h
-base/synchronization/lock_impl_posix.o: base/logging.h
+base/synchronization/lock_impl_posix.o: base/logging.h base/debug/debugger.h
 base/synchronization/lock.o: base/synchronization/lock.h base/base_export.h
 base/synchronization/lock.o: base/synchronization/lock_impl.h
 base/synchronization/lock.o: build/build_config.h base/basictypes.h
@@ -4349,7 +4359,7 @@ base/synchronization/lock.o: /usr/include/stdint.h /usr/include/bits/wchar.h
 base/synchronization/lock.o: base/threading/platform_thread.h base/time.h
 base/synchronization/lock.o: /usr/include/time.h /usr/include/bits/types.h
 base/synchronization/lock.o: /usr/include/bits/typesizes.h base/atomicops.h
-base/synchronization/lock.o: base/logging.h
+base/synchronization/lock.o: base/logging.h base/debug/debugger.h
 base/message_loop.o: base/message_loop.h base/base_export.h base/basictypes.h
 base/message_loop.o: /usr/include/limits.h /usr/include/features.h
 base/message_loop.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
@@ -4374,19 +4384,18 @@ base/message_loop.o: base/sequenced_task_runner_helpers.h base/task_runner.h
 base/message_loop.o: base/time.h /usr/include/time.h
 base/message_loop.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
 base/message_loop.o: base/message_pump.h base/observer_list.h base/logging.h
-base/message_loop.o: base/memory/weak_ptr.h base/template_util.h
-base/message_loop.o: base/threading/thread_checker.h
-base/message_loop.o: base/threading/thread_checker_impl.h
-base/message_loop.o: base/synchronization/lock.h
-base/message_loop.o: base/synchronization/lock_impl.h
-base/message_loop.o: base/threading/platform_thread.h base/pending_task.h
-base/message_loop.o: base/callback.h base/callback_internal.h
-base/message_loop.o: base/memory/scoped_ptr.h /usr/include/assert.h
-base/message_loop.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+base/message_loop.o: base/debug/debugger.h base/memory/weak_ptr.h
+base/message_loop.o: base/template_util.h base/threading/thread_checker.h
+base/message_loop.o: base/pending_task.h base/callback.h
+base/message_loop.o: base/callback_internal.h base/memory/scoped_ptr.h
+base/message_loop.o: /usr/include/assert.h /usr/include/stdlib.h
+base/message_loop.o: /usr/include/bits/waitflags.h
 base/message_loop.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/message_loop.o: /usr/include/bits/pthreadtypes.h base/move.h
-base/message_loop.o: base/tracking_info.h base/bind.h base/bind_internal.h
-base/message_loop.o: base/bind_helpers.h
+base/message_loop.o: base/tracking_info.h base/synchronization/lock.h
+base/message_loop.o: base/synchronization/lock_impl.h
+base/message_loop.o: base/threading/platform_thread.h base/bind.h
+base/message_loop.o: base/bind_internal.h base/bind_helpers.h
 base/message_loop.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/message_loop.o: base/tuple.h base/lazy_instance.h
 base/message_loop.o: base/memory/aligned_memory.h
@@ -4425,17 +4434,17 @@ base/run_loop.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/run_loop.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
 base/run_loop.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 base/run_loop.o: base/move.h base/template_util.h base/memory/weak_ptr.h
-base/run_loop.o: base/logging.h base/threading/thread_checker.h
-base/run_loop.o: base/threading/thread_checker_impl.h
-base/run_loop.o: base/synchronization/lock.h base/synchronization/lock_impl.h
-base/run_loop.o: base/threading/platform_thread.h base/time.h
-base/run_loop.o: base/message_loop.h base/location.h
-base/run_loop.o: base/message_loop_proxy.h base/single_thread_task_runner.h
+base/run_loop.o: base/logging.h base/debug/debugger.h
+base/run_loop.o: base/threading/thread_checker.h base/message_loop.h
+base/run_loop.o: base/location.h base/message_loop_proxy.h
+base/run_loop.o: base/single_thread_task_runner.h
 base/run_loop.o: base/sequenced_task_runner.h
 base/run_loop.o: base/sequenced_task_runner_helpers.h base/task_runner.h
-base/run_loop.o: base/message_pump.h base/observer_list.h base/pending_task.h
-base/run_loop.o: base/tracking_info.h base/bind.h base/bind_internal.h
-base/run_loop.o: base/bind_helpers.h
+base/run_loop.o: base/time.h base/message_pump.h base/observer_list.h
+base/run_loop.o: base/pending_task.h base/tracking_info.h
+base/run_loop.o: base/synchronization/lock.h base/synchronization/lock_impl.h
+base/run_loop.o: base/threading/platform_thread.h base/bind.h
+base/run_loop.o: base/bind_internal.h base/bind_helpers.h
 base/run_loop.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/run_loop.o: base/tuple.h
 base/pending_task.o: base/pending_task.h base/base_export.h base/callback.h
@@ -4464,7 +4473,7 @@ base/pending_task.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 base/pending_task.o: base/move.h base/template_util.h base/location.h
 base/pending_task.o: base/time.h base/tracking_info.h base/tracked_objects.h
 base/pending_task.o: base/lazy_instance.h base/logging.h
-base/pending_task.o: base/memory/aligned_memory.h
+base/pending_task.o: base/debug/debugger.h base/memory/aligned_memory.h
 base/pending_task.o: base/threading/thread_restrictions.h
 base/pending_task.o: base/profiler/alternate_timer.h
 base/pending_task.o: base/profiler/tracked_time.h base/synchronization/lock.h
@@ -4490,7 +4499,7 @@ base/metrics/statistics_recorder.o: build/build_config.h
 base/metrics/statistics_recorder.o: /usr/include/stdint.h
 base/metrics/statistics_recorder.o: /usr/include/bits/wchar.h
 base/metrics/statistics_recorder.o: base/lazy_instance.h base/atomicops.h
-base/metrics/statistics_recorder.o: base/logging.h
+base/metrics/statistics_recorder.o: base/logging.h base/debug/debugger.h
 base/metrics/statistics_recorder.o: base/memory/aligned_memory.h
 base/metrics/statistics_recorder.o: base/compiler_specific.h
 base/metrics/statistics_recorder.o: /usr/include/stdlib.h
@@ -4531,9 +4540,9 @@ base/metrics/histogram.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
 base/metrics/histogram.o: base/port.h build/build_config.h
 base/metrics/histogram.o: /usr/include/stdint.h /usr/include/bits/wchar.h
 base/metrics/histogram.o: base/base_export.h base/compiler_specific.h
-base/metrics/histogram.o: base/logging.h base/memory/scoped_ptr.h
-base/metrics/histogram.o: /usr/include/assert.h /usr/include/stdlib.h
-base/metrics/histogram.o: /usr/include/bits/waitflags.h
+base/metrics/histogram.o: base/logging.h base/debug/debugger.h
+base/metrics/histogram.o: base/memory/scoped_ptr.h /usr/include/assert.h
+base/metrics/histogram.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 base/metrics/histogram.o: /usr/include/bits/waitstatus.h
 base/metrics/histogram.o: /usr/include/sys/types.h /usr/include/bits/types.h
 base/metrics/histogram.o: /usr/include/bits/typesizes.h /usr/include/time.h
@@ -4575,18 +4584,12 @@ base/memory/weak_ptr.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
 base/memory/weak_ptr.o: base/port.h build/build_config.h
 base/memory/weak_ptr.o: /usr/include/stdint.h /usr/include/bits/wchar.h
 base/memory/weak_ptr.o: base/base_export.h base/logging.h
-base/memory/weak_ptr.o: base/memory/ref_counted.h base/atomic_ref_count.h
-base/memory/weak_ptr.o: base/atomicops.h
+base/memory/weak_ptr.o: base/debug/debugger.h base/memory/ref_counted.h
+base/memory/weak_ptr.o: base/atomic_ref_count.h base/atomicops.h
 base/memory/weak_ptr.o: base/third_party/dynamic_annotations/dynamic_annotations.h
 base/memory/weak_ptr.o: base/compiler_specific.h
 base/memory/weak_ptr.o: base/threading/thread_collision_warner.h
 base/memory/weak_ptr.o: base/template_util.h base/threading/thread_checker.h
-base/memory/weak_ptr.o: base/threading/thread_checker_impl.h
-base/memory/weak_ptr.o: base/synchronization/lock.h
-base/memory/weak_ptr.o: base/synchronization/lock_impl.h
-base/memory/weak_ptr.o: base/threading/platform_thread.h base/time.h
-base/memory/weak_ptr.o: /usr/include/time.h /usr/include/bits/types.h
-base/memory/weak_ptr.o: /usr/include/bits/typesizes.h
 base/tracking_info.o: base/tracking_info.h base/time.h /usr/include/time.h
 base/tracking_info.o: /usr/include/bits/types.h /usr/include/features.h
 base/tracking_info.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
@@ -4602,9 +4605,9 @@ base/tracking_info.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
 base/tracking_info.o: base/port.h build/build_config.h /usr/include/stdint.h
 base/tracking_info.o: /usr/include/bits/wchar.h base/base_export.h
 base/tracking_info.o: base/tracked_objects.h base/lazy_instance.h
-base/tracking_info.o: base/logging.h base/memory/aligned_memory.h
-base/tracking_info.o: base/compiler_specific.h /usr/include/stdlib.h
-base/tracking_info.o: /usr/include/bits/waitflags.h
+base/tracking_info.o: base/logging.h base/debug/debugger.h
+base/tracking_info.o: base/memory/aligned_memory.h base/compiler_specific.h
+base/tracking_info.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 base/tracking_info.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/tracking_info.o: /usr/include/bits/pthreadtypes.h
 base/tracking_info.o: base/third_party/dynamic_annotations/dynamic_annotations.h
@@ -4638,6 +4641,7 @@ base/thread_task_runner_handle.o: base/third_party/dynamic_annotations/dynamic_a
 base/thread_task_runner_handle.o: base/compiler_specific.h
 base/thread_task_runner_handle.o: base/threading/thread_collision_warner.h
 base/thread_task_runner_handle.o: base/lazy_instance.h base/logging.h
+base/thread_task_runner_handle.o: base/debug/debugger.h
 base/thread_task_runner_handle.o: base/memory/aligned_memory.h
 base/thread_task_runner_handle.o: /usr/include/stdlib.h
 base/thread_task_runner_handle.o: /usr/include/bits/waitflags.h
@@ -4677,7 +4681,7 @@ base/message_pump_default.o: base/time.h /usr/include/time.h
 base/message_pump_default.o: /usr/include/bits/types.h
 base/message_pump_default.o: /usr/include/bits/typesizes.h
 base/message_pump_default.o: base/synchronization/waitable_event.h
-base/message_pump_default.o: base/logging.h
+base/message_pump_default.o: base/logging.h base/debug/debugger.h
 base/pickle.o: base/pickle.h base/base_export.h base/basictypes.h
 base/pickle.o: /usr/include/limits.h /usr/include/features.h
 base/pickle.o: /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h
@@ -4687,8 +4691,8 @@ base/pickle.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
 base/pickle.o: /usr/include/bits/xopen_lim.h /usr/include/bits/stdio_lim.h
 base/pickle.o: /usr/include/string.h base/port.h build/build_config.h
 base/pickle.o: /usr/include/stdint.h /usr/include/bits/wchar.h
-base/pickle.o: base/compiler_specific.h base/logging.h base/string16.h
-base/pickle.o: /usr/include/stdio.h /usr/include/bits/types.h
+base/pickle.o: base/compiler_specific.h base/logging.h base/debug/debugger.h
+base/pickle.o: base/string16.h /usr/include/stdio.h /usr/include/bits/types.h
 base/pickle.o: /usr/include/bits/typesizes.h /usr/include/libio.h
 base/pickle.o: /usr/include/_G_config.h /usr/include/wchar.h
 base/pickle.o: /usr/include/wctype.h /usr/include/endian.h
@@ -4741,6 +4745,7 @@ base/metrics/sample_vector.o: base/move.h base/template_util.h
 base/metrics/sample_vector.o: base/metrics/histogram_base.h
 base/metrics/sample_vector.o: base/base_export.h
 base/metrics/sample_vector.o: base/metrics/histogram_samples.h base/logging.h
+base/metrics/sample_vector.o: base/debug/debugger.h
 base/metrics/sample_vector.o: base/metrics/bucket_ranges.h
 base/metrics/bucket_ranges.o: base/metrics/bucket_ranges.h base/base_export.h
 base/metrics/bucket_ranges.o: base/basictypes.h /usr/include/limits.h
@@ -4759,6 +4764,7 @@ base/metrics/bucket_ranges.o: /usr/include/string.h base/port.h
 base/metrics/bucket_ranges.o: build/build_config.h /usr/include/stdint.h
 base/metrics/bucket_ranges.o: /usr/include/bits/wchar.h
 base/metrics/bucket_ranges.o: base/metrics/histogram_base.h base/logging.h
+base/metrics/bucket_ranges.o: base/debug/debugger.h
 base/location.o: build/build_config.h base/location.h base/base_export.h
 base/location.o: base/basictypes.h /usr/include/limits.h
 base/location.o: /usr/include/features.h /usr/include/sys/cdefs.h
@@ -4796,6 +4802,7 @@ base/threading/thread_local_storage_posix.o: base/port.h build/build_config.h
 base/threading/thread_local_storage_posix.o: /usr/include/stdint.h
 base/threading/thread_local_storage_posix.o: /usr/include/bits/wchar.h
 base/threading/thread_local_storage_posix.o: base/logging.h
+base/threading/thread_local_storage_posix.o: base/debug/debugger.h
 base/profiler/tracked_time.o: base/profiler/tracked_time.h base/base_export.h
 base/profiler/tracked_time.o: base/basictypes.h /usr/include/limits.h
 base/profiler/tracked_time.o: /usr/include/features.h
@@ -4831,6 +4838,7 @@ base/profiler/alternate_timer.o: /usr/include/bits/stdio_lim.h
 base/profiler/alternate_timer.o: /usr/include/string.h base/port.h
 base/profiler/alternate_timer.o: build/build_config.h /usr/include/stdint.h
 base/profiler/alternate_timer.o: /usr/include/bits/wchar.h
+base/profiler/alternate_timer.o: base/debug/debugger.h
 base/threading/thread_checker_impl.o: base/threading/thread_checker_impl.h
 base/threading/thread_checker_impl.o: base/base_export.h
 base/threading/thread_checker_impl.o: base/synchronization/lock.h
@@ -4875,6 +4883,7 @@ base/synchronization/waitable_event_posix.o: /usr/include/string.h
 base/synchronization/waitable_event_posix.o: base/port.h build/build_config.h
 base/synchronization/waitable_event_posix.o: /usr/include/stdint.h
 base/synchronization/waitable_event_posix.o: /usr/include/bits/wchar.h
+base/synchronization/waitable_event_posix.o: base/debug/debugger.h
 base/synchronization/waitable_event_posix.o: base/synchronization/waitable_event.h
 base/synchronization/waitable_event_posix.o: base/synchronization/condition_variable.h
 base/synchronization/waitable_event_posix.o: base/synchronization/lock.h
@@ -4925,6 +4934,7 @@ base/synchronization/condition_variable_posix.o: /usr/include/sys/select.h
 base/synchronization/condition_variable_posix.o: /usr/include/bits/select.h
 base/synchronization/condition_variable_posix.o: /usr/include/bits/sigset.h
 base/synchronization/condition_variable_posix.o: base/logging.h
+base/synchronization/condition_variable_posix.o: base/debug/debugger.h
 base/synchronization/condition_variable_posix.o: base/threading/thread_restrictions.h
 base/message_pump.o: base/message_pump.h base/base_export.h
 base/message_pump.o: base/memory/ref_counted.h base/atomic_ref_count.h
@@ -4971,8 +4981,9 @@ base/metrics/histogram_samples.o: /usr/include/time.h
 base/metrics/histogram_samples.o: /usr/include/bits/pthreadtypes.h
 base/metrics/histogram_samples.o: base/compiler_specific.h base/move.h
 base/metrics/histogram_samples.o: base/template_util.h base/pickle.h
-base/metrics/histogram_samples.o: base/logging.h base/string16.h
-base/metrics/histogram_samples.o: /usr/include/stdio.h /usr/include/libio.h
+base/metrics/histogram_samples.o: base/logging.h base/debug/debugger.h
+base/metrics/histogram_samples.o: base/string16.h /usr/include/stdio.h
+base/metrics/histogram_samples.o: /usr/include/libio.h
 base/metrics/histogram_samples.o: /usr/include/_G_config.h
 base/metrics/histogram_samples.o: /usr/include/wchar.h /usr/include/wctype.h
 base/metrics/histogram_samples.o: /usr/include/endian.h
@@ -5006,19 +5017,18 @@ base/threading/thread.o: base/task_runner.h base/time.h /usr/include/time.h
 base/threading/thread.o: /usr/include/bits/types.h
 base/threading/thread.o: /usr/include/bits/typesizes.h base/message_pump.h
 base/threading/thread.o: base/observer_list.h base/logging.h
-base/threading/thread.o: base/memory/weak_ptr.h base/template_util.h
-base/threading/thread.o: base/threading/thread_checker.h
-base/threading/thread.o: base/threading/thread_checker_impl.h
-base/threading/thread.o: base/synchronization/lock.h
-base/threading/thread.o: base/synchronization/lock_impl.h
-base/threading/thread.o: base/threading/platform_thread.h base/pending_task.h
-base/threading/thread.o: base/callback.h base/callback_internal.h
-base/threading/thread.o: base/memory/scoped_ptr.h /usr/include/assert.h
-base/threading/thread.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+base/threading/thread.o: base/debug/debugger.h base/memory/weak_ptr.h
+base/threading/thread.o: base/template_util.h base/threading/thread_checker.h
+base/threading/thread.o: base/pending_task.h base/callback.h
+base/threading/thread.o: base/callback_internal.h base/memory/scoped_ptr.h
+base/threading/thread.o: /usr/include/assert.h /usr/include/stdlib.h
+base/threading/thread.o: /usr/include/bits/waitflags.h
 base/threading/thread.o: /usr/include/bits/waitstatus.h
 base/threading/thread.o: /usr/include/sys/types.h
 base/threading/thread.o: /usr/include/bits/pthreadtypes.h base/move.h
-base/threading/thread.o: base/tracking_info.h base/bind.h
+base/threading/thread.o: base/tracking_info.h base/synchronization/lock.h
+base/threading/thread.o: base/synchronization/lock_impl.h
+base/threading/thread.o: base/threading/platform_thread.h base/bind.h
 base/threading/thread.o: base/bind_internal.h base/bind_helpers.h
 base/threading/thread.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/threading/thread.o: base/tuple.h base/lazy_instance.h
@@ -5048,6 +5058,7 @@ base/profiler/scoped_profile.o: /usr/include/time.h /usr/include/bits/types.h
 base/profiler/scoped_profile.o: /usr/include/bits/typesizes.h
 base/profiler/scoped_profile.o: base/atomicops.h base/tracked_objects.h
 base/profiler/scoped_profile.o: base/lazy_instance.h base/logging.h
+base/profiler/scoped_profile.o: base/debug/debugger.h
 base/profiler/scoped_profile.o: base/memory/aligned_memory.h
 base/profiler/scoped_profile.o: base/compiler_specific.h
 base/profiler/scoped_profile.o: /usr/include/stdlib.h
@@ -5118,9 +5129,8 @@ base/at_exit.o: base/move.h base/template_util.h base/synchronization/lock.h
 base/at_exit.o: base/synchronization/lock_impl.h
 base/at_exit.o: base/threading/platform_thread.h base/time.h base/bind.h
 base/at_exit.o: base/bind_internal.h base/bind_helpers.h
-base/at_exit.o: base/memory/weak_ptr.h base/logging.h
+base/at_exit.o: base/memory/weak_ptr.h base/logging.h base/debug/debugger.h
 base/at_exit.o: base/threading/thread_checker.h
-base/at_exit.o: base/threading/thread_checker_impl.h
 base/at_exit.o: base/memory/raw_scoped_refptr_mismatch_checker.h base/tuple.h
 chrome/common/automation_constants.o: chrome/common/automation_constants.h
 chrome/test/webdriver/webdriver_capabilities_parser.o: chrome/test/webdriver/webdriver_capabilities_parser.h
@@ -5189,6 +5199,34 @@ chrome/test/webdriver/webdriver_capabilities_parser.o: content/common/content_ex
 chrome/test/webdriver/webdriver_capabilities_parser.o: chrome/test/webdriver/webdriver_error.h
 chrome/test/webdriver/webdriver_capabilities_parser.o: chrome/test/webdriver/webdriver_util.h
 chrome/test/webdriver/webdriver_capabilities_parser.o: chrome/test/automation/value_conversion_traits.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/QDebug
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qdebug.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qalgorithms.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qglobal.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qconfig.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qhash.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qatomic.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qbasicatomic.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qatomic_arch.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qatomic_i386.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qchar.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qiterator.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qlist.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qpair.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qdatastream.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qscopedpointer.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qiodevice.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qobject.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qobjectdefs.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qnamespace.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qstring.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qbytearray.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qmap.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtextstream.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qlocale.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qvector.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qset.h
+chrome/test/webdriver/webdriver_capabilities_parser.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qcontiguouscache.h
 chrome/test/webdriver/webdriver_logging.o: chrome/test/webdriver/webdriver_logging.h
 chrome/test/webdriver/webdriver_logging.o: base/basictypes.h
 chrome/test/webdriver/webdriver_logging.o: /usr/include/limits.h
@@ -5238,6 +5276,7 @@ chrome/test/webdriver/webdriver_logging.o: base/synchronization/lock.h
 chrome/test/webdriver/webdriver_logging.o: base/synchronization/lock_impl.h
 chrome/test/webdriver/webdriver_logging.o: base/threading/platform_thread.h
 chrome/test/webdriver/webdriver_logging.o: base/values.h base/logging.h
+chrome/test/webdriver/webdriver_logging.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_logging.o: base/string_number_conversions.h
 chrome/test/webdriver/webdriver_logging.o: base/string_util.h
 chrome/test/webdriver/webdriver_logging.o: /usr/include/ctype.h
@@ -5266,7 +5305,8 @@ base/file_util.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/file_util.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 base/file_util.o: base/move.h base/template_util.h base/platform_file.h
 base/file_util.o: base/time.h base/atomicops.h base/logging.h
-base/file_util.o: base/stringprintf.h base/string_util.h /usr/include/ctype.h
+base/file_util.o: base/debug/debugger.h base/stringprintf.h
+base/file_util.o: base/string_util.h /usr/include/ctype.h
 base/file_util.o: base/utf_string_conversions.h
 base/logging.o: base/logging.h base/base_export.h base/basictypes.h
 base/logging.o: /usr/include/limits.h /usr/include/features.h
@@ -5277,13 +5317,14 @@ base/logging.o: /usr/include/linux/limits.h /usr/include/bits/posix2_lim.h
 base/logging.o: /usr/include/bits/xopen_lim.h /usr/include/bits/stdio_lim.h
 base/logging.o: /usr/include/string.h base/port.h build/build_config.h
 base/logging.o: /usr/include/stdint.h /usr/include/bits/wchar.h
-base/logging.o: base/base_switches.h base/debug/alias.h base/eintr_wrapper.h
-base/logging.o: base/string_piece.h base/hash_tables.h base/string16.h
-base/logging.o: /usr/include/stdio.h /usr/include/bits/types.h
-base/logging.o: /usr/include/bits/typesizes.h /usr/include/libio.h
-base/logging.o: /usr/include/_G_config.h /usr/include/wchar.h
-base/logging.o: /usr/include/wctype.h /usr/include/endian.h
-base/logging.o: /usr/include/bits/endian.h /usr/include/bits/sys_errlist.h
+base/logging.o: base/debug/debugger.h base/base_switches.h base/debug/alias.h
+base/logging.o: base/eintr_wrapper.h base/string_piece.h base/hash_tables.h
+base/logging.o: base/string16.h /usr/include/stdio.h
+base/logging.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
+base/logging.o: /usr/include/libio.h /usr/include/_G_config.h
+base/logging.o: /usr/include/wchar.h /usr/include/wctype.h
+base/logging.o: /usr/include/endian.h /usr/include/bits/endian.h
+base/logging.o: /usr/include/bits/sys_errlist.h
 base/logging.o: base/synchronization/lock_impl.h
 base/logging.o: base/threading/platform_thread.h base/time.h
 base/logging.o: /usr/include/time.h base/atomicops.h
@@ -5334,7 +5375,8 @@ base/file_util_posix.o: /usr/include/unistd.h /usr/include/bits/posix_opt.h
 base/file_util_posix.o: /usr/include/bits/environments.h
 base/file_util_posix.o: /usr/include/bits/confname.h /usr/include/getopt.h
 base/file_util_posix.o: /usr/include/ctype.h base/eintr_wrapper.h
-base/file_util_posix.o: base/logging.h base/memory/singleton.h base/at_exit.h
+base/file_util_posix.o: base/logging.h base/debug/debugger.h
+base/file_util_posix.o: base/memory/singleton.h base/at_exit.h
 base/file_util_posix.o: base/callback.h base/callback_forward.h
 base/file_util_posix.o: base/callback_internal.h base/memory/ref_counted.h
 base/file_util_posix.o: base/atomic_ref_count.h
@@ -5366,9 +5408,9 @@ base/file_path.o: /usr/include/bits/local_lim.h /usr/include/linux/limits.h
 base/file_path.o: /usr/include/bits/posix2_lim.h
 base/file_path.o: /usr/include/bits/xopen_lim.h /usr/include/string.h
 base/file_path.o: base/port.h /usr/include/stdint.h base/string_piece.h
-base/file_path.o: base/logging.h base/pickle.h base/string_util.h
-base/file_path.o: /usr/include/ctype.h base/sys_string_conversions.h
-base/file_path.o: base/utf_string_conversions.h
+base/file_path.o: base/logging.h base/debug/debugger.h base/pickle.h
+base/file_path.o: base/string_util.h /usr/include/ctype.h
+base/file_path.o: base/sys_string_conversions.h base/utf_string_conversions.h
 base/string_util.o: base/string_util.h /usr/include/ctype.h
 base/string_util.o: /usr/include/features.h /usr/include/sys/cdefs.h
 base/string_util.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
@@ -5399,10 +5441,11 @@ base/string_util.o: /usr/include/bits/mathcalls.h /usr/include/stdlib.h
 base/string_util.o: /usr/include/bits/waitflags.h
 base/string_util.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/string_util.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
-base/string_util.o: base/logging.h base/memory/singleton.h base/at_exit.h
-base/string_util.o: base/callback.h base/callback_forward.h
-base/string_util.o: base/callback_internal.h base/memory/ref_counted.h
-base/string_util.o: base/atomic_ref_count.h base/atomicops.h
+base/string_util.o: base/logging.h base/debug/debugger.h
+base/string_util.o: base/memory/singleton.h base/at_exit.h base/callback.h
+base/string_util.o: base/callback_forward.h base/callback_internal.h
+base/string_util.o: base/memory/ref_counted.h base/atomic_ref_count.h
+base/string_util.o: base/atomicops.h
 base/string_util.o: base/third_party/dynamic_annotations/dynamic_annotations.h
 base/string_util.o: base/threading/thread_collision_warner.h
 base/string_util.o: base/memory/scoped_ptr.h /usr/include/assert.h
@@ -5455,6 +5498,7 @@ base/platform_file_posix.o: /usr/include/bits/environments.h
 base/platform_file_posix.o: /usr/include/bits/confname.h
 base/platform_file_posix.o: /usr/include/getopt.h /usr/include/ctype.h
 base/platform_file_posix.o: base/eintr_wrapper.h base/logging.h
+base/platform_file_posix.o: base/debug/debugger.h
 base/platform_file_posix.o: base/threading/thread_restrictions.h
 base/platform_file_posix.o: base/utf_string_conversions.h
 base/platform_file.o: base/platform_file.h build/build_config.h
@@ -5564,8 +5608,9 @@ base/command_line.o: /usr/include/libio.h /usr/include/_G_config.h
 base/command_line.o: /usr/include/wchar.h /usr/include/wctype.h
 base/command_line.o: /usr/include/endian.h /usr/include/bits/endian.h
 base/command_line.o: /usr/include/bits/sys_errlist.h base/string_piece.h
-base/command_line.o: base/logging.h base/string_split.h base/string_util.h
-base/command_line.o: /usr/include/ctype.h base/utf_string_conversions.h
+base/command_line.o: base/logging.h base/debug/debugger.h base/string_split.h
+base/command_line.o: base/string_util.h /usr/include/ctype.h
+base/command_line.o: base/utf_string_conversions.h
 third_party/modp_b64/modp_b64.o: third_party/modp_b64/modp_b64.h
 third_party/modp_b64/modp_b64.o: third_party/modp_b64/modp_b64_data.h
 third_party/modp_b64/modp_b64.o: build/build_config.h /usr/include/stdint.h
@@ -5605,14 +5650,11 @@ net/base/net_log.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 net/base/net_log.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 net/base/net_log.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 net/base/net_log.o: base/move.h base/template_util.h base/memory/weak_ptr.h
-net/base/net_log.o: base/logging.h base/threading/thread_checker.h
-net/base/net_log.o: base/threading/thread_checker_impl.h
-net/base/net_log.o: base/synchronization/lock.h
-net/base/net_log.o: base/synchronization/lock_impl.h
-net/base/net_log.o: base/threading/platform_thread.h base/time.h
+net/base/net_log.o: base/logging.h base/debug/debugger.h
+net/base/net_log.o: base/threading/thread_checker.h
 net/base/net_log.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 net/base/net_log.o: base/tuple.h base/string_number_conversions.h
-net/base/net_log.o: base/string_piece.h base/hash_tables.h
+net/base/net_log.o: base/string_piece.h base/hash_tables.h base/time.h
 net/base/net_log.o: base/utf_string_conversions.h base/values.h
 net/base/net_log.o: net/base/net_errors.h base/platform_file.h
 net/base/net_log.o: base/file_path.h net/base/net_error_list.h
@@ -5652,11 +5694,7 @@ net/base/file_stream.o: /usr/include/bits/pthreadtypes.h base/move.h
 net/base/file_stream.o: base/template_util.h base/cancelable_callback.h
 net/base/file_stream.o: base/bind.h base/bind_internal.h base/bind_helpers.h
 net/base/file_stream.o: base/memory/weak_ptr.h base/logging.h
-net/base/file_stream.o: base/threading/thread_checker.h
-net/base/file_stream.o: base/threading/thread_checker_impl.h
-net/base/file_stream.o: base/synchronization/lock.h
-net/base/file_stream.o: base/synchronization/lock_impl.h
-net/base/file_stream.o: base/threading/platform_thread.h
+net/base/file_stream.o: base/debug/debugger.h base/threading/thread_checker.h
 net/base/file_stream.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 net/base/file_stream.o: base/tuple.h net/base/file_stream_whence.h
 net/base/file_stream.o: net/base/net_export.h net/base/net_log.h
@@ -5686,8 +5724,9 @@ net/base/net_errors.o: /usr/include/bits/sys_errlist.h base/string_piece.h
 net/base/net_errors.o: base/time.h /usr/include/time.h base/atomicops.h
 net/base/net_errors.o: net/base/net_export.h net/base/net_error_list.h
 net/base/net_errors.o: base/metrics/histogram.h base/logging.h
-net/base/net_errors.o: base/memory/scoped_ptr.h /usr/include/assert.h
-net/base/net_errors.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
+net/base/net_errors.o: base/debug/debugger.h base/memory/scoped_ptr.h
+net/base/net_errors.o: /usr/include/assert.h /usr/include/stdlib.h
+net/base/net_errors.o: /usr/include/bits/waitflags.h
 net/base/net_errors.o: /usr/include/bits/waitstatus.h
 net/base/net_errors.o: /usr/include/sys/types.h
 net/base/net_errors.o: /usr/include/bits/pthreadtypes.h base/move.h
@@ -5737,7 +5776,8 @@ net/base/net_errors_posix.o: /usr/include/bits/posix_opt.h
 net/base/net_errors_posix.o: /usr/include/bits/environments.h
 net/base/net_errors_posix.o: /usr/include/bits/confname.h
 net/base/net_errors_posix.o: /usr/include/getopt.h /usr/include/ctype.h
-net/base/net_errors_posix.o: base/logging.h base/stringprintf.h
+net/base/net_errors_posix.o: base/logging.h base/debug/debugger.h
+net/base/net_errors_posix.o: base/stringprintf.h
 net/base/io_buffer.o: net/base/io_buffer.h base/memory/ref_counted.h
 net/base/io_buffer.o: base/atomic_ref_count.h base/atomicops.h
 net/base/io_buffer.o: base/basictypes.h /usr/include/limits.h
@@ -5761,10 +5801,11 @@ net/base/io_buffer.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 net/base/io_buffer.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
 net/base/io_buffer.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 net/base/io_buffer.o: base/move.h base/template_util.h base/pickle.h
-net/base/io_buffer.o: base/logging.h base/string16.h /usr/include/stdio.h
-net/base/io_buffer.o: /usr/include/libio.h /usr/include/_G_config.h
-net/base/io_buffer.o: /usr/include/wchar.h /usr/include/wctype.h
-net/base/io_buffer.o: /usr/include/endian.h /usr/include/bits/endian.h
+net/base/io_buffer.o: base/logging.h base/debug/debugger.h base/string16.h
+net/base/io_buffer.o: /usr/include/stdio.h /usr/include/libio.h
+net/base/io_buffer.o: /usr/include/_G_config.h /usr/include/wchar.h
+net/base/io_buffer.o: /usr/include/wctype.h /usr/include/endian.h
+net/base/io_buffer.o: /usr/include/bits/endian.h
 net/base/io_buffer.o: /usr/include/bits/sys_errlist.h net/base/net_export.h
 net/base/file_stream_net_log_parameters.o: net/base/file_stream_net_log_parameters.h
 net/base/file_stream_net_log_parameters.o: net/base/file_stream_metrics.h
@@ -5827,8 +5868,9 @@ net/base/file_stream_metrics.o: /usr/include/bits/stdio_lim.h
 net/base/file_stream_metrics.o: /usr/include/string.h base/port.h
 net/base/file_stream_metrics.o: build/build_config.h /usr/include/stdint.h
 net/base/file_stream_metrics.o: /usr/include/bits/wchar.h base/logging.h
-net/base/file_stream_metrics.o: base/base_export.h base/metrics/histogram.h
-net/base/file_stream_metrics.o: base/atomicops.h base/compiler_specific.h
+net/base/file_stream_metrics.o: base/base_export.h base/debug/debugger.h
+net/base/file_stream_metrics.o: base/metrics/histogram.h base/atomicops.h
+net/base/file_stream_metrics.o: base/compiler_specific.h
 net/base/file_stream_metrics.o: base/memory/scoped_ptr.h
 net/base/file_stream_metrics.o: /usr/include/assert.h /usr/include/stdlib.h
 net/base/file_stream_metrics.o: /usr/include/bits/waitflags.h
@@ -5887,11 +5929,8 @@ net/base/file_stream_posix.o: /usr/include/bits/pthreadtypes.h base/move.h
 net/base/file_stream_posix.o: base/template_util.h base/cancelable_callback.h
 net/base/file_stream_posix.o: base/bind.h base/bind_internal.h
 net/base/file_stream_posix.o: base/bind_helpers.h base/memory/weak_ptr.h
-net/base/file_stream_posix.o: base/logging.h base/threading/thread_checker.h
-net/base/file_stream_posix.o: base/threading/thread_checker_impl.h
-net/base/file_stream_posix.o: base/synchronization/lock.h
-net/base/file_stream_posix.o: base/synchronization/lock_impl.h
-net/base/file_stream_posix.o: base/threading/platform_thread.h
+net/base/file_stream_posix.o: base/logging.h base/debug/debugger.h
+net/base/file_stream_posix.o: base/threading/thread_checker.h
 net/base/file_stream_posix.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 net/base/file_stream_posix.o: base/tuple.h net/base/file_stream_whence.h
 net/base/file_stream_posix.o: net/base/net_export.h net/base/net_log.h
@@ -5916,7 +5955,11 @@ net/base/file_stream_posix.o: base/sequenced_task_runner.h
 net/base/file_stream_posix.o: base/sequenced_task_runner_helpers.h
 net/base/file_stream_posix.o: base/task_runner.h base/message_pump.h
 net/base/file_stream_posix.o: base/observer_list.h base/pending_task.h
-net/base/file_stream_posix.o: base/tracking_info.h base/metrics/histogram.h
+net/base/file_stream_posix.o: base/tracking_info.h
+net/base/file_stream_posix.o: base/synchronization/lock.h
+net/base/file_stream_posix.o: base/synchronization/lock_impl.h
+net/base/file_stream_posix.o: base/threading/platform_thread.h
+net/base/file_stream_posix.o: base/metrics/histogram.h
 net/base/file_stream_posix.o: base/metrics/bucket_ranges.h
 net/base/file_stream_posix.o: base/metrics/histogram_base.h
 net/base/file_stream_posix.o: base/metrics/histogram_samples.h
@@ -5963,20 +6006,20 @@ base/threading/worker_pool.o: /usr/include/bits/typesizes.h
 base/threading/worker_pool.o: /usr/include/time.h
 base/threading/worker_pool.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/threading/worker_pool.o: base/template_util.h base/memory/weak_ptr.h
-base/threading/worker_pool.o: base/logging.h base/threading/thread_checker.h
-base/threading/worker_pool.o: base/threading/thread_checker_impl.h
-base/threading/worker_pool.o: base/synchronization/lock.h
-base/threading/worker_pool.o: base/synchronization/lock_impl.h
-base/threading/worker_pool.o: base/threading/platform_thread.h base/time.h
+base/threading/worker_pool.o: base/logging.h base/debug/debugger.h
+base/threading/worker_pool.o: base/threading/thread_checker.h
 base/threading/worker_pool.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/threading/worker_pool.o: base/tuple.h base/lazy_instance.h
 base/threading/worker_pool.o: base/memory/aligned_memory.h
 base/threading/worker_pool.o: base/threading/thread_restrictions.h
-base/threading/worker_pool.o: base/task_runner.h
+base/threading/worker_pool.o: base/task_runner.h base/time.h
 base/threading/worker_pool.o: base/threading/post_task_and_reply_impl.h
 base/threading/worker_pool.o: base/location.h base/tracked_objects.h
 base/threading/worker_pool.o: base/profiler/alternate_timer.h
 base/threading/worker_pool.o: base/profiler/tracked_time.h
+base/threading/worker_pool.o: base/synchronization/lock.h
+base/threading/worker_pool.o: base/synchronization/lock_impl.h
+base/threading/worker_pool.o: base/threading/platform_thread.h
 base/threading/worker_pool.o: base/threading/thread_local_storage.h
 base/threading/worker_pool.o: base/tracking_info.h
 base/threading/worker_pool_posix.o: base/threading/worker_pool_posix.h
@@ -6024,6 +6067,7 @@ base/threading/worker_pool_posix.o: base/synchronization/lock_impl.h
 base/threading/worker_pool_posix.o: base/threading/platform_thread.h
 base/threading/worker_pool_posix.o: base/tracked_objects.h
 base/threading/worker_pool_posix.o: base/lazy_instance.h base/logging.h
+base/threading/worker_pool_posix.o: base/debug/debugger.h
 base/threading/worker_pool_posix.o: base/memory/aligned_memory.h
 base/threading/worker_pool_posix.o: base/threading/thread_restrictions.h
 base/threading/worker_pool_posix.o: base/profiler/alternate_timer.h
@@ -6033,7 +6077,6 @@ base/threading/worker_pool_posix.o: base/bind.h base/bind_internal.h
 base/threading/worker_pool_posix.o: base/bind_helpers.h
 base/threading/worker_pool_posix.o: base/memory/weak_ptr.h
 base/threading/worker_pool_posix.o: base/threading/thread_checker.h
-base/threading/worker_pool_posix.o: base/threading/thread_checker_impl.h
 base/threading/worker_pool_posix.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 base/threading/worker_pool_posix.o: base/tuple.h base/stringprintf.h
 base/threading/worker_pool_posix.o: base/threading/thread_local.h
@@ -6054,9 +6097,10 @@ base/string_split.o: /usr/include/linux/limits.h
 base/string_split.o: /usr/include/bits/posix2_lim.h
 base/string_split.o: /usr/include/bits/xopen_lim.h /usr/include/string.h
 base/string_split.o: base/port.h build/build_config.h /usr/include/stdint.h
-base/string_split.o: base/logging.h base/string_util.h /usr/include/ctype.h
-base/string_split.o: base/compiler_specific.h base/string_piece.h
-base/string_split.o: base/hash_tables.h base/third_party/icu/icu_utf.h
+base/string_split.o: base/logging.h base/debug/debugger.h base/string_util.h
+base/string_split.o: /usr/include/ctype.h base/compiler_specific.h
+base/string_split.o: base/string_piece.h base/hash_tables.h
+base/string_split.o: base/third_party/icu/icu_utf.h
 base/string_split.o: base/utf_string_conversions.h
 chrome/test/webdriver/commands/webdriver_command.o: chrome/test/webdriver/commands/webdriver_command.h
 chrome/test/webdriver/commands/webdriver_command.o: chrome/test/webdriver/commands/command.h
@@ -6142,9 +6186,9 @@ chrome/test/webdriver/commands/webdriver_command.o: base/task_runner.h
 chrome/test/webdriver/commands/webdriver_command.o: base/message_pump.h
 chrome/test/webdriver/commands/webdriver_command.o: base/observer_list.h
 chrome/test/webdriver/commands/webdriver_command.o: base/logging.h
+chrome/test/webdriver/commands/webdriver_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/webdriver_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/webdriver_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/webdriver_command.o: base/threading/thread_checker_impl.h
 chrome/test/webdriver/commands/webdriver_command.o: base/pending_task.h
 chrome/test/webdriver/commands/webdriver_command.o: base/tracking_info.h
 chrome/test/webdriver/commands/webdriver_command.o: chrome/common/automation_constants.h
@@ -6586,16 +6630,16 @@ chrome/test/webdriver/commands/session_with_id.o: base/time.h
 chrome/test/webdriver/commands/session_with_id.o: base/message_pump.h
 chrome/test/webdriver/commands/session_with_id.o: base/observer_list.h
 chrome/test/webdriver/commands/session_with_id.o: base/logging.h
+chrome/test/webdriver/commands/session_with_id.o: base/debug/debugger.h
 chrome/test/webdriver/commands/session_with_id.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/session_with_id.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/session_with_id.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/session_with_id.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/session_with_id.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/session_with_id.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/session_with_id.o: base/pending_task.h
 chrome/test/webdriver/commands/session_with_id.o: base/callback.h
 chrome/test/webdriver/commands/session_with_id.o: base/callback_internal.h
 chrome/test/webdriver/commands/session_with_id.o: base/tracking_info.h
+chrome/test/webdriver/commands/session_with_id.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/session_with_id.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/session_with_id.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/session_with_id.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/session_with_id.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/session_with_id.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -7027,7 +7071,7 @@ base/scoped_temp_dir.o: /usr/include/bits/waitstatus.h
 base/scoped_temp_dir.o: /usr/include/sys/types.h /usr/include/time.h
 base/scoped_temp_dir.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/scoped_temp_dir.o: base/template_util.h base/platform_file.h base/time.h
-base/scoped_temp_dir.o: base/atomicops.h base/logging.h
+base/scoped_temp_dir.o: base/atomicops.h base/logging.h base/debug/debugger.h
 chrome/test/webdriver/commands/url_command.o: chrome/test/webdriver/commands/url_command.h
 chrome/test/webdriver/commands/url_command.o: chrome/test/webdriver/commands/webdriver_command.h
 chrome/test/webdriver/commands/url_command.o: chrome/test/webdriver/commands/command.h
@@ -7097,16 +7141,16 @@ chrome/test/webdriver/commands/url_command.o: base/task_runner.h base/time.h
 chrome/test/webdriver/commands/url_command.o: base/message_pump.h
 chrome/test/webdriver/commands/url_command.o: base/observer_list.h
 chrome/test/webdriver/commands/url_command.o: base/logging.h
+chrome/test/webdriver/commands/url_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/url_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/url_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/url_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/url_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/url_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/url_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/url_command.o: base/pending_task.h
 chrome/test/webdriver/commands/url_command.o: base/callback.h
 chrome/test/webdriver/commands/url_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/url_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/url_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/url_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/url_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/url_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/url_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/url_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -7546,16 +7590,16 @@ chrome/test/webdriver/commands/window_commands.o: base/time.h
 chrome/test/webdriver/commands/window_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/window_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/window_commands.o: base/logging.h
+chrome/test/webdriver/commands/window_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/window_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/window_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/window_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/window_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/window_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/window_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/window_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/window_commands.o: base/callback.h
 chrome/test/webdriver/commands/window_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/window_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/window_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/window_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/window_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/window_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/window_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/window_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -8007,16 +8051,16 @@ chrome/test/webdriver/commands/webelement_commands.o: base/task_runner.h
 chrome/test/webdriver/commands/webelement_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/webelement_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/webelement_commands.o: base/logging.h
+chrome/test/webdriver/commands/webelement_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/webelement_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/webelement_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/webelement_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/webelement_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/webelement_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/webelement_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/webelement_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/webelement_commands.o: base/callback.h
 chrome/test/webdriver/commands/webelement_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/webelement_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/webelement_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/webelement_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/webelement_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/webelement_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/webelement_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/webelement_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -8452,16 +8496,16 @@ chrome/test/webdriver/commands/title_command.o: base/time.h
 chrome/test/webdriver/commands/title_command.o: base/message_pump.h
 chrome/test/webdriver/commands/title_command.o: base/observer_list.h
 chrome/test/webdriver/commands/title_command.o: base/logging.h
+chrome/test/webdriver/commands/title_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/title_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/title_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/title_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/title_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/title_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/title_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/title_command.o: base/pending_task.h
 chrome/test/webdriver/commands/title_command.o: base/callback.h
 chrome/test/webdriver/commands/title_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/title_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/title_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/title_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/title_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/title_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/title_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/title_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -8904,16 +8948,16 @@ chrome/test/webdriver/commands/target_locator_commands.o: base/time.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/logging.h
+chrome/test/webdriver/commands/target_locator_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/target_locator_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/target_locator_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/target_locator_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/target_locator_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/callback.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/target_locator_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/target_locator_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/target_locator_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/target_locator_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/target_locator_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/target_locator_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/target_locator_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -9352,16 +9396,16 @@ chrome/test/webdriver/commands/source_command.o: base/time.h
 chrome/test/webdriver/commands/source_command.o: base/message_pump.h
 chrome/test/webdriver/commands/source_command.o: base/observer_list.h
 chrome/test/webdriver/commands/source_command.o: base/logging.h
+chrome/test/webdriver/commands/source_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/source_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/source_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/source_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/source_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/source_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/source_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/source_command.o: base/pending_task.h
 chrome/test/webdriver/commands/source_command.o: base/callback.h
 chrome/test/webdriver/commands/source_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/source_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/source_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/source_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/source_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/source_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/source_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/source_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -9802,16 +9846,16 @@ chrome/test/webdriver/commands/set_timeout_commands.o: base/time.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/logging.h
+chrome/test/webdriver/commands/set_timeout_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/set_timeout_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/set_timeout_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/set_timeout_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/set_timeout_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/callback.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/set_timeout_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/set_timeout_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/set_timeout_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/set_timeout_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/set_timeout_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/set_timeout_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/set_timeout_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -10252,16 +10296,16 @@ chrome/test/webdriver/commands/screenshot_command.o: base/time.h
 chrome/test/webdriver/commands/screenshot_command.o: base/message_pump.h
 chrome/test/webdriver/commands/screenshot_command.o: base/observer_list.h
 chrome/test/webdriver/commands/screenshot_command.o: base/logging.h
+chrome/test/webdriver/commands/screenshot_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/screenshot_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/screenshot_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/screenshot_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/screenshot_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/screenshot_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/screenshot_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/screenshot_command.o: base/pending_task.h
 chrome/test/webdriver/commands/screenshot_command.o: base/callback.h
 chrome/test/webdriver/commands/screenshot_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/screenshot_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/screenshot_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/screenshot_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/screenshot_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/screenshot_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/screenshot_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/screenshot_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -10701,16 +10745,16 @@ chrome/test/webdriver/commands/navigate_commands.o: base/time.h
 chrome/test/webdriver/commands/navigate_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/navigate_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/navigate_commands.o: base/logging.h
+chrome/test/webdriver/commands/navigate_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/navigate_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/navigate_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/navigate_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/navigate_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/navigate_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/navigate_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/navigate_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/navigate_commands.o: base/callback.h
 chrome/test/webdriver/commands/navigate_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/navigate_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/navigate_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/navigate_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/navigate_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/navigate_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/navigate_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/navigate_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -11156,16 +11200,16 @@ chrome/test/webdriver/commands/mouse_commands.o: base/time.h
 chrome/test/webdriver/commands/mouse_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/mouse_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/mouse_commands.o: base/logging.h
+chrome/test/webdriver/commands/mouse_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/mouse_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/mouse_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/mouse_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/mouse_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/mouse_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/mouse_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/mouse_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/mouse_commands.o: base/callback.h
 chrome/test/webdriver/commands/mouse_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/mouse_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/mouse_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/mouse_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/mouse_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/mouse_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/mouse_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
 chrome/test/webdriver/commands/mouse_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtNetwork/QtNetwork
@@ -11603,16 +11647,16 @@ chrome/test/webdriver/commands/log_command.o: base/task_runner.h base/time.h
 chrome/test/webdriver/commands/log_command.o: base/message_pump.h
 chrome/test/webdriver/commands/log_command.o: base/observer_list.h
 chrome/test/webdriver/commands/log_command.o: base/logging.h
+chrome/test/webdriver/commands/log_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/log_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/log_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/log_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/log_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/log_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/log_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/log_command.o: base/pending_task.h
 chrome/test/webdriver/commands/log_command.o: base/callback.h
 chrome/test/webdriver/commands/log_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/log_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/log_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/log_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/log_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/log_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/log_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/log_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -12050,16 +12094,16 @@ chrome/test/webdriver/commands/keys_command.o: base/task_runner.h base/time.h
 chrome/test/webdriver/commands/keys_command.o: base/message_pump.h
 chrome/test/webdriver/commands/keys_command.o: base/observer_list.h
 chrome/test/webdriver/commands/keys_command.o: base/logging.h
+chrome/test/webdriver/commands/keys_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/keys_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/keys_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/keys_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/keys_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/keys_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/keys_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/keys_command.o: base/pending_task.h
 chrome/test/webdriver/commands/keys_command.o: base/callback.h
 chrome/test/webdriver/commands/keys_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/keys_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/keys_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/keys_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/keys_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/keys_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/keys_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/keys_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -12500,16 +12544,16 @@ chrome/test/webdriver/commands/html5_storage_commands.o: base/time.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/logging.h
+chrome/test/webdriver/commands/html5_storage_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/html5_storage_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/html5_storage_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/html5_storage_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/html5_storage_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/callback.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/html5_storage_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/html5_storage_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/html5_storage_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/html5_storage_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/html5_storage_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/html5_storage_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/html5_storage_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -12949,16 +12993,16 @@ chrome/test/webdriver/commands/html5_location_commands.o: base/time.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/logging.h
+chrome/test/webdriver/commands/html5_location_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/html5_location_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/html5_location_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/html5_location_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/html5_location_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/callback.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/html5_location_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/html5_location_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/html5_location_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/html5_location_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/html5_location_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/html5_location_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/html5_location_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -13400,16 +13444,16 @@ chrome/test/webdriver/commands/find_element_commands.o: base/time.h
 chrome/test/webdriver/commands/find_element_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/find_element_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/find_element_commands.o: base/logging.h
+chrome/test/webdriver/commands/find_element_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/find_element_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/find_element_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/find_element_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/find_element_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/find_element_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/find_element_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/find_element_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/find_element_commands.o: base/callback.h
 chrome/test/webdriver/commands/find_element_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/find_element_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/find_element_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/find_element_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/find_element_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/find_element_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/find_element_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/find_element_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -13850,16 +13894,16 @@ chrome/test/webdriver/commands/file_upload_command.o: base/task_runner.h
 chrome/test/webdriver/commands/file_upload_command.o: base/message_pump.h
 chrome/test/webdriver/commands/file_upload_command.o: base/observer_list.h
 chrome/test/webdriver/commands/file_upload_command.o: base/logging.h
+chrome/test/webdriver/commands/file_upload_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/file_upload_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/file_upload_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/file_upload_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/file_upload_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/file_upload_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/file_upload_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/file_upload_command.o: base/pending_task.h
 chrome/test/webdriver/commands/file_upload_command.o: base/callback.h
 chrome/test/webdriver/commands/file_upload_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/file_upload_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/file_upload_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/file_upload_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/file_upload_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/file_upload_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/file_upload_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/file_upload_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -14298,16 +14342,16 @@ chrome/test/webdriver/commands/execute_command.o: base/time.h
 chrome/test/webdriver/commands/execute_command.o: base/message_pump.h
 chrome/test/webdriver/commands/execute_command.o: base/observer_list.h
 chrome/test/webdriver/commands/execute_command.o: base/logging.h
+chrome/test/webdriver/commands/execute_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/execute_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/execute_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/execute_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/execute_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/execute_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/execute_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/execute_command.o: base/pending_task.h
 chrome/test/webdriver/commands/execute_command.o: base/callback.h
 chrome/test/webdriver/commands/execute_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/execute_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/execute_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/execute_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/execute_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/execute_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/execute_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/execute_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -14747,16 +14791,16 @@ chrome/test/webdriver/commands/execute_async_script_command.o: base/time.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/message_pump.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/observer_list.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/logging.h
+chrome/test/webdriver/commands/execute_async_script_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/execute_async_script_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/execute_async_script_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/execute_async_script_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/execute_async_script_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/pending_task.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/callback.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/execute_async_script_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/execute_async_script_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/execute_async_script_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/execute_async_script_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/execute_async_script_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/execute_async_script_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/execute_async_script_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -15199,16 +15243,16 @@ chrome/test/webdriver/commands/cookie_commands.o: base/time.h
 chrome/test/webdriver/commands/cookie_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/cookie_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/cookie_commands.o: base/logging.h
+chrome/test/webdriver/commands/cookie_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/cookie_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/cookie_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/cookie_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/cookie_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/cookie_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/cookie_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/cookie_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/cookie_commands.o: base/callback.h
 chrome/test/webdriver/commands/cookie_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/cookie_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/cookie_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/cookie_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/cookie_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/cookie_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/cookie_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/cookie_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -15650,16 +15694,16 @@ chrome/test/webdriver/commands/chrome_commands.o: base/time.h
 chrome/test/webdriver/commands/chrome_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/chrome_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/chrome_commands.o: base/logging.h
+chrome/test/webdriver/commands/chrome_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/chrome_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/chrome_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/chrome_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/chrome_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/chrome_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/chrome_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/chrome_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/chrome_commands.o: base/callback.h
 chrome/test/webdriver/commands/chrome_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/chrome_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/chrome_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/chrome_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/chrome_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/chrome_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/chrome_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/chrome_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -16099,16 +16143,16 @@ chrome/test/webdriver/commands/browser_connection_commands.o: base/time.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/logging.h
+chrome/test/webdriver/commands/browser_connection_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/browser_connection_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/browser_connection_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/browser_connection_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/browser_connection_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/callback.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/browser_connection_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/browser_connection_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/browser_connection_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/browser_connection_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/browser_connection_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/browser_connection_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/browser_connection_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -16548,16 +16592,16 @@ chrome/test/webdriver/commands/appcache_status_command.o: base/time.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/message_pump.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/observer_list.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/logging.h
+chrome/test/webdriver/commands/appcache_status_command.o: base/debug/debugger.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/appcache_status_command.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/appcache_status_command.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/appcache_status_command.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/appcache_status_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/pending_task.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/callback.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/callback_internal.h
 chrome/test/webdriver/commands/appcache_status_command.o: base/tracking_info.h
+chrome/test/webdriver/commands/appcache_status_command.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/appcache_status_command.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/appcache_status_command.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/appcache_status_command.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/appcache_status_command.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/appcache_status_command.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -16997,16 +17041,16 @@ chrome/test/webdriver/commands/alert_commands.o: base/time.h
 chrome/test/webdriver/commands/alert_commands.o: base/message_pump.h
 chrome/test/webdriver/commands/alert_commands.o: base/observer_list.h
 chrome/test/webdriver/commands/alert_commands.o: base/logging.h
+chrome/test/webdriver/commands/alert_commands.o: base/debug/debugger.h
 chrome/test/webdriver/commands/alert_commands.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/alert_commands.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/alert_commands.o: base/threading/thread_checker_impl.h
-chrome/test/webdriver/commands/alert_commands.o: base/synchronization/lock.h
-chrome/test/webdriver/commands/alert_commands.o: base/synchronization/lock_impl.h
-chrome/test/webdriver/commands/alert_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/alert_commands.o: base/pending_task.h
 chrome/test/webdriver/commands/alert_commands.o: base/callback.h
 chrome/test/webdriver/commands/alert_commands.o: base/callback_internal.h
 chrome/test/webdriver/commands/alert_commands.o: base/tracking_info.h
+chrome/test/webdriver/commands/alert_commands.o: base/synchronization/lock.h
+chrome/test/webdriver/commands/alert_commands.o: base/synchronization/lock_impl.h
+chrome/test/webdriver/commands/alert_commands.o: base/threading/platform_thread.h
 chrome/test/webdriver/commands/alert_commands.o: chrome/common/automation_constants.h
 chrome/test/webdriver/commands/alert_commands.o: chrome/test/automation/automation_json_requests.h
 chrome/test/webdriver/commands/alert_commands.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QtWebKit
@@ -17453,9 +17497,9 @@ chrome/test/webdriver/commands/sessions.o: base/task_runner.h
 chrome/test/webdriver/commands/sessions.o: base/message_pump.h
 chrome/test/webdriver/commands/sessions.o: base/observer_list.h
 chrome/test/webdriver/commands/sessions.o: base/logging.h
+chrome/test/webdriver/commands/sessions.o: base/debug/debugger.h
 chrome/test/webdriver/commands/sessions.o: base/memory/weak_ptr.h
 chrome/test/webdriver/commands/sessions.o: base/threading/thread_checker.h
-chrome/test/webdriver/commands/sessions.o: base/threading/thread_checker_impl.h
 chrome/test/webdriver/commands/sessions.o: base/pending_task.h
 chrome/test/webdriver/commands/sessions.o: base/tracking_info.h
 chrome/test/webdriver/commands/sessions.o: chrome/common/automation_constants.h
@@ -17842,11 +17886,11 @@ base/rand_util.o: /usr/include/math.h /usr/include/bits/huge_val.h
 base/rand_util.o: /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h
 base/rand_util.o: /usr/include/bits/inf.h /usr/include/bits/nan.h
 base/rand_util.o: /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h
-base/rand_util.o: base/logging.h base/string_util.h /usr/include/ctype.h
-base/rand_util.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
-base/rand_util.o: /usr/include/endian.h /usr/include/bits/endian.h
-base/rand_util.o: base/compiler_specific.h base/string16.h
-base/rand_util.o: /usr/include/stdio.h /usr/include/libio.h
+base/rand_util.o: base/logging.h base/debug/debugger.h base/string_util.h
+base/rand_util.o: /usr/include/ctype.h /usr/include/bits/types.h
+base/rand_util.o: /usr/include/bits/typesizes.h /usr/include/endian.h
+base/rand_util.o: /usr/include/bits/endian.h base/compiler_specific.h
+base/rand_util.o: base/string16.h /usr/include/stdio.h /usr/include/libio.h
 base/rand_util.o: /usr/include/_G_config.h /usr/include/wchar.h
 base/rand_util.o: /usr/include/wctype.h /usr/include/bits/sys_errlist.h
 base/rand_util.o: base/string_piece.h base/hash_tables.h
@@ -17887,7 +17931,7 @@ base/rand_util_posix.o: /usr/include/bits/waitflags.h
 base/rand_util_posix.o: /usr/include/bits/waitstatus.h base/move.h
 base/rand_util_posix.o: base/template_util.h base/platform_file.h base/time.h
 base/rand_util_posix.o: base/atomicops.h base/lazy_instance.h base/logging.h
-base/rand_util_posix.o: base/memory/aligned_memory.h
+base/rand_util_posix.o: base/debug/debugger.h base/memory/aligned_memory.h
 base/rand_util_posix.o: base/third_party/dynamic_annotations/dynamic_annotations.h
 base/rand_util_posix.o: base/threading/thread_restrictions.h
 chrome/common/zip.o: chrome/common/zip.h base/callback.h
@@ -17917,11 +17961,7 @@ chrome/common/zip.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 chrome/common/zip.o: base/move.h base/template_util.h base/bind.h
 chrome/common/zip.o: base/bind_internal.h base/bind_helpers.h
 chrome/common/zip.o: base/memory/weak_ptr.h base/logging.h
-chrome/common/zip.o: base/threading/thread_checker.h
-chrome/common/zip.o: base/threading/thread_checker_impl.h
-chrome/common/zip.o: base/synchronization/lock.h
-chrome/common/zip.o: base/synchronization/lock_impl.h
-chrome/common/zip.o: base/threading/platform_thread.h base/time.h
+chrome/common/zip.o: base/debug/debugger.h base/threading/thread_checker.h
 chrome/common/zip.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 chrome/common/zip.o: base/tuple.h base/file_util.h /usr/include/stdio.h
 chrome/common/zip.o: /usr/include/libio.h /usr/include/_G_config.h
@@ -17929,7 +17969,7 @@ chrome/common/zip.o: /usr/include/wchar.h /usr/include/wctype.h
 chrome/common/zip.o: /usr/include/endian.h /usr/include/bits/endian.h
 chrome/common/zip.o: /usr/include/bits/sys_errlist.h base/file_path.h
 chrome/common/zip.o: base/hash_tables.h base/string16.h base/string_piece.h
-chrome/common/zip.o: base/platform_file.h base/string_util.h
+chrome/common/zip.o: base/platform_file.h base/time.h base/string_util.h
 chrome/common/zip.o: /usr/include/ctype.h chrome/common/zip_internal.h
 chrome/common/zip.o: third_party/zlib/contrib/minizip/unzip.h
 chrome/common/zip.o: third_party/zlib/zlib.h third_party/zlib/zconf.h
@@ -17978,8 +18018,8 @@ chrome/common/zip_reader.o: third_party/zlib/contrib/minizip/unzip.h
 chrome/common/zip_reader.o: third_party/zlib/zlib.h third_party/zlib/zconf.h
 chrome/common/zip_reader.o: third_party/zlib/mozzconf.h
 chrome/common/zip_reader.o: third_party/zlib/contrib/minizip/ioapi.h
-chrome/common/zip_reader.o: base/logging.h base/string_util.h
-chrome/common/zip_reader.o: /usr/include/ctype.h
+chrome/common/zip_reader.o: base/logging.h base/debug/debugger.h
+chrome/common/zip_reader.o: base/string_util.h /usr/include/ctype.h
 chrome/common/zip_reader.o: base/utf_string_conversions.h
 chrome/common/zip_reader.o: chrome/common/zip_internal.h
 chrome/common/zip_reader.o: third_party/zlib/contrib/minizip/zip.h
@@ -17993,10 +18033,6 @@ chrome/common/zip_reader.o: base/cancelable_callback.h base/bind.h
 chrome/common/zip_reader.o: base/bind_internal.h base/bind_helpers.h
 chrome/common/zip_reader.o: base/memory/weak_ptr.h
 chrome/common/zip_reader.o: base/threading/thread_checker.h
-chrome/common/zip_reader.o: base/threading/thread_checker_impl.h
-chrome/common/zip_reader.o: base/synchronization/lock.h
-chrome/common/zip_reader.o: base/synchronization/lock_impl.h
-chrome/common/zip_reader.o: base/threading/platform_thread.h
 chrome/common/zip_reader.o: base/memory/raw_scoped_refptr_mismatch_checker.h
 chrome/common/zip_reader.o: base/tuple.h net/base/file_stream_whence.h
 chrome/common/zip_reader.o: net/base/net_export.h net/base/net_log.h
@@ -18245,7 +18281,8 @@ base/sys_info_posix.o: base/memory/scoped_ptr.h /usr/include/assert.h
 base/sys_info_posix.o: /usr/include/stdlib.h /usr/include/bits/waitflags.h
 base/sys_info_posix.o: /usr/include/bits/waitstatus.h base/move.h
 base/sys_info_posix.o: base/template_util.h base/platform_file.h
-base/sys_info_posix.o: base/logging.h base/threading/thread_restrictions.h
+base/sys_info_posix.o: base/logging.h base/debug/debugger.h
+base/sys_info_posix.o: base/threading/thread_restrictions.h
 base/sys_info_posix.o: base/utf_string_conversions.h
 base/sys_info_posix.o: /usr/include/sys/statvfs.h /usr/include/bits/statvfs.h
 base/sys_info_linux.o: base/sys_info.h base/base_export.h base/basictypes.h
@@ -18276,9 +18313,76 @@ base/sys_info_linux.o: /usr/include/bits/waitstatus.h
 base/sys_info_linux.o: /usr/include/sys/types.h
 base/sys_info_linux.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/sys_info_linux.o: base/template_util.h base/platform_file.h
-base/sys_info_linux.o: base/logging.h base/string_number_conversions.h
+base/sys_info_linux.o: base/logging.h base/debug/debugger.h
+base/sys_info_linux.o: base/string_number_conversions.h
 base/debug/alias.o: base/debug/alias.h base/base_export.h
 base/debug/alias.o: build/build_config.h
+base/debug/debugger.o: base/debug/debugger.h base/base_export.h
+base/debug/debugger.o: base/logging.h base/basictypes.h /usr/include/limits.h
+base/debug/debugger.o: /usr/include/features.h /usr/include/sys/cdefs.h
+base/debug/debugger.o: /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h
+base/debug/debugger.o: /usr/include/gnu/stubs-32.h
+base/debug/debugger.o: /usr/include/bits/posix1_lim.h
+base/debug/debugger.o: /usr/include/bits/local_lim.h
+base/debug/debugger.o: /usr/include/linux/limits.h
+base/debug/debugger.o: /usr/include/bits/posix2_lim.h
+base/debug/debugger.o: /usr/include/bits/xopen_lim.h
+base/debug/debugger.o: /usr/include/bits/stdio_lim.h /usr/include/string.h
+base/debug/debugger.o: base/port.h build/build_config.h /usr/include/stdint.h
+base/debug/debugger.o: /usr/include/bits/wchar.h
+base/debug/debugger.o: base/threading/platform_thread.h base/time.h
+base/debug/debugger.o: /usr/include/time.h /usr/include/bits/types.h
+base/debug/debugger.o: /usr/include/bits/typesizes.h base/atomicops.h
+base/debug/debugger_posix.o: base/debug/debugger.h base/base_export.h
+base/debug/debugger_posix.o: build/build_config.h /usr/include/errno.h
+base/debug/debugger_posix.o: /usr/include/features.h /usr/include/sys/cdefs.h
+base/debug/debugger_posix.o: /usr/include/bits/wordsize.h
+base/debug/debugger_posix.o: /usr/include/gnu/stubs.h
+base/debug/debugger_posix.o: /usr/include/gnu/stubs-32.h
+base/debug/debugger_posix.o: /usr/include/bits/errno.h
+base/debug/debugger_posix.o: /usr/include/linux/errno.h
+base/debug/debugger_posix.o: /usr/include/asm/errno.h
+base/debug/debugger_posix.o: /usr/include/asm-generic/errno.h
+base/debug/debugger_posix.o: /usr/include/asm-generic/errno-base.h
+base/debug/debugger_posix.o: /usr/include/fcntl.h /usr/include/bits/fcntl.h
+base/debug/debugger_posix.o: /usr/include/sys/types.h
+base/debug/debugger_posix.o: /usr/include/bits/types.h
+base/debug/debugger_posix.o: /usr/include/bits/typesizes.h
+base/debug/debugger_posix.o: /usr/include/time.h
+base/debug/debugger_posix.o: /usr/include/bits/pthreadtypes.h
+base/debug/debugger_posix.o: /usr/include/bits/stat.h /usr/include/stdio.h
+base/debug/debugger_posix.o: /usr/include/libio.h /usr/include/_G_config.h
+base/debug/debugger_posix.o: /usr/include/wchar.h /usr/include/bits/wchar.h
+base/debug/debugger_posix.o: /usr/include/wctype.h /usr/include/endian.h
+base/debug/debugger_posix.o: /usr/include/bits/endian.h
+base/debug/debugger_posix.o: /usr/include/bits/stdio_lim.h
+base/debug/debugger_posix.o: /usr/include/bits/sys_errlist.h
+base/debug/debugger_posix.o: /usr/include/stdlib.h
+base/debug/debugger_posix.o: /usr/include/bits/waitflags.h
+base/debug/debugger_posix.o: /usr/include/bits/waitstatus.h
+base/debug/debugger_posix.o: /usr/include/sys/param.h /usr/include/limits.h
+base/debug/debugger_posix.o: /usr/include/bits/posix1_lim.h
+base/debug/debugger_posix.o: /usr/include/bits/local_lim.h
+base/debug/debugger_posix.o: /usr/include/linux/limits.h
+base/debug/debugger_posix.o: /usr/include/bits/posix2_lim.h
+base/debug/debugger_posix.o: /usr/include/bits/xopen_lim.h
+base/debug/debugger_posix.o: /usr/include/linux/param.h
+base/debug/debugger_posix.o: /usr/include/asm/param.h
+base/debug/debugger_posix.o: /usr/include/asm-generic/param.h
+base/debug/debugger_posix.o: /usr/include/sys/stat.h /usr/include/unistd.h
+base/debug/debugger_posix.o: /usr/include/bits/posix_opt.h
+base/debug/debugger_posix.o: /usr/include/bits/environments.h
+base/debug/debugger_posix.o: /usr/include/bits/confname.h
+base/debug/debugger_posix.o: /usr/include/getopt.h /usr/include/ctype.h
+base/debug/debugger_posix.o: /usr/include/execinfo.h base/basictypes.h
+base/debug/debugger_posix.o: /usr/include/string.h base/port.h
+base/debug/debugger_posix.o: /usr/include/stdint.h base/eintr_wrapper.h
+base/debug/debugger_posix.o: base/logging.h base/memory/scoped_ptr.h
+base/debug/debugger_posix.o: /usr/include/assert.h base/compiler_specific.h
+base/debug/debugger_posix.o: base/move.h base/template_util.h
+base/debug/debugger_posix.o: base/safe_strerror_posix.h base/string_piece.h
+base/debug/debugger_posix.o: base/hash_tables.h base/string16.h
+base/debug/debugger_posix.o: base/stringprintf.h
 base/timer.o: base/timer.h base/base_export.h base/bind.h
 base/timer.o: base/bind_internal.h base/bind_helpers.h base/basictypes.h
 base/timer.o: /usr/include/limits.h /usr/include/features.h
@@ -18301,15 +18405,14 @@ base/timer.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/timer.o: /usr/include/bits/types.h /usr/include/bits/typesizes.h
 base/timer.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 base/timer.o: base/move.h base/template_util.h base/memory/weak_ptr.h
-base/timer.o: base/logging.h base/threading/thread_checker.h
-base/timer.o: base/threading/thread_checker_impl.h
-base/timer.o: base/synchronization/lock.h base/synchronization/lock_impl.h
-base/timer.o: base/threading/platform_thread.h base/time.h
+base/timer.o: base/logging.h base/debug/debugger.h
+base/timer.o: base/threading/thread_checker.h
 base/timer.o: base/memory/raw_scoped_refptr_mismatch_checker.h base/tuple.h
-base/timer.o: base/location.h base/single_thread_task_runner.h
+base/timer.o: base/location.h base/time.h base/single_thread_task_runner.h
 base/timer.o: base/sequenced_task_runner.h
 base/timer.o: base/sequenced_task_runner_helpers.h base/task_runner.h
 base/timer.o: base/thread_task_runner_handle.h
+base/timer.o: base/threading/platform_thread.h
 base/path_service.o: base/path_service.h base/base_export.h base/base_paths.h
 base/path_service.o: build/build_config.h base/file_path.h
 base/path_service.o: base/compiler_specific.h base/hash_tables.h
@@ -18336,7 +18439,8 @@ base/path_service.o: /usr/include/bits/waitstatus.h /usr/include/sys/types.h
 base/path_service.o: /usr/include/time.h /usr/include/bits/pthreadtypes.h
 base/path_service.o: base/move.h base/template_util.h base/platform_file.h
 base/path_service.o: base/time.h base/atomicops.h base/lazy_instance.h
-base/path_service.o: base/logging.h base/memory/aligned_memory.h
+base/path_service.o: base/logging.h base/debug/debugger.h
+base/path_service.o: base/memory/aligned_memory.h
 base/path_service.o: base/third_party/dynamic_annotations/dynamic_annotations.h
 base/path_service.o: base/threading/thread_restrictions.h
 base/path_service.o: base/synchronization/lock.h
@@ -18395,7 +18499,8 @@ base/base_paths_posix.o: /usr/include/sys/types.h /usr/include/time.h
 base/base_paths_posix.o: /usr/include/bits/pthreadtypes.h base/move.h
 base/base_paths_posix.o: base/template_util.h base/platform_file.h
 base/base_paths_posix.o: base/time.h base/atomicops.h base/logging.h
-base/base_paths_posix.o: base/path_service.h base/nix/xdg_util.h
+base/base_paths_posix.o: base/debug/debugger.h base/path_service.h
+base/base_paths_posix.o: base/nix/xdg_util.h
 base/environment.o: base/environment.h base/base_export.h
 base/environment.o: build/build_config.h base/string_util.h
 base/environment.o: /usr/include/ctype.h /usr/include/features.h
@@ -18883,6 +18988,7 @@ chrome/test/webdriver/webdriver_key_converter.o: qwebviewext.h
 chrome/test/webdriver/webdriver_key_converter.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtWebKit/QWebView
 chrome/test/webdriver/webdriver_key_converter.o: base/format_macros.h
 chrome/test/webdriver/webdriver_key_converter.o: base/logging.h
+chrome/test/webdriver/webdriver_key_converter.o: base/debug/debugger.h
 chrome/test/webdriver/webdriver_key_converter.o: base/stringprintf.h
 chrome/test/webdriver/webdriver_key_converter.o: base/utf_string_conversions.h
 chrome/test/webdriver/webdriver_key_converter.o: chrome/test/webdriver/keycode_text_conversion.h
@@ -19710,10 +19816,14 @@ Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtconcurrent
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qmap.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qdebug.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtconcurrentcompilertest.h
+Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/QObject
+Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qobject.h
+Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/QFutureWatcher
+Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qfuturewatcher.h
+Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qfuture.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/QtConcurrentRun
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtconcurrentrun.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtconcurrentrunbase.h
-Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qfuture.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qthreadpool.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qthread.h
 Test/main.o: /home/dmytro/QtSDK/Desktop/Qt/4.8.1/gcc/include/QtCore/qtconcurrentstoredfunctioncall.h
