@@ -1,2 +1,12 @@
+build.properties
 *.o
 *.user
+*.pyc
+*.log
+moc_*.cpp
+test/Java/.idea/workspace.xml
+*.db
+*.orig
+*.png
+test/Java/out
+*.autosave
