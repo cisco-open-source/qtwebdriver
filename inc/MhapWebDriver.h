@@ -6,7 +6,6 @@ extern "C"
 {
 #endif
 
-#define NDEBUG 1
 int main_server(int argc, char *argv[]);
 
 #ifdef __cplusplus
