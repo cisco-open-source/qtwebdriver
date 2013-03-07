@@ -42,6 +42,10 @@ make CC=${GCC} CXX=${G} QT_LIB_PATH=${QTLIB} QT_INC_PATH=${QTINC} OUTLIBDIR=${OU
 cp -r ../inc /opt/webdriver/linux2_2/release
 cp -r ../lib /opt/webdriver/linux2_2/release
 
+# build version for MVM in debug mode
+make clean
+make CC=${GCC} CXX=${G} QT_LIB_PATH=${QTLIB} QT_INC_PATH=${QTINC} OUTLIBDIR=${OUT_LIB_DIR}
+
 ###### LINUX (desktop) build an test application #######
 GCC=gcc
 G=g++
@@ -53,4 +57,4 @@ mkdir -p ${OUT_LIB_DIR}
 make clean
 
 # build version for desktop test application
-make CC=${GCC} CXX=${G} QT_LIB_PATH=${QTLIB} QT_INC_PATH=${QTINC} OUTLIBDIR=${OUT_LIB_DIR}
+make CC=${GCC} CXX=${G} QT_LIB_PATH=${QTLIB} QT_INC_PATH=${QTINC} OUTLIBDIR=${OUT_LIB_DIR} mode=debug
