@@ -12,3 +12,5 @@ test/Java/out
 *.autosave
 .idea*
 report/*
+/bin/
+/lib/
