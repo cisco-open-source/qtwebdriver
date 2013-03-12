@@ -247,7 +247,7 @@ void Automation::ExecuteScript(const WebViewId &view_id, const FramePath &frame_
     if (frame == NULL)
         frame = view->page()->mainFrame();
 
-    qDebug()<<script.c_str();
+//    qDebug()<<script.c_str();
 
     std::string res;
     if (isAsync)
