@@ -10,3 +10,5 @@ test/Java/.idea/workspace.xml
 *.png
 test/Java/out
 *.autosave
+.idea*
+report/*
