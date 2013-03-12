@@ -244,7 +244,7 @@ bool InitWebDriverLogging(const FilePath& log_path, LogLevel min_log_level) {
   // Init global file log.
   FileLog* log;
   if (log_path.empty()) {
-    log = FileLog::CreateFileLog(FILE_PATH_LITERAL("chromedriver.log"),
+    log = FileLog::CreateFileLog(FILE_PATH_LITERAL("webdriver.log"),
                                  min_log_level);
   } else {
     log = new FileLog(log_path, min_log_level);

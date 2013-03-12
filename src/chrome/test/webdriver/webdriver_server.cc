@@ -318,7 +318,9 @@ int RunChromeDriver() {
   // The tests depend on parsing the first line ChromeDriver outputs,
   // so all other logging should happen after this.
 //  if (!cmd_line->HasSwitch("silent")) {
-    std::cout << "Started WebDriver" << std::endl
+
+    std::cout << "************************"<< std::endl
+              << "Started WebDriver" << std::endl
               << "port=" << port << std::endl
               << "root=" << root << std::endl
               << "url-base=" << url_base << std::endl
@@ -328,6 +330,7 @@ int RunChromeDriver() {
       std::cout << "log=" << FileLog::Get()->path().value() << std::endl;
     else
       std::cout << "Log file could not be created. log = " << FileLog::Get()->path().value() << std::endl;
+    std::cout << "************************"<< std::endl;
 //  }
 
   // Run until we receive command to shutdown.
