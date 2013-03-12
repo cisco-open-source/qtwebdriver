@@ -33,6 +33,8 @@
 #include "chrome/test/webdriver/webdriver_switches.h"
 #include "chrome/test/webdriver/webdriver_util.h"
 
+#include <QtCore/QDebug>
+
 namespace webdriver {
 
 namespace {
@@ -74,7 +76,7 @@ void WriteHttpResponse(struct mg_connection* connection,
     modified_response.AddHeader("connection", "close");
   std::string data;
   modified_response.GetData(&data);
-  std::cout<<"RESPONSE: "<<data.data()<<std::endl;
+  qDebug()<<"[WD]:"<<"RESPONSE: "<<data.c_str();
   mg_write(connection, data.data(), data.length());
 }
 
@@ -398,12 +400,11 @@ void Dispatcher::AddCallback(const std::string& uri_pattern,
 bool Dispatcher::ProcessHttpRequest(
     struct mg_connection* connection,
     const struct mg_request_info* request_info) {
-  printf("ProcessHttpRequest: %s\n" ,  request_info->uri);
+  qDebug()<<"[WD]:"<<"ProcessHttpRequest:"<< request_info->uri;
   std::vector<webdriver::mongoose::CallbackDetails>::const_iterator callback;
   for (callback = callbacks_.begin();
        callback < callbacks_.end();
        ++callback) {
-//      printf( "ProcessHttpRequest: %s | Callback url: %s\n", request_info->uri, callback->uri_regex_.c_str() );
     if (MatchPattern(request_info->uri, callback->uri_regex_)) {
       callback->func_(connection, request_info, callback->user_data_);
       return true;

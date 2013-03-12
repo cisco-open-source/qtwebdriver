@@ -80,7 +80,7 @@ Automation::~Automation() {}
 
 void Automation::Init(const BrowserOptions& options, int* build_no, Error** error)
 {
-    qDebug()<<"*************INIT SESSION******************";
+    qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
 
 	*build_no = build_no_;
@@ -91,11 +91,11 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     pWeb = NULL;
 
     //Searching for a allready opened window
-    qDebug()<<"Browser Start Window: "<<options.browser_start_window.c_str();
+    qDebug()<<"[WD]:""Browser Start Window: "<<options.browser_start_window.c_str();
     if (!options.browser_start_window.empty())
         foreach(QWidget* pWidget, qApp->allWidgets())
         {
-            qDebug()<<pWidget<<pWidget->windowTitle();
+            qDebug()<<"[WD]:"<<pWidget<<pWidget->windowTitle();
 
             if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
             {
@@ -117,7 +117,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     //proxy setup
     if (options.command.HasSwitch(switches::kNoProxyServer))
     {
-        qDebug() << "No proxy";
+        qDebug()<<"[WD]:" << "No proxy";
         pWeb->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
     }
     else if (options.command.HasSwitch(switches::kProxyServer))
@@ -167,7 +167,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         }
     }
 
-    qDebug() << "hostname = " << pWeb->page()->networkAccessManager()->proxy().hostName()
+    qDebug()<<"[WD]:" << "hostname = " << pWeb->page()->networkAccessManager()->proxy().hostName()
              << ", port = " << pWeb->page()->networkAccessManager()->proxy().port();
 
     //handle initial window size and position
@@ -183,7 +183,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             if (isOkW && isOkH)
                 pWeb->resize(w, h);
             else
-                qDebug() << "Wrong parameter in " << switches::kWindowSize << " switch";
+                qDebug()<<"[WD]:" << "Wrong parameter in " << switches::kWindowSize << " switch";
         }
     }
     if (options.command.HasSwitch(switches::kWindowPosition))
@@ -198,9 +198,11 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             if (isOkX && isOkY)
                 pWeb->move(x, y);
             else
-                qDebug() << "Wrong parameter in " << switches::kWindowPosition << " switch";
+               qDebug()<<"[WD]:" << "Wrong parameter in " << switches::kWindowPosition << " switch";
         }
     }
+
+    qDebug()<<"WD: "<<pWeb->geometry();
     if (options.command.HasSwitch(switches::kStartMaximized))
         pWeb->showMaximized();
 
@@ -210,7 +212,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
 
 void Automation::Terminate()
 {
-  qDebug()<<"*************TERMINATE SESSION******************";
+  qDebug()<<"[WD]:"<<"*************TERMINATE SESSION******************";
   logger_.Log(kInfoLogLevel, "QtWebKit WebDriver shutdown");
 
   foreach(QWidget* pView, qApp->topLevelWidgets())
@@ -247,7 +249,7 @@ void Automation::ExecuteScript(const WebViewId &view_id, const FramePath &frame_
     if (frame == NULL)
         frame = view->page()->mainFrame();
 
-//    qDebug()<<script.c_str();
+//    qDebug()<<"[WD]:"<<script.c_str();
 
     std::string res;
     if (isAsync)
@@ -268,7 +270,7 @@ void Automation::ExecuteScript(const WebViewId &view_id, const FramePath &frame_
         res = f1result.toString().toStdString();
     }
     *result = res;
-    qDebug()<<result->c_str();
+    qDebug()<<"[WD]:"<<result->c_str();
 }
 
 void Automation::MouseMoveDeprecated(const WebViewId &view_id, const Point &p, Error **error)
@@ -411,7 +413,7 @@ void Automation::SendWebKeyEvent(const WebViewId &view_id, const WebKeyEvent &ke
     QWebView *view = view_id.GetWebView();
 
     QKeyEvent keyEvent = ConvertToQtKeyEvent(key_event);
-    qDebug()<<keyEvent.type() << keyEvent.text() << keyEvent.key();
+//    qDebug()<<"[WD]:"<<keyEvent.type() << keyEvent.text() << keyEvent.key();
     qApp->sendEvent(view, &keyEvent);
 
 }
@@ -500,7 +502,7 @@ void Automation::NavigateToURL(const WebViewId &view_id, const std::string &url,
 //      will be ready
     QUrl address(QString(url.c_str()));
 
-    qDebug()<<address;
+    qDebug()<<"[WD]:"<<address;
 
     view->stop();
     connect(view, SIGNAL(loadFinished(bool)),this, SLOT(pageLoadFinished()), Qt::QueuedConnection);
@@ -726,7 +728,7 @@ void Automation::SetCookie(const std::string &url, base::DictionaryValue *cookie
             return;
         }
 
-        qDebug() << "domain.c_str()=[" << domain.c_str() <<"]";
+        qDebug()<<"[WD]:" << "domain.c_str()=[" << domain.c_str() <<"]";
 
         // TODO: check why it fails here
         //cookie.setDomain(QString(domain.c_str()));
@@ -769,19 +771,19 @@ void Automation::SetCookie(const std::string &url, base::DictionaryValue *cookie
         }
 
         time_t time = (base::Time::FromDoubleT(expiry)).ToTimeT();
-        //qDebug() << "time=[" << time <<"]";
+        //qDebug()<<"[WD]:" << "time=[" << time <<"]";
 
         QDateTime qtime;
         qtime.setTime_t(time);
 
         if (qtime > QDateTime::currentDateTime())
         {
-            qDebug() << "Adding cookie";
+            qDebug()<<"[WD]:"<< "Adding cookie";
             cookie.setExpirationDate(qtime);
         }
         else
         {
-            qDebug() << "cookie expired";
+            qDebug()<<"[WD]:" << "cookie expired";
             automation::Error auto_error(automation::kInvalidId, "Could not set expired cookie");
             Error *pError = Error::FromAutomationError(auto_error);
             error = &pError;
@@ -1542,7 +1544,7 @@ void JSNotifier::setResult(QVariant result)
 // {
 //     if (obj == pWeb) {
 //         if (event->type() == QEvent::Drop) {
-//             qDebug()<<&event;
+//             qDebug()<<"[WD]:"<<&event;
 //             return false;
 //         }
 //         else
