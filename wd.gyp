@@ -8,6 +8,8 @@
       'target_name': 'WebDriver',
       'type': '<(library)',
 
+      'standalone_static_library': 1,
+
       'include_dirs': [
         'inc/',
       	'src/',
