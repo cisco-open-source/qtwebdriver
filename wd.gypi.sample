@@ -1,0 +1,6 @@
+'variables': {
+  'CISCO_QT_INC_PATH':   '/opt/qt4_nds/linux2_2/release/include/',
+  'CISCO_QT_LIB_PATH':   '/opt/qt4_nds/linux2_2/release/lib/',
+  'DESKTOP_QT_INC_PATH': '~/Qt/4.8.4/gcc/lib/',
+  'DESKTOP_QT_LIB_PATH': '~/Qt/4.8.4/gcc/include/',
+}
