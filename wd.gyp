@@ -3,6 +3,29 @@
     "wd.gypi",
   ],
 
+  'conditions': [
+    [ 'platform == "desktop"', {
+      'variables': {
+        'QT_INC_PATH': '<(DESKTOP_QT_INC_PATH)',
+        'QT_LIB_PATH': '<(DESKTOP_QT_LIB_PATH)'
+      },
+    } ],
+
+    [ 'platform == "flip"', {
+      'variables': {
+        'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
+        'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)'
+      },
+    } ],
+  ],
+
+  'target_defaults': {
+    'configurations': {
+      'desktop': {},
+      'flip': {},
+    },
+  },
+
   'targets': [
     {
       'target_name': 'WebDriver',
@@ -12,8 +35,8 @@
 
       'include_dirs': [
         'inc/',
-      	'src/',
-      	'<(CISCO_QT_INC_PATH)',
+        'src/',
+        '<(QT_INC_PATH)',
       ],
 
       'sources': [
@@ -195,15 +218,15 @@
 
       'include_dirs': [
         'inc/',
-        '<(DESKTOP_QT_INC_PATH)',
+        '<(QT_INC_PATH)',
       ],
 
       'dependencies': [
-      	'WebDriver',
+        'WebDriver',
       ],
 
       'libraries': [
-        '-L<(DESKTOP_QT_LIB_PATH)',
+        '-L<(QT_LIB_PATH)',
         '-lQtWebKit',
         '-lQtNetwork',
         '-lQtGui',
