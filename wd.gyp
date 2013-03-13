@@ -191,8 +191,24 @@
       'target_name': 'WebDriverTest',
       'type': 'executable',
 
+      'include_dirs': [
+        'inc/',
+        '<(DESKTOP_QT_INC_PATH)',
+      ],
+
       'dependencies': [
       	'WebDriver',
+      ],
+
+      'libraries': [
+        '-L<(DESKTOP_QT_LIB_PATH)',
+        '-lQtWebKit',
+        '-lQtNetwork',
+        '-lQtGui',
+        '-lQtCore',
+        '-lpthread',
+        '-lrt',
+        '-ldl',
       ],
 
       'sources': [
