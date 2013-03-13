@@ -14,7 +14,7 @@ CFLAGS_C_Default := $(RPM_OPT_FLAGS)
 CFLAGS_CC_Default := $(RPM_OPT_FLAGS)
 
 INCS_Default := -Iinc \
-	-I/home/vv/Qt/4.8.4/include
+	-I/usr/include
 
 OBJS := $(obj).target/$(TARGET)/src/Test/main.o
 
@@ -47,7 +47,7 @@ $(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cc FORCE_DO_CMD
 ### Rules for final target.
 LDFLAGS_Default := 
 
-LIBS := -L/home/vv/Qt/4.8.4/lib/ \
+LIBS := -L/usr/lib/ \
 	-lQtWebKit \
 	-lQtNetwork \
 	-lQtGui \

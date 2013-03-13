@@ -299,7 +299,7 @@ ifeq ($(strip $(foreach prefix,$(NO_LOAD),\
 endif
 
 quiet_cmd_regen_makefile = ACTION Regenerating $@
-cmd_regen_makefile = /bin/gyp -fmake --ignore-environment "--toplevel-dir=." "--depth=." "-Dlibrary=static_library" wd.gyp
+cmd_regen_makefile = /usr/bin/gyp -fmake --ignore-environment "--toplevel-dir=." "--depth=." "-Dlibrary=static_library" wd.gyp
 Makefile: wd.gyp wd.gypi
 	$(call do_cmd,regen_makefile)
 
