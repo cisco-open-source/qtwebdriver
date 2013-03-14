@@ -175,6 +175,11 @@ Error* Session::ExecuteScript(const FrameId& frame_id,
                               const std::string& script,
                               const ListValue* const args,
                               Value** value) {
+    if (!frame_id.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support script execution");
+    }
+
   std::string args_as_json;
   base::JSONWriter::Write(static_cast<const Value* const>(args),
                           &args_as_json);
@@ -229,6 +234,12 @@ Error* Session::ExecuteAsyncScript(const FrameId& frame_id,
                                    const std::string& script,
                                    const ListValue* const args,
                                    Value** value) {
+
+    if (!frame_id.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support script execution");
+    }
+
   std::string args_as_json;
   base::JSONWriter::Write(static_cast<const Value* const>(args),
                           &args_as_json);
