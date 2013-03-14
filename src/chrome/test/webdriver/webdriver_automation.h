@@ -324,6 +324,10 @@ class Automation : public QObject {
                          std::vector<ElementId>* elements,
                          Error** error);
 
+  void GetNativeElementWithFocus(const WebViewId& view_id,
+                         ElementId* element,
+                         Error** error);
+
   void ClearNativeElement(const WebViewId& view_id,
                          const ElementId& element,
                          Error** error);

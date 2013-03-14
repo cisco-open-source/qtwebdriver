@@ -277,6 +277,10 @@ class Session {
                             bool ignore_opacity,
                             bool* is_visible);
 
+  // get active element on page
+  Error* ActiveElement(const FrameId& frame_id,
+                     ElementId* element);
+
   // Clear input element.
   Error* ClearElement(const FrameId& frame_id,
                             const ElementId& element);

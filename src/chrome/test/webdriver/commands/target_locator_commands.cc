@@ -158,15 +158,14 @@ bool ActiveElementCommand::DoesPost() {
 }
 
 void ActiveElementCommand::ExecutePost(Response* const response) {
-  ListValue args;
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(
-      "return document.activeElement || document.body", &args, &result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(result);
+    ElementId element;
+    Error* error = session_->ActiveElement(
+        session_->current_target(), &element);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(element.ToValue());
 }
 
 }  // namespace webdriver

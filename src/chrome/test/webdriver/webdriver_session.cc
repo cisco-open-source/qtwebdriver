@@ -1193,6 +1193,33 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
       CreateDirectValueParser(is_displayed));
 }
 
+Error* Session::ActiveElement(const FrameId& frame_id,
+                   ElementId* element) {
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementWithFocus,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            &error));
+
+        return error;
+    }
+
+    ListValue args;
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      "return document.activeElement || document.body",
+      "isDisplayed",
+      &args,
+      CreateDirectValueParser(element));
+}
+
+
+
 Error* Session::ClearElement(const FrameId& frame_id,
                           const ElementId& element) {
     if (current_target_.view_id.IsApp()) {

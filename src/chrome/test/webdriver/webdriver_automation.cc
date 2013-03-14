@@ -1032,6 +1032,48 @@ void Automation::GetNativeElementSize(const WebViewId& view_id,
     *size = Size(pWidget->width(), pWidget->height());
 }
 
+void Automation::GetNativeElementWithFocus(const WebViewId& view_id,
+                       ElementId* element,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *focusWidget = QApplication::focusWidget();
+
+    if (NULL == focusWidget || view == focusWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    // TODO: do we need to check if focusWidget is child of view?
+
+    // get elements map for this view. If doesnt exist create new one
+    QString viewKey(view_id.GetId().id().c_str());
+    ElementMap* elementsMap = NULL;
+    if (windowsElementMap.contains(viewKey))
+    {
+        elementsMap = windowsElementMap.value(viewKey);
+    }
+    else
+    {
+        elementsMap = new ElementMap();
+        windowsElementMap.insert(viewKey, elementsMap);
+    }
+
+    // generate element id and save it in map
+    QString elementKey = GenerateElementKey(focusWidget);
+    elementsMap->insert(elementKey, QPointer<QWidget>(focusWidget));
+    *element = ElementId(elementKey.toStdString());
+
+    qDebug() << "[WD] GetNativeElementWithFocus, found:" << focusWidget << " key:" << elementKey;
+}
+
 void Automation::ClearNativeElement(const WebViewId& view_id,
                        const ElementId& element,
                        Error** error)
