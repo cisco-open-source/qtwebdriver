@@ -186,6 +186,17 @@ bool ElementEnabledCommand::DoesGet() {
 }
 
 void ElementEnabledCommand::ExecuteGet(Response* const response) {
+    bool is_enabled;
+    Error* error = session_->IsElementEnabled(
+        session_->current_target(), element,
+        &is_enabled);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(Value::CreateBooleanValue(is_enabled));
+    // code below doesnt support native views...
+    /*
   ListValue args;
   args.Append(element.ToValue());
 
@@ -200,6 +211,7 @@ void ElementEnabledCommand::ExecuteGet(Response* const response) {
     return;
   }
   response->SetValue(result);
+  */
 }
 
 ///////////////////// ElementEqualsCommand ////////////////////
