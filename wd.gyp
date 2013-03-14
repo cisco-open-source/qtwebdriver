@@ -20,6 +20,21 @@
   ],
 
   'target_defaults': {
+    'cflags': [
+      '-g',
+      '-fPIC',
+      '-Wall',
+      '-W',
+    ],
+
+    'defines': [
+      'OS_POSIX',
+      'QT_NO_DEBUG',
+      'QT_GUI_LIB',
+      'QT_CORE_LIB',
+      'QT_SHARED',
+    ],
+
     'configurations': {
       'desktop': {},
       'flip': {},
