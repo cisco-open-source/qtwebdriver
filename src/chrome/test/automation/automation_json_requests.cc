@@ -110,19 +110,29 @@ WebViewId WebViewId::ForView(const AutomationId& view_id)
   return id;
 }
 
-WebViewId  WebViewId::ForQtView(QWebView *view)
+WebViewId  WebViewId::ForQtView(QWidget *view)
 {
     WebViewId id;
     id.old_style_ = false;
-    id.webView_ = view;
+    id.view_ = view;
     QVariant automationId = view->property("automationId");
+    QWebView* pView = qobject_cast<QWebView*>(view);
     if (automationId.isValid())
     {
-        AutomationId aId(AutomationId::kTypeTab, QString::number(automationId.toInt()).toStdString());
-        id.id_ = aId;
+        if (pView != NULL)
+        {
+            AutomationId aId(AutomationId::kTypeTab, QString::number(automationId.toInt()).toStdString());
+            id.id_ = aId;
+        }
+        else
+        {
+            AutomationId aId(AutomationId::kTypeAppShell, QString::number(automationId.toInt()).toStdString());
+            id.id_ = aId;
+        }
     }
     return id;
 }
+
 
 // static
 //WebViewId WebViewId::ForOldStyleTab(int tab_id, QWebView *view)
@@ -138,7 +148,7 @@ WebViewId WebViewId::ForOldStyleTab(int tab_id)
 
 WebViewId::WebViewId()
     : old_style_(true),
-      webView_(NULL)
+      view_(NULL)
 {}
 
 /*void WebViewId::UpdateDictionary(DictionaryValue* dict,
@@ -168,6 +178,10 @@ bool WebViewId::IsTab() const {
   return old_style_ || id_.type() == AutomationId::kTypeTab;
 }
 
+bool WebViewId::IsApp() const {
+  return id_.type() == AutomationId::kTypeAppShell;
+}
+
 int WebViewId::tab_id() const {
   return tab_id_;
 }
@@ -177,9 +191,9 @@ bool WebViewId::old_style() const
   return old_style_;
 }
 
-QWebView* WebViewId::GetWebView() const
+QWidget* WebViewId::GetView() const
 {
-    return webView_;
+    return view_;
 }
 
 /*

@@ -40,6 +40,8 @@ class ElementId {
   // to a valid ID on the page.
   bool is_valid() const;
 
+  const std::string& id() const { return id_; }
+
  private:
   std::string id_;
   bool is_valid_;

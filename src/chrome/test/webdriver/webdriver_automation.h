@@ -13,6 +13,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QObject>
 #include <QtCore/QEventLoop>
+#include <QtCore/QHash>
 #include <QtGui/QKeyEvent>
 
 #include "base/command_line.h"
@@ -24,6 +25,7 @@
 #include "ui/base/keycodes/keyboard_codes.h"
 #include "chrome/test/automation/automation_json_requests.h"
 #include "chrome/test/webdriver/webdriver_basic_types.h"
+#include "chrome/test/webdriver/webdriver_element_id.h"
 #include "qwebviewext.h"
 
 class AutomationId;
@@ -43,6 +45,8 @@ namespace webdriver {
 
 class Error;
 class FramePath;
+
+typedef QHash<QString, QPointer<QWidget> > ElementMap;
 
 //Notify automation module about end of execution of async script
 class JSNotifier : public QObject
@@ -208,6 +212,12 @@ class Automation : public QObject {
   // Closes the given view.
   void CloseView(const WebViewId& view_id, Error** error);
 
+  // Gets the bounds for the given view.
+  void GetViewBounds(const WebViewId &view_id, Rect *bounds, Error **error);
+
+  // Gets view title
+  void GetViewTitle(const WebViewId &view_id, std::string* title, Error **error);
+
   // Sets the bounds for the given view. The position should be in screen
   // coordinates, while the size should be the desired size of the view.
   void SetViewBounds(const WebViewId& view_id,
@@ -292,6 +302,41 @@ class Automation : public QObject {
   // set text into Prompt text field
   void SetAlertPromptText(const std::string& text, Error **error);
 
+
+  // get native element size
+  void GetNativeElementSize(const WebViewId& view_id,
+                         const ElementId& element,
+                         Size* size,
+                         Error** error);
+
+  // find native element
+  void FindNativeElement(const WebViewId& view_id,
+                         const ElementId& root_element,
+                         const std::string& locator,
+                         const std::string& query,
+                         ElementId* element,
+                         Error** error);
+
+  void FindNativeElements(const WebViewId& view_id,
+                         const ElementId& root_element,
+                         const std::string& locator,
+                         const std::string& query,
+                         std::vector<ElementId>* elements,
+                         Error** error);
+
+  void IsNativeElementDisplayed(const WebViewId& view_id,
+                         const ElementId& element,
+                         bool ignore_opacity,
+                         bool* is_displayed,
+                         Error** error);
+
+  void IsNativeElementEnabled(const WebViewId& view_id,
+                         const ElementId& element,
+                         bool* is_enabled,
+                         Error** error);
+
+
+
  private:
   AutomationProxy* automation() const;
   QWebView* ConvertViewIdToPointer(const WebViewId& view_id);
@@ -305,11 +350,15 @@ class Automation : public QObject {
   Error* CheckMaximizeSupported();
   Error* IsNewMouseApiSupported(bool* supports_new_api);
 
-  QPoint ConvertPoinToQPoint(const Point& p);
+  QPoint ConvertPointToQPoint(const Point& p);
+  Rect ConvertQRectToRect(const QRect &rect);
   QRect ConvertRectToQRect(const Rect& rect);
   Qt::MouseButton ConvertMouseButtonToQtMouseButton(automation::MouseButton button);
   QWebFrame* FindFrameByPath(QWebFrame* parent, const FramePath &frame_path);
   QWebFrame* FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path);
+  QWidget* GetNativeElement(const WebViewId &view_id, const ElementId &element);
+  bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
+  QString GenerateElementKey(const QWidget* widget);
   QKeyEvent ConvertToQtKeyEvent(const WebKeyEvent &key_event);
   void BuildKeyMap();
   bool checkView(const WebViewId &view_id);
@@ -323,6 +372,7 @@ class Automation : public QObject {
   QEventLoop loop;
   bool isLoading;
   QMap<int, int> keyMap;
+  QHash<QString, ElementMap* > windowsElementMap;
 
   DISALLOW_COPY_AND_ASSIGN(Automation);
 

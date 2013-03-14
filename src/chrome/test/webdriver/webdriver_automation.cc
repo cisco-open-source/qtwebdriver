@@ -88,87 +88,99 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
-    pWeb = NULL;
+    QWidget *pStartView = NULL;
 
     //Searching for a allready opened window
-    qDebug()<<"[WD]:""Browser Start Window: "<<options.browser_start_window.c_str();
+    qDebug() << "[WD]:""Browser Start Window: " << options.browser_start_window.c_str();
     if (!options.browser_start_window.empty())
+    {
         foreach(QWidget* pWidget, qApp->allWidgets())
         {
-            qDebug()<<"[WD]:"<<pWidget<<pWidget->windowTitle();
+            QWebView* pView = qobject_cast<QWebView*>(pWidget);
 
-            if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
+            //check found widget if it is QWebView or top level widget; and if it don't belong to any session
+            if ((pView != NULL) || (pWidget->isTopLevel()) && !pWidget->property("sessionId").isValid())
             {
-                QWebView* pView = qobject_cast<QWebView*>(pWidget);
-                //check found widget if it is QWebView or ancestor; and if it don't belong to any session
-                if ((pView != NULL) && !pView->property("sessionId").isValid())
+                qDebug()<<"[WD]:"<<pWidget<<pWidget->windowTitle();
+
+                if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
                 {
-                    pWeb = pView;
+                    pStartView = pWidget;
                     qsrand(QTime::currentTime().msec());
-                    pWeb->setProperty("automationId", qrand());
+                    pStartView->setProperty("automationId", qrand());
+
+                    qDebug()<<"[WD]: found view to attach: "<<pWidget<<pWidget->windowTitle();
+
                     break;
                 }
             }
         }
-    //or create default one
-    if (pWeb == NULL)
-        pWeb = new QWebViewExt();
-
-    //proxy setup
-    if (options.command.HasSwitch(switches::kNoProxyServer))
-    {
-        qDebug()<<"[WD]:" << "No proxy";
-        pWeb->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
     }
-    else if (options.command.HasSwitch(switches::kProxyServer))
+
+    //or create default one
+    if (pStartView == NULL)
+        pStartView = new QWebViewExt();
+
+    // TODO: save proxy settings for further usage
+    QWebView* pWebView = qobject_cast<QWebView*>(pStartView);
+    if (pWebView != NULL)
     {
-        QStringList list = QString::fromStdString(options.command.GetSwitchValueASCII(switches::kProxyServer)).split(";");
-        foreach (QString s, list)
+        //proxy setup
+        if (options.command.HasSwitch(switches::kNoProxyServer))
         {
-            if (s.startsWith("http"))
+            qDebug()<<"[WD]:" << "No proxy";
+            pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+        }
+        else if (options.command.HasSwitch(switches::kProxyServer))
+        {
+            QStringList list = QString::fromStdString(options.command.GetSwitchValueASCII(switches::kProxyServer)).split(";");
+            foreach (QString s, list)
             {
-                QString urlString;
-                urlString = s;
-                if (s.startsWith("http="))
-                    urlString = s.remove(0, QString("http=").length());
-
-                if (!urlString.startsWith("http://"))
-                    urlString.insert(0, "http://");
-
-                QUrl proxyUrl(urlString);
-                if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
+                if (s.startsWith("http"))
                 {
-                    int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-                    pWeb->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                    QString urlString;
+                    urlString = s;
+                    if (s.startsWith("http="))
+                        urlString = s.remove(0, QString("http=").length());
+
+                    if (!urlString.startsWith("http://"))
+                        urlString.insert(0, "http://");
+
+                    QUrl proxyUrl(urlString);
+                    if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
+                    {
+                        int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
+                        pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                    }
                 }
             }
         }
-    }
-    else if (options.command.HasSwitch(switches::kProxyPacUrl))
-    {
-        qWarning() << "Proxy autoconfiguration from a URL is not suported";
-        *error = new Error(kBadRequest, "Proxy autoconfiguration from a URL is not suported");
-        return;
-    }
-    else if (options.command.HasSwitch(switches::kProxyAutoDetect))
-    {
-        qWarning() << "Proxy autodetection with WPAD is not suported";
-        *error = new Error(kBadRequest, "Proxy autodetection with WPAD is not suported");
-        return;
-    }
-    else
-    {
-        //Use system proxy by default
-        QUrl proxyUrl(qgetenv("http_proxy"));
-        if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
+        else if (options.command.HasSwitch(switches::kProxyPacUrl))
         {
-            int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-            pWeb->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+            qWarning() << "Proxy autoconfiguration from a URL is not suported";
+            *error = new Error(kBadRequest, "Proxy autoconfiguration from a URL is not suported");
+            return;
         }
-    }
+        else if (options.command.HasSwitch(switches::kProxyAutoDetect))
+        {
+            qWarning() << "Proxy autodetection with WPAD is not suported";
+            *error = new Error(kBadRequest, "Proxy autodetection with WPAD is not suported");
+            return;
+        }
+        else
+        {
+            //Use system proxy by default
+            QUrl proxyUrl(qgetenv("http_proxy"));
+            if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
+            {
+                int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
+                pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+            }
+        }
 
-    qDebug()<<"[WD]:" << "hostname = " << pWeb->page()->networkAccessManager()->proxy().hostName()
-             << ", port = " << pWeb->page()->networkAccessManager()->proxy().port();
+        qDebug()<<"[WD]:" << "hostname = " << pWebView->page()->networkAccessManager()->proxy().hostName()
+                 << ", port = " << pWebView->page()->networkAccessManager()->proxy().port();
+    }
 
     //handle initial window size and position
     if (options.command.HasSwitch(switches::kWindowSize))
@@ -181,9 +193,9 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             int w = list.at(0).toInt(&isOkW);
             int h = list.at(1).toInt(&isOkH);
             if (isOkW && isOkH)
-                pWeb->resize(w, h);
+                pStartView->resize(w, h);
             else
-                qDebug()<<"[WD]:" << "Wrong parameter in " << switches::kWindowSize << " switch";
+                qWarning()<<"[WD]:" << "Wrong parameter in " << switches::kWindowSize << " switch";
         }
     }
     if (options.command.HasSwitch(switches::kWindowPosition))
@@ -196,24 +208,33 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             int x = list.at(0).toInt(&isOkX);
             int y = list.at(1).toInt(&isOkY);
             if (isOkX && isOkY)
-                pWeb->move(x, y);
+                pStartView->move(x, y);
             else
-               qDebug()<<"[WD]:" << "Wrong parameter in " << switches::kWindowPosition << " switch";
+               qWarning()<<"[WD]:" << "Wrong parameter in " << switches::kWindowPosition << " switch";
         }
     }
 
-    qDebug()<<"WD: "<<pWeb->geometry();
+    qDebug() << "[WD]: geometry:" << pStartView->geometry();
     if (options.command.HasSwitch(switches::kStartMaximized))
-        pWeb->showMaximized();
+        pStartView->showMaximized();
 
-    pWeb->setProperty("sessionId", sessionId);
-    pWeb->show();
+    pStartView->setProperty("sessionId", sessionId);
+    pStartView->show();
 }
 
 void Automation::Terminate()
 {
   qDebug()<<"[WD]:"<<"*************TERMINATE SESSION******************";
   logger_.Log(kInfoLogLevel, "QtWebKit WebDriver shutdown");
+
+  // clear elements map
+  QMutableHashIterator<QString, ElementMap* > wnd(windowsElementMap);
+  while (wnd.hasNext()) {
+      wnd.next();
+      ElementMap *elementMap  = wnd.value();
+      if (elementMap != NULL) delete elementMap;
+      wnd.remove();
+  }
 
   foreach(QWidget* pView, qApp->topLevelWidgets())
   {
@@ -243,7 +264,7 @@ void Automation::ExecuteScript(const WebViewId &view_id, const FramePath &frame_
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QWebFrame* frame = FindFrameByPath(view->page()->mainFrame(), frame_path);
     if (frame == NULL)
@@ -281,9 +302,9 @@ void Automation::MouseMoveDeprecated(const WebViewId &view_id, const Point &p, E
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPoinToQPoint(p), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPointToQPoint(p), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, moveEvent);
 }
 
@@ -295,9 +316,9 @@ void Automation::MouseClickDeprecated(const WebViewId &view_id, const Point &p, 
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QPoint point = ConvertPoinToQPoint(p);
+    QPoint point = ConvertPointToQPoint(p);
     Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
@@ -319,11 +340,11 @@ void Automation::MouseDragDeprecated(const WebViewId &view_id, const Point &star
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPoinToQPoint(start), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPoinToQPoint(end), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPoinToQPoint(end), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPointToQPoint(start), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPointToQPoint(end), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPointToQPoint(end), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
 
     QApplication::postEvent(view, pressEvent);
     QApplication::postEvent(view, moveEvent);
@@ -338,9 +359,9 @@ void Automation::MouseButtonUpDeprecated(const WebViewId &view_id, const Point &
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPoinToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, releaseEvent);
 }
 
@@ -352,9 +373,9 @@ void Automation::MouseButtonDownDeprecated(const WebViewId &view_id, const Point
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPoinToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::sendEvent(view, pressEvent);
 }
 
@@ -366,10 +387,10 @@ void Automation::MouseDoubleClickDeprecated(const WebViewId &view_id, const Poin
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
-    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, ConvertPoinToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPoinToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
 
     QApplication::postEvent(view, dbEvent);
     QApplication::postEvent(view, releaseEvent);
@@ -384,7 +405,7 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     QMimeData data;
     QList<QUrl> urls;
@@ -394,9 +415,9 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
 
     data.setUrls(urls);
 
-    QDragEnterEvent *dragEnterEvent = new QDragEnterEvent(ConvertPoinToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
-    QDragMoveEvent *dragMoveEvent = new QDragMoveEvent(ConvertPoinToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
-    QDropEvent *dropEvent = new QDropEvent(ConvertPoinToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
+    QDragEnterEvent *dragEnterEvent = new QDragEnterEvent(ConvertPointToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
+    QDragMoveEvent *dragMoveEvent = new QDragMoveEvent(ConvertPointToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
+    QDropEvent *dropEvent = new QDropEvent(ConvertPointToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
     QApplication::sendEvent(view, dragEnterEvent);
     QApplication::sendEvent(view, dragMoveEvent);
     QApplication::sendEvent(view, dropEvent);
@@ -410,7 +431,7 @@ void Automation::SendWebKeyEvent(const WebViewId &view_id, const WebKeyEvent &ke
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     QKeyEvent keyEvent = ConvertToQtKeyEvent(key_event);
 //    qDebug()<<"[WD]:"<<keyEvent.type() << keyEvent.text() << keyEvent.key();
@@ -427,7 +448,7 @@ void Automation::SendNativeKeyEvent(const WebViewId &view_id, ui::KeyboardCode k
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     Qt::KeyboardModifier mods = static_cast<Qt::KeyboardModifier>(modifiers);
     QKeyEvent pressKeyEvent(QEvent::KeyPress, key_code, mods);
@@ -459,7 +480,7 @@ void Automation::CaptureEntirePageAsPNG(const WebViewId &view_id, const FilePath
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     QPixmap pixmap = QPixmap::grabWidget(view);
     bool saved = pixmap.save(path.value().c_str());
@@ -497,7 +518,7 @@ void Automation::NavigateToURL(const WebViewId &view_id, const std::string &url,
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 //TODO: Need review when Automation::WaitForAllViewsToStopLoading(Error** error)
 //      will be ready
     QUrl address(QString(url.c_str()));
@@ -522,7 +543,7 @@ void Automation::NavigateToURLAsync(const WebViewId &view_id, const std::string 
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QUrl address(QString(url.c_str()));
     view->load(address);
@@ -536,7 +557,7 @@ void Automation::GoForward(const WebViewId &view_id, Error **error)
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QWebHistory *history = view->history();
     history->forward();
@@ -550,7 +571,7 @@ void Automation::GoBack(const WebViewId &view_id, Error **error)
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QWebHistory *history = view->history();
     history->back();
@@ -564,7 +585,7 @@ void Automation::Reload(const WebViewId &view_id, Error **error)
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     view->reload();
 }
@@ -825,16 +846,19 @@ void Automation::GetViews(std::vector<WebViewInfo>* views,
                           Error** error)
 {
     std::string extension_id;
-    foreach(QWidget* pWidget, qApp->topLevelWidgets())
+    foreach(QWidget* pWidget, qApp->allWidgets())
     {
         QVariant sessionIdVar = pWidget->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
         {
-            QWebView* pView = qobject_cast<QWebView*>(pWidget);
-            if ((pView != NULL) && !pView->isHidden())
+            if (!pWidget->isHidden())
             {
-                WebViewId pWebView = WebViewId::ForQtView(pView);
-                views->push_back(WebViewInfo(pWebView, extension_id));
+                QWebView* pView = qobject_cast<QWebView*>(pWidget);
+                if (pView != NULL || pWidget->isTopLevel())
+                {
+                    WebViewId pWebView = WebViewId::ForQtView(pWidget);
+                    views->push_back(WebViewInfo(pWebView, extension_id));
+                }
             }
         }
     }
@@ -851,15 +875,15 @@ void Automation::DoesViewExist(WebViewId *view_id, bool *does_exist, Error **err
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
-            if (pView != NULL)
+            if (pView != NULL || pWidget->isTopLevel())
             {
-                QVariant automationIdVar = pView->property("automationId");
+                QVariant automationIdVar = pWidget->property("automationId");
                 int automationId;
                 base::StringToInt(view_id->GetId().id(), &automationId);
                 if (automationIdVar.isValid() && (automationIdVar.toInt() == automationId))
                 {
                     *does_exist = true;
-                    *view_id = WebViewId::ForQtView(pView);
+                    *view_id = WebViewId::ForQtView(pWidget);
                     break;
                 }
             }
@@ -875,7 +899,19 @@ void Automation::CloseView(const WebViewId &view_id, Error **error)
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    ElementMap* elementsMap = NULL;
+    QString elementKey(view_id.GetId().id().c_str());
+    if (windowsElementMap.contains(elementKey))
+    {
+        elementsMap = windowsElementMap.value(elementKey);
+        if (elementsMap != NULL)
+        {
+            windowsElementMap.remove(elementKey);
+            delete elementsMap;
+        }
+    }
+
+    QWidget *view = view_id.GetView();
     logger_.Log(kWarningLogLevel, "Automation::CloseView");
 
     // destroy children correctly
@@ -889,6 +925,33 @@ void Automation::CloseView(const WebViewId &view_id, Error **error)
     view->close();
 }
 
+void Automation::GetViewBounds(const WebViewId &view_id, Rect *bounds, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    *bounds = ConvertQRectToRect(view->geometry());
+}
+
+void Automation::GetViewTitle(const WebViewId &view_id, std::string* title, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    *title = view->windowTitle().toStdString();
+}
+
+
 void Automation::SetViewBounds(const WebViewId &view_id, const Rect &bounds, Error **error)
 {
     if(!checkView(view_id))
@@ -897,7 +960,7 @@ void Automation::SetViewBounds(const WebViewId &view_id, const Rect &bounds, Err
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     view->setGeometry(ConvertRectToQRect(bounds));
 }
@@ -910,13 +973,229 @@ void Automation::MaximizeView(const WebViewId &view_id, Error **error)
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWidget *view = view_id.GetView();
 
     view->setGeometry(QApplication::desktop()->rect());
 }
 
+QWidget* Automation::GetNativeElement(const WebViewId &view_id, const ElementId &element)
+{
+    // get elements map for this view. If doesnt exist create new one
+    ElementMap* elementsMap = NULL;
+    QString viewKey(view_id.GetId().id().c_str());
+    if (windowsElementMap.contains(viewKey))
+    {
+        elementsMap = windowsElementMap.value(viewKey);
+    }
+
+    if (elementsMap == NULL)
+    {
+        qWarning() << "[WD] GetNativeElement: elementsMap for view not found.";
+        return NULL;
+    }
+
+    // get widget for key
+    QPointer<QWidget> rootWidget = elementsMap->value(QString(element.id().c_str()));
+    if (rootWidget != NULL)
+    {
+        // found
+        return rootWidget.data();
+    }
+
+    qWarning() << "[WD] GetNativeElement: element " << element.id().c_str() << " not found.";
+
+    return NULL;
+}
+
+void Automation::GetNativeElementSize(const WebViewId& view_id,
+                       const ElementId& element,
+                       Size* size,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    *size = Size(pWidget->width(), pWidget->height());
+}
+
+void Automation::IsNativeElementDisplayed(const WebViewId& view_id,
+                       const ElementId& element,
+                       bool ignore_opacity,
+                       bool* is_displayed,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    // TODO: take in account ignore_opacity argument
+    *is_displayed = pWidget->isVisible();
+}
+
+void Automation::IsNativeElementEnabled(const WebViewId& view_id,
+                       const ElementId& element,
+                       bool* is_enabled,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    *is_enabled = pWidget->isEnabled();
+}
+
+void Automation::FindNativeElement(const WebViewId& view_id,
+                       const ElementId& root_element,
+                       const std::string& locator,
+                       const std::string& query,
+                       ElementId* element,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    std::vector<ElementId> elements;
+
+    FindNativeElements(view_id, root_element, locator, query, &elements, error);
+    if (*error == NULL)
+        *element = elements[0];
+}
+
+void Automation::FindNativeElements(const WebViewId& view_id,
+                       const ElementId& root_element,
+                       const std::string& locator,
+                       const std::string& query,
+                       std::vector<ElementId>* elements,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    // get elements map for this view. If doesnt exist create new one
+    QString viewKey(view_id.GetId().id().c_str());
+    ElementMap* elementsMap = NULL;
+    if (windowsElementMap.contains(viewKey))
+    {
+        elementsMap = windowsElementMap.value(viewKey);
+    }
+    else
+    {
+        elementsMap = new ElementMap();
+        windowsElementMap.insert(viewKey, elementsMap);
+    }
+
+    qDebug() << "[WD] FindNativeElements, loc:" << locator.c_str() << " query:" << query.c_str();
+
+    QString elementKey(root_element.id().c_str());
+    QWidget *parent = view_id.GetView();
+    if (!elementKey.isEmpty())
+    {
+        // get widget for key
+        QPointer<QWidget> rootWidget = elementsMap->value(QString(elementKey));
+        if (rootWidget != NULL)
+            parent = rootWidget.data();
+    }
+
+    // list all child widgets and find matched locator
+    QList<QWidget*> childs = parent->findChildren<QWidget*>();
+    foreach(QWidget *child, childs)
+    {
+        if (FilterNativeWidget(child, locator, query))
+        {
+            // generate element id and save it in map
+            elementKey = GenerateElementKey(child);
+            elementsMap->insert(elementKey, QPointer<QWidget>(child));
+            (*elements).push_back(ElementId(elementKey.toStdString()));
+
+            qDebug() << "[WD] FindNativeElements, found:" << child << " key:" << elementKey;
+        }
+    }
+}
+
+QString Automation::GenerateElementKey(const QWidget* widget)
+{
+    char key[16];
+    qsrand(QTime::currentTime().msec());
+
+    snprintf(key, 16, ":qtw:%08x", qrand());
+    return QString(key);
+}
+
+bool Automation::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query)
+{
+    if (locator == LocatorType::kClassName)
+    {
+        if (query == widget->metaObject()->className())
+            return true;
+    }
+    else if (locator == LocatorType::kId)
+    {
+        if (query == widget->accessibleName().toStdString())
+            return true;
+    }
+    else if (locator == LocatorType::kName)
+    {
+        if (query == widget->windowTitle().toStdString())
+            return true;
+    }
+    else if (locator == LocatorType::kXpath)
+    {
+        // TODO: implement if possible
+        return false;
+    }
+
+    qWarning() << "[WD] unsupported locator:" << locator.c_str();
+    // LocatorType::kLinkText
+    // LocatorType::kPartialLinkText
+    // LocatorType::kCss
+    // LocatorType::kTagName
+    return false;
+}
+
+
 void Automation::GetAppModalDialogMessage(std::string* message, Error** error)
 {
+    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
@@ -952,6 +1231,7 @@ void Automation::GetAppModalDialogMessage(std::string* message, Error** error)
 
 void Automation::AcceptOrDismissAppModalDialog(bool accept, Error** error)
 {
+    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
@@ -999,6 +1279,7 @@ void Automation::AcceptOrDismissAppModalDialog(bool accept, Error** error)
 void Automation::AcceptPromptAppModalDialog(const std::string& prompt_text,
                                             Error** error)
 {
+    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
@@ -1280,13 +1561,18 @@ QWebView *Automation::ConvertViewIdToPointer(const WebViewId& view_id)
     return NULL;
 }
 
-QPoint Automation::ConvertPoinToQPoint(const Point &p)
+QPoint Automation::ConvertPointToQPoint(const Point &p)
 {
     QPoint resultPoint;
     resultPoint.setX(p.x());
     resultPoint.setY(p.y());
 
     return resultPoint;
+}
+
+Rect Automation::ConvertQRectToRect(const QRect &rect)
+{
+    return Rect(rect.x(), rect.y(), rect.width(), rect.height());
 }
 
 QRect Automation::ConvertRectToQRect(const Rect &rect)
@@ -1341,8 +1627,9 @@ QWebFrame* Automation::FindFrameByMeta(QWebFrame* parent, const FramePath &frame
 
 void Automation::AddIdToCurrentFrame(const WebViewId &view_id, const FramePath &frame_path, Error **error)
 {
+    // TODO: review
     error = NULL;
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     if(NULL == view)
     {

@@ -44,6 +44,7 @@
 
 #include <QtGui/QApplication>
 #include <QtCore/QDebug>
+#include <Qt/QtTest>
 
 
 using automation::kLeftButton;
@@ -249,6 +250,7 @@ Error* Session::ExecuteAsyncScript(const FrameId& frame_id,
 }
 
 Error* Session::SendKeys(const ElementId& element, const string16& keys) {
+    // TODO: extend for native app
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
@@ -405,7 +407,11 @@ Error* Session::Reload() {
 }
 
 Error* Session::GetURL(std::string* url) {
-  return ExecuteScriptAndParse(current_target_,
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support URL source");
+    }
+    return ExecuteScriptAndParse(current_target_,
                                "function() { return document.URL }",
                                "getUrl",
                                new ListValue(),
@@ -413,6 +419,19 @@ Error* Session::GetURL(std::string* url) {
 }
 
 Error* Session::GetTitle(std::string* tab_title) {
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetViewTitle,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            tab_title,
+            &error));
+
+        return error;
+    }
+
   const char* kGetTitleScript =
       "function() {"
       "  if (document.title)"
@@ -707,6 +726,7 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
 
   if (!does_exist)
     return new Error(kNoSuchWindow);
+  // TODO: where is real switching to view?
   frame_elements_.clear();
   current_target_ = FrameId(new_view, FramePath());
   return NULL;
@@ -825,6 +845,17 @@ Error* Session::CloseWindow() {
 }
 
 Error* Session::GetWindowBounds(const WebViewId& window, Rect* bounds) {
+    if (window.IsApp()) {
+        Error* error = NULL;
+        RunSessionTask(base::Bind(
+            &Automation::GetViewBounds,
+            base::Unretained(automation_.get()),
+            window,
+            bounds,
+            &error));
+        return error;
+    }
+
   const char* kGetWindowBoundsScript =
       "function() {"
       "  return {"
@@ -947,12 +978,29 @@ Error* Session::FindElement(const FrameId& frame_id,
                             const std::string& locator,
                             const std::string& query,
                             ElementId* element) {
-  std::vector<ElementId> elements;
-  Error* error = FindElementsHelper(
-      frame_id, root_element, locator, query, true, &elements);
-  if (!error)
-    *element = elements[0];
-  return error;
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::FindNativeElement,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            root_element,
+            locator,
+            query,
+            element,
+            &error));
+
+        return error;
+    }
+
+    std::vector<ElementId> elements;
+    Error* error = FindElementsHelper(
+        frame_id, root_element, locator, query, true, &elements);
+    if (!error)
+      *element = elements[0];
+    return error;
 }
 
 Error* Session::FindElements(const FrameId& frame_id,
@@ -960,6 +1008,22 @@ Error* Session::FindElements(const FrameId& frame_id,
                              const std::string& locator,
                              const std::string& query,
                              std::vector<ElementId>* elements) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::FindNativeElements,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            root_element,
+            locator,
+            query,
+            elements,
+            &error));
+
+        return error;
+    }
+
   return FindElementsHelper(
       frame_id, root_element, locator, query, false, elements);
 }
@@ -982,6 +1046,7 @@ Error* Session::GetElementRegionInView(
     bool center,
     bool verify_clickable_at_middle,
     Point* location) {
+    // TODO: extend for native app
   CHECK(element.is_valid());
 
   Point region_offset = region.origin();
@@ -1031,6 +1096,21 @@ Error* Session::GetElementRegionInView(
 Error* Session::GetElementSize(const FrameId& frame_id,
                                const ElementId& element,
                                Size* size) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementSize,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            size,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_SIZE),
@@ -1042,6 +1122,7 @@ Error* Session::GetElementSize(const FrameId& frame_id,
 Error* Session::GetElementFirstClientRect(const FrameId& frame_id,
                                           const ElementId& element,
                                           Rect* rect) {
+    // TODO: extend for native app
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
@@ -1055,6 +1136,7 @@ Error* Session::GetElementEffectiveStyle(
     const ElementId& element,
     const std::string& prop,
     std::string* value) {
+    // TODO: extend for native app
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_EFFECTIVE_STYLE),
@@ -1067,6 +1149,7 @@ Error* Session::GetElementBorder(const FrameId& frame_id,
                                  const ElementId& element,
                                  int* border_left,
                                  int* border_top) {
+    // TODO: extend for native app
   std::string border_left_str, border_top_str;
   Error* error = GetElementEffectiveStyle(
       frame_id, element, "border-left-width", &border_left_str);
@@ -1086,6 +1169,22 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
                                    const ElementId& element,
                                    bool ignore_opacity,
                                    bool* is_displayed) {
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementDisplayed,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            ignore_opacity,
+            is_displayed,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_DISPLAYED),
@@ -1097,6 +1196,21 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
 Error* Session::IsElementEnabled(const FrameId& frame_id,
                                  const ElementId& element,
                                  bool* is_enabled) {
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementEnabled,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            is_enabled,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_ENABLED),
@@ -1108,6 +1222,7 @@ Error* Session::IsElementEnabled(const FrameId& frame_id,
 Error* Session::IsOptionElementSelected(const FrameId& frame_id,
                                         const ElementId& element,
                                         bool* is_selected) {
+    // TODO: extend for native app
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_SELECTED),
@@ -1119,6 +1234,7 @@ Error* Session::IsOptionElementSelected(const FrameId& frame_id,
 Error* Session::SetOptionElementSelected(const FrameId& frame_id,
                                          const ElementId& element,
                                          bool selected) {
+    // TODO: extend for native app
   // This wrapper ensures the script is started successfully and
   // allows for an alert to happen when the option selection occurs.
   // See selenium bug 2671.
@@ -1139,6 +1255,7 @@ Error* Session::SetOptionElementSelected(const FrameId& frame_id,
 
 Error* Session::ToggleOptionElement(const FrameId& frame_id,
                                     const ElementId& element) {
+    // TODO: extend for native app
   bool is_selected;
   Error* error = IsOptionElementSelected(frame_id, element, &is_selected);
   if (error)
@@ -1150,6 +1267,10 @@ Error* Session::ToggleOptionElement(const FrameId& frame_id,
 Error* Session::GetElementTagName(const FrameId& frame_id,
                                   const ElementId& element,
                                   std::string* tag_name) {
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support tag names");
+    }
   return ExecuteScriptAndParse(
       frame_id,
       "function(elem) { return elem.tagName.toLowerCase() }",
@@ -1160,6 +1281,7 @@ Error* Session::GetElementTagName(const FrameId& frame_id,
 
 Error* Session::GetClickableLocation(const ElementId& element,
                                      Point* location) {
+    // TODO: extend for native app
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
@@ -1206,6 +1328,10 @@ Error* Session::GetClickableLocation(const ElementId& element,
 Error* Session::GetAttribute(const ElementId& element,
                              const std::string& key,
                              Value** value) {
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support attributes");
+    }
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::GET_ATTRIBUTE),
@@ -1827,6 +1953,7 @@ Error* Session::ExecuteFindElementScriptAndParse(
 }
 
 Error* Session::VerifyElementIsClickable(
+        // TODO: extend for native app
     const FrameId& frame_id,
     const ElementId& element,
     const Point& location) {
@@ -1873,6 +2000,7 @@ Error* Session::VerifyElementIsClickable(
 }
 
 Error* Session::GetElementRegionInViewHelper(
+        // TODO: extend for native app
     const FrameId& frame_id,
     const ElementId& element,
     const Rect& region,
