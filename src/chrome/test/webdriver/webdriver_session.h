@@ -277,6 +277,10 @@ class Session {
                             bool ignore_opacity,
                             bool* is_visible);
 
+  // Clear input element.
+  Error* ClearElement(const FrameId& frame_id,
+                            const ElementId& element);
+
   // Gets whether the element is currently enabled.
   Error* IsElementEnabled(const FrameId& frame_id,
                           const ElementId& element,

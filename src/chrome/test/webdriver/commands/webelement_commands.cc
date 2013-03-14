@@ -94,6 +94,15 @@ bool ElementClearCommand::DoesPost() {
 }
 
 void ElementClearCommand::ExecutePost(Response* const response) {
+    Error* error = session_->ClearElement(
+        session_->current_target(), element);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+
+    // TODO: check if we need Value from session.
+    /*
   ListValue args;
   args.Append(element.ToValue());
 
@@ -107,6 +116,7 @@ void ElementClearCommand::ExecutePost(Response* const response) {
     return;
   }
   response->SetValue(result);
+  */
 }
 
 ///////////////////// ElementCssCommand ////////////////////

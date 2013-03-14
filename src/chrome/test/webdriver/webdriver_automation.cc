@@ -12,6 +12,8 @@
 #include <QtCore/QDebug>
 #include <QtNetwork/QtNetwork>
 #include <QtGui/QMessageBox>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPlainTextEdit>
 #include <QtGui/QInputDialog>
 
 #include "webdriver_automation.h"
@@ -1028,6 +1030,44 @@ void Automation::GetNativeElementSize(const WebViewId& view_id,
     }
 
     *size = Size(pWidget->width(), pWidget->height());
+}
+
+void Automation::ClearNativeElement(const WebViewId& view_id,
+                       const ElementId& element,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    // check if we can clear element
+    QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit*>(pWidget);
+    if (NULL != plainTextEdit)
+    {
+        plainTextEdit->clear();
+        return;
+    }
+
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
+    if (NULL != lineEdit)
+    {
+        lineEdit->clear();
+        return;
+    }
+
+    *error = new Error(kNoSuchElement);
+    return;
 }
 
 void Automation::IsNativeElementDisplayed(const WebViewId& view_id,

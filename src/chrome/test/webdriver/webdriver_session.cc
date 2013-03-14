@@ -1193,6 +1193,35 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
       CreateDirectValueParser(is_displayed));
 }
 
+Error* Session::ClearElement(const FrameId& frame_id,
+                          const ElementId& element) {
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::ClearNativeElement,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            &error));
+
+        return error;
+    }
+
+    ListValue args;
+    args.Append(element.ToValue());
+
+    std::string script = base::StringPrintf(
+        "(%s).apply(null, arguments);", atoms::asString(atoms::CLEAR).c_str());
+
+    Value* result = NULL;
+    Error* error = ExecuteScript(script, &args, &result);
+
+    // TODO: check if we need return "result" value
+    return error;
+}
+
+
 Error* Session::IsElementEnabled(const FrameId& frame_id,
                                  const ElementId& element,
                                  bool* is_enabled) {
