@@ -1,5 +1,5 @@
 #include <QtGui/QApplication>
-#include <QtWebKit/QWebSettings>
+#include <QtWebKit/QtWebKit>
 #include <QtCore/QTextCodec>
 #include <MhapWebDriver.h>
 #include <QtCore/QFuture>
@@ -25,6 +25,10 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setLocalStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
+
+    //Test
+    regitsterView<QWebView>("QWebView");
+    regitsterView<QWidget>("QWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));

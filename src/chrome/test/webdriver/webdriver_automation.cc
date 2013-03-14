@@ -56,7 +56,7 @@
 // #include "base/win/windows_version.h"
 // #endif
 
-#include <iostream>
+#include "viewfactory.h"
 
 class QNetworkCookie;
 
@@ -91,11 +91,12 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     pWeb = NULL;
 
     //Searching for a allready opened window
-    qDebug()<<"[WD]:""Browser Start Window: "<<options.browser_start_window.c_str();
     if (!options.browser_start_window.empty())
+    {
+        qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
         foreach(QWidget* pWidget, qApp->allWidgets())
         {
-            qDebug()<<"[WD]:"<<pWidget<<pWidget->windowTitle();
+            qDebug()<<"[WD]:"<<"looking for start window"<<pWidget<<pWidget->windowTitle();
 
             if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
             {
@@ -104,15 +105,22 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
                 if ((pView != NULL) && !pView->property("sessionId").isValid())
                 {
                     pWeb = pView;
-                    qsrand(QTime::currentTime().msec());
-                    pWeb->setProperty("automationId", qrand());
                     break;
                 }
             }
         }
-    //or create default one
+    }
+
+    //or create new one
     if (pWeb == NULL)
-        pWeb = new QWebViewExt();
+        pWeb = dynamic_cast<QWebView*>(ViewFactory::GetInstance()->create(options.browser_class));
+
+    qDebug()<<"[WD]:"<<"Using window:"<<pWeb;
+    if (pWeb == NULL)
+    {
+        *error = new Error(kBadRequest, "Can't create WebView");
+        return;
+    }
 
     //proxy setup
     if (options.command.HasSwitch(switches::kNoProxyServer))
@@ -202,7 +210,6 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         }
     }
 
-    qDebug()<<"WD: "<<pWeb->geometry();
     if (options.command.HasSwitch(switches::kStartMaximized))
         pWeb->showMaximized();
 

@@ -113,6 +113,7 @@ Error* CapabilitiesParser::Parse() {
     parser_map["chrome.noWebsiteTestingDefaults"] =
         &CapabilitiesParser::ParseNoWebsiteTestingDefaults;
     parser_map["browserStartWindow"] = &CapabilitiesParser::ParseBrowserStartWindow;
+    parser_map["browserClass"] = &CapabilitiesParser::ParseBrowserClass;
   } else {
     parser_map["args"] = &CapabilitiesParser::ParseArgs;
     parser_map["binary"] = &CapabilitiesParser::ParseBinary;
@@ -128,6 +129,7 @@ Error* CapabilitiesParser::Parse() {
         &CapabilitiesParser::ParseNoWebsiteTestingDefaults;
     parser_map["switches"] = &CapabilitiesParser::ParseArgs;
     parser_map["browserStartWindow"] = &CapabilitiesParser::ParseBrowserStartWindow;
+    parser_map["browserClass"] = &CapabilitiesParser::ParseBrowserClass;
   }
 
   DictionaryValue::key_iterator key_iter = options->begin_keys();
@@ -439,8 +441,14 @@ Error* CapabilitiesParser::ParseNoWebsiteTestingDefaults(const Value* option) {
 }
 
 Error* CapabilitiesParser::ParseBrowserStartWindow(const Value* option) {
-  if (!option->GetAsString(&caps_->browserStartWindow))
+  if (!option->GetAsString(&caps_->browser_start_window))
     return CreateBadInputError("browserStartWindow", Value::TYPE_STRING, option);
+  return NULL;
+}
+
+Error* CapabilitiesParser::ParseBrowserClass(const Value* option) {
+  if (!option->GetAsString(&caps_->browser_class))
+    return CreateBadInputError("browserClass", Value::TYPE_STRING, option);
   return NULL;
 }
 

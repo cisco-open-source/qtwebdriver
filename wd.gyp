@@ -211,6 +211,7 @@
         'src/third_party/zlib/inflate.c',
         'src/third_party/zlib/inftrees.c',
         'src/third_party/zlib/zutil.c',
+        'src/viewfactory.cc',
       ],
     }, {
       'target_name': 'WebDriverTest',
