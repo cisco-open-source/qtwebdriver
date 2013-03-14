@@ -231,6 +231,10 @@ class Session {
   // Scroll the element into view and get its location relative to
   // the client's viewport.
   Error* GetElementLocationInView(
+            const ElementId& element,
+            Point* location);
+
+  Error* GetElementLocation(const FrameId& frame_id,
       const ElementId& element,
       Point* location);
 

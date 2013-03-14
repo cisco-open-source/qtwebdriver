@@ -276,20 +276,16 @@ bool ElementLocationCommand::DoesGet() {
 }
 
 void ElementLocationCommand::ExecuteGet(Response* const response) {
-  std::string script = base::StringPrintf(
-      "return (%s).apply(null, arguments);",
-      atoms::asString(atoms::GET_LOCATION).c_str());
-
-  ListValue args;
-  args.Append(element.ToValue());
-
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(script, &args, &result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(result);
+    Point location;
+    Error* error = session_->GetElementLocation(session_->current_target(), element, &location);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    DictionaryValue* coord_dict = new DictionaryValue();
+    coord_dict->SetInteger("x", location.x());
+    coord_dict->SetInteger("y", location.y());
+    response->SetValue(coord_dict);
 }
 
 ///////////////////// ElementLocationInViewCommand ////////////////////

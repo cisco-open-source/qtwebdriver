@@ -1004,6 +1004,7 @@ QWidget* Automation::GetNativeElement(const WebViewId &view_id, const ElementId 
         return rootWidget.data();
     }
 
+    // TODO: add kStaleElementReference error
     qWarning() << "[WD] GetNativeElement: element " << element.id().c_str() << " not found.";
 
     return NULL;
@@ -1072,6 +1073,34 @@ void Automation::GetNativeElementWithFocus(const WebViewId& view_id,
     *element = ElementId(elementKey.toStdString());
 
     qDebug() << "[WD] GetNativeElementWithFocus, found:" << focusWidget << " key:" << elementKey;
+}
+
+void Automation::GetNativeElementLocation(const WebViewId& view_id,
+                       const ElementId& element,
+                       Point* location,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
+
+    qDebug() << "[WD] GetNativeElementLocation: " << pos;
+
+    // TODO: replace with smth more correct :)
+    *location = Point(pos.x(), pos.y());
 }
 
 void Automation::ClearNativeElement(const WebViewId& view_id,

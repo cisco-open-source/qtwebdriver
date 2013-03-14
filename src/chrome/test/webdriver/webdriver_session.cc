@@ -1040,6 +1040,34 @@ Error* Session::GetElementLocationInView(
       false /* center */, false /* verify_clickable_at_middle */, location);
 }
 
+Error* Session::GetElementLocation(
+        const FrameId& frame_id,
+        const ElementId& element,
+        Point* location) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementLocation,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      atoms::asString(atoms::GET_LOCATION),
+      "getLocation",
+      CreateListValueFrom(element),
+      CreateDirectValueParser(location));
+}
+
 Error* Session::GetElementRegionInView(
     const ElementId& element,
     const Rect& region,
