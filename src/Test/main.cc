@@ -24,7 +24,10 @@ class MainWindow : public QWidget
      virtual ~MainWindow();
 
  private slots:
-     void testPushButton();
+     void PushButtonPressed();
+     void PushButtonReleased();
+     void PushButtonClicked();
+
 
  private:
      QLineEdit *textEdit;
@@ -50,7 +53,9 @@ MainWindow::MainWindow()
     this->resize(1024, 800);
     this->setWindowTitle("WD_native");
 
-    connect(pushButton, SIGNAL(clicked()), this, SLOT(testPushButton()));
+    connect(pushButton, SIGNAL(pressed()), this, SLOT(PushButtonPressed()));
+    connect(pushButton, SIGNAL(released()), this, SLOT(PushButtonReleased()));
+    connect(pushButton, SIGNAL(clicked()), this, SLOT(PushButtonClicked()));
 }
 
 MainWindow::~MainWindow()
@@ -58,10 +63,25 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::testPushButton()
+void MainWindow::PushButtonPressed()
 {
-    qDebug() << "\n\n!!!!!!!!!!!! Test PushButton !!!!!!!!!!!!!!\n\n";
-    textEdit->setText("It's alive ;-)");
+    QString msg = "\n!!!!!!! Test PushButton pressed !!!!!!!!\n";
+    qDebug() << msg;
+    textEdit->setText(msg);
+}
+
+void MainWindow::PushButtonReleased()
+{
+    QString msg = "\n!!!!!!! Test PushButton released !!!!!!!!\n";
+    qDebug() << msg;
+    textEdit->setText(msg);
+}
+
+void MainWindow::PushButtonClicked()
+{
+    QString msg = "\n!!!!!!! Test PushButton clicked !!!!!!!!\n";
+    qDebug() << msg;
+    textEdit->setText(msg);
 }
 
 int main(int argc, char *argv[])
@@ -84,9 +104,9 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
 
-regitsterView<QWebView>("QWebView");
+    regitsterView<QWebView>("QWebView");
     regitsterView<QWidget>("QWidget");
-	    MainWindow mainWindow;
+    MainWindow mainWindow;
     mainWindow.show();
 
     QFutureWatcher<int> watcher;
