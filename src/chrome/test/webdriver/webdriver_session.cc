@@ -44,7 +44,6 @@
 
 #include <QtGui/QApplication>
 #include <QtCore/QDebug>
-#include <Qt/QtTest>
 
 
 using automation::kLeftButton;
