@@ -312,8 +312,23 @@ void Automation::MouseMoveDeprecated(const WebViewId &view_id, const Point &p, E
 
     QWidget *view = view_id.GetView();
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPointToQPoint(p), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(view, moveEvent);
+    QPoint point = ConvertPointToQPoint(p);
+
+    // Find child widget that will receive event
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget)
+    {
+        qDebug() << "[WD] mouse move at view " << point << " on element: " << receiverWidget;
+        point = receiverWidget->mapFrom(view, point);
+    }
+    else
+    {
+        qDebug() << "[WD] mouse move at view " << point;
+        receiverWidget = view;
+    }
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(receiverWidget, moveEvent);
 }
 
 void Automation::MouseClickDeprecated(const WebViewId &view_id, const Point &p, automation::MouseButton button, Error **error)
@@ -327,16 +342,30 @@ void Automation::MouseClickDeprecated(const WebViewId &view_id, const Point &p, 
     QWidget *view = view_id.GetView();
 
     QPoint point = ConvertPointToQPoint(p);
+
+    // Find child widget that will receive click
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget)
+    {
+        qDebug() << "[WD] click at view " << point << " on element: " << receiverWidget;
+        point = receiverWidget->mapFrom(view, point);
+    }
+    else
+    {
+        qDebug() << "[WD] click at view " << point;
+        receiverWidget = view;
+    }
+
     Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
 
-    QApplication::postEvent(view, pressEvent);
-    QApplication::postEvent(view, releaseEvent);
+    QApplication::postEvent(receiverWidget, pressEvent);
+    QApplication::postEvent(receiverWidget, releaseEvent);
     if (Qt::RightButton == mouseButton)
     {
         QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
-        QApplication::postEvent(view, contextEvent);
+        QApplication::postEvent(receiverWidget, contextEvent);
     }
 }
 
@@ -349,6 +378,8 @@ void Automation::MouseDragDeprecated(const WebViewId &view_id, const Point &star
     }
 
     QWidget *view = view_id.GetView();
+
+    // TODO: verify this
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPointToQPoint(start), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, ConvertPointToQPoint(end), Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
@@ -369,8 +400,23 @@ void Automation::MouseButtonUpDeprecated(const WebViewId &view_id, const Point &
 
     QWidget *view = view_id.GetView();
 
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(view, releaseEvent);
+    QPoint point = ConvertPointToQPoint(p);
+
+    // Find child widget that will receive event
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget)
+    {
+        qDebug() << "[WD] mouse button up at view " << point << " on element: " << receiverWidget;
+        point = receiverWidget->mapFrom(view, point);
+    }
+    else
+    {
+        qDebug() << "[WD] mouse button up at view " << point;
+        receiverWidget = view;
+    }
+
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(receiverWidget, releaseEvent);
 }
 
 void Automation::MouseButtonDownDeprecated(const WebViewId &view_id, const Point &p, Error **error)
@@ -383,8 +429,23 @@ void Automation::MouseButtonDownDeprecated(const WebViewId &view_id, const Point
 
     QWidget *view = view_id.GetView();
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::sendEvent(view, pressEvent);
+    QPoint point = ConvertPointToQPoint(p);
+
+    // Find child widget that will receive event
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget)
+    {
+        qDebug() << "[WD] mouse move at view " << point << " on element: " << receiverWidget;
+        point = receiverWidget->mapFrom(view, point);
+    }
+    else
+    {
+        qDebug() << "[WD] mouse move at view " << point;
+        receiverWidget = view;
+    }
+
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::sendEvent(receiverWidget, pressEvent);
 }
 
 void Automation::MouseDoubleClickDeprecated(const WebViewId &view_id, const Point &p, Error **error)
@@ -397,11 +458,26 @@ void Automation::MouseDoubleClickDeprecated(const WebViewId &view_id, const Poin
 
     QWidget *view = view_id.GetView();
 
-    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, ConvertPointToQPoint(p), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QPoint point = ConvertPointToQPoint(p);
 
-    QApplication::postEvent(view, dbEvent);
-    QApplication::postEvent(view, releaseEvent);
+    // Find child widget that will receive event
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget)
+    {
+        qDebug() << "[WD] mouse move at view " << point << " on element: " << receiverWidget;
+        point = receiverWidget->mapFrom(view, point);
+    }
+    else
+    {
+        qDebug() << "[WD] mouse move at view " << point;
+        receiverWidget = view;
+    }
+
+    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(receiverWidget, dbEvent);
+    QApplication::postEvent(receiverWidget, releaseEvent);
 }
 
 void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &location,
@@ -422,6 +498,8 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
         urls.append(QUrl(paths.at(i).c_str()));
 
     data.setUrls(urls);
+
+    // TODO: verify this
 
     QDragEnterEvent *dragEnterEvent = new QDragEnterEvent(ConvertPointToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
     QDragMoveEvent *dragMoveEvent = new QDragMoveEvent(ConvertPointToQPoint(location), Qt::CopyAction, &data, Qt::LeftButton,  Qt::NoModifier);
@@ -1363,15 +1441,19 @@ bool Automation::FilterNativeWidget(const QWidget* widget, const std::string& lo
     }
     else if (locator == LocatorType::kXpath)
     {
+        qWarning() << "[WD] unimplemented locator:" << locator.c_str();
         // TODO: implement if possible
         return false;
     }
+    else
+    {
+        qWarning() << "[WD] unsupported locator:" << locator.c_str();
+        // LocatorType::kLinkText
+        // LocatorType::kPartialLinkText
+        // LocatorType::kCss
+        // LocatorType::kTagName
+    }
 
-    qWarning() << "[WD] unsupported locator:" << locator.c_str();
-    // LocatorType::kLinkText
-    // LocatorType::kPartialLinkText
-    // LocatorType::kCss
-    // LocatorType::kTagName
     return false;
 }
 
