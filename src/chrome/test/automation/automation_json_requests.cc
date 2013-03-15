@@ -115,20 +115,28 @@ WebViewId  WebViewId::ForQtView(QWidget *view)
     WebViewId id;
     id.old_style_ = false;
     id.view_ = view;
-    QVariant automationId = view->property("automationId");
+
+    int automationId;
+    QVariant viewAutomationId = view->property("automationId");
     QWebView* pView = qobject_cast<QWebView*>(view);
-    if (automationId.isValid())
+    if (viewAutomationId.isValid())
+       automationId = viewAutomationId.toInt();
+    else
     {
-        if (pView != NULL)
-        {
-            AutomationId aId(AutomationId::kTypeTab, QString::number(automationId.toInt()).toStdString());
-            id.id_ = aId;
-        }
-        else
-        {
-            AutomationId aId(AutomationId::kTypeAppShell, QString::number(automationId.toInt()).toStdString());
-            id.id_ = aId;
-        }
+        qsrand(QTime::currentTime().msec());
+        automationId = qrand();
+        view->setProperty("automationId", automationId);
+    }
+
+    if (pView != NULL)
+    {
+        AutomationId aId(AutomationId::kTypeTab, QString::number(automationId).toStdString());
+        id.id_ = aId;
+    }
+    else
+    {
+        AutomationId aId(AutomationId::kTypeAppShell, QString::number(automationId).toStdString());
+        id.id_ = aId;
     }
     return id;
 }

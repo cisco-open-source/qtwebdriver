@@ -58,6 +58,7 @@
 // #include "base/win/windows_version.h"
 // #endif
 
+#include "viewfactory.h"
 #include <iostream>
 
 class QNetworkCookie;
@@ -93,9 +94,9 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     QWidget *pStartView = NULL;
 
     //Searching for a allready opened window
-    qDebug() << "[WD]:""Browser Start Window: " << options.browser_start_window.c_str();
     if (!options.browser_start_window.empty())
     {
+        qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
         foreach(QWidget* pWidget, qApp->allWidgets())
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
@@ -103,13 +104,12 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             //check found widget if it is QWebView or top level widget; and if it don't belong to any session
             if ((pView != NULL) || (pWidget->isTopLevel()) && !pWidget->property("sessionId").isValid())
             {
-                qDebug()<<"[WD]:"<<pWidget<<pWidget->windowTitle();
+            qDebug()<<"[WD]:"<<"looking for start window"<<pWidget<<pWidget->windowTitle();
 
                 if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
                 {
                     pStartView = pWidget;
-                    qsrand(QTime::currentTime().msec());
-                    pStartView->setProperty("automationId", qrand());
+                    pWeb->setProperty("automationId", qrand());
 
                     qDebug()<<"[WD]: found view to attach: "<<pWidget<<pWidget->windowTitle();
 
@@ -119,9 +119,16 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         }
     }
 
-    //or create default one
+    //or create new one
     if (pStartView == NULL)
-        pStartView = new QWebViewExt();
+        pStartView = ViewFactory::GetInstance()->create(options.browser_class);
+
+    qDebug()<<"[WD]:"<<"Using window:"<<pStartView;
+    if (pStartView == NULL)
+    {
+        *error = new Error(kBadRequest, "Can't create WebView");
+        return;
+    }
 
     // TODO: save proxy settings for further usage
     QWebView* pWebView = qobject_cast<QWebView*>(pStartView);

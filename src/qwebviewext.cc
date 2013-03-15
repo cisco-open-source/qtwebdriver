@@ -3,12 +3,11 @@
 #include <QtCore/QTime>
 #include <QtCore/QDebug>
 #include <QtNetwork/QNetworkProxy>
+#include <QtGui/QWidget>
 
 QWebViewExt::QWebViewExt(QWidget *parent) :
     QWebView(parent)
 {
-    qsrand(QTime::currentTime().msec());
-    setProperty("automationId", qrand());
     connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
 }
 

@@ -117,10 +117,11 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
   Automation::BrowserOptions browser_options;
   //browser_options.command = capabilities_.command;
   browser_options.channel_id = capabilities_.channel;
-  browser_options.browser_start_window = capabilities_.browserStartWindow;
+  browser_options.browser_start_window = capabilities_.browser_start_window;
   browser_options.detach_process = capabilities_.detach;
   browser_options.user_data_dir = capabilities_.profile;
   browser_options.command = capabilities_.command;
+  browser_options.browser_class = capabilities_.browser_class;
   if (!capabilities_.no_website_testing_defaults) {
     browser_options.ignore_certificate_errors = true;
   }

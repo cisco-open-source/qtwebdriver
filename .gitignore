@@ -14,4 +14,9 @@ test/Java/out
 report/*
 /bin/
 /lib/
+/out/
 /wd.gypi
+/wd.Makefile
+/Makefile
+/WebDriver.target.mk
+/WebDriverTest.target.mk

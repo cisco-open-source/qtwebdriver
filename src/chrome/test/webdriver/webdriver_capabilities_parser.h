@@ -73,7 +73,10 @@ struct Capabilities {
   FilePath profile;
 
   // Name of the window to use for connecting to an already running QWebView.
-  std::string browserStartWindow;
+  std::string browser_start_window;
+
+  // Name of the WebView class to create as "browser"
+  std::string browser_class;
 
   // save proxy capabilities to return in "sessions" command
   DictionaryValue *proxy;
@@ -118,6 +121,7 @@ class CapabilitiesParser {
   Error* ParseProxyServers(const base::DictionaryValue* options);
   Error* ParseNoWebsiteTestingDefaults(const base::Value* option);
   Error* ParseBrowserStartWindow(const base::Value* option);
+  Error* ParseBrowserClass(const base::Value* option);
 
   // The capabilities dictionary to parse.
   const base::DictionaryValue* dict_;

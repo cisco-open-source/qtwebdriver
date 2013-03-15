@@ -2,7 +2,6 @@
 #define QWEBVIEWEXT_H
 
 #include <QtWebKit/QWebView>
-#include "chrome/common/automation_id.h"
 
 class QWebViewExt : public QWebView
 {

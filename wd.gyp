@@ -3,15 +3,55 @@
     "wd.gypi",
   ],
 
+  'conditions': [
+    [ 'platform == "desktop"', {
+      'variables': {
+        'QT_INC_PATH': '<(DESKTOP_QT_INC_PATH)',
+        'QT_LIB_PATH': '<(DESKTOP_QT_LIB_PATH)'
+      },
+    } ],
+
+    [ 'platform == "flip"', {
+      'variables': {
+        'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
+        'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)'
+      },
+    } ],
+  ],
+
+  'target_defaults': {
+    'cflags': [
+      '-g',
+      '-fPIC',
+      '-Wall',
+      '-W',
+    ],
+
+    'defines': [
+      'OS_POSIX',
+      'QT_NO_DEBUG',
+      'QT_GUI_LIB',
+      'QT_CORE_LIB',
+      'QT_SHARED',
+    ],
+
+    'configurations': {
+      'desktop': {},
+      'flip': {},
+    },
+  },
+
   'targets': [
     {
       'target_name': 'WebDriver',
       'type': '<(library)',
 
+      'standalone_static_library': 1,
+
       'include_dirs': [
         'inc/',
-      	'src/',
-      	'<(CISCO_QT_INC_PATH)',
+        'src/',
+        '<(QT_INC_PATH)',
       ],
 
       'sources': [
@@ -186,6 +226,7 @@
         'src/third_party/zlib/inflate.c',
         'src/third_party/zlib/inftrees.c',
         'src/third_party/zlib/zutil.c',
+        'src/viewfactory.cc',
       ],
     }, {
       'target_name': 'WebDriverTest',
@@ -193,15 +234,15 @@
 
       'include_dirs': [
         'inc/',
-        '<(DESKTOP_QT_INC_PATH)',
+        '<(QT_INC_PATH)',
       ],
 
       'dependencies': [
-      	'WebDriver',
+        'WebDriver',
       ],
 
       'libraries': [
-        '-L<(DESKTOP_QT_LIB_PATH)',
+        '-L<(QT_LIB_PATH)',
         '-lQtWebKit',
         '-lQtNetwork',
         '-lQtGui',

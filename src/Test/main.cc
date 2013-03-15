@@ -1,5 +1,5 @@
 #include <QtGui/QApplication>
-#include <QtWebKit/QWebSettings>
+#include <QtWebKit/QtWebKit>
 #include <QtCore/QTextCodec>
 #include <MhapWebDriver.h>
 #include <QtCore/QFuture>
@@ -83,8 +83,10 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
-    // start hybridTest window
-    MainWindow mainWindow;
+
+regitsterView<QWebView>("QWebView");
+    regitsterView<QWidget>("QWidget");
+	    MainWindow mainWindow;
     mainWindow.show();
 
     QFutureWatcher<int> watcher;

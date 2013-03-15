@@ -104,6 +104,10 @@ class Automation : public QObject {
     // The name of window of an already running browser to connect to. If empty,
     // create default window
     std::string browser_start_window;
+
+    // The name of WebView class that will be created on session init. If empty
+    // or can't be resolved create default QWebViewExt
+    std::string browser_class;
   };
 
   explicit Automation(const Logger& logger);
