@@ -35,10 +35,13 @@
       'QT_SHARED',
     ],
 
-    'configurations': {
-      'desktop': {},
-      'flip': {},
-    },
+    'conditions': [
+      [ 'mode == "release"', {
+        'defines': [
+          'NDEBUG',
+        ],
+      } ],
+    ],
   },
 
   'targets': [
