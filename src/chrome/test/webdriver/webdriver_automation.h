@@ -333,6 +333,11 @@ class Automation : public QObject {
                          Point* location,
                          Error** error);
 
+  void GetNativeElementLocationInView(const WebViewId& view_id,
+                         const ElementId& element,
+                         Point* location,
+                         Error** error);
+
   void ClearNativeElement(const WebViewId& view_id,
                          const ElementId& element,
                          Error** error);

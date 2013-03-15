@@ -1042,6 +1042,21 @@ Error* Session::FindElements(const FrameId& frame_id,
 Error* Session::GetElementLocationInView(
     const ElementId& element,
     Point* location) {
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementLocationInView,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
   Size size;
   Error* error = GetElementSize(current_target_, element, &size);
   if (error)

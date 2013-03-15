@@ -1103,6 +1103,35 @@ void Automation::GetNativeElementLocation(const WebViewId& view_id,
     *location = Point(pos.x(), pos.y());
 }
 
+void Automation::GetNativeElementLocationInView(const WebViewId& view_id,
+                       const ElementId& element,
+                       Point* location,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
+
+    qDebug() << "[WD] GetNativeElementLocationInView: " << pos;
+
+    // TODO: replace with smth more correct :)
+    // TODO: get location in view
+    *location = Point(pos.x(), pos.y());
+}
+
 void Automation::ClearNativeElement(const WebViewId& view_id,
                        const ElementId& element,
                        Error** error)
