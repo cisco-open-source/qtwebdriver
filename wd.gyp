@@ -47,7 +47,7 @@
   'targets': [
     {
       'target_name': 'WebDriver',
-      'type': '<(library)',
+      'type': 'static_library',
 
       'standalone_static_library': 1,
 
@@ -230,6 +230,15 @@
         'src/third_party/zlib/inftrees.c',
         'src/third_party/zlib/zutil.c',
         'src/viewfactory.cc',
+      ],
+    }, {
+      'target_name': 'WebDriverShared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver',
+
+      'dependencies': [
+        'WebDriver',
       ],
     }, {
       'target_name': 'WebDriverTest',

@@ -19,12 +19,13 @@ for platform in $platforms
 do
   for mode in $modes
   do
-    gyp --depth . -D library=static_library -G output_dir=. -D platform=$platform -D mode=$mode --generator-output=out/$platform/$mode wd.gyp
+    gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode --generator-output=out/$platform/$mode wd.gyp
     cd out/$platform/$mode
     make
     cd ../../..
     mkdir -p bin/$platform/$mode/
     cp -f out/$platform/$mode/Default/libWebDriver.a bin/$platform/$mode/
+    cp -f out/$platform/$mode/Default/lib.target/libWebDriver.so bin/$platform/$mode/
     cp -f out/$platform/$mode/Default/WebDriverTest bin/$platform/$mode/
   done
 done
