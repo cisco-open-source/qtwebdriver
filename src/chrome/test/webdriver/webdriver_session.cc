@@ -1224,7 +1224,7 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
                                    bool ignore_opacity,
                                    bool* is_displayed) {
 
-    if (current_target_.view_id.IsApp()) {
+    if (frame_id.view_id.IsApp()) {
         Error* error = NULL;
 
         RunSessionTask(base::Bind(
@@ -1249,7 +1249,7 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
 
 Error* Session::ActiveElement(const FrameId& frame_id,
                    ElementId* element) {
-    if (current_target_.view_id.IsApp()) {
+    if (frame_id.view_id.IsApp()) {
         Error* error = NULL;
 
         RunSessionTask(base::Bind(
@@ -1276,7 +1276,7 @@ Error* Session::ActiveElement(const FrameId& frame_id,
 
 Error* Session::ClearElement(const FrameId& frame_id,
                           const ElementId& element) {
-    if (current_target_.view_id.IsApp()) {
+    if (frame_id.view_id.IsApp()) {
         Error* error = NULL;
 
         RunSessionTask(base::Bind(
@@ -1302,12 +1302,72 @@ Error* Session::ClearElement(const FrameId& frame_id,
     return error;
 }
 
+Error* Session::MoveAndClickElement(const FrameId& frame_id,
+                                const ElementId& element) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+        Point location;
+
+        error = GetClickableLocation(element, &location);
+        if (!error)
+          error = MouseMoveAndClick(location, automation::kLeftButton);
+
+        return error;
+    }
+
+    std::string tag_name;
+    Error* error = GetElementTagName(
+            frame_id, element, &tag_name);
+    if (error) {
+      return error;
+    }
+
+    if (tag_name == "option") {
+      const char* kCanOptionBeToggledScript =
+          "function(option) {"
+          "  for (var parent = option.parentElement;"
+          "       parent;"
+          "       parent = parent.parentElement) {"
+          "    if (parent.tagName.toLowerCase() == 'select') {"
+          "      return parent.multiple;"
+          "    }"
+          "  }"
+          "  throw new Error('Option element is not in a select');"
+          "}";
+      bool can_be_toggled;
+      error = ExecuteScriptAndParse(
+          frame_id,
+          kCanOptionBeToggledScript,
+          "canOptionBeToggled",
+          CreateListValueFrom(element),
+          CreateDirectValueParser(&can_be_toggled));
+      if (error) {
+        return error;
+      }
+
+      if (can_be_toggled) {
+        error = ToggleOptionElement(
+            frame_id, element);
+      } else {
+        error = SetOptionElementSelected(
+            frame_id, element, true);
+      }
+    } else {
+      Point location;
+      error = GetClickableLocation(element, &location);
+      if (!error)
+        error = MouseMoveAndClick(location, automation::kLeftButton);
+    }
+
+    return error;
+}
 
 Error* Session::IsElementEnabled(const FrameId& frame_id,
                                  const ElementId& element,
                                  bool* is_enabled) {
 
-    if (current_target_.view_id.IsApp()) {
+    if (frame_id.view_id.IsApp()) {
         Error* error = NULL;
 
         RunSessionTask(base::Bind(
@@ -1391,7 +1451,21 @@ Error* Session::GetElementTagName(const FrameId& frame_id,
 
 Error* Session::GetClickableLocation(const ElementId& element,
                                      Point* location) {
-    // TODO: extend for native app
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementClickableLocation,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
@@ -1572,6 +1646,7 @@ base::ListValue* Session::GetLog() const {
 }
 
 Error* Session::GetBrowserConnectionState(bool* online) {
+    // TODO: add native support
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::IS_ONLINE),
@@ -1581,6 +1656,7 @@ Error* Session::GetBrowserConnectionState(bool* online) {
 }
 
 Error* Session::GetAppCacheStatus(int* status) {
+    // TODO: add native support
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::GET_APPCACHE_STATUS),
@@ -1590,6 +1666,7 @@ Error* Session::GetAppCacheStatus(int* status) {
 }
 
 Error* Session::GetStorageSize(StorageType type, int* size) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_SIZE
                                 : atoms::GET_SESSION_STORAGE_SIZE);
@@ -1604,6 +1681,7 @@ Error* Session::GetStorageSize(StorageType type, int* size) {
 Error* Session::SetStorageItem(StorageType type,
                                const std::string& key,
                                const std::string& value) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::SET_LOCAL_STORAGE_ITEM
                                 : atoms::SET_SESSION_STORAGE_ITEM);
@@ -1616,6 +1694,7 @@ Error* Session::SetStorageItem(StorageType type,
 }
 
 Error* Session::ClearStorage(StorageType type) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::CLEAR_LOCAL_STORAGE
                                 : atoms::CLEAR_SESSION_STORAGE);
@@ -1628,6 +1707,7 @@ Error* Session::ClearStorage(StorageType type) {
 }
 
 Error* Session::GetStorageKeys(StorageType type, ListValue** keys) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_KEYS
                                 : atoms::GET_SESSION_STORAGE_KEYS);
@@ -1642,6 +1722,7 @@ Error* Session::GetStorageKeys(StorageType type, ListValue** keys) {
 Error* Session::GetStorageItem(StorageType type,
                                const std::string& key,
                                std::string* value) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_ITEM
                                 : atoms::GET_SESSION_STORAGE_ITEM);
@@ -1656,6 +1737,7 @@ Error* Session::GetStorageItem(StorageType type,
 Error* Session::RemoveStorageItem(StorageType type,
                                   const std::string& key,
                                   std::string* value) {
+    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::REMOVE_LOCAL_STORAGE_ITEM
                                 : atoms::REMOVE_SESSION_STORAGE_ITEM);

@@ -305,6 +305,9 @@ class Session {
                                   const ElementId& element,
                                   bool selected);
 
+  Error* MoveAndClickElement(const FrameId& frame_id,
+                                  const ElementId& element);
+
   // Toggles the option element's selection state. The option element should
   // support multi selection.
   Error* ToggleOptionElement(const FrameId& frame_id,
