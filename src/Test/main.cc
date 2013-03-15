@@ -106,8 +106,9 @@ int main(int argc, char *argv[])
 
     regitsterView<QWebView>("QWebView");
     regitsterView<QWidget>("QWidget");
-    MainWindow mainWindow;
-    mainWindow.show();
+    regitsterView<MainWindow>("MainNativeWindow");
+    //MainWindow mainWindow;
+    //mainWindow.show();
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
