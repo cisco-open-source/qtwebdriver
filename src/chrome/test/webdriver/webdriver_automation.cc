@@ -104,12 +104,11 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             //check found widget if it is QWebView or top level widget; and if it don't belong to any session
             if ((pView != NULL) || (pWidget->isTopLevel()) && !pWidget->property("sessionId").isValid())
             {
-            qDebug()<<"[WD]:"<<"looking for start window"<<pWidget<<pWidget->windowTitle();
+                qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 
                 if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
                 {
                     pStartView = pWidget;
-                    pWeb->setProperty("automationId", qrand());
 
                     qDebug()<<"[WD]: found view to attach: "<<pWidget<<pWidget->windowTitle();
 
