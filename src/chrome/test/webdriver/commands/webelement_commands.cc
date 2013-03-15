@@ -245,21 +245,16 @@ void ElementEqualsCommand::ExecuteGet(Response* const response) {
     return;
   }
 
-  std::string script = "return arguments[0] == arguments[1];";
-
-  ListValue args;
-  args.Append(element.ToValue());
-
   ElementId other_element(path_segments_.at(6));
-  args.Append(other_element.ToValue());
+  bool is_equals;
 
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(script, &args, &result);
+  Error* error = session_->ElementEquals(session_->current_target(), element, other_element, &is_equals);
   if (error) {
     response->SetError(error);
     return;
   }
-  response->SetValue(result);
+
+  response->SetValue(Value::CreateBooleanValue(is_equals));
 }
 
 ///////////////////// ElementLocationCommand ////////////////////

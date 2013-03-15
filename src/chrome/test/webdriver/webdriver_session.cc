@@ -1094,6 +1094,36 @@ Error* Session::GetElementLocation(
       CreateDirectValueParser(location));
 }
 
+Error* Session::ElementEquals(const FrameId& frame_id,
+    const ElementId& element1,
+    const ElementId& element2,
+    bool* is_equal) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::NativeElementEquals,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element1,
+            element2,
+            is_equal,
+            &error));
+
+        return error;
+    }
+
+    std::string script = "return arguments[0] == arguments[1];";
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      script,
+      "elementEquals",
+      CreateListValueFrom(element1, element2),
+      CreateDirectValueParser(is_equal));
+}
+
 Error* Session::GetElementRegionInView(
     const ElementId& element,
     const Rect& region,

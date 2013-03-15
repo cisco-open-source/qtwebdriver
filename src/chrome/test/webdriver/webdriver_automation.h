@@ -337,6 +337,12 @@ class Automation : public QObject {
                          Point* location,
                          Error** error);
 
+  void NativeElementEquals(const WebViewId& view_id,
+                         const ElementId& element1,
+                         const ElementId& element2,
+                         bool* is_equals,
+                         Error** error);
+
   void GetNativeElementClickableLocation(const WebViewId& view_id,
                          const ElementId& element,
                          Point* location,

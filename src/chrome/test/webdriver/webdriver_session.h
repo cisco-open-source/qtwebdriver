@@ -238,6 +238,11 @@ class Session {
       const ElementId& element,
       Point* location);
 
+  Error* ElementEquals(const FrameId& frame_id,
+      const ElementId& element1,
+      const ElementId& element2,
+      bool* is_equal);
+
   // Scroll the element's region into view and get its location relative to
   // the client's viewport. If |center| is true, the element will be centered
   // if it is too big to fit in view. If |verify_clickable_at_middle| is true,

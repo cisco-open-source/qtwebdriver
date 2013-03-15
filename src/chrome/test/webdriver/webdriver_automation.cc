@@ -1187,6 +1187,28 @@ void Automation::GetNativeElementLocation(const WebViewId& view_id,
     *location = Point(pos.x(), pos.y());
 }
 
+void Automation::NativeElementEquals(const WebViewId& view_id,
+                       const ElementId& element1,
+                       const ElementId& element2,
+                       bool* is_equals,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget1 = GetNativeElement(view_id, element1);
+    QWidget *pWidget2 = GetNativeElement(view_id, element2);
+
+
+    qDebug() << "[WD] NativeElementEquals: el1: " << pWidget1 << " el2: " << pWidget2 << " equals:" << (pWidget1 == pWidget2);
+
+    *is_equals = (pWidget1 == pWidget2);
+}
+
 void Automation::GetNativeElementClickableLocation(const WebViewId& view_id,
                        const ElementId& element,
                        Point* location,
