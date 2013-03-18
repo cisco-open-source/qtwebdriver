@@ -232,14 +232,15 @@ class Automation : public QObject {
   void MaximizeView(const WebViewId& view_id, Error** error);
 
   // Gets the active JavaScript modal dialog's message.
-  void GetAppModalDialogMessage(std::string* message, Error** error);
+  void GetAppModalDialogMessage(const WebViewId& view_id, std::string* message, Error** error);
 
   // Accepts or dismisses the active JavaScript modal dialog.
-  void AcceptOrDismissAppModalDialog(bool accept, Error** error);
+  void AcceptOrDismissAppModalDialog(const WebViewId& view_id, bool accept, Error** error);
 
   // Accepts an active prompt JavaScript modal dialog, using the given
   // prompt text as the result of the prompt.
-  void AcceptPromptAppModalDialog(const std::string& prompt_text,
+  void AcceptPromptAppModalDialog(const WebViewId& view_id,
+                                  const std::string& prompt_text,
                                   Error** error);
 
   // Gets the version of the runing browser.
@@ -304,7 +305,7 @@ class Automation : public QObject {
   void AddIdToCurrentFrame(const WebViewId &view_id, const FramePath &frame_path, Error **error);
 
   // set text into Prompt text field
-  void SetAlertPromptText(const std::string& text, Error **error);
+  void SetAlertPromptText(const WebViewId& view_id, const std::string& text, Error **error);
 
 
   // get native element size

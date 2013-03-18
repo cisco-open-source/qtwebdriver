@@ -1546,15 +1546,22 @@ bool Automation::FilterNativeWidget(const QWidget* widget, const std::string& lo
 }
 
 
-void Automation::GetAppModalDialogMessage(std::string* message, Error** error)
+void Automation::GetAppModalDialogMessage(const WebViewId& view_id, std::string* message, Error** error)
 {
-    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
 
+  if(!checkView(view_id))
+  {
+      *error = new Error(kNoSuchWindow);
+      return;
+  }
+
+  QWidget *view = view_id.GetView();
+
   // QMessageBox::information(pWeb, "Alert", message->c_str(), QMessageBox::Ok);
-  QMessageBox *msgBox = pWeb->findChild<QMessageBox*>();
+  QMessageBox *msgBox = view->findChild<QMessageBox*>();
   if (NULL != msgBox)
   {
       std::string text = msgBox->text().toStdString();
@@ -1562,7 +1569,7 @@ void Automation::GetAppModalDialogMessage(std::string* message, Error** error)
   }
   else
   {
-      QInputDialog *msgbox = pWeb->findChild<QInputDialog*>();
+      QInputDialog *msgbox = view->findChild<QInputDialog*>();
 
       if (NULL != msgbox)
       {
@@ -1582,16 +1589,23 @@ void Automation::GetAppModalDialogMessage(std::string* message, Error** error)
   }*/
 }
 
-void Automation::AcceptOrDismissAppModalDialog(bool accept, Error** error)
+void Automation::AcceptOrDismissAppModalDialog(const WebViewId& view_id, bool accept, Error** error)
 {
-    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
 
+  if(!checkView(view_id))
+  {
+      *error = new Error(kNoSuchWindow);
+      return;
+  }
+
+  QWidget *view = view_id.GetView();
+
   // automation::Error auto_error;
 
-  QMessageBox *msgBox = pWeb->findChild<QMessageBox*>();
+  QMessageBox *msgBox = view->findChild<QMessageBox*>();
 
   if(NULL != msgBox)
   {
@@ -1606,7 +1620,7 @@ void Automation::AcceptOrDismissAppModalDialog(bool accept, Error** error)
   }  
   else
   {
-      QInputDialog *msgbox = pWeb->findChild<QInputDialog*>();
+      QInputDialog *msgbox = view->findChild<QInputDialog*>();
       if(NULL != msgbox)
       {
           if(accept)
@@ -1629,17 +1643,25 @@ void Automation::AcceptOrDismissAppModalDialog(bool accept, Error** error)
   }*/
 }
 
-void Automation::AcceptPromptAppModalDialog(const std::string& prompt_text,
+void Automation::AcceptPromptAppModalDialog(const WebViewId& view_id,
+                                            const std::string& prompt_text,
                                             Error** error)
 {
-    // TODO: review, check pWeb usage
   *error = CheckAlertsSupported();
   if (*error)
     return;
 
+  if(!checkView(view_id))
+  {
+      *error = new Error(kNoSuchWindow);
+      return;
+  }
+
+  QWidget *view = view_id.GetView();
+
   // automation::Error auto_error;
 
-  QMessageBox *msgBox = pWeb->findChild<QMessageBox*>();
+  QMessageBox *msgBox = view->findChild<QMessageBox*>();
 
   if(NULL != msgBox)
   {
@@ -1647,7 +1669,7 @@ void Automation::AcceptPromptAppModalDialog(const std::string& prompt_text,
   }
   else
   {
-      QInputDialog *msgbox = pWeb->findChild<QInputDialog*>();
+      QInputDialog *msgbox = view->findChild<QInputDialog*>();
       if(NULL != msgbox)
       {
            msgbox->accept();
@@ -1997,9 +2019,17 @@ void Automation::AddIdToCurrentFrame(const WebViewId &view_id, const FramePath &
     pFrame->setProperty("frame_id", QString(frame_path.value().c_str()));
 }
 
-void Automation::SetAlertPromptText(const std::string &text, Error **error)
+void Automation::SetAlertPromptText(const WebViewId& view_id, const std::string &text, Error **error)
 {
-    QInputDialog *alert = pWeb->findChild<QInputDialog*>();
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QInputDialog *alert = view->findChild<QInputDialog*>();
 
     if (NULL != alert)
     {

@@ -912,6 +912,7 @@ Error* Session::GetAlertMessage(std::string* text) {
   RunSessionTask(base::Bind(
       &Automation::GetAppModalDialogMessage,
       base::Unretained(automation_.get()),
+      current_target_.view_id,
       text,
       &error));
   return error;
@@ -927,6 +928,7 @@ Error* Session::SetAlertPromptText(const std::string& alert_prompt_text)
       RunSessionTask(base::Bind(
           &Automation::SetAlertPromptText,
           base::Unretained(automation_.get()),
+          current_target_.view_id,
           alert_prompt_text,
           &error));
       return error;
@@ -940,12 +942,14 @@ Error* Session::AcceptOrDismissAlert(bool accept) {
     RunSessionTask(base::Bind(
         &Automation::AcceptPromptAppModalDialog,
         base::Unretained(automation_.get()),
+        current_target_.view_id,
         alert_prompt_text_,
         &error));
   } else {
     RunSessionTask(base::Bind(
         &Automation::AcceptOrDismissAppModalDialog,
         base::Unretained(automation_.get()),
+        current_target_.view_id,
         accept,
         &error));
   }
