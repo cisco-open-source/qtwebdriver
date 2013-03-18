@@ -1685,7 +1685,6 @@ base::ListValue* Session::GetLog() const {
 }
 
 Error* Session::GetBrowserConnectionState(bool* online) {
-    // TODO: add native support
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::IS_ONLINE),
@@ -1695,7 +1694,6 @@ Error* Session::GetBrowserConnectionState(bool* online) {
 }
 
 Error* Session::GetAppCacheStatus(int* status) {
-    // TODO: add native support
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::GET_APPCACHE_STATUS),
@@ -1705,7 +1703,6 @@ Error* Session::GetAppCacheStatus(int* status) {
 }
 
 Error* Session::GetStorageSize(StorageType type, int* size) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_SIZE
                                 : atoms::GET_SESSION_STORAGE_SIZE);
@@ -1720,7 +1717,6 @@ Error* Session::GetStorageSize(StorageType type, int* size) {
 Error* Session::SetStorageItem(StorageType type,
                                const std::string& key,
                                const std::string& value) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::SET_LOCAL_STORAGE_ITEM
                                 : atoms::SET_SESSION_STORAGE_ITEM);
@@ -1733,7 +1729,6 @@ Error* Session::SetStorageItem(StorageType type,
 }
 
 Error* Session::ClearStorage(StorageType type) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::CLEAR_LOCAL_STORAGE
                                 : atoms::CLEAR_SESSION_STORAGE);
@@ -1746,7 +1741,6 @@ Error* Session::ClearStorage(StorageType type) {
 }
 
 Error* Session::GetStorageKeys(StorageType type, ListValue** keys) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_KEYS
                                 : atoms::GET_SESSION_STORAGE_KEYS);
@@ -1761,7 +1755,6 @@ Error* Session::GetStorageKeys(StorageType type, ListValue** keys) {
 Error* Session::GetStorageItem(StorageType type,
                                const std::string& key,
                                std::string* value) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_ITEM
                                 : atoms::GET_SESSION_STORAGE_ITEM);
@@ -1776,7 +1769,6 @@ Error* Session::GetStorageItem(StorageType type,
 Error* Session::RemoveStorageItem(StorageType type,
                                   const std::string& key,
                                   std::string* value) {
-    // TODO: add native support
   std::string js = atoms::asString(
       type == kLocalStorageType ? atoms::REMOVE_LOCAL_STORAGE_ITEM
                                 : atoms::REMOVE_SESSION_STORAGE_ITEM);
@@ -2184,7 +2176,6 @@ Error* Session::ExecuteFindElementScriptAndParse(
 }
 
 Error* Session::VerifyElementIsClickable(
-        // TODO: extend for native app
     const FrameId& frame_id,
     const ElementId& element,
     const Point& location) {
@@ -2231,7 +2222,6 @@ Error* Session::VerifyElementIsClickable(
 }
 
 Error* Session::GetElementRegionInViewHelper(
-        // TODO: extend for native app
     const FrameId& frame_id,
     const ElementId& element,
     const Rect& region,
