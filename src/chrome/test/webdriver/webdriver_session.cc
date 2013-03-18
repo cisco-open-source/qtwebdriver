@@ -1130,7 +1130,7 @@ Error* Session::GetElementRegionInView(
     bool center,
     bool verify_clickable_at_middle,
     Point* location) {
-    // TODO: extend for native app
+
   CHECK(element.is_valid());
 
   Point region_offset = region.origin();
@@ -1206,7 +1206,7 @@ Error* Session::GetElementSize(const FrameId& frame_id,
 Error* Session::GetElementFirstClientRect(const FrameId& frame_id,
                                           const ElementId& element,
                                           Rect* rect) {
-    // TODO: extend for native app
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
@@ -1220,7 +1220,7 @@ Error* Session::GetElementEffectiveStyle(
     const ElementId& element,
     const std::string& prop,
     std::string* value) {
-    // TODO: extend for native app
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_EFFECTIVE_STYLE),
@@ -1233,7 +1233,7 @@ Error* Session::GetElementBorder(const FrameId& frame_id,
                                  const ElementId& element,
                                  int* border_left,
                                  int* border_top) {
-    // TODO: extend for native app
+
   std::string border_left_str, border_top_str;
   Error* error = GetElementEffectiveStyle(
       frame_id, element, "border-left-width", &border_left_str);
@@ -1422,7 +1422,12 @@ Error* Session::IsElementEnabled(const FrameId& frame_id,
 Error* Session::IsOptionElementSelected(const FrameId& frame_id,
                                         const ElementId& element,
                                         bool* is_selected) {
-    // TODO: extend for native app
+
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support option elements");
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_SELECTED),
@@ -1434,7 +1439,12 @@ Error* Session::IsOptionElementSelected(const FrameId& frame_id,
 Error* Session::SetOptionElementSelected(const FrameId& frame_id,
                                          const ElementId& element,
                                          bool selected) {
-    // TODO: extend for native app
+
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support option elements");
+    }
+
   // This wrapper ensures the script is started successfully and
   // allows for an alert to happen when the option selection occurs.
   // See selenium bug 2671.
@@ -1455,7 +1465,6 @@ Error* Session::SetOptionElementSelected(const FrameId& frame_id,
 
 Error* Session::ToggleOptionElement(const FrameId& frame_id,
                                     const ElementId& element) {
-    // TODO: extend for native app
   bool is_selected;
   Error* error = IsOptionElementSelected(frame_id, element, &is_selected);
   if (error)
