@@ -20,8 +20,10 @@ do
   for mode in $modes
   do
     gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode --generator-output=out/$platform/$mode wd.gyp
+    [ $? -ne 0 ] && exit 1
     cd out/$platform/$mode
     make
+    [ $? -ne 0 ] && exit 1
     cd ../../..
     mkdir -p bin/$platform/$mode/
     cp -f out/$platform/$mode/Default/libWebDriver.a bin/$platform/$mode/
