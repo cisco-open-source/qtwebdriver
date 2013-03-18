@@ -337,6 +337,12 @@ class Automation : public QObject {
                          Point* location,
                          Error** error);
 
+  void GetNativeElementProperty(const WebViewId& view_id,
+                         const ElementId& element,
+                         const std::string& name,
+                         base::Value** value,
+                         Error** error);
+
   void NativeElementEquals(const WebViewId& view_id,
                          const ElementId& element1,
                          const ElementId& element2,

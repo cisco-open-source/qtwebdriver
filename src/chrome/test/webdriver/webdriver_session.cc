@@ -1551,10 +1551,21 @@ Error* Session::GetClickableLocation(const ElementId& element,
 Error* Session::GetAttribute(const ElementId& element,
                              const std::string& key,
                              Value** value) {
-    if (!current_target_.view_id.IsTab()) {
-      return new Error(kUnknownError,
-                       "The current target does not support attributes");
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementProperty,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            key,
+            value,
+            &error));
+
+        return error;
     }
+
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::GET_ATTRIBUTE),

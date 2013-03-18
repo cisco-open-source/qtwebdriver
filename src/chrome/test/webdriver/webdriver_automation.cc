@@ -1187,6 +1187,72 @@ void Automation::GetNativeElementLocation(const WebViewId& view_id,
     *location = Point(pos.x(), pos.y());
 }
 
+void Automation::GetNativeElementProperty(const WebViewId& view_id,
+                       const ElementId& element,
+                       const std::string& name,
+                       base::Value** value,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    qDebug() << "[WD] GetNativeElementProperty: " << name.c_str();
+
+    QVariant propertyValue = pWidget->property(name.c_str());
+
+    if (!propertyValue.isValid())
+    {
+        qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " not found.";
+        *value = NULL;
+        return;
+    }
+
+    qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " value: " << propertyValue;
+
+    // convert QVariant to base::Value
+    Value* val = NULL;
+
+    switch (propertyValue.type())
+    {
+    case QVariant::Bool:
+        val = Value::CreateBooleanValue(propertyValue.toBool());
+        break;
+    case QVariant::Int:
+        val = Value::CreateIntegerValue(propertyValue.toInt());
+        break;
+    case QVariant::Double:
+        val = Value::CreateDoubleValue(propertyValue.toDouble());
+        break;
+    case QVariant::String:
+        val = Value::CreateStringValue(propertyValue.toString().toStdString());
+        break;
+    default:
+        qWarning() << "[WD] GetNativeElementProperty: " << name.c_str() << ", cant handle type " <<  propertyValue.type();
+    }
+
+    if (NULL == val)
+    {
+        *value = NULL;
+    }
+    else
+    {
+        scoped_ptr<Value> ret_value(val);
+        *value = static_cast<Value*>(ret_value.release());
+    }
+}
+
 void Automation::NativeElementEquals(const WebViewId& view_id,
                        const ElementId& element1,
                        const ElementId& element2,
