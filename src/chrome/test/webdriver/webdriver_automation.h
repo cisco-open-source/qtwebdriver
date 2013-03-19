@@ -173,13 +173,16 @@ class Automation : public QObject {
   void GoBack(const WebViewId& view_id, Error** error);
   void Reload(const WebViewId& view_id, Error** error);
 
-  void GetCookies(const std::string& url,
+  void GetCookies(const WebViewId& view_id,
+                  const std::string& url,
                   base::ListValue** cookies,
                   Error** error);
-  void DeleteCookie(const std::string& url,
+  void DeleteCookie(const WebViewId& view_id,
+                    const std::string& url,
                     const std::string& cookie_name,
                     Error** error);
-  void SetCookie(const std::string& url,
+  void SetCookie(const WebViewId& view_id,
+                 const std::string& url,
                  base::DictionaryValue* cookie_dict,
                  Error** error);
 

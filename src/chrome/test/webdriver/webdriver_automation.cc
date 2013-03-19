@@ -676,20 +676,18 @@ void Automation::Reload(const WebViewId &view_id, Error **error)
     view->reload();
 }
 
-void Automation::GetCookies(const std::string &url, base::ListValue **cookies, Error **error)
+void Automation::GetCookies(const WebViewId &view_id, const std::string &url, base::ListValue **cookies, Error **error)
 {
-    error = NULL;
-
-    if (NULL == pWeb)
+    if(!checkView(view_id))
     {
-        automation::Error auto_error(automation::kInvalidId);
-        Error *pError = Error::FromAutomationError(auto_error);
-        error = &pError;
+        *error = new Error(kNoSuchWindow);
         return;
     }
 
+    QWebView *view = view_id.GetWebView();
+
     QString qUrl = url.c_str();
-    QNetworkCookieJar* jar = pWeb->page()->networkAccessManager()->cookieJar();
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
 
     if (NULL == jar)
     {
@@ -731,20 +729,18 @@ void Automation::GetCookies(const std::string &url, base::ListValue **cookies, E
      *cookies = static_cast<ListValue*>(cookies_value.release());
 }
 
-void Automation::DeleteCookie(const std::string &url, const std::string &cookie_name, Error **error)
+void Automation::DeleteCookie(const WebViewId &view_id, const std::string &url, const std::string &cookie_name, Error **error)
 {
-    error = NULL;
-
-    if (NULL == pWeb)
+    if(!checkView(view_id))
     {
-        automation::Error auto_error(automation::kInvalidId);
-        Error *pError = Error::FromAutomationError(auto_error);
-        error = &pError;
+        *error = new Error(kNoSuchWindow);
         return;
     }
 
+    QWebView *view = view_id.GetWebView();
+
     QString qUrl = url.c_str();
-    QNetworkCookieJar* jar = pWeb->page()->networkAccessManager()->cookieJar();
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
 
     if (NULL == jar)
     {
@@ -773,7 +769,7 @@ void Automation::DeleteCookie(const std::string &url, const std::string &cookie_
             // NOTE: use QNetworkCookieJar::deleteCookie in case QT 5.0
             QNetworkCookieJar * newCookieJar = new QNetworkCookieJar();
             newCookieJar->setCookiesFromUrl(cookies, QUrl(qUrl));
-            pWeb->page()->networkAccessManager()->setCookieJar(newCookieJar);
+            view->page()->networkAccessManager()->setCookieJar(newCookieJar);
             return;
         }
         else
@@ -787,17 +783,15 @@ void Automation::DeleteCookie(const std::string &url, const std::string &cookie_
     error = &pError;
 }
 
-void Automation::SetCookie(const std::string &url, base::DictionaryValue *cookie_dict, Error **error)
+void Automation::SetCookie(const WebViewId &view_id, const std::string &url, base::DictionaryValue *cookie_dict, Error **error)
 {
-    error = NULL;
-
-    if (NULL == pWeb)
+    if(!checkView(view_id))
     {
-        automation::Error auto_error(automation::kInvalidId);
-        Error *pError = Error::FromAutomationError(auto_error);
-        error = &pError;
+        *error = new Error(kNoSuchWindow);
         return;
     }
+
+    QWebView *view = view_id.GetWebView();
 
     QList<QNetworkCookie> cookie_list;
     std::string name, value;
@@ -913,12 +907,12 @@ void Automation::SetCookie(const std::string &url, base::DictionaryValue *cookie
 
     cookie_list.append(cookie);
 
-    QNetworkCookieJar* jar = pWeb->page()->networkAccessManager()->cookieJar();
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
 
     if (!jar)
     {
         jar = new QNetworkCookieJar(this);
-        pWeb->page()->networkAccessManager()->setCookieJar(jar);
+        view->page()->networkAccessManager()->setCookieJar(jar);
     }
 
     if (!jar->setCookiesFromUrl(cookie_list, QUrl(url.c_str())))

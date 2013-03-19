@@ -646,9 +646,14 @@ Error* Session::MouseDoubleClick() {
 
 Error* Session::GetCookies(const std::string& url, ListValue** cookies) {
   Error* error = NULL;
+  if (!current_target_.view_id.IsTab()) {
+    return new Error(kUnknownError,
+                     "The current target does not support navigation");
+  }
   RunSessionTask(base::Bind(
       &Automation::GetCookies,
       base::Unretained(automation_.get()),
+      current_target_.view_id,
       url,
       cookies,
       &error));
@@ -658,9 +663,14 @@ Error* Session::GetCookies(const std::string& url, ListValue** cookies) {
 Error* Session::DeleteCookie(const std::string& url,
                            const std::string& cookie_name) {
   Error* error = NULL;
+  if (!current_target_.view_id.IsTab()) {
+    return new Error(kUnknownError,
+                     "The current target does not support navigation");
+  }
   RunSessionTask(base::Bind(
       &Automation::DeleteCookie,
       base::Unretained(automation_.get()),
+      current_target_.view_id,
       url,
       cookie_name,
       &error));
@@ -673,9 +683,14 @@ Error* Session::DeleteCookie(const std::string& url,
 Error* Session::SetCookie(const std::string& url,
                           DictionaryValue* cookie_dict) {
   Error* error = NULL;
+  if (!current_target_.view_id.IsTab()) {
+    return new Error(kUnknownError,
+                     "The current target does not support navigation");
+  }
   RunSessionTask(base::Bind(
       &Automation::SetCookie,
       base::Unretained(automation_.get()),
+      current_target_.view_id,
       url,
       cookie_dict,
       &error));
