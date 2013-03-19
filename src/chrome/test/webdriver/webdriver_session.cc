@@ -1133,7 +1133,8 @@ Error* Session::ElementEquals(const FrameId& frame_id,
         return error;
     }
 
-    std::string script = "return arguments[0] == arguments[1];";
+    std::string script = "function(el1, el2) { return el1 == el2; }";
+    //std::string script = "return arguments[0] == arguments[1];";
 
   return ExecuteScriptAndParse(
       frame_id,
