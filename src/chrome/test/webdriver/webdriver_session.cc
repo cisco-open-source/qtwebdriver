@@ -1312,13 +1312,14 @@ Error* Session::ActiveElement(const FrameId& frame_id,
         return error;
     }
 
-    ListValue *args = new ListValue();
+    std::string script = "function() { return document.activeElement || document.body; }";
+    //"return document.activeElement || document.body"
 
   return ExecuteScriptAndParse(
       frame_id,
-      "return document.activeElement || document.body",
+      script,
       "activeElement",
-      args,
+      new ListValue(),
       CreateDirectValueParser(element));
 }
 
