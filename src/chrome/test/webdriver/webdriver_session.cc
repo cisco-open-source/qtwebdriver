@@ -1311,13 +1311,13 @@ Error* Session::ActiveElement(const FrameId& frame_id,
         return error;
     }
 
-    ListValue args;
+    ListValue *args = new ListValue();
 
   return ExecuteScriptAndParse(
       frame_id,
       "return document.activeElement || document.body",
-      "isDisplayed",
-      &args,
+      "activeElement",
+      args,
       CreateDirectValueParser(element));
 }
 
