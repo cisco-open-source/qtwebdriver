@@ -115,6 +115,14 @@ void SwitchFrameCommand::ExecutePost(Response* const response) {
   int index = 0;
   ElementId element;
   Error* error = NULL;
+
+  // TODO: move this function to session?
+  if ( session_->current_target().view_id.IsApp() )
+  {
+      error = new Error(kUnknownError, "This trget doesnt support switchFrame command");
+      return;
+  }
+
   if (GetStringParameter("id", &id)) {
     error = session_->SwitchToFrameWithNameOrId(id);
   } else if (GetIntegerParameter("id", &index)) {
