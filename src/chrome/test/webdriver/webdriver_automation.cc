@@ -684,7 +684,7 @@ void Automation::GetCookies(const WebViewId &view_id, const std::string &url, ba
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QString qUrl = url.c_str();
     QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
@@ -737,7 +737,7 @@ void Automation::DeleteCookie(const WebViewId &view_id, const std::string &url, 
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QString qUrl = url.c_str();
     QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
@@ -791,7 +791,7 @@ void Automation::SetCookie(const WebViewId &view_id, const std::string &url, bas
         return;
     }
 
-    QWebView *view = view_id.GetWebView();
+    QWebView *view = qobject_cast<QWebView*>(view_id.GetView());
 
     QList<QNetworkCookie> cookie_list;
     std::string name, value;
@@ -829,7 +829,7 @@ void Automation::SetCookie(const WebViewId &view_id, const std::string &url, bas
             return;
         }
 
-        qDebug()<<"[WD]:" << "domain.c_str()=[" << domain.c_str() <<"]";
+        qDebug() << "[WD]:" << "domain.c_str()=[" << domain.c_str() <<"]";
 
         // TODO: check why it fails here
         //cookie.setDomain(QString(domain.c_str()));
