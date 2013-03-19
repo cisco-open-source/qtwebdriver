@@ -1,5 +1,5 @@
-#ifndef MHAPWEBDRIVER_H
-#define MHAPWEBDRIVER_H
+#ifndef WEBDRIVER_H
+#define WEBDRIVER_H
 
 #include <viewfactory.h>
 
@@ -20,4 +20,4 @@ void regitsterView(std::string name)
     ViewFactory::GetInstance()->add<T>(name);
 }
 
-#endif // MHAPWEBDRIVER_H
+#endif // WEBDRIVER_H

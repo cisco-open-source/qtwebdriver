@@ -1,7 +1,7 @@
 #include <QtGui/QApplication>
 #include <QtWebKit/QtWebKit>
 #include <QtCore/QTextCodec>
-#include <MhapWebDriver.h>
+#include <WebDriver.h>
 #include <QtCore/QFuture>
 #include <QtCore/QObject>
 #include <QtCore/QFutureWatcher>
