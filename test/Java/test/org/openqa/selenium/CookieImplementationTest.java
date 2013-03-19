@@ -278,11 +278,11 @@ public class CookieImplementationTest extends JUnit4TestBase {
     driver.manage().addCookie(cookie1);
 
     driver.get(domainHelper.getUrlForFirstValidHostname("child/childPage.html"));
-    Cookie cookie2 = new Cookie("rodent", "hamster", "/child");
+    Cookie cookie2 = new Cookie("rodent", "hamster", "/common/child");
     driver.manage().addCookie(cookie2);
 
     driver.get(domainHelper.getUrlForFirstValidHostname("child/grandchild/grandchildPage.html"));
-    Cookie cookie3 = new Cookie("dog", "dalmation", "/child/grandchild/");
+    Cookie cookie3 = new Cookie("dog", "dalmation", "/common/child/grandchild/");
     driver.manage().addCookie(cookie3);
 
     driver.get(domainHelper.getUrlForFirstValidHostname("child/grandchild/grandchildPage.html"));
@@ -318,7 +318,7 @@ public class CookieImplementationTest extends JUnit4TestBase {
   @Ignore(OPERA)
   @Test
   public void testCookieEqualityAfterSetAndGet() {
-    driver.get(domainHelper.getUrlForFirstValidHostname("common/animals"));
+    driver.get(domainHelper.getUrlForFirstValidHostname("animals"));
 
     driver.manage().deleteAllCookies();
 
