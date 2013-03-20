@@ -101,8 +101,8 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
 
-            //check found widget if it is QWebView or top level widget; and if it don't belong to any session
-            if ((pView != NULL) || (pWidget->isTopLevel()) && !pWidget->property("sessionId").isValid())
+            //check found widget if it is QWebView or top level widget
+            if ((pView != NULL) || pWidget->isTopLevel())
             {
                 qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 
@@ -226,7 +226,6 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     if (options.command.HasSwitch(switches::kStartMaximized))
         pStartView->showMaximized();
 
-    pStartView->setProperty("sessionId", sessionId);
     pStartView->show();
 }
 
@@ -246,8 +245,7 @@ void Automation::Terminate()
 
   foreach(QWidget* pView, qApp->topLevelWidgets())
   {
-      QVariant sessionIdVar = pView->property("sessionId");
-      if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()) && !pView->isHidden())
+      if (!pView->isHidden())
       {
           // destroy children correctly
           QList<QWidget*> childs = pView->findChildren<QWidget*>();
@@ -928,17 +926,13 @@ void Automation::GetViews(std::vector<WebViewInfo>* views,
     std::string extension_id;
     foreach(QWidget* pWidget, qApp->allWidgets())
     {
-        QVariant sessionIdVar = pWidget->property("sessionId");
-        if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
+        if (!pWidget->isHidden())
         {
-            if (!pWidget->isHidden())
+            QWebView* pView = qobject_cast<QWebView*>(pWidget);
+            if (pView != NULL || pWidget->isTopLevel())
             {
-                QWebView* pView = qobject_cast<QWebView*>(pWidget);
-                if (pView != NULL || pWidget->isTopLevel())
-                {
-                    WebViewId pWebView = WebViewId::ForQtView(pWidget);
-                    views->push_back(WebViewInfo(pWebView, extension_id));
-                }
+                WebViewId pWebView = WebViewId::ForQtView(pWidget);
+                views->push_back(WebViewInfo(pWebView, extension_id));
             }
         }
     }
@@ -951,21 +945,17 @@ void Automation::DoesViewExist(WebViewId *view_id, bool *does_exist, Error **err
 
     foreach(QWidget* pWidget, qApp->allWidgets())
     {
-        QVariant sessionIdVar = pWidget->property("sessionId");
-        if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
+        QWebView* pView = qobject_cast<QWebView*>(pWidget);
+        if (pView != NULL || pWidget->isTopLevel())
         {
-            QWebView* pView = qobject_cast<QWebView*>(pWidget);
-            if (pView != NULL || pWidget->isTopLevel())
+            QVariant automationIdVar = pWidget->property("automationId");
+            int automationId;
+            base::StringToInt(view_id->GetId().id(), &automationId);
+            if (automationIdVar.isValid() && (automationIdVar.toInt() == automationId))
             {
-                QVariant automationIdVar = pWidget->property("automationId");
-                int automationId;
-                base::StringToInt(view_id->GetId().id(), &automationId);
-                if (automationIdVar.isValid() && (automationIdVar.toInt() == automationId))
-                {
-                    *does_exist = true;
-                    *view_id = WebViewId::ForQtView(pWidget);
-                    break;
-                }
+                *does_exist = true;
+                *view_id = WebViewId::ForQtView(pWidget);
+                break;
             }
         }
     }
@@ -2158,16 +2148,12 @@ bool Automation::checkView(const WebViewId &view_id)
     //Rework to check only pointer
     foreach(QWidget* pView, qApp->allWidgets())
     {
-        QVariant sessionIdVar = pView->property("sessionId");
-        if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
-        {
-           QVariant automationIdVar = pView->property("automationId");
-           int automationId;
-           base::StringToInt(view_id.GetId().id(), &automationId);
-           if (automationIdVar.isValid() && (automationIdVar.toInt() == automationId))
-               //Need to check type of widget
-               return true;
-        }
+        QVariant automationIdVar = pView->property("automationId");
+        int automationId;
+        base::StringToInt(view_id.GetId().id(), &automationId);
+        if (automationIdVar.isValid() && (automationIdVar.toInt() == automationId))
+            //Need to check type of widget
+            return true;
     }
     return false;
 }
