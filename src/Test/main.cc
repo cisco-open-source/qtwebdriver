@@ -46,12 +46,10 @@ MainWindow::MainWindow()
     pushButton->setAccessibleName("PushButton");
     pushButton->move(10, 60);
 
-    webView = new QWebView(this);
-    webView->move(10, 100);
-    webView->setWindowTitle(QString("WD"));
-
-    this->resize(1024, 800);
+    this->resize(300, 200);
     this->setWindowTitle("WD_native");
+
+    webView = NULL;
 
     connect(pushButton, SIGNAL(pressed()), this, SLOT(PushButtonPressed()));
     connect(pushButton, SIGNAL(released()), this, SLOT(PushButtonReleased()));
@@ -65,23 +63,29 @@ MainWindow::~MainWindow()
 
 void MainWindow::PushButtonPressed()
 {
-    QString msg = "\n!!!!!!! Test PushButton pressed !!!!!!!!\n";
+    QString msg = "!!!!!!! Test PushButton pressed !!!!!!!!";
     qDebug() << msg;
-    textEdit->setText(msg);
 }
 
 void MainWindow::PushButtonReleased()
 {
-    QString msg = "\n!!!!!!! Test PushButton released !!!!!!!!\n";
+    QString msg = "!!!!!!! Test PushButton released !!!!!!!!";
     qDebug() << msg;
-    textEdit->setText(msg);
 }
 
 void MainWindow::PushButtonClicked()
 {
-    QString msg = "\n!!!!!!! Test PushButton clicked !!!!!!!!\n";
+    QString msg = "!!!!!!! Test PushButton clicked !!!!!!!!";
     qDebug() << msg;
-    textEdit->setText(msg);
+
+    if (NULL == webView)
+    {
+        webView = new QWebView();
+        webView->setWindowTitle(QString("WD"));
+        webView->show();
+    }
+
+    webView->load(QUrl(textEdit->text()));
 }
 
 int main(int argc, char *argv[])
@@ -107,8 +111,8 @@ int main(int argc, char *argv[])
     regitsterView<QWebView>("QWebView");
     regitsterView<QWidget>("QWidget");
     regitsterView<MainWindow>("MainNativeWindow");
-    //MainWindow mainWindow;
-    //mainWindow.show();
+//    MainWindow mainWindow;
+//    mainWindow.show();
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
