@@ -496,6 +496,15 @@ void ElementValueCommand::ExecuteGet(Response* const response) {
 }
 
 void ElementValueCommand::ExecutePost(Response* const response) {
+
+    if ( session_->current_target().view_id.IsApp() )
+    {
+        Error* error = SendKeys();
+        if (error)
+            response->SetError(error);
+        return;
+    }
+
   bool is_input = false;
   Error* error = HasAttributeWithLowerCaseValueASCII("tagName", "input",
                                                      &is_input);

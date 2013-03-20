@@ -134,6 +134,11 @@ class Automation : public QObject {
                        const WebKeyEvent& key_event,
                        Error** error);
 
+  void SendNativeElementWebKeyEvent(const WebViewId &view_id,
+                                    const ElementId &element,
+                                    const WebKeyEvent &key_event,
+                                    Error **error);
+
   // Sends an OS level key event to the current browser. Waits until the key
   // has been processed by the browser.
   void SendNativeKeyEvent(const WebViewId& view_id,

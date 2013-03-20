@@ -436,9 +436,16 @@ class Session {
   Error* ExecuteScriptAndParseValue(const FrameId& frame_id,
                                     const std::string& script,
                                     base::Value** value, bool isAsync);
+
   void SendKeysOnSessionThread(const string16& keys,
                                bool release_modifiers,
                                Error** error);
+
+  void SendKeysOnElementSessionThread(const ElementId& element,
+                               const string16& keys,
+                               bool release_modifiers,
+                               Error** error);
+
 //  Error* ProcessWebMouseEvents(const std::vector<WebMouseEvent>& events);
   WebMouseEvent CreateWebMouseEvent(automation::MouseEventType type,
                                     automation::MouseButton button,

@@ -520,6 +520,40 @@ void Automation::SendWebKeyEvent(const WebViewId &view_id, const WebKeyEvent &ke
     QKeyEvent keyEvent = ConvertToQtKeyEvent(key_event);
 //    qDebug()<<"[WD]:"<<keyEvent.type() << keyEvent.text() << keyEvent.key();
     qApp->sendEvent(view, &keyEvent);
+}
+
+void Automation::SendNativeElementWebKeyEvent(const WebViewId &view_id, const ElementId &element, const WebKeyEvent &key_event, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    if (!pWidget->isVisible())
+    {
+        *error = new Error(kElementNotVisible);
+        return;
+    }
+
+    if (!pWidget->isEnabled())
+    {
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QKeyEvent keyEvent = ConvertToQtKeyEvent(key_event);
+    qDebug()<<"[WD] SendNativeElementWebKeyEvent: " << keyEvent.type() << keyEvent.text() << keyEvent.key();
+    qApp->sendEvent(pWidget, &keyEvent);
 
 }
 

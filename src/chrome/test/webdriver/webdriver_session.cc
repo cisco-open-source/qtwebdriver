@@ -261,6 +261,19 @@ Error* Session::ExecuteAsyncScript(const FrameId& frame_id,
 }
 
 Error* Session::SendKeys(const ElementId& element, const string16& keys) {
+    if (current_target_.view_id.IsApp())
+    {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+                          &Session::SendKeysOnElementSessionThread,
+                          base::Unretained(this),
+                          element,
+                          keys,
+                          true /* release_modifiers */,
+                          &error));
+        return error;
+    }
     // TODO: extend for native app
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
@@ -1990,6 +2003,51 @@ void Session::SendKeysOnSessionThread(const string16& keys,
     } else {
       automation_->SendWebKeyEvent(
           current_target_.view_id,
+          key_events[i], error);
+    }
+    if (*error) {
+      std::string details = base::StringPrintf(
+          "Failed to send key event. Event details:\n"
+              "Type: %d, KeyCode: %d, UnmodifiedText: %s, ModifiedText: %s, "
+              "Modifiers: %d",
+          key_events[i].type,
+          key_events[i].key_code,
+          key_events[i].unmodified_text.c_str(),
+          key_events[i].modified_text.c_str(),
+          key_events[i].modifiers);
+      (*error)->AddDetails(details);
+      return;
+    }
+  }
+}
+
+void Session::SendKeysOnElementSessionThread(const ElementId& element,
+                                      const string16& keys,
+                                      bool release_modifiers,
+                                      Error** error) {
+  std::vector<WebKeyEvent> key_events;
+  std::string error_msg;
+  if (!ConvertKeysToWebKeyEvents(keys, logger_, release_modifiers,
+                                 &sticky_modifiers_, &key_events, &error_msg)) {
+    *error = new Error(kUnknownError, error_msg);
+    return;
+  }
+  for (size_t i = 0; i < key_events.size(); ++i) {
+    if (capabilities_.native_events) {
+      // The automation provider will generate up/down events for us, we
+      // only need to call it once as compared to the WebKeyEvent method.
+      // Hence we filter events by their types, keeping only rawkeydown.
+//      if (key_events[i].type != automation::kRawKeyDownType)
+//        continue;
+//      automation_->SendNativeKeyEvent(
+//          current_target_.view_id,
+//          key_events[i].key_code,
+//          key_events[i].modifiers,
+//          error);
+    } else {
+      automation_->SendNativeElementWebKeyEvent(
+          current_target_.view_id,
+          element,
           key_events[i], error);
     }
     if (*error) {
