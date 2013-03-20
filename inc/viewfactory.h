@@ -26,7 +26,7 @@ public:
     template <class C>
     void add(const std::string & id)
     {
-        typename FactoryMap::iterator it = factory.find(id);
+        FactoryMap::iterator it = factory.find(id);
         if (it == factory.end())
             factory[id] = new ViewCreator<C>();
     }

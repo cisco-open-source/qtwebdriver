@@ -17,7 +17,7 @@ ViewFactory* ViewFactory::GetInstance()
 
 QWidget* ViewFactory::create(const std::string & id)
 {
-    typename FactoryMap::iterator it = factory.find(id);
+    FactoryMap::iterator it = factory.find(id);
     if (it != factory.end())
         return it->second->create();
     qDebug()<<"[WD]:"<<"Browser class"<<QString(id.c_str())<<" is not registered. Create default one";
