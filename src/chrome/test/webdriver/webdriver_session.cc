@@ -737,6 +737,7 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
     if (error)
       return error;
   }
+
   if (!does_exist) {
     // See if any of the tab window names match |name|.
     std::vector<WebViewInfo> views;
@@ -744,28 +745,48 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
     if (error)
       return error;
     for (size_t i = 0; i < views.size(); ++i) {
-      if (!views[i].view_id.IsTab())
-        continue;
-      std::string window_name;
-      Error* error = ExecuteScriptAndParse(
-          FrameId(views[i].view_id, FramePath()),
-          "function() { return window.name; }",
-          "getWindowName",
-          new ListValue(),
-          CreateDirectValueParser(&window_name));
-      if (error)
-        return error;
-      if (id_or_name == window_name) {
-        new_view = views[i].view_id;
-        does_exist = true;
-        break;
+      if (views[i].view_id.IsTab())
+      {
+          std::string window_name;
+          Error* error = ExecuteScriptAndParse(
+              FrameId(views[i].view_id, FramePath()),
+              "function() { return window.name; }",
+              "getWindowName",
+              new ListValue(),
+              CreateDirectValueParser(&window_name));
+          if (error)
+            return error;
+
+          if (id_or_name == window_name) {
+            new_view = views[i].view_id;
+            does_exist = true;
+            break;
+          }
+      }
+      else if (views[i].view_id.IsApp())
+      {
+          std::string window_name;
+
+          RunSessionTask(base::Bind(
+              &Automation::GetViewTitle,
+              base::Unretained(automation_.get()),
+              views[i].view_id,
+              &window_name,
+              &error));
+          if (error)
+            return error;
+
+          if (id_or_name == window_name) {
+            new_view = views[i].view_id;
+            does_exist = true;
+            break;
+          }
       }
     }
   }
 
   if (!does_exist)
     return new Error(kNoSuchWindow);
-  // TODO: where is real switching to view?
   frame_elements_.clear();
   current_target_ = FrameId(new_view, FramePath());
   return NULL;
