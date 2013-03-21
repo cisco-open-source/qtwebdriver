@@ -26,8 +26,8 @@ do
     [ $? -ne 0 ] && exit 1
     cd ../../..
     mkdir -p bin/$platform/$mode/
-    cp -f out/$platform/$mode/Default/libWebDriver.a bin/$platform/$mode/
-    cp -f out/$platform/$mode/Default/lib.target/libWebDriver.so bin/$platform/$mode/
-    cp -f out/$platform/$mode/Default/WebDriverTest bin/$platform/$mode/
+    cp -f out/$platform/$mode/Default/libWebDriver.a bin/$platform/$mode/ 2>/dev/null
+    cp -f out/$platform/$mode/Default/lib.target/libWebDriver.so bin/$platform/$mode/ 2>/dev/null
+    cp -f out/$platform/$mode/Default/WebDriverTest bin/$platform/$mode/ 2>/dev/null
   done
 done

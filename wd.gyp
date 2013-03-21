@@ -9,6 +9,37 @@
         'QT_INC_PATH': '<(DESKTOP_QT_INC_PATH)',
         'QT_LIB_PATH': '<(DESKTOP_QT_LIB_PATH)'
       },
+
+      'targets': [
+        {
+          'target_name': 'WebDriverTest',
+          'type': 'executable',
+
+          'include_dirs': [
+            'inc/',
+            '<(QT_INC_PATH)',
+          ],
+
+          'dependencies': [
+            'WebDriver',
+          ],
+
+          'libraries': [
+            '-L<(QT_LIB_PATH)',
+            '-lQtWebKit',
+            '-lQtNetwork',
+            '-lQtGui',
+            '-lQtCore',
+            '-lpthread',
+            '-lrt',
+            '-ldl',
+          ],
+
+          'sources': [
+            'src/Test/main.cc',
+          ],
+        },
+      ],
     } ],
 
     [ 'platform == "flip"', {
@@ -240,33 +271,6 @@
       'dependencies': [
         'WebDriver',
       ],
-    }, {
-      'target_name': 'WebDriverTest',
-      'type': 'executable',
-
-      'include_dirs': [
-        'inc/',
-        '<(QT_INC_PATH)',
-      ],
-
-      'dependencies': [
-        'WebDriver',
-      ],
-
-      'libraries': [
-        '-L<(QT_LIB_PATH)',
-        '-lQtWebKit',
-        '-lQtNetwork',
-        '-lQtGui',
-        '-lQtCore',
-        '-lpthread',
-        '-lrt',
-        '-ldl',
-      ],
-
-      'sources': [
-        'src/Test/main.cc',
-      ],
-    }
+    },
   ],
 }
