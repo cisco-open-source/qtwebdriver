@@ -37,6 +37,7 @@
 
           'sources': [
             'src/Test/main.cc',
+            'src/third_party/mongoose/mongoose.c',
           ],
         },
       ],
@@ -249,7 +250,6 @@
         'src/qtaskrunner.cc',
         'src/qwebviewext.cc',
         'src/third_party/modp_b64/modp_b64.cc',
-        'src/third_party/mongoose/mongoose.c',
         'src/third_party/webdriver/atoms.cc',
         'src/third_party/zlib/adler32.c',
         'src/third_party/zlib/contrib/minizip/ioapi.c',
