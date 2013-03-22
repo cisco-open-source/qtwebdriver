@@ -123,7 +123,7 @@ WebViewId  WebViewId::ForQtView(QWebView *view)
        automationId = viewAutomationId.toInt();
     else
     {
-        qsrand(QTime::currentTime().msec());
+//        qsrand(QTime::currentTime().msec());
         automationId = qrand();
         view->setProperty("automationId", automationId);
     }

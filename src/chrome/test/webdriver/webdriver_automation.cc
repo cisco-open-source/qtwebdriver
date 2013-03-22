@@ -84,7 +84,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     BuildKeyMap();
 
 	*build_no = build_no_;
-
+//Need to keep after merge sessionId remove
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 

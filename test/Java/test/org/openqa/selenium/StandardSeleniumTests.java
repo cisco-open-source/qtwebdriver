@@ -88,7 +88,7 @@ import org.openqa.selenium.testing.ParallelSuite;
     UploadTest.class,
     VisibilityTest.class,
     WebElementTest.class,
-//    WindowSwitchingTest.class,
+    WindowSwitchingTest.class,
     WindowTest.class,
     XPathElementFindingTest.class,
 
