@@ -23,6 +23,7 @@ import com.opera.core.systems.OperaSettings;
 
 import static org.openqa.selenium.remote.CapabilityType.HAS_NATIVE_EVENTS;
 
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 public class BrowserToCapabilities {
@@ -80,6 +81,10 @@ public class BrowserToCapabilities {
 
       case iphone:
         caps = DesiredCapabilities.iphone();
+        break;
+
+    case qtwebkit:
+        caps = new DesiredCapabilities("qtwebkit", "", Platform.ANY);
         break;
 
       default:

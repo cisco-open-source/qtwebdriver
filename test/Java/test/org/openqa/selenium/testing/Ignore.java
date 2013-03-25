@@ -41,6 +41,7 @@ public @interface Ignore {
     REMOTE,
     SAFARI,
     SELENESE,
+    QTWEBKIT,
   }
 
   Driver[] value() default {Driver.ALL};

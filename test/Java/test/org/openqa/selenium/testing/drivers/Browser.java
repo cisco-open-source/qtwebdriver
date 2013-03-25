@@ -39,12 +39,13 @@ public enum Browser {
   none, // For those cases where you don't actually want a browser
   opera,
   opera_mobile,
-  safari;
+  safari,
+  qtwebkit;
 
   private static final Logger log = Logger.getLogger(Browser.class.getName());
 
   public static Browser detect() {
-    String browserName = "chrome";//System.getProperty("selenium.browser");
+    String browserName = "qtwebkit";//System.getProperty("selenium.browser");
     if (browserName == null) {
       log.info("No browser detected, returning null");
       return null;

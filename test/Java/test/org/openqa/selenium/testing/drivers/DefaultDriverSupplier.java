@@ -23,6 +23,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Throwables;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -62,7 +63,8 @@ public class DefaultDriverSupplier implements Supplier<WebDriver> {
 
     //try {
 
-        DesiredCapabilities capability = DesiredCapabilities.chrome();
+        DesiredCapabilities capability = new DesiredCapabilities("QtWebkit", "", Platform.ANY);
+        capability.setCapability("browserClass", "MhaWebView");
         URL hostURL;
 
         try {
