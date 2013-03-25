@@ -3,7 +3,7 @@ build.properties
 *.user
 *.pyc
 *.log
-moc_*.cpp
+src/moc_*.cc
 test/Java/.idea/workspace.xml
 *.db
 *.orig

@@ -6,6 +6,7 @@
   'conditions': [
     [ 'platform == "desktop"', {
       'variables': {
+        'QT_BIN_PATH': '<(DESKTOP_QT_BIN_PATH)',
         'QT_INC_PATH': '<(DESKTOP_QT_INC_PATH)',
         'QT_LIB_PATH': '<(DESKTOP_QT_LIB_PATH)'
       },
@@ -45,6 +46,7 @@
 
     [ 'platform == "flip"', {
       'variables': {
+        'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
         'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
         'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)'
       },
@@ -221,6 +223,7 @@
         'src/chrome/test/webdriver/commands/window_commands.cc',
         'src/chrome/test/webdriver/frame_path.cc',
         'src/chrome/test/webdriver/http_response.cc',
+        'src/chrome/test/webdriver/webdriver_automation.h',
         'src/chrome/test/webdriver/webdriver_automation.cc',
         'src/chrome/test/webdriver/webdriver_basic_types.cc',
         'src/chrome/test/webdriver/webdriver_capabilities_parser.cc',
@@ -247,7 +250,9 @@
         'src/net/base/net_errors.cc',
         'src/net/base/net_errors_posix.cc',
         'src/net/base/net_log.cc',
+        'src/qtaskrunner.h',
         'src/qtaskrunner.cc',
+        'src/qwebviewext.h',
         'src/qwebviewext.cc',
         'src/third_party/modp_b64/modp_b64.cc',
         'src/third_party/webdriver/atoms.cc',
@@ -262,6 +267,14 @@
         'src/third_party/zlib/zutil.c',
         'src/viewfactory.cc',
       ],
+
+      'rules': [ {
+        'rule_name': 'generate_moc',
+        'extension': 'h',
+        'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
+        'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', 'src/moc_<(RULE_INPUT_ROOT).cc' ],
+        'message': 'Generating <(RULE_INPUT_ROOT).cc.',
+      } ],
     }, {
       'target_name': 'WebDriverShared',
       'type': 'shared_library',
