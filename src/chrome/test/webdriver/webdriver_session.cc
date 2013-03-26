@@ -41,10 +41,12 @@
 #include "chrome/test/webdriver/webdriver_util.h"
 #include "third_party/webdriver/atoms.h"
 
-
-#include <QtGui/QApplication>
 #include <QtCore/QDebug>
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
+#else
+#include <QtGui/QApplication>
+#endif
 
 using automation::kLeftButton;
 using automation::kMouseDown;

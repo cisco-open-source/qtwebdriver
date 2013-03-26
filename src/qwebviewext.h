@@ -1,7 +1,12 @@
 #ifndef QWEBVIEWEXT_H
 #define QWEBVIEWEXT_H
 
-#include <QtWebKit/QWebView>
+#include <QtCore/QGlobalStatic>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#else
+#include <QtWebKit/QtWebKit>
+#endif
 
 class QWebViewExt : public QWebView
 {

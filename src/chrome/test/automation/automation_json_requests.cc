@@ -4,6 +4,7 @@
 
 #include "chrome/test/automation/automation_json_requests.h"
 #include "qwebviewext.h"
+#include <QtCore/QTime>
 #include <QtCore/QVariant>
 
 /*#include "base/basictypes.h"

@@ -1,7 +1,11 @@
 {
-  "includes": [
-    "wd.gypi",
+  'includes': [
+    'wd.gypi',
   ],
+
+  'variables': {
+    'QT5%': '0',
+  },
 
   'conditions': [
     [ 'platform == "desktop"', {
@@ -25,20 +29,47 @@
             'WebDriver',
           ],
 
-          'libraries': [
-            '-L<(QT_LIB_PATH)',
-            '-lQtWebKit',
-            '-lQtNetwork',
-            '-lQtGui',
-            '-lQtCore',
-            '-lpthread',
-            '-lrt',
-            '-ldl',
-          ],
-
           'sources': [
             'src/Test/main.cc',
             'src/third_party/mongoose/mongoose.c',
+          ],
+
+          'conditions': [
+            [ '<(QT5) == 1', {
+              'libraries': [
+                '-L<(QT_LIB_PATH)',
+                '-lQt5WebKitWidgets',
+                '-lQt5OpenGL',
+                '-lQt5PrintSupport',
+                '-lQt5WebKit',
+                '-lQt5Script',
+                '-lQt5Network',
+                '-lQt5V8',
+                '-lQt5Widgets',
+                '-lQt5Quick',
+                '-lQt5Qml',
+                '-lQt5Sql',
+                '-lQt5Declarative',
+                '-lQt5XmlPatterns',
+                '-lQt5Xml',
+                '-lQt5Gui',
+                '-lQt5Core',
+                '-lpthread',
+                '-lrt',
+                '-ldl',
+              ],
+            }, {
+              'libraries': [
+                '-L<(QT_LIB_PATH)',
+                '-lQtWebKit',
+                '-lQtNetwork',
+                '-lQtGui',
+                '-lQtCore',
+                '-lpthread',
+                '-lrt',
+                '-ldl',
+              ],
+            } ],
           ],
         },
       ],
@@ -62,6 +93,7 @@
     ],
 
     'defines': [
+      '__STDC_FORMAT_MACROS',
       'OS_POSIX',
       'QT_NO_DEBUG',
       'QT_GUI_LIB',

@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
 #include <QtCore/QEvent>
 #include <QtCore/QThread>
 #include <QtGui/QKeyEvent>
@@ -11,8 +9,19 @@
 #include <QtWebKit/QtWebKit>
 #include <QtCore/QDebug>
 #include <QtNetwork/QtNetwork>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebFrame>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
+#else
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 #include <QtGui/QMessageBox>
 #include <QtGui/QInputDialog>
+#endif
 
 #include "webdriver_automation.h"
 
@@ -94,11 +103,21 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     if (!options.browser_start_window.empty())
     {
         qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        foreach(QWindow* pWidget, qApp->allWindows())
+#else
         foreach(QWidget* pWidget, qApp->allWidgets())
+#endif
         {
-            qDebug()<<"[WD]:"<<"looking for start window"<<pWidget<<pWidget->windowTitle();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+            QString title = pWidget->title();
+#else
+            QString title = pWidget->windowTitle();
+#endif
 
-            if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
+            qDebug() << "[WD]:" << "looking for start window" << pWidget << title;
+
+            if ((options.browser_start_window == title.toStdString()) || (options.browser_start_window == "*"))
             {
                 QWebView* pView = qobject_cast<QWebView*>(pWidget);
                 //check found widget if it is QWebView or ancestor; and if it don't belong to any session
@@ -222,10 +241,14 @@ void Automation::Terminate()
   qDebug()<<"[WD]:"<<"*************TERMINATE SESSION******************";
   logger_.Log(kInfoLogLevel, "QtWebKit WebDriver shutdown");
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  foreach(QWindow* pView, qApp->topLevelWindows())
+#else
   foreach(QWidget* pView, qApp->topLevelWidgets())
+#endif
   {
       QVariant sessionIdVar = pView->property("sessionId");
-      if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()) && !pView->isHidden())
+      if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()) && pView->isVisible())
       {
           // destroy children correctly
           QList<QWidget*> childs = pView->findChildren<QWidget*>();
@@ -235,7 +258,9 @@ void Automation::Terminate()
               child->close();
           }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
           pView->setAttribute(Qt::WA_DeleteOnClose, true);
+#endif
           pView->close();
       }
   }
@@ -826,13 +851,17 @@ void Automation::GetViews(std::vector<WebViewInfo>* views,
                           Error** error)
 {
     std::string extension_id;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    foreach(QWindow* pWidget, qApp->topLevelWindows())
+#else
     foreach(QWidget* pWidget, qApp->topLevelWidgets())
+#endif
     {
         QVariant sessionIdVar = pWidget->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
-            if ((pView != NULL) && !pView->isHidden())
+            if ((pView != NULL) && pView->isVisible())
             {
                 WebViewId pWebView = WebViewId::ForQtView(pView);
                 views->push_back(WebViewInfo(pWebView, extension_id));
@@ -846,7 +875,11 @@ void Automation::DoesViewExist(WebViewId *view_id, bool *does_exist, Error **err
     error = NULL;
     *does_exist = false;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    foreach(QWindow* pWidget, qApp->allWindows())
+#else
     foreach(QWidget* pWidget, qApp->allWidgets())
+#endif
     {
         QVariant sessionIdVar = pWidget->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
@@ -1493,7 +1526,11 @@ void Automation::BuildKeyMap()
 bool Automation::checkView(const WebViewId &view_id)
 {
     //Rework to check only pointer
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    foreach(QWindow* pView, qApp->allWindows())
+#else
     foreach(QWidget* pView, qApp->allWidgets())
+#endif
     {
         QVariant sessionIdVar = pView->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))

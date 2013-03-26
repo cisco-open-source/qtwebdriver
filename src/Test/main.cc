@@ -1,17 +1,27 @@
+#include <QtCore/QFuture>
+#include <QtCore/QFutureWatcher>
+#include <QtCore/QObject>
+#include <QtCore/QTextCodec>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtConcurrent/QtConcurrentRun>
+#include <QtWebKitWidgets/QWebView>
+#include <QtWidgets/QApplication>
+#else
+#include <QtCore/QtConcurrentRun>
 #include <QtGui/QApplication>
 #include <QtWebKit/QtWebKit>
-#include <QtCore/QTextCodec>
+#endif
+
 #include <WebDriver.h>
-#include <QtCore/QFuture>
-#include <QtCore/QObject>
-#include <QtCore/QFutureWatcher>
-#include <QtCore/QtConcurrentRun>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
+#endif
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);

@@ -7,7 +7,13 @@
 
 #include <string>
 #include <vector>
+
+#include <QtCore/QGlobalStatic>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#else
 #include <QtWebKit/QtWebKit>
+#endif
 
 #include "base/compiler_specific.h"
 //#include "base/file_path.h"

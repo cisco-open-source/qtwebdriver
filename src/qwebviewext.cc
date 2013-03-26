@@ -3,7 +3,11 @@
 #include <QtCore/QTime>
 #include <QtCore/QDebug>
 #include <QtNetwork/QNetworkProxy>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QWidget>
+#else
 #include <QtGui/QWidget>
+#endif
 
 QWebViewExt::QWebViewExt(QWidget *parent) :
     QWebView(parent)
