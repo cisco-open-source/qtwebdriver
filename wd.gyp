@@ -63,6 +63,7 @@
                 '-L<(QT_LIB_PATH)',
                 '-lQtWebKit',
                 '-lQtNetwork',
+                '-lQtXml',
                 '-lQtGui',
                 '-lQtCore',
                 '-lpthread',
