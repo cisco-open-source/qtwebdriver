@@ -416,7 +416,6 @@ class Automation : public QObject {
   // scoped_ptr<ProxyLauncher> launcher_;
   int build_no_;
   scoped_ptr<base::DictionaryValue> geolocation_;
-  QWebView *pWeb;
   int sessionId;
   QEventLoop loop;
   bool isLoading;
