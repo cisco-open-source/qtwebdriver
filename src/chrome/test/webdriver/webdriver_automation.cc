@@ -112,7 +112,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         {
 
             //check found widget if it is QWebView or top level widget
-            if ((pView != NULL) || pWidget->isTopLevel())
+            if ((pWidget != NULL) || pWidget->isTopLevel())
             {
                 qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 

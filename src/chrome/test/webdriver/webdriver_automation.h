@@ -13,6 +13,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QObject>
 #include <QtCore/QEventLoop>
+#include <QtCore/QPointer>
 #include <QtCore/QHash>
 #include <QtGui/QKeyEvent>
 

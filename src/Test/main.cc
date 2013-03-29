@@ -13,6 +13,9 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QPushButton>
+#include <QtGui/QLineEdit>
+#include <QtGui/QApplication>
+
 
 #include <QtWebKit/QtWebKit>
 #endif
