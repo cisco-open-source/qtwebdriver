@@ -103,17 +103,9 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     if (!options.browser_start_window.empty())
     {
         qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        foreach(QWindow* pWidget, qApp->allWindows())
-#else
         foreach(QWidget* pWidget, qApp->allWidgets())
-#endif
         {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-            QString title = pWidget->title();
-#else
             QString title = pWidget->windowTitle();
-#endif
 
             qDebug() << "[WD]:" << "looking for start window" << pWidget << title;
 
@@ -241,14 +233,10 @@ void Automation::Terminate()
   qDebug()<<"[WD]:"<<"*************TERMINATE SESSION******************";
   logger_.Log(kInfoLogLevel, "QtWebKit WebDriver shutdown");
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-  foreach(QWindow* pView, qApp->topLevelWindows())
-#else
   foreach(QWidget* pView, qApp->topLevelWidgets())
-#endif
   {
       QVariant sessionIdVar = pView->property("sessionId");
-      if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()) && pView->isVisible())
+      if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()) && !pView->isHidden())
       {
           // destroy children correctly
           QList<QWidget*> childs = pView->findChildren<QWidget*>();
@@ -258,9 +246,7 @@ void Automation::Terminate()
               child->close();
           }
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
           pView->setAttribute(Qt::WA_DeleteOnClose, true);
-#endif
           pView->close();
       }
   }
@@ -851,17 +837,13 @@ void Automation::GetViews(std::vector<WebViewInfo>* views,
                           Error** error)
 {
     std::string extension_id;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    foreach(QWindow* pWidget, qApp->topLevelWindows())
-#else
     foreach(QWidget* pWidget, qApp->topLevelWidgets())
-#endif
     {
         QVariant sessionIdVar = pWidget->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
-            if ((pView != NULL) && pView->isVisible())
+            if ((pView != NULL) && !pView->isHidden())
             {
                 WebViewId pWebView = WebViewId::ForQtView(pView);
                 views->push_back(WebViewInfo(pWebView, extension_id));
@@ -875,11 +857,7 @@ void Automation::DoesViewExist(WebViewId *view_id, bool *does_exist, Error **err
     error = NULL;
     *does_exist = false;
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    foreach(QWindow* pWidget, qApp->allWindows())
-#else
     foreach(QWidget* pWidget, qApp->allWidgets())
-#endif
     {
         QVariant sessionIdVar = pWidget->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
@@ -1526,11 +1504,7 @@ void Automation::BuildKeyMap()
 bool Automation::checkView(const WebViewId &view_id)
 {
     //Rework to check only pointer
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    foreach(QWindow* pView, qApp->allWindows())
-#else
     foreach(QWidget* pView, qApp->allWidgets())
-#endif
     {
         QVariant sessionIdVar = pView->property("sessionId");
         if (sessionIdVar.isValid() && (sessionId == sessionIdVar.toInt()))
