@@ -33,6 +33,11 @@ void CreateSession::ExecutePost(Response* const response) {
     return;
   }
 
+  if (SessionManager::GetInstance()->GetSessions().size()  > 0)
+  {
+      response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
+      return;
+  }
   // Session manages its own liftime, so do not call delete.
   Session* session = new Session();
   Error* error = session->Init(dict);
