@@ -276,7 +276,7 @@ Error* Session::SendKeys(const ElementId& element, const string16& keys) {
                           &error));
         return error;
     }
-    // TODO: extend for native app
+
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
