@@ -9,9 +9,86 @@
 #include <QtWidgets/QApplication>
 #else
 #include <QtCore/QtConcurrentRun>
-#include <QtGui/QApplication>
+//#include <QDebug>
+
+#include <QtGui/QWidget>
+#include <QtGui/QPushButton>
+
 #include <QtWebKit/QtWebKit>
 #endif
+
+class MainWindow : public QWidget
+ {
+     Q_OBJECT
+
+ public:
+     MainWindow();
+     virtual ~MainWindow();
+
+ private slots:
+     void PushButtonPressed();
+     void PushButtonReleased();
+     void PushButtonClicked();
+
+
+ private:
+     QLineEdit *textEdit;
+     QPushButton *pushButton;
+     QWebView *webView;
+ };
+
+MainWindow::MainWindow()
+{
+    textEdit = new QLineEdit(this);
+    textEdit->move(10, 10);
+    textEdit->setAccessibleName("InputText");
+
+    pushButton = new QPushButton(this);
+    pushButton->setText("Push me");
+    pushButton->setAccessibleName("PushButton");
+    pushButton->move(10, 60);
+
+    this->resize(300, 200);
+    this->setWindowTitle("WD_native");
+
+    webView = NULL;
+
+    connect(pushButton, SIGNAL(pressed()), this, SLOT(PushButtonPressed()));
+    connect(pushButton, SIGNAL(released()), this, SLOT(PushButtonReleased()));
+    connect(pushButton, SIGNAL(clicked()), this, SLOT(PushButtonClicked()));
+}
+
+MainWindow::~MainWindow()
+{
+
+}
+
+void MainWindow::PushButtonPressed()
+{
+    QString msg = "!!!!!!! Test PushButton pressed !!!!!!!!";
+    qDebug() << msg;
+}
+
+void MainWindow::PushButtonReleased()
+{
+    QString msg = "!!!!!!! Test PushButton released !!!!!!!!";
+    qDebug() << msg;
+}
+
+void MainWindow::PushButtonClicked()
+{
+    QString msg = "!!!!!!! Test PushButton clicked !!!!!!!!";
+    qDebug() << msg;
+
+    if (NULL == webView)
+    {
+        webView = new QWebView();
+        webView->setWindowTitle(QString("WD"));
+        webView->show();
+    }
+
+    webView->load(QUrl(textEdit->text()));
+}
 
 #include <WebDriver.h>
 
@@ -36,9 +113,12 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
-    //Test
+
     regitsterView<QWebView>("QWebView");
     regitsterView<QWidget>("QWidget");
+    regitsterView<MainWindow>("MainNativeWindow");
+//    MainWindow mainWindow;
+//    mainWindow.show();
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
@@ -47,3 +127,6 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+
+
+#include "moc_main.cc"
