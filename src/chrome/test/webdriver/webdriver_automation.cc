@@ -1545,11 +1545,13 @@ bool Automation::FilterNativeWidget(const QWidget* widget, const std::string& lo
         if (query == widget->metaObject()->className())
             return true;
     }
+#if WD_NATIVE_VIEW_WITH_ACCESSIBILITY
     else if (locator == LocatorType::kId)
     {
         if (query == widget->accessibleName().toStdString())
             return true;
     }
+#endif
     else if (locator == LocatorType::kName)
     {
         if (query == widget->windowTitle().toStdString())
