@@ -111,25 +111,16 @@
           'WD_CONFIG_QWIDGET_VIEW',
         ],
       } ],
-    ],
-
-    'conditions': [
       [ '<(WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY) == 1', {
         'defines': [
           'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY',
         ],
       } ],
-    ],
-
-    'conditions': [
       [ '<(WD_CONFIG_QML_VIEW) == 1', {
         'defines': [
           'WD_CONFIG_QML_VIEW',
         ],
       } ],
-    ],
-
-    'conditions': [
       [ 'mode == "release"', {
         'defines': [
           'NDEBUG',
