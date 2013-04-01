@@ -5,6 +5,9 @@
 
   'variables': {
     'QT5%': '0',
+    'WD_CONFIG_QWIDGET_VIEW%': '0',
+    'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY%': '0',
+    'WD_CONFIG_QML_VIEW%': '0',
   },
 
   'conditions': [
@@ -100,6 +103,30 @@
       'QT_GUI_LIB',
       'QT_CORE_LIB',
       'QT_SHARED',
+    ],
+
+    'conditions': [
+      [ '<(WD_CONFIG_QWIDGET_VIEW) == 1', {
+        'defines': [
+          'WD_CONFIG_QWIDGET_VIEW',
+        ],
+      } ],
+    ],
+
+    'conditions': [
+      [ '<(WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY) == 1', {
+        'defines': [
+          'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY',
+        ],
+      } ],
+    ],
+
+    'conditions': [
+      [ '<(WD_CONFIG_QML_VIEW) == 1', {
+        'defines': [
+          'WD_CONFIG_QML_VIEW',
+        ],
+      } ],
     ],
 
     'conditions': [
