@@ -17,6 +17,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
+#include <QtGui/QComboBox>
 #include <QtWidgets/QInputDialog>
 #else
 #include <QtGui/QApplication>
@@ -24,6 +25,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
+#include <QtGui/QComboBox>
 #include <QtGui/QInputDialog>
 #endif
 
@@ -1388,6 +1390,18 @@ void Automation::ClearNativeElement(const WebViewId& view_id,
         return;
     }
 
+    if (!pWidget->isVisible())
+    {
+        *error = new Error(kElementNotVisible);
+        return;
+    }
+
+    if (!pWidget->isEnabled())
+    {
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     // check if we can clear element
     QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit*>(pWidget);
     if (NULL != plainTextEdit)
@@ -1400,6 +1414,19 @@ void Automation::ClearNativeElement(const WebViewId& view_id,
     if (NULL != lineEdit)
     {
         lineEdit->clear();
+        return;
+    }
+
+    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
+    if (NULL != comboBox)
+    {
+        if (!comboBox->isEditable())
+        {
+            *error = new Error(kInvalidElementState);
+            return;
+        }
+
+        comboBox->clearEditText();
         return;
     }
 
