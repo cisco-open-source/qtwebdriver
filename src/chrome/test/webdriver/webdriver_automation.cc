@@ -18,6 +18,8 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QComboBox>
+#include <QtGui/QCheckBox>
+#include <QtGui/QRadioButton>
 #include <QtWidgets/QInputDialog>
 #else
 #include <QtGui/QApplication>
@@ -26,6 +28,8 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QComboBox>
+#include <QtGui/QCheckBox>
+#include <QtGui/QRadioButton>
 #include <QtGui/QInputDialog>
 #endif
 
@@ -1480,6 +1484,43 @@ void Automation::IsNativeElementEnabled(const WebViewId& view_id,
     }
 
     *is_enabled = pWidget->isEnabled();
+}
+
+void Automation::IsNativeElementSelected(const WebViewId& view_id,
+                       const ElementId& element,
+                       bool* is_selected,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
+    if (NULL != checkBox)
+    {
+        *is_selected = checkBox->isChecked();
+        return;
+    }
+
+    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
+    if (NULL != radioButton)
+    {
+        *is_selected = radioButton->isChecked();
+        return;
+    }
+
+    *error = new Error(kInvalidElementState);
 }
 
 void Automation::FindNativeElement(const WebViewId& view_id,

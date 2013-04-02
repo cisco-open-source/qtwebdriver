@@ -384,6 +384,11 @@ class Automation : public QObject {
                          bool* is_enabled,
                          Error** error);
 
+  void IsNativeElementSelected(const WebViewId& view_id,
+                         const ElementId& element,
+                         bool* is_selected,
+                         Error** error);
+
 
 
  private:

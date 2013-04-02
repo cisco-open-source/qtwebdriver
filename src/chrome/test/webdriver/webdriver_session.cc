@@ -1480,9 +1480,18 @@ Error* Session::IsOptionElementSelected(const FrameId& frame_id,
                                         const ElementId& element,
                                         bool* is_selected) {
 
-    if (!current_target_.view_id.IsTab()) {
-      return new Error(kUnknownError,
-                       "The current target does not support option elements");
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementSelected,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            is_selected,
+            &error));
+
+        return error;
     }
 
   return ExecuteScriptAndParse(
