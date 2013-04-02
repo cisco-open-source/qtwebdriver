@@ -629,26 +629,14 @@ bool ElementTextCommand::DoesGet() {
 }
 
 void ElementTextCommand::ExecuteGet(Response* const response) {
-  Value* unscoped_result = NULL;
-  ListValue args;
-  args.Append(element.ToValue());
-
-  std::string script = base::StringPrintf(
-      "return (%s).apply(null, arguments);",
-      atoms::asString(atoms::GET_TEXT).c_str());
-
-  Error* error = session_->ExecuteScript(script, &args,
-                                         &unscoped_result);
-  scoped_ptr<Value> result(unscoped_result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  if (!result->IsType(Value::TYPE_STRING)) {
-    response->SetError(new Error(kUnknownError, "Result is not string type"));
-    return;
-  }
-  response->SetValue(result.release());
+    std::string element_text;
+    Error* error = session_->GetElementText(
+        session_->current_target(), element, &element_text);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(Value::CreateStringValue(element_text));
 }
 
 }  // namespace webdriver

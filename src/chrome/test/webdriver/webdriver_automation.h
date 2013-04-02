@@ -389,6 +389,10 @@ class Automation : public QObject {
                          bool* is_selected,
                          Error** error);
 
+  void GetNativeElementText(const WebViewId &view_id,
+                         const ElementId& element,
+                         std::string* element_text,
+                         Error **error);
 
 
  private:

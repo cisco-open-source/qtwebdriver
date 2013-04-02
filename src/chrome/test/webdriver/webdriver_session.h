@@ -323,6 +323,10 @@ class Session {
                            const ElementId& element,
                            std::string* tag_name);
 
+  Error* GetElementText(const FrameId& frame_id,
+                           const ElementId& element,
+                           std::string* element_text);
+
   // Gets the clickable location of the given element. It will be the center
   // location of the element. If the element is not clickable, or if the
   // location cannot be determined, an error will be returned.

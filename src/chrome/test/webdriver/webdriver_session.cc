@@ -1542,7 +1542,7 @@ Error* Session::ToggleOptionElement(const FrameId& frame_id,
 Error* Session::GetElementTagName(const FrameId& frame_id,
                                   const ElementId& element,
                                   std::string* tag_name) {
-    if (!current_target_.view_id.IsTab()) {
+    if (!frame_id.view_id.IsTab()) {
       return new Error(kUnknownError,
                        "The current target does not support tag names");
     }
@@ -1553,6 +1553,34 @@ Error* Session::GetElementTagName(const FrameId& frame_id,
       CreateListValueFrom(element),
       CreateDirectValueParser(tag_name));
 }
+
+Error* Session::GetElementText(const FrameId& frame_id,
+                         const ElementId& element,
+                         std::string* element_text) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementText,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            element_text,
+            &error));
+
+        return error;
+   }
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      atoms::asString(atoms::GET_TEXT),
+      "getText",
+      CreateListValueFrom(element),
+      CreateDirectValueParser(element_text));
+
+
+}
+
 
 Error* Session::GetClickableLocation(const ElementId& element,
                                      Point* location) {

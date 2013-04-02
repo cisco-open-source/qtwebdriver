@@ -1523,6 +1523,51 @@ void Automation::IsNativeElementSelected(const WebViewId& view_id,
     *error = new Error(kInvalidElementState);
 }
 
+void Automation::GetNativeElementText(const WebViewId &view_id,
+                       const ElementId& element,
+                       std::string* element_text,
+                       Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    QWidget *pWidget = GetNativeElement(view_id, element);
+
+    if (NULL == pWidget)
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+
+    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
+    if (NULL != comboBox)
+    {
+        *element_text = comboBox->currentText().toStdString();
+        return;
+    }
+
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
+    if (NULL != lineEdit)
+    {
+        *element_text = lineEdit->text().toStdString();
+        return;
+    }
+
+    QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit*>(pWidget);
+    if (NULL != plainText)
+    {
+        *element_text = plainText->toPlainText().toStdString();
+        return;
+    }
+
+    *error = new Error(kNoSuchElement);
+}
+
+
 void Automation::FindNativeElement(const WebViewId& view_id,
                        const ElementId& root_element,
                        const std::string& locator,
