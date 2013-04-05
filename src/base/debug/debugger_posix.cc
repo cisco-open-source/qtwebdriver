@@ -224,6 +224,8 @@ bool BeingDebugged() {
 #endif
 #elif defined(ARCH_CPU_MIPS_FAMILY)
 #define DEBUG_BREAK() asm("break 2")
+#elif defined(__SH4__)
+#define DEBUG_BREAK()
 #else
 #define DEBUG_BREAK() asm("int3")
 #endif
