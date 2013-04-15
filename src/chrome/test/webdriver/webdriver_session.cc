@@ -1967,19 +1967,15 @@ void Session::InitOnSessionThread(const Automation::BrowserOptions& options,
                                   int* build_no,
                                   Error** error) {
   automation_.reset(new Automation(logger_));
-  automation_->Init(options, build_no, error);
+  WebViewId current_view = automation_->Init(options, build_no, error);
   if (*error)
     return;
 
-  std::vector<WebViewInfo> views;
-  automation_->GetViews(&views, error);
-  if (*error)
-    return;
-  if (views.empty()) {
+  if (!current_view.IsValid()) {
     *error = new Error(kUnknownError, "No view ids after initialization");
     return;
   }
-  current_target_ = FrameId(views[0].view_id, FramePath());
+  current_target_ = FrameId(current_view, FramePath());
 }
 
 void Session::TerminateOnSessionThread() {
@@ -2419,6 +2415,29 @@ Error* Session::GetScreenShot(std::string* png) {
   if (!file_util::ReadFileToString(path, png))
     return new Error(kUnknownError, "Could not read screenshot file");
   return NULL;
+}
+
+
+Error* Session::GetSource(const std::string &script, const base::ListValue *const args, base::Value **value)
+{
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeSource,
+            base::Unretained(automation_.get()),
+            current_target().view_id,
+            value,
+            &error));
+
+        return error;
+    }
+
+    return ExecuteScript(
+      current_target_,
+      script,
+      args,
+      value);
 }
 
 #if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
