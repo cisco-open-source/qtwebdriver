@@ -231,8 +231,17 @@ class Session {
   // Scroll the element into view and get its location relative to
   // the client's viewport.
   Error* GetElementLocationInView(
+            const ElementId& element,
+            Point* location);
+
+  Error* GetElementLocation(const FrameId& frame_id,
       const ElementId& element,
       Point* location);
+
+  Error* ElementEquals(const FrameId& frame_id,
+      const ElementId& element1,
+      const ElementId& element2,
+      bool* is_equal);
 
   // Scroll the element's region into view and get its location relative to
   // the client's viewport. If |center| is true, the element will be centered
@@ -277,6 +286,14 @@ class Session {
                             bool ignore_opacity,
                             bool* is_visible);
 
+  // get active element on page
+  Error* ActiveElement(const FrameId& frame_id,
+                     ElementId* element);
+
+  // Clear input element.
+  Error* ClearElement(const FrameId& frame_id,
+                            const ElementId& element);
+
   // Gets whether the element is currently enabled.
   Error* IsElementEnabled(const FrameId& frame_id,
                           const ElementId& element,
@@ -293,6 +310,9 @@ class Session {
                                   const ElementId& element,
                                   bool selected);
 
+  Error* MoveAndClickElement(const FrameId& frame_id,
+                                  const ElementId& element);
+
   // Toggles the option element's selection state. The option element should
   // support multi selection.
   Error* ToggleOptionElement(const FrameId& frame_id,
@@ -302,6 +322,10 @@ class Session {
   Error* GetElementTagName(const FrameId& frame_id,
                            const ElementId& element,
                            std::string* tag_name);
+
+  Error* GetElementText(const FrameId& frame_id,
+                           const ElementId& element,
+                           std::string* element_text);
 
   // Gets the clickable location of the given element. It will be the center
   // location of the element. If the element is not clickable, or if the
@@ -416,9 +440,16 @@ class Session {
   Error* ExecuteScriptAndParseValue(const FrameId& frame_id,
                                     const std::string& script,
                                     base::Value** value, bool isAsync);
+
   void SendKeysOnSessionThread(const string16& keys,
                                bool release_modifiers,
                                Error** error);
+
+  void SendKeysOnElementSessionThread(const ElementId& element,
+                               const string16& keys,
+                               bool release_modifiers,
+                               Error** error);
+
 //  Error* ProcessWebMouseEvents(const std::vector<WebMouseEvent>& events);
   WebMouseEvent CreateWebMouseEvent(automation::MouseEventType type,
                                     automation::MouseButton button,

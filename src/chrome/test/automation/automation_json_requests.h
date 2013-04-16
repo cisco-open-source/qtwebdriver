@@ -71,9 +71,9 @@ class WebViewId {
   //static WebViewId ForView(const AutomationId& view_id, QWebView *view);
   static WebViewId ForView(const AutomationId& view_id);
 
-  // Creates an ID for the given view ID.
+    // Creates an ID for the given view ID.
   //static WebViewId ForView(const AutomationId& view_id, QWebView *view);
-  static WebViewId ForQtView(QWebView *view);
+  static WebViewId ForQtView(QWidget *view);
 
   // Creates an ID for the given tab ID.
   //WebViewId ForOldStyleTab(int tab_id, QWebView *view);
@@ -97,6 +97,9 @@ class WebViewId {
   // Returns whether this ID refers to a tab.
   bool IsTab() const;
 
+  // Returns whether this ID refers to app.
+  bool IsApp() const;
+
   int tab_id() const;
 
   // The old style is to use a single integer ID for a tab. The new style is
@@ -104,8 +107,8 @@ class WebViewId {
   // types.
   bool old_style() const;
 
-  // return pointer to WebView widget
-  QWebView* GetWebView() const;
+    // return pointer to view widget
+  QWidget* GetView() const;
 
  private:
   // Whether this ID is an old-style integer tab ID.
@@ -113,7 +116,7 @@ class WebViewId {
 
   AutomationId id_;
   int tab_id_;
-  QWebView *webView_;
+  QWidget *view_;
 };
 
 // Used to locate a WebView. The same locator may locate different WebViews

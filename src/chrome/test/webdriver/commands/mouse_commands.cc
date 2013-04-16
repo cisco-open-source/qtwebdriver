@@ -36,55 +36,15 @@ bool MoveAndClickCommand::DoesPost() {
 }
 
 void MoveAndClickCommand::ExecutePost(Response* response) {
-  std::string tag_name;
-  Error* error = session_->GetElementTagName(
-      session_->current_target(), element, &tag_name);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
+    Error* error = NULL;
 
-  if (tag_name == "option") {
-    const char* kCanOptionBeToggledScript =
-        "function(option) {"
-        "  for (var parent = option.parentElement;"
-        "       parent;"
-        "       parent = parent.parentElement) {"
-        "    if (parent.tagName.toLowerCase() == 'select') {"
-        "      return parent.multiple;"
-        "    }"
-        "  }"
-        "  throw new Error('Option element is not in a select');"
-        "}";
-    bool can_be_toggled;
-    error = session_->ExecuteScriptAndParse(
-        session_->current_target(),
-        kCanOptionBeToggledScript,
-        "canOptionBeToggled",
-        CreateListValueFrom(element),
-        CreateDirectValueParser(&can_be_toggled));
+    error = session_->MoveAndClickElement(session_->current_target(), element);
+
     if (error) {
       response->SetError(error);
-      return;
     }
 
-    if (can_be_toggled) {
-      error = session_->ToggleOptionElement(
-          session_->current_target(), element);
-    } else {
-      error = session_->SetOptionElementSelected(
-          session_->current_target(), element, true);
-    }
-  } else {
-    Point location;
-    error = session_->GetClickableLocation(element, &location);
-    if (!error)
-      error = session_->MouseMoveAndClick(location, automation::kLeftButton);
-  }
-  if (error) {
-    response->SetError(error);
     return;
-  }
 }
 
 HoverCommand::HoverCommand(const std::vector<std::string>& path_segments,

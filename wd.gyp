@@ -5,6 +5,11 @@
 
   'variables': {
     'QT5%': '0',
+    'WD_CONFIG_QWIDGET_VIEW%': '0',
+    'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY%': '0',
+    'WD_CONFIG_QML_VIEW%': '0',
+    'WD_BUILD_MONGOOSE%': '0',
+    'WD_BUILD_MODP_B64%': '0',
   },
 
   'conditions': [
@@ -22,6 +27,7 @@
 
           'include_dirs': [
             'inc/',
+            'src/',
             '<(QT_INC_PATH)',
           ],
 
@@ -31,7 +37,6 @@
 
           'sources': [
             'src/Test/main.cc',
-            'src/third_party/mongoose/mongoose.c',
           ],
 
           'conditions': [
@@ -63,11 +68,24 @@
                 '-L<(QT_LIB_PATH)',
                 '-lQtWebKit',
                 '-lQtNetwork',
+                '-lQtXml',
                 '-lQtGui',
                 '-lQtCore',
                 '-lpthread',
                 '-lrt',
                 '-ldl',
+              ],
+            } ],
+
+            [ '<(WD_BUILD_MONGOOSE) == 0', {
+              'sources': [
+                'src/third_party/mongoose/mongoose.c',
+              ],
+            } ],
+
+            [ '<(WD_BUILD_MODP_B64) == 0', {
+              'sources': [
+                'src/third_party/modp_b64/modp_b64.cc',
               ],
             } ],
           ],
@@ -86,7 +104,6 @@
 
   'target_defaults': {
     'cflags': [
-      '-g',
       '-fPIC',
       '-Wall',
       '-W',
@@ -102,11 +119,42 @@
     ],
 
     'conditions': [
+      [ '<(WD_CONFIG_QWIDGET_VIEW) == 1', {
+        'defines': [
+          'WD_CONFIG_QWIDGET_VIEW',
+        ],
+      } ],
+      [ '<(WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY) == 1', {
+        'defines': [
+          'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY',
+        ],
+      } ],
+      [ '<(WD_CONFIG_QML_VIEW) == 1', {
+        'defines': [
+          'WD_CONFIG_QML_VIEW',
+        ],
+      } ],
+      [ 'mode == "debug"', {
+        'cflags': [
+          '-O0',
+          '-g',
+        ],
+      } ],
       [ 'mode == "release"', {
+        'cflags': [
+          '-O3',
+        ],
+
         'defines': [
           'NDEBUG',
         ],
       } ],
+      [ 'mode == "release_dbg"', {
+        'cflags': [
+          '-O3',
+          '-g',
+        ],
+      } ]
     ],
   },
 
@@ -286,7 +334,6 @@
         'src/qtaskrunner.cc',
         'src/qwebviewext.h',
         'src/qwebviewext.cc',
-        'src/third_party/modp_b64/modp_b64.cc',
         'src/third_party/webdriver/atoms.cc',
         'src/third_party/zlib/adler32.c',
         'src/third_party/zlib/contrib/minizip/ioapi.c',
@@ -307,6 +354,20 @@
         'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', 'src/moc_<(RULE_INPUT_ROOT).cc' ],
         'message': 'Generating <(RULE_INPUT_ROOT).cc.',
       } ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 1', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+
+        [ '<(WD_BUILD_MODP_B64) == 1', {
+          'sources': [
+            'src/third_party/modp_b64/modp_b64.cc',
+          ],
+        } ],
+      ],
     }, {
       'target_name': 'WebDriverShared',
       'type': 'shared_library',

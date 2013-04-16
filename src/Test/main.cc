@@ -9,7 +9,10 @@
 #include <QtWidgets/QApplication>
 #else
 #include <QtCore/QtConcurrentRun>
+//#include <QDebug>
+
 #include <QtGui/QApplication>
+
 #include <QtWebKit/QtWebKit>
 #endif
 
@@ -36,7 +39,6 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
-    //Test
     regitsterView<QWebView>("QWebView");
     regitsterView<QWidget>("QWidget");
 

@@ -177,6 +177,11 @@ Error* Session::ExecuteScript(const FrameId& frame_id,
                               const std::string& script,
                               const ListValue* const args,
                               Value** value) {
+    if (!frame_id.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support script execution");
+    }
+
   std::string args_as_json;
   base::JSONWriter::Write(static_cast<const Value* const>(args),
                           &args_as_json);
@@ -231,6 +236,12 @@ Error* Session::ExecuteAsyncScript(const FrameId& frame_id,
                                    const std::string& script,
                                    const ListValue* const args,
                                    Value** value) {
+
+    if (!frame_id.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support script execution");
+    }
+
   std::string args_as_json;
   base::JSONWriter::Write(static_cast<const Value* const>(args),
                           &args_as_json);
@@ -252,6 +263,20 @@ Error* Session::ExecuteAsyncScript(const FrameId& frame_id,
 }
 
 Error* Session::SendKeys(const ElementId& element, const string16& keys) {
+    if (current_target_.view_id.IsApp())
+    {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+                          &Session::SendKeysOnElementSessionThread,
+                          base::Unretained(this),
+                          element,
+                          keys,
+                          true /* release_modifiers */,
+                          &error));
+        return error;
+    }
+
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
@@ -408,7 +433,11 @@ Error* Session::Reload() {
 }
 
 Error* Session::GetURL(std::string* url) {
-  return ExecuteScriptAndParse(current_target_,
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support URL source");
+    }
+    return ExecuteScriptAndParse(current_target_,
                                "function() { return document.URL }",
                                "getUrl",
                                new ListValue(),
@@ -416,6 +445,19 @@ Error* Session::GetURL(std::string* url) {
 }
 
 Error* Session::GetTitle(std::string* tab_title) {
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetViewTitle,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            tab_title,
+            &error));
+
+        return error;
+    }
+
   const char* kGetTitleScript =
       "function() {"
       "  if (document.title)"
@@ -697,6 +739,7 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
     if (error)
       return error;
   }
+
   if (!does_exist) {
     // See if any of the tab window names match |name|.
     std::vector<WebViewInfo> views;
@@ -704,21 +747,42 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
     if (error)
       return error;
     for (size_t i = 0; i < views.size(); ++i) {
-      if (!views[i].view_id.IsTab())
-        continue;
-      std::string window_name;
-      Error* error = ExecuteScriptAndParse(
-          FrameId(views[i].view_id, FramePath()),
-          "function() { return window.name; }",
-          "getWindowName",
-          new ListValue(),
-          CreateDirectValueParser(&window_name));
-      if (error)
-        return error;
-      if (id_or_name == window_name) {
-        new_view = views[i].view_id;
-        does_exist = true;
-        break;
+      if (views[i].view_id.IsTab())
+      {
+          std::string window_name;
+          Error* error = ExecuteScriptAndParse(
+              FrameId(views[i].view_id, FramePath()),
+              "function() { return window.name; }",
+              "getWindowName",
+              new ListValue(),
+              CreateDirectValueParser(&window_name));
+          if (error)
+            return error;
+
+          if (id_or_name == window_name) {
+            new_view = views[i].view_id;
+            does_exist = true;
+            break;
+          }
+      }
+      else if (views[i].view_id.IsApp())
+      {
+          std::string window_name;
+
+          RunSessionTask(base::Bind(
+              &Automation::GetViewTitle,
+              base::Unretained(automation_.get()),
+              views[i].view_id,
+              &window_name,
+              &error));
+          if (error)
+            return error;
+
+          if (id_or_name == window_name) {
+            new_view = views[i].view_id;
+            does_exist = true;
+            break;
+          }
       }
     }
   }
@@ -843,6 +907,17 @@ Error* Session::CloseWindow() {
 }
 
 Error* Session::GetWindowBounds(const WebViewId& window, Rect* bounds) {
+    if (window.IsApp()) {
+        Error* error = NULL;
+        RunSessionTask(base::Bind(
+            &Automation::GetViewBounds,
+            base::Unretained(automation_.get()),
+            window,
+            bounds,
+            &error));
+        return error;
+    }
+
   const char* kGetWindowBoundsScript =
       "function() {"
       "  return {"
@@ -888,6 +963,7 @@ Error* Session::GetAlertMessage(std::string* text) {
   RunSessionTask(base::Bind(
       &Automation::GetAppModalDialogMessage,
       base::Unretained(automation_.get()),
+      current_target_.view_id,
       text,
       &error));
   return error;
@@ -903,6 +979,7 @@ Error* Session::SetAlertPromptText(const std::string& alert_prompt_text)
       RunSessionTask(base::Bind(
           &Automation::SetAlertPromptText,
           base::Unretained(automation_.get()),
+          current_target_.view_id,
           alert_prompt_text,
           &error));
       return error;
@@ -916,12 +993,14 @@ Error* Session::AcceptOrDismissAlert(bool accept) {
     RunSessionTask(base::Bind(
         &Automation::AcceptPromptAppModalDialog,
         base::Unretained(automation_.get()),
+        current_target_.view_id,
         alert_prompt_text_,
         &error));
   } else {
     RunSessionTask(base::Bind(
         &Automation::AcceptOrDismissAppModalDialog,
         base::Unretained(automation_.get()),
+        current_target_.view_id,
         accept,
         &error));
   }
@@ -965,12 +1044,29 @@ Error* Session::FindElement(const FrameId& frame_id,
                             const std::string& locator,
                             const std::string& query,
                             ElementId* element) {
-  std::vector<ElementId> elements;
-  Error* error = FindElementsHelper(
-      frame_id, root_element, locator, query, true, &elements);
-  if (!error)
-    *element = elements[0];
-  return error;
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::FindNativeElement,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            root_element,
+            locator,
+            query,
+            element,
+            &error));
+
+        return error;
+    }
+
+    std::vector<ElementId> elements;
+    Error* error = FindElementsHelper(
+        frame_id, root_element, locator, query, true, &elements);
+    if (!error)
+      *element = elements[0];
+    return error;
 }
 
 Error* Session::FindElements(const FrameId& frame_id,
@@ -978,6 +1074,22 @@ Error* Session::FindElements(const FrameId& frame_id,
                              const std::string& locator,
                              const std::string& query,
                              std::vector<ElementId>* elements) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::FindNativeElements,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            root_element,
+            locator,
+            query,
+            elements,
+            &error));
+
+        return error;
+    }
+
   return FindElementsHelper(
       frame_id, root_element, locator, query, false, elements);
 }
@@ -985,6 +1097,21 @@ Error* Session::FindElements(const FrameId& frame_id,
 Error* Session::GetElementLocationInView(
     const ElementId& element,
     Point* location) {
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementLocationInView,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
   Size size;
   Error* error = GetElementSize(current_target_, element, &size);
   if (error)
@@ -994,12 +1121,72 @@ Error* Session::GetElementLocationInView(
       false /* center */, false /* verify_clickable_at_middle */, location);
 }
 
+Error* Session::GetElementLocation(
+        const FrameId& frame_id,
+        const ElementId& element,
+        Point* location) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementLocation,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      atoms::asString(atoms::GET_LOCATION),
+      "getLocation",
+      CreateListValueFrom(element),
+      CreateDirectValueParser(location));
+}
+
+Error* Session::ElementEquals(const FrameId& frame_id,
+    const ElementId& element1,
+    const ElementId& element2,
+    bool* is_equal) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::NativeElementEquals,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element1,
+            element2,
+            is_equal,
+            &error));
+
+        return error;
+    }
+
+    std::string script = "function(el1, el2) { return el1 == el2; }";
+    //std::string script = "return arguments[0] == arguments[1];";
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      script,
+      "elementEquals",
+      CreateListValueFrom(element1, element2),
+      CreateDirectValueParser(is_equal));
+}
+
 Error* Session::GetElementRegionInView(
     const ElementId& element,
     const Rect& region,
     bool center,
     bool verify_clickable_at_middle,
     Point* location) {
+
   CHECK(element.is_valid());
 
   Point region_offset = region.origin();
@@ -1049,6 +1236,21 @@ Error* Session::GetElementRegionInView(
 Error* Session::GetElementSize(const FrameId& frame_id,
                                const ElementId& element,
                                Size* size) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementSize,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            size,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_SIZE),
@@ -1060,6 +1262,7 @@ Error* Session::GetElementSize(const FrameId& frame_id,
 Error* Session::GetElementFirstClientRect(const FrameId& frame_id,
                                           const ElementId& element,
                                           Rect* rect) {
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
@@ -1073,6 +1276,7 @@ Error* Session::GetElementEffectiveStyle(
     const ElementId& element,
     const std::string& prop,
     std::string* value) {
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::GET_EFFECTIVE_STYLE),
@@ -1085,6 +1289,7 @@ Error* Session::GetElementBorder(const FrameId& frame_id,
                                  const ElementId& element,
                                  int* border_left,
                                  int* border_top) {
+
   std::string border_left_str, border_top_str;
   Error* error = GetElementEffectiveStyle(
       frame_id, element, "border-left-width", &border_left_str);
@@ -1104,6 +1309,22 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
                                    const ElementId& element,
                                    bool ignore_opacity,
                                    bool* is_displayed) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementDisplayed,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            ignore_opacity,
+            is_displayed,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_DISPLAYED),
@@ -1112,9 +1333,141 @@ Error* Session::IsElementDisplayed(const FrameId& frame_id,
       CreateDirectValueParser(is_displayed));
 }
 
+Error* Session::ActiveElement(const FrameId& frame_id,
+                   ElementId* element) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementWithFocus,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            &error));
+
+        return error;
+    }
+
+    std::string script = "function() { return document.activeElement || document.body; }";
+    //"return document.activeElement || document.body"
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      script,
+      "activeElement",
+      new ListValue(),
+      CreateDirectValueParser(element));
+}
+
+
+
+Error* Session::ClearElement(const FrameId& frame_id,
+                          const ElementId& element) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::ClearNativeElement,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            &error));
+
+        return error;
+    }
+
+    ListValue args;
+    args.Append(element.ToValue());
+
+    std::string script = base::StringPrintf(
+        "(%s).apply(null, arguments);", atoms::asString(atoms::CLEAR).c_str());
+
+    Value* result = NULL;
+    Error* error = ExecuteScript(script, &args, &result);
+
+    // TODO: check if we need return "result" value
+    return error;
+}
+
+Error* Session::MoveAndClickElement(const FrameId& frame_id,
+                                const ElementId& element) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+        Point location;
+
+        error = GetClickableLocation(element, &location);
+        if (!error)
+          error = MouseMoveAndClick(location, automation::kLeftButton);
+
+        return error;
+    }
+
+    std::string tag_name;
+    Error* error = GetElementTagName(
+            frame_id, element, &tag_name);
+    if (error) {
+      return error;
+    }
+
+    if (tag_name == "option") {
+      const char* kCanOptionBeToggledScript =
+          "function(option) {"
+          "  for (var parent = option.parentElement;"
+          "       parent;"
+          "       parent = parent.parentElement) {"
+          "    if (parent.tagName.toLowerCase() == 'select') {"
+          "      return parent.multiple;"
+          "    }"
+          "  }"
+          "  throw new Error('Option element is not in a select');"
+          "}";
+      bool can_be_toggled;
+      error = ExecuteScriptAndParse(
+          frame_id,
+          kCanOptionBeToggledScript,
+          "canOptionBeToggled",
+          CreateListValueFrom(element),
+          CreateDirectValueParser(&can_be_toggled));
+      if (error) {
+        return error;
+      }
+
+      if (can_be_toggled) {
+        error = ToggleOptionElement(
+            frame_id, element);
+      } else {
+        error = SetOptionElementSelected(
+            frame_id, element, true);
+      }
+    } else {
+      Point location;
+      error = GetClickableLocation(element, &location);
+      if (!error)
+        error = MouseMoveAndClick(location, automation::kLeftButton);
+    }
+
+    return error;
+}
+
 Error* Session::IsElementEnabled(const FrameId& frame_id,
                                  const ElementId& element,
                                  bool* is_enabled) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementEnabled,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            is_enabled,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_ENABLED),
@@ -1126,6 +1479,21 @@ Error* Session::IsElementEnabled(const FrameId& frame_id,
 Error* Session::IsOptionElementSelected(const FrameId& frame_id,
                                         const ElementId& element,
                                         bool* is_selected) {
+
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::IsNativeElementSelected,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            is_selected,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       frame_id,
       atoms::asString(atoms::IS_SELECTED),
@@ -1137,6 +1505,12 @@ Error* Session::IsOptionElementSelected(const FrameId& frame_id,
 Error* Session::SetOptionElementSelected(const FrameId& frame_id,
                                          const ElementId& element,
                                          bool selected) {
+
+    if (!current_target_.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support option elements");
+    }
+
   // This wrapper ensures the script is started successfully and
   // allows for an alert to happen when the option selection occurs.
   // See selenium bug 2671.
@@ -1168,6 +1542,10 @@ Error* Session::ToggleOptionElement(const FrameId& frame_id,
 Error* Session::GetElementTagName(const FrameId& frame_id,
                                   const ElementId& element,
                                   std::string* tag_name) {
+    if (!frame_id.view_id.IsTab()) {
+      return new Error(kUnknownError,
+                       "The current target does not support tag names");
+    }
   return ExecuteScriptAndParse(
       frame_id,
       "function(elem) { return elem.tagName.toLowerCase() }",
@@ -1176,8 +1554,51 @@ Error* Session::GetElementTagName(const FrameId& frame_id,
       CreateDirectValueParser(tag_name));
 }
 
+Error* Session::GetElementText(const FrameId& frame_id,
+                         const ElementId& element,
+                         std::string* element_text) {
+    if (frame_id.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementText,
+            base::Unretained(automation_.get()),
+            frame_id.view_id,
+            element,
+            element_text,
+            &error));
+
+        return error;
+   }
+
+  return ExecuteScriptAndParse(
+      frame_id,
+      atoms::asString(atoms::GET_TEXT),
+      "getText",
+      CreateListValueFrom(element),
+      CreateDirectValueParser(element_text));
+
+
+}
+
+
 Error* Session::GetClickableLocation(const ElementId& element,
                                      Point* location) {
+
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementClickableLocation,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            &error));
+
+        return error;
+    }
+
   bool is_displayed = false;
   Error* error = IsElementDisplayed(
       current_target_, element, true /* ignore_opacity */, &is_displayed);
@@ -1224,6 +1645,21 @@ Error* Session::GetClickableLocation(const ElementId& element,
 Error* Session::GetAttribute(const ElementId& element,
                              const std::string& key,
                              Value** value) {
+    if (current_target_.view_id.IsApp()) {
+        Error* error = NULL;
+
+        RunSessionTask(base::Bind(
+            &Automation::GetNativeElementProperty,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            key,
+            value,
+            &error));
+
+        return error;
+    }
+
   return ExecuteScriptAndParse(
       current_target_,
       atoms::asString(atoms::GET_ATTRIBUTE),
@@ -1627,6 +2063,51 @@ void Session::SendKeysOnSessionThread(const string16& keys,
     } else {
       automation_->SendWebKeyEvent(
           current_target_.view_id,
+          key_events[i], error);
+    }
+    if (*error) {
+      std::string details = base::StringPrintf(
+          "Failed to send key event. Event details:\n"
+              "Type: %d, KeyCode: %d, UnmodifiedText: %s, ModifiedText: %s, "
+              "Modifiers: %d",
+          key_events[i].type,
+          key_events[i].key_code,
+          key_events[i].unmodified_text.c_str(),
+          key_events[i].modified_text.c_str(),
+          key_events[i].modifiers);
+      (*error)->AddDetails(details);
+      return;
+    }
+  }
+}
+
+void Session::SendKeysOnElementSessionThread(const ElementId& element,
+                                      const string16& keys,
+                                      bool release_modifiers,
+                                      Error** error) {
+  std::vector<WebKeyEvent> key_events;
+  std::string error_msg;
+  if (!ConvertKeysToWebKeyEvents(keys, logger_, release_modifiers,
+                                 &sticky_modifiers_, &key_events, &error_msg)) {
+    *error = new Error(kUnknownError, error_msg);
+    return;
+  }
+  for (size_t i = 0; i < key_events.size(); ++i) {
+    if (capabilities_.native_events) {
+      // The automation provider will generate up/down events for us, we
+      // only need to call it once as compared to the WebKeyEvent method.
+      // Hence we filter events by their types, keeping only rawkeydown.
+//      if (key_events[i].type != automation::kRawKeyDownType)
+//        continue;
+//      automation_->SendNativeKeyEvent(
+//          current_target_.view_id,
+//          key_events[i].key_code,
+//          key_events[i].modifiers,
+//          error);
+    } else {
+      automation_->SendNativeElementWebKeyEvent(
+          current_target_.view_id,
+          element,
           key_events[i], error);
     }
     if (*error) {

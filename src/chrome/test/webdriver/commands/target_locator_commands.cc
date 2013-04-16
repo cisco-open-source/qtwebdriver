@@ -115,6 +115,14 @@ void SwitchFrameCommand::ExecutePost(Response* const response) {
   int index = 0;
   ElementId element;
   Error* error = NULL;
+
+  // TODO: move this function to session?
+  if ( session_->current_target().view_id.IsApp() )
+  {
+      error = new Error(kUnknownError, "This trget doesnt support switchFrame command");
+      return;
+  }
+
   if (GetStringParameter("id", &id)) {
     error = session_->SwitchToFrameWithNameOrId(id);
   } else if (GetIntegerParameter("id", &index)) {
@@ -158,15 +166,14 @@ bool ActiveElementCommand::DoesPost() {
 }
 
 void ActiveElementCommand::ExecutePost(Response* const response) {
-  ListValue args;
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(
-      "return document.activeElement || document.body", &args, &result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(result);
+    ElementId element;
+    Error* error = session_->ActiveElement(
+        session_->current_target(), &element);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(element.ToValue());
 }
 
 }  // namespace webdriver

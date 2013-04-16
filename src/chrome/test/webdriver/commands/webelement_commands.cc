@@ -94,6 +94,15 @@ bool ElementClearCommand::DoesPost() {
 }
 
 void ElementClearCommand::ExecutePost(Response* const response) {
+    Error* error = session_->ClearElement(
+        session_->current_target(), element);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+
+    // TODO: check if we need Value from session.
+    /*
   ListValue args;
   args.Append(element.ToValue());
 
@@ -107,6 +116,7 @@ void ElementClearCommand::ExecutePost(Response* const response) {
     return;
   }
   response->SetValue(result);
+  */
 }
 
 ///////////////////// ElementCssCommand ////////////////////
@@ -186,6 +196,17 @@ bool ElementEnabledCommand::DoesGet() {
 }
 
 void ElementEnabledCommand::ExecuteGet(Response* const response) {
+    bool is_enabled;
+    Error* error = session_->IsElementEnabled(
+        session_->current_target(), element,
+        &is_enabled);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(Value::CreateBooleanValue(is_enabled));
+    // code below doesnt support native views...
+    /*
   ListValue args;
   args.Append(element.ToValue());
 
@@ -200,6 +221,7 @@ void ElementEnabledCommand::ExecuteGet(Response* const response) {
     return;
   }
   response->SetValue(result);
+  */
 }
 
 ///////////////////// ElementEqualsCommand ////////////////////
@@ -223,21 +245,16 @@ void ElementEqualsCommand::ExecuteGet(Response* const response) {
     return;
   }
 
-  std::string script = "return arguments[0] == arguments[1];";
-
-  ListValue args;
-  args.Append(element.ToValue());
-
   ElementId other_element(path_segments_.at(6));
-  args.Append(other_element.ToValue());
+  bool is_equals;
 
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(script, &args, &result);
+  Error* error = session_->ElementEquals(session_->current_target(), element, other_element, &is_equals);
   if (error) {
     response->SetError(error);
     return;
   }
-  response->SetValue(result);
+
+  response->SetValue(Value::CreateBooleanValue(is_equals));
 }
 
 ///////////////////// ElementLocationCommand ////////////////////
@@ -254,20 +271,16 @@ bool ElementLocationCommand::DoesGet() {
 }
 
 void ElementLocationCommand::ExecuteGet(Response* const response) {
-  std::string script = base::StringPrintf(
-      "return (%s).apply(null, arguments);",
-      atoms::asString(atoms::GET_LOCATION).c_str());
-
-  ListValue args;
-  args.Append(element.ToValue());
-
-  Value* result = NULL;
-  Error* error = session_->ExecuteScript(script, &args, &result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(result);
+    Point location;
+    Error* error = session_->GetElementLocation(session_->current_target(), element, &location);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    DictionaryValue* coord_dict = new DictionaryValue();
+    coord_dict->SetInteger("x", location.x());
+    coord_dict->SetInteger("y", location.y());
+    response->SetValue(coord_dict);
 }
 
 ///////////////////// ElementLocationInViewCommand ////////////////////
@@ -483,6 +496,15 @@ void ElementValueCommand::ExecuteGet(Response* const response) {
 }
 
 void ElementValueCommand::ExecutePost(Response* const response) {
+
+    if ( session_->current_target().view_id.IsApp() )
+    {
+        Error* error = SendKeys();
+        if (error)
+            response->SetError(error);
+        return;
+    }
+
   bool is_input = false;
   Error* error = HasAttributeWithLowerCaseValueASCII("tagName", "input",
                                                      &is_input);
@@ -607,26 +629,14 @@ bool ElementTextCommand::DoesGet() {
 }
 
 void ElementTextCommand::ExecuteGet(Response* const response) {
-  Value* unscoped_result = NULL;
-  ListValue args;
-  args.Append(element.ToValue());
-
-  std::string script = base::StringPrintf(
-      "return (%s).apply(null, arguments);",
-      atoms::asString(atoms::GET_TEXT).c_str());
-
-  Error* error = session_->ExecuteScript(script, &args,
-                                         &unscoped_result);
-  scoped_ptr<Value> result(unscoped_result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  if (!result->IsType(Value::TYPE_STRING)) {
-    response->SetError(new Error(kUnknownError, "Result is not string type"));
-    return;
-  }
-  response->SetValue(result.release());
+    std::string element_text;
+    Error* error = session_->GetElementText(
+        session_->current_target(), element, &element_text);
+    if (error) {
+      response->SetError(error);
+      return;
+    }
+    response->SetValue(Value::CreateStringValue(element_text));
 }
 
 }  // namespace webdriver
