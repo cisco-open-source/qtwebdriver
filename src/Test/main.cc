@@ -39,8 +39,8 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
-    regitsterView<QWebView>("QWebView");
-    regitsterView<QWidget>("QWidget");
+    registerView<QWebView>("QWebView");
+    registerView<QWidget>("QWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));

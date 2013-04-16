@@ -24,12 +24,12 @@ int main_server(int argc, char *argv[]);
 }
 #endif
 
-/** @fn void regitsterView(std::string name)
+/** @fn void registerView(std::string name)
   * @brief register View for testing
   * @param[in] name factory name for this class type
   **/
 template <class T>
-void regitsterView(std::string name)
+void registerView(std::string name)
 {
     ViewFactory::GetInstance()->add<T>(name);
 }
