@@ -71,6 +71,7 @@
                 '-lQtXml',
                 '-lQtGui',
                 '-lQtCore',
+                '-lQtDeclarative',
                 '-lpthread',
                 '-lrt',
                 '-ldl',
