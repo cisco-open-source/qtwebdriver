@@ -2345,6 +2345,7 @@ void Automation::createUIXML(QWidget *parent, QIODevice* buff, ElementMap* eleme
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 
     writer->setDevice(buff);
+    writer->setAutoFormatting(true);
     writer->writeStartDocument();
 
     qDebug()<<"WD: "<<needAddWebSource;
@@ -2374,7 +2375,7 @@ void Automation::addWidgetToXML(QWidget* parent, ElementMap* elementsMap, QXmlSt
     QWebView* webview = qobject_cast< QWebView *>(parent);
     if (webview && needAddWebSource)
     {
-        writer->writeEntityReference(webview->page()->mainFrame()->toHtml());
+        writer->writeCharacters(webview->page()->mainFrame()->toHtml());
     }
     else
     {
@@ -2383,7 +2384,7 @@ void Automation::addWidgetToXML(QWidget* parent, ElementMap* elementsMap, QXmlSt
         {
             QWidget* childWgt = qobject_cast<QWidget *>(child);
             if (childWgt)
-                addWidgetToXML(childWgt, elementsMap, writer);
+                addWidgetToXML(childWgt, elementsMap, writer, needAddWebSource);
 
         }
     }
