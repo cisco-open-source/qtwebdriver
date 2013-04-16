@@ -406,6 +406,11 @@ class Session {
   // Overrides the current geolocation.
   Error* OverrideGeolocation(const base::DictionaryValue* geolocation);
 
+  // return source of the current target (XML for QtUI)
+  Error* GetSource (const std::string& script,
+                    const base::ListValue* const args,
+                    base::Value** value);
+
   const std::string& id() const;
 
   const FrameId& current_target() const;

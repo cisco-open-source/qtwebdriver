@@ -30,7 +30,7 @@ bool SourceCommand::DoesGet() {
 void SourceCommand::ExecuteGet(Response* const response) {
   ListValue args;
   Value* result = NULL;
-  Error* error = session_->ExecuteScript(kSource, &args, &result);
+  Error* error = session_->GetSource(kSource, &args, &result);
   if (error) {
     response->SetError(error);
     return;

@@ -16,6 +16,8 @@
 #include <QtCore/QPointer>
 #include <QtCore/QHash>
 #include <QtGui/QKeyEvent>
+#include <QtCore/QBuffer>
+#include <QtXml/QXmlStreamWriter>
 
 #include "base/command_line.h"
 #include "base/file_path.h"
@@ -115,7 +117,7 @@ class Automation : public QObject {
   virtual ~Automation();
 
   // Start the system's default Chrome binary.
-  void Init(const BrowserOptions& options, int* build_no, Error** error);
+  WebViewId Init(const BrowserOptions& options, int* build_no, Error** error);
 
   // Terminates this session and disconnects its automation proxy. After
   // invoking this method, the Automation can safely be deleted.
@@ -393,6 +395,10 @@ class Automation : public QObject {
                          const ElementId& element,
                          std::string* element_text,
                          Error **error);
+						 
+  void GetNativeSource(const WebViewId& view_id,
+                         base::Value** result,
+                         Error** error);
 
 
  private:
@@ -420,6 +426,9 @@ class Automation : public QObject {
   QKeyEvent ConvertToQtKeyEvent(const WebKeyEvent &key_event);
   void BuildKeyMap();
   bool checkView(const WebViewId &view_id);
+  void createUIXML(QWidget *parent, QIODevice *buff, ElementMap* elementsMap, Error **error, bool needAddWebSource = false);
+  void FindNativeElementByXpath(QWidget *parent, ElementMap* elementsMap, const std::string &query, std::vector<ElementId>* elements, Error **error);
+  void addWidgetToXML(QWidget* parent, ElementMap *elementsMap, QXmlStreamWriter *writer, bool needAddWebSource = false);
 
   const Logger& logger_;
   // scoped_ptr<ProxyLauncher> launcher_;

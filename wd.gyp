@@ -10,6 +10,7 @@
     'WD_CONFIG_QML_VIEW%': '0',
     'WD_BUILD_MONGOOSE%': '0',
     'WD_BUILD_MODP_B64%': '0',
+    'WD_CONFIG_XPATH%': '0',
   },
 
   'conditions': [
@@ -69,6 +70,7 @@
                 '-lQtWebKit',
                 '-lQtNetwork',
                 '-lQtXml',
+                '-lQtXmlPatterns',
                 '-lQtGui',
                 '-lQtCore',
                 '-lQtDeclarative',
@@ -133,6 +135,11 @@
       [ '<(WD_CONFIG_QML_VIEW) == 1', {
         'defines': [
           'WD_CONFIG_QML_VIEW',
+        ],
+      } ],
+      [ '<(WD_CONFIG_XPATH) == 1', {
+        'defines': [
+          'WD_CONFIG_XPATH',
         ],
       } ],
       [ 'mode == "debug"', {

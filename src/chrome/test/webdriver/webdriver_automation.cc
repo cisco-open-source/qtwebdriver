@@ -10,6 +10,11 @@
 #include <QtCore/QDebug>
 #include <QtNetwork/QtNetwork>
 
+#ifdef WD_CONFIG_XPATH
+#include <QtXmlPatterns/QXmlQuery>
+#include <QtXmlPatterns/QXmlResultItems>
+#endif
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWidgets/QApplication>
@@ -98,7 +103,7 @@ Automation::Automation(const Logger& logger)
 
 Automation::~Automation() {}
 
-void Automation::Init(const BrowserOptions& options, int* build_no, Error** error)
+WebViewId Automation::Init(const BrowserOptions& options, int* build_no, Error** error)
 {
     qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
@@ -142,7 +147,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     if (pStartView == NULL)
     {
         *error = new Error(kBadRequest, "Can't create WebView");
-        return;
+        return WebViewId();
     }
 
     // TODO: save proxy settings for further usage
@@ -183,13 +188,13 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         {
             qWarning() << "Proxy autoconfiguration from a URL is not suported";
             *error = new Error(kBadRequest, "Proxy autoconfiguration from a URL is not suported");
-            return;
+            return WebViewId();
         }
         else if (options.command.HasSwitch(switches::kProxyAutoDetect))
         {
             qWarning() << "Proxy autodetection with WPAD is not suported";
             *error = new Error(kBadRequest, "Proxy autodetection with WPAD is not suported");
-            return;
+            return WebViewId();
         }
         else
         {
@@ -240,9 +245,12 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
 
     qDebug() << "[WD]: geometry:" << pStartView->geometry();
     if (options.command.HasSwitch(switches::kStartMaximized))
-        pStartView->showMaximized();
+        pStartView->setGeometry(QApplication::desktop()->rect());
 
     pStartView->show();
+
+    return WebViewId::ForQtView(pStartView);
+
 }
 
 void Automation::Terminate()
@@ -976,6 +984,7 @@ void Automation::GetViews(std::vector<WebViewInfo>* views,
     std::string extension_id;
     foreach(QWidget* pWidget, qApp->allWidgets())
     {
+        qDebug() << pWidget;
         if (!pWidget->isHidden())
         {
             QWebView* pView = qobject_cast<QWebView*>(pWidget);
@@ -1583,6 +1592,10 @@ void Automation::FindNativeElement(const WebViewId& view_id,
 
     std::vector<ElementId> elements;
 
+    QBuffer buff;
+//    createUIXML(&buff);
+    qDebug()<<"[WD]:"<<buff.data();
+
     FindNativeElements(view_id, root_element, locator, query, &elements, error);
     if (*error == NULL)
         *element = elements[0];
@@ -1618,6 +1631,7 @@ void Automation::FindNativeElements(const WebViewId& view_id,
 
     QString elementKey(root_element.id().c_str());
     QWidget *parent = view_id.GetView();
+
     if (!elementKey.isEmpty())
     {
         // get widget for key
@@ -1626,18 +1640,26 @@ void Automation::FindNativeElements(const WebViewId& view_id,
             parent = rootWidget.data();
     }
 
-    // list all child widgets and find matched locator
-    QList<QWidget*> childs = parent->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
+    if (locator == LocatorType::kXpath)
     {
-        if (FilterNativeWidget(child, locator, query))
-        {
-            // generate element id and save it in map
-            elementKey = GenerateElementKey(child);
-            elementsMap->insert(elementKey, QPointer<QWidget>(child));
-            (*elements).push_back(ElementId(elementKey.toStdString()));
+        FindNativeElementByXpath(parent, elementsMap, query, elements, error);
+    }
+    else
+    {
 
-            qDebug() << "[WD] FindNativeElements, found:" << child << " key:" << elementKey;
+        // list all child widgets and find matched locator
+        QList<QWidget*> childs = parent->findChildren<QWidget*>();
+        foreach(QWidget *child, childs)
+        {
+            if (FilterNativeWidget(child, locator, query))
+            {
+                // generate element id and save it in map
+                elementKey = GenerateElementKey(child);
+                elementsMap->insert(elementKey, QPointer<QWidget>(child));
+                (*elements).push_back(ElementId(elementKey.toStdString()));
+
+                qDebug() << "[WD] FindNativeElements, found:" << child << " key:" << elementKey;
+            }
         }
     }
 }
@@ -1645,7 +1667,7 @@ void Automation::FindNativeElements(const WebViewId& view_id,
 QString Automation::GenerateElementKey(const QWidget* widget)
 {
     char key[16];
-    qsrand(QTime::currentTime().msec());
+//    qsrand(QTime::currentTime().msec());
 
     snprintf(key, 16, ":qtw:%08x", qrand());
     return QString(key);
@@ -2315,6 +2337,154 @@ bool Automation::checkView(const WebViewId &view_id)
             return true;
     }
     return false;
+}
+
+void Automation::createUIXML(QWidget *parent, QIODevice* buff, ElementMap* elementsMap, Error** error, bool needAddWebSource)
+{
+
+    QXmlStreamWriter* writer = new QXmlStreamWriter();
+
+    writer->setDevice(buff);
+    writer->writeStartDocument();
+
+    qDebug()<<"WD: "<<needAddWebSource;
+    addWidgetToXML(parent, elementsMap, writer, needAddWebSource);
+
+    writer->writeEndDocument();
+
+    delete writer;
+}
+
+void Automation::addWidgetToXML(QWidget* parent, ElementMap* elementsMap, QXmlStreamWriter* writer, bool needAddWebSource)
+{
+    writer->writeStartElement(parent->metaObject()->className());
+
+#ifdef  WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY
+    qDebug()<<"[WD]:"<< parent->metaObject()->className() <<" accessible name"<<parent->accessibleName();
+    if (!parent->accessibleName().isEmpty())
+        writer->writeAttribute("id", parent->accessibleName());
+#endif
+    if (!parent->windowTitle().isEmpty())
+        writer->writeAttribute("name", parent->windowTitle());
+
+    QString elementKey = GenerateElementKey(parent);
+    elementsMap->insert(elementKey, QPointer<QWidget>(parent));
+    writer->writeAttribute("elementId", elementKey);
+
+    QWebView* webview = qobject_cast< QWebView *>(parent);
+    if (webview && needAddWebSource)
+    {
+        writer->writeEntityReference(webview->page()->mainFrame()->toHtml());
+    }
+    else
+    {
+        QList<QObject*> childs = parent->children();
+        foreach(QObject *child, childs)
+        {
+            QWidget* childWgt = qobject_cast<QWidget *>(child);
+            if (childWgt)
+                addWidgetToXML(childWgt, elementsMap, writer);
+
+        }
+    }
+    writer->writeEndElement();
+}
+
+void Automation::FindNativeElementByXpath(QWidget* parent, ElementMap* elementsMap, const std::string &query, std::vector<ElementId>* elements, Error **error)
+{
+#ifndef WD_CONFIG_XPATH
+    *error = new Error(kXPathLookupError, "Finding elements by xpath don't supported");
+    return;
+#else
+    QXmlResultItems result;
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+
+    buff.open(QIODevice::ReadWrite);
+    createUIXML(parent, &buff, elementsMap, error);
+
+    buff.seek(0);
+    qDebug()<<buff.data();
+    QXmlQuery xmlquery;
+    xmlquery.bindVariable("buff", &buff);
+    qDebug()<<"doc($buff) "+QString(query.c_str());
+    xmlquery.setQuery("doc($buff) "+QString(query.c_str()));
+
+    if (!xmlquery.isValid())
+    {
+        *error = new Error(kXPathLookupError);
+        return;
+    }
+    xmlquery.evaluateTo(&result);
+
+    buff.close();
+    QXmlItem item(result.next());
+    while (!item.isNull())
+    {
+        qDebug()<<"Loking for element";
+        if (item.isNode())
+        {
+            xmlquery.setFocus(item);
+            xmlquery.setQuery("./@elementId/string()");
+            if (!xmlquery.isValid())
+            {
+                *error = new Error(kXPathLookupError);
+                return;
+            }
+            QString elementId;
+            xmlquery.evaluateTo(&elementId);
+            qDebug()<<"WD: elementId"<<elementId;
+            if (!elementId.isEmpty())
+            {
+                elementId.remove('\n');
+                qDebug()<<"WD: elementId"<<elementId;
+                (*elements).push_back(ElementId(elementId.toStdString()));
+            }
+        }
+        item = result.next();
+    }
+    if (elements->empty())
+    {
+        qDebug()<<"Element not found;";
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+#endif
+}
+
+void Automation::GetNativeSource(const WebViewId& view_id,
+                       base::Value** result,
+                       Error** error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *parent = view_id.GetView();
+
+    // get elements map for this view. If doesnt exist create new one
+    QString viewKey(view_id.GetId().id().c_str());
+    ElementMap* elementsMap = NULL;
+    if (windowsElementMap.contains(viewKey))
+    {
+        elementsMap = windowsElementMap.value(viewKey);
+    }
+    else
+    {
+        elementsMap = new ElementMap();
+        windowsElementMap.insert(viewKey, elementsMap);
+    }
+
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+    buff.open(QIODevice::ReadWrite);
+    createUIXML(parent, &buff, elementsMap, error, true);
+    qDebug()<<"[WD]:"<<"XML Buffer"<<byteArray;
+
+    *result = Value::CreateStringValue(byteArray.data());
+
 }
 
 void Automation::pageLoadStarted()
