@@ -22,7 +22,7 @@
 #include "FindingTest.h"
 #include "CoordinatesTest.h"
 
-#include <WebDriver.h>
+#include <QtWebkitWebDriver.h>
 
 int main(int argc, char *argv[])
 {
