@@ -180,6 +180,8 @@
       ],
 
       'sources': [
+        'src/Test/ClickTest.cc',
+        'src/Test/WindowTest.cc',
         'src/base/at_exit.cc',
         'src/base/atomicops_internals_x86_gcc.cc',
         'src/base/base64.cc',
