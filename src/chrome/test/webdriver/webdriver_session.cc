@@ -1393,7 +1393,7 @@ Error* Session::MoveAndClickElement(const FrameId& frame_id,
                                 const ElementId& element) {
 
     if (frame_id.view_id.IsApp()) {
-        Error* error = NULL;
+        Error* error;
         Point location;
 
         error = GetClickableLocation(element, &location);
@@ -1684,24 +1684,24 @@ Error* Session::WaitForAllViewsToStopLoading() {
 
 Error* Session::InstallExtension(
     const FilePath& path, std::string* extension_id) {
-//  Error* error = NULL;
+  Error* error = NULL;
 //  RunSessionTask(base::Bind(
 //      &Automation::InstallExtension,
 //      base::Unretained(automation_.get()),
 //      path,
 //      extension_id,
 //      &error));
-//  return error;
+  return error;
 }
 
 Error* Session::GetExtensionsInfo(base::ListValue* extensions_list) {
-//  Error* error = NULL;
+  Error* error = NULL;
 //  RunSessionTask(base::Bind(
 //      &Automation::GetExtensionsInfo,
 //      base::Unretained(automation_.get()),
 //      extensions_list,
 //      &error));
-//  return error;
+  return error;
 }
 
 Error* Session::IsPageActionVisible(
@@ -1713,7 +1713,7 @@ Error* Session::IsPageActionVisible(
 //        kUnknownError,
 //        "The current target does not support page actions. Switch to a tab.");
 //  }
-//  Error* error = NULL;
+  Error* error = NULL;
 //  RunSessionTask(base::Bind(
 //      &Automation::IsPageActionVisible,
 //      base::Unretained(automation_.get()),
@@ -1721,19 +1721,19 @@ Error* Session::IsPageActionVisible(
 //      extension_id,
 //      is_visible,
 //      &error));
-//  return error;
+  return error;
 }
 
 Error* Session::SetExtensionState(
     const std::string& extension_id, bool enable) {
-//  Error* error = NULL;
+  Error* error = NULL;
 //  RunSessionTask(base::Bind(
 //      &Automation::SetExtensionState,
 //      base::Unretained(automation_.get()),
 //      extension_id,
 //      enable,
 //      &error));
-//  return error;
+  return error;
 }
 
 Error* Session::ClickExtensionButton(
@@ -1749,13 +1749,13 @@ Error* Session::ClickExtensionButton(
 }
 
 Error* Session::UninstallExtension(const std::string& extension_id) {
-//  Error* error = NULL;
+  Error* error = NULL;
 //  RunSessionTask(base::Bind(
 //      &Automation::UninstallExtension,
 //      base::Unretained(automation_.get()),
 //      extension_id,
 //      &error));
-//  return error;
+  return error;
 }
 
 Error* Session::SetPreference(
@@ -1782,7 +1782,7 @@ Error* Session::SetPreference(
 //    if (error)
 //      error->AddDetails("Failed to set local state pref '" + pref + "'");
 //  }
-//  return error;
+  return error;
 }
 
 base::ListValue* Session::GetLog() const {
