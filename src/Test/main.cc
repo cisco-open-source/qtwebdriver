@@ -14,6 +14,9 @@
 #include <QtGui/QApplication>
 
 #include <QtWebKit/QtWebKit>
+
+#include "WindowTest.h"
+#include "ClickTest.h"
 #endif
 
 #include <QtWebkitWebDriver.h>
@@ -41,6 +44,8 @@ int main(int argc, char *argv[])
 
     registerView<QWebView>("QWebView");
     registerView<QWidget>("QWidget");
+    registerView<WindowTestWidget>("WindowTestWidget");
+    registerView<ClickTestWidget>("ClickTestWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
