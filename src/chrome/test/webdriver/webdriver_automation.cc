@@ -92,7 +92,8 @@ Automation::BrowserOptions::~BrowserOptions() {}
 Automation::Automation(const Logger& logger)
     : logger_(logger),
       build_no_(0),
-      isLoading(false)
+      isLoading(false),
+      sessionId(0)
 {
 }
 
@@ -546,7 +547,6 @@ void Automation::SendNativeElementWebKeyEvent(const WebViewId &view_id, const El
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1139,7 +1139,6 @@ void Automation::GetNativeElementSize(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1233,7 +1232,6 @@ void Automation::GetNativeElementProperty(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1299,7 +1297,6 @@ void Automation::NativeElementEquals(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget1 = GetNativeElement(view_id, element1);
     QWidget *pWidget2 = GetNativeElement(view_id, element2);
 
@@ -1385,7 +1382,6 @@ void Automation::ClearNativeElement(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1450,7 +1446,6 @@ void Automation::IsNativeElementDisplayed(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1474,7 +1469,6 @@ void Automation::IsNativeElementEnabled(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1497,7 +1491,6 @@ void Automation::IsNativeElementSelected(const WebViewId& view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
     QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
@@ -1534,8 +1527,7 @@ void Automation::GetNativeElementText(const WebViewId &view_id,
         return;
     }
 
-    QWidget *view = view_id.GetView();
-    QWidget *pWidget = GetNativeElement(view_id, element);
+   QWidget *pWidget = GetNativeElement(view_id, element);
 
     if (NULL == pWidget)
     {
@@ -2009,11 +2001,11 @@ void Automation::OverrideGeolocation(const DictionaryValue* geolocation,
 //  }
 }
 
-AutomationProxy* Automation::automation() const
-{
-    return NULL;
-    // return launcher_->automation();
-}
+//AutomationProxy* Automation::automation() const
+//{
+//    return NULL;
+//    // return launcher_->automation();
+//}
 
 Error* Automation::DetermineBuildNumber()
 {
@@ -2223,7 +2215,7 @@ QKeyEvent Automation::ConvertToQtKeyEvent(const WebKeyEvent &key_event)
     Qt::KeyboardModifiers modifiers;
     QString text;
 
-    if ((key_event.type == automation::kRawKeyDownType) || (key_event.type == automation::kRawKeyDownType))
+    if ((key_event.type == automation::kKeyDownType) || (key_event.type == automation::kRawKeyDownType))
         type = QEvent::KeyPress;
     else
         type = QEvent::KeyRelease;

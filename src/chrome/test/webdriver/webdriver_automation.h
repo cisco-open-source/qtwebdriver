@@ -396,7 +396,7 @@ class Automation : public QObject {
 
 
  private:
-  AutomationProxy* automation() const;
+//  AutomationProxy* automation() const;
   QWebView* ConvertViewIdToPointer(const WebViewId& view_id);
   Error* DetermineBuildNumber();
   Error* CheckVersion(int min_required_build_no,
