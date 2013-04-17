@@ -20,5 +20,4 @@ report/*
 /Makefile
 /WebDriver.target.mk
 /WebDriverTest.target.mk
-wd.*
 *.log
