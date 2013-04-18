@@ -10,16 +10,14 @@
 #else
 #include <QtCore/QtConcurrentRun>
 //#include <QDebug>
-
 #include <QtGui/QApplication>
-
 #include <QtWebKit/QtWebKit>
-
-#include "WindowTest.h"
-#include "ClickTest.h"
 #endif
 
 #include <QtWebkitWebDriver.h>
+#include "WindowTest.h"
+#include "ClickTest.h"
+
 
 int main(int argc, char *argv[])
 {
