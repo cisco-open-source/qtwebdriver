@@ -1015,7 +1015,7 @@ void Automation::SetCookie(const WebViewId &view_id, const std::string &url, bas
 
 int Automation::checkViewInMap(QWidget* view)
 {
-    int automationId;
+    int automationId = 0;
     WindowsMap::const_iterator i = windowsMap.constBegin();
 
     while (i != windowsMap.constEnd()) {
