@@ -509,7 +509,7 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
     QMimeData data;
     QList<QUrl> urls;
 
-    for (int i = 0; i < paths.size(); i++)
+    for (uint i = 0; i < paths.size(); i++)
         urls.append(QUrl(paths.at(i).c_str()));
 
     data.setUrls(urls);
@@ -592,19 +592,19 @@ void Automation::SendNativeKeyEvent(const WebViewId &view_id, ui::KeyboardCode k
     QApplication::sendEvent(view, &releaseKeyEvent);
 }
 
-void Automation::SendWebMouseEvent(const WebViewId &view_id, const WebMouseEvent &event, Error **error)
-{
-  /*WebViewLocator view_locator;
-  *error = ConvertViewIdToLocator(view_id, &view_locator);
-  if (*error)
-    return;
+//void Automation::SendWebMouseEvent(const WebViewId &view_id, const WebMouseEvent &event, Error **error)
+//{
+//  WebViewLocator view_locator;
+//  *error = ConvertViewIdToLocator(view_id, &view_locator);
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendWebMouseEventJSONRequest(
-          automation(), view_locator, event, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
-}
+//  automation::Error auto_error;
+//  if (!SendWebMouseEventJSONRequest(
+//          automation(), view_locator, event, &auto_error)) {
+//    *error = Error::FromAutomationError(auto_error);
+//  }
+//}
 
 void Automation::CaptureEntirePageAsPNG(const WebViewId &view_id, const FilePath &path, Error **error)
 {
@@ -628,21 +628,21 @@ void Automation::CaptureEntirePageAsPNG(const WebViewId &view_id, const FilePath
     }
 }
 
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-void Automation::HeapProfilerDump(const WebViewId &view_id, const std::string &reason, Error **error)
-{
-  /*WebViewLocator view_locator;
-  *error = ConvertViewIdToLocator(view_id, &view_locator);
-  if (*error)
-    return;
+//#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
+//void Automation::HeapProfilerDump(const WebViewId &view_id, const std::string &reason, Error **error)
+//{
+//  WebViewLocator view_locator;
+//  *error = ConvertViewIdToLocator(view_id, &view_locator);
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendHeapProfilerDumpJSONRequest(
-          automation(), view_locator, reason, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
-}
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
+//  automation::Error auto_error;
+//  if (!SendHeapProfilerDumpJSONRequest(
+//          automation(), view_locator, reason, &auto_error)) {
+//    *error = Error::FromAutomationError(auto_error);
+//  }
+//}
+//#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
 
 void Automation::NavigateToURL(const WebViewId &view_id, const std::string &url, Error **error)
 {
@@ -748,7 +748,7 @@ void Automation::GetCookies(const WebViewId &view_id, const std::string &url, ba
     QList<QNetworkCookie> cookies_list = jar->cookiesForUrl(QUrl(qUrl));
 
     ListValue* list = new ListValue();
-    for (size_t i = 0; i < cookies_list.size(); ++i)
+    for (int i = 0; i < cookies_list.size(); ++i)
     {
       const QNetworkCookie& cookie = cookies_list[i];
 
@@ -1821,154 +1821,154 @@ void Automation::AcceptPromptAppModalDialog(const WebViewId& view_id,
   }*/
 }
 
-void Automation::GetBrowserVersion(std::string* version)
-{
-  // *version = automation()->server_version();
-}
+//void Automation::GetBrowserVersion(std::string* version)
+//{
+//  *version = automation()->server_version();
+//}
 
-void Automation::GetChromeDriverAutomationVersion(int* version, Error** error)
-{
-  /* automation::Error auto_error;
-  if (!SendGetChromeDriverAutomationVersion(automation(), version, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//void Automation::GetChromeDriverAutomationVersion(int* version, Error** error)
+//{
+//  automation::Error auto_error;
+//  if (!SendGetChromeDriverAutomationVersion(automation(), version, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::WaitForAllViewsToStopLoading(Error** error)
-{
-  /* automation::Error auto_error;
-  if (!SendWaitForAllViewsToStopLoadingJSONRequest(automation(), &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//void Automation::WaitForAllViewsToStopLoading(Error** error)
+//{
+//   automation::Error auto_error;
+//  if (!SendWaitForAllViewsToStopLoadingJSONRequest(automation(), &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::InstallExtension(const FilePath &path, std::string *extension_id, Error **error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
+//void Automation::InstallExtension(const FilePath &path, std::string *extension_id, Error **error)
+//{
+//  *error = CheckNewExtensionInterfaceSupported();
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendInstallExtensionJSONRequest(
-          automation(), path, false /* with_ui *//*, extension_id,
-          &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//  automation::Error auto_error;
+//  if (!SendInstallExtensionJSONRequest(
+//          automation(), path, false /* with_ui */, extension_id,
+//          &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::GetExtensionsInfo(
-    base::ListValue* extensions_list, Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
+//void Automation::GetExtensionsInfo(
+//    base::ListValue* extensions_list, Error** error)
+//{
+//  *error = CheckNewExtensionInterfaceSupported();
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendGetExtensionsInfoJSONRequest(
-          automation(), extensions_list, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//  automation::Error auto_error;
+//  if (!SendGetExtensionsInfoJSONRequest(
+//          automation(), extensions_list, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::IsPageActionVisible(const WebViewId &tab_id, const std::string &extension_id,
-                                     bool *is_visible, Error **error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
+//void Automation::IsPageActionVisible(const WebViewId &tab_id, const std::string &extension_id,
+//                                     bool *is_visible, Error **error)
+//{
+//  *error = CheckNewExtensionInterfaceSupported();
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendIsPageActionVisibleJSONRequest(
-          automation(), tab_id, extension_id, is_visible, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//  automation::Error auto_error;
+//  if (!SendIsPageActionVisibleJSONRequest(
+//          automation(), tab_id, extension_id, is_visible, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::SetExtensionState(
-    const std::string& extension_id,
-    bool enable,
-    Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
+//void Automation::SetExtensionState(
+//    const std::string& extension_id,
+//    bool enable,
+//    Error** error)
+//{
+//  *error = CheckNewExtensionInterfaceSupported();
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendSetExtensionStateJSONRequest(
-          automation(), extension_id, enable /* enable *//*,
-          false /* allow_in_incognito *//*, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//  automation::Error auto_error;
+//  if (!SendSetExtensionStateJSONRequest(
+//          automation(), extension_id, enable /* enable */,
+//          false /* allow_in_incognito */, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::ClickExtensionButton(
-    const std::string& extension_id,
-    bool browser_action,
-    Error** error)
-{
-  /*automation::Error auto_error;
-  if (!SendClickExtensionButtonJSONRequest(
-          automation(), extension_id, browser_action, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//void Automation::ClickExtensionButton(
+//    const std::string& extension_id,
+//    bool browser_action,
+//    Error** error)
+//{
+//  automation::Error auto_error;
+//  if (!SendClickExtensionButtonJSONRequest(
+//          automation(), extension_id, browser_action, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::UninstallExtension(
-    const std::string& extension_id, Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
+//void Automation::UninstallExtension(
+//    const std::string& extension_id, Error** error)
+//{
+//  *error = CheckNewExtensionInterfaceSupported();
+//  if (*error)
+//    return;
 
-  automation::Error auto_error;
-  if (!SendUninstallExtensionJSONRequest(
-          automation(), extension_id, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
+//  automation::Error auto_error;
+//  if (!SendUninstallExtensionJSONRequest(
+//          automation(), extension_id, &auto_error))
+//    *error = Error::FromAutomationError(auto_error);
+//}
 
-void Automation::SetLocalStatePreference(const std::string &pref, base::Value *value, Error **error)
-{
-  /*scoped_ptr<Value> scoped_value(value);
-  // In version 927, SetLocalStatePrefs was changed from taking a browser
-  // handle to a browser index.
-  if (build_no_ >= 927) {
-    automation::Error auto_error;
-    if (!SendSetLocalStatePreferenceJSONRequest(
-            automation(), pref, scoped_value.release(), &auto_error))
-      *error = Error::FromAutomationError(auto_error);
-  } else {
-    std::string request, response;
-    DictionaryValue request_dict;
-    request_dict.SetString("command", "SetLocalStatePrefs");
-    request_dict.SetString("path", pref);
-    request_dict.Set("value", scoped_value.release());
-    base::JSONWriter::Write(&request_dict, &request);
-    if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
-            request, -1, &response)) {
-      *error = new Error(kUnknownError, base::StringPrintf(
-          "Failed to set local state pref '%s'", pref.c_str()));
-    }
-  }*/
-}
+//void Automation::SetLocalStatePreference(const std::string &pref, base::Value *value, Error **error)
+//{
+//  scoped_ptr<Value> scoped_value(value);
+//  // In version 927, SetLocalStatePrefs was changed from taking a browser
+//  // handle to a browser index.
+//  if (build_no_ >= 927) {
+//    automation::Error auto_error;
+//    if (!SendSetLocalStatePreferenceJSONRequest(
+//            automation(), pref, scoped_value.release(), &auto_error))
+//      *error = Error::FromAutomationError(auto_error);
+//  } else {
+//    std::string request, response;
+//    DictionaryValue request_dict;
+//    request_dict.SetString("command", "SetLocalStatePrefs");
+//    request_dict.SetString("path", pref);
+//    request_dict.Set("value", scoped_value.release());
+//    base::JSONWriter::Write(&request_dict, &request);
+//    if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
+//            request, -1, &response)) {
+//      *error = new Error(kUnknownError, base::StringPrintf(
+//          "Failed to set local state pref '%s'", pref.c_str()));
+//    }
+//  }
+//}
 
-void Automation::SetPreference(const std::string &pref, base::Value *value, Error **error)
-{
-  /*scoped_ptr<Value> scoped_value(value);
-  // Chrome 17 is on the 963 branch. The first released 18 build should have
-  // the new SetPrefs method which uses a browser index instead of handle.
-  if (build_no_ >= 964) {
-    automation::Error auto_error;
-    if (!SendSetPreferenceJSONRequest(
-            automation(), pref, scoped_value.release(), &auto_error))
-      *error = Error::FromAutomationError(auto_error);
-  } else {
-    std::string request, response;
-    DictionaryValue request_dict;
-    request_dict.SetString("command", "SetPrefs");
-    request_dict.SetInteger("windex", 0);
-    request_dict.SetString("path", pref);
-    request_dict.Set("value", scoped_value.release());
-    base::JSONWriter::Write(&request_dict, &request);
-    if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
-            request, -1, &response)) {
-      *error = new Error(kUnknownError, base::StringPrintf(
-          "Failed to set pref '%s'", pref.c_str()));
-    }
-  }*/
-}
+//void Automation::SetPreference(const std::string &pref, base::Value *value, Error **error)
+//{
+//    scoped_ptr<Value> scoped_value(value);
+//    // Chrome 17 is on the 963 branch. The first released 18 build should have
+//    // the new SetPrefs method which uses a browser index instead of handle.
+//    if (build_no_ >= 964) {
+//      automation::Error auto_error;
+//      if (!SendSetPreferenceJSONRequest(
+//              automation(), pref, scoped_value.release(), &auto_error))
+//        *error = Error::FromAutomationError(auto_error);
+//    } else {
+//      std::string request, response;
+//      DictionaryValue request_dict;
+//      request_dict.SetString("command", "SetPrefs");
+//      request_dict.SetInteger("windex", 0);
+//      request_dict.SetString("path", pref);
+//      request_dict.Set("value", scoped_value.release());
+//      base::JSONWriter::Write(&request_dict, &request);
+//      if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
+//              request, -1, &response)) {
+//        *error = new Error(kUnknownError, base::StringPrintf(
+//            "Failed to set pref '%s'", pref.c_str()));
+//      }
+//    }
+//}
 
 void Automation::GetGeolocation(scoped_ptr<base::DictionaryValue> *geolocation, Error **error)
 {
@@ -2067,7 +2067,7 @@ Error* Automation::CheckMaximizeSupported()
 
 QWebView *Automation::ConvertViewIdToPointer(const WebViewId& view_id)
 {
-    AutomationId id = view_id.GetId();
+    //AutomationId id = view_id.GetId();
     return NULL;
 }
 

@@ -149,9 +149,9 @@ class Automation : public QObject {
 
   // Sends a web mouse event to the given view. Waits until the event has
   // been processed by the view.
-  void SendWebMouseEvent(const WebViewId& view_id,
-                         const WebMouseEvent& event,
-                         Error** error);
+//  void SendWebMouseEvent(const WebViewId& view_id,
+//                         const WebMouseEvent& event,
+//                         Error** error);
 
   // Drag and drop the file paths to the given location.
   void DragAndDropFilePaths(const WebViewId& view_id,
@@ -165,11 +165,11 @@ class Automation : public QObject {
   void CaptureEntirePageAsPNG(
       const WebViewId& view_id, const FilePath& path, Error** error);
 
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-  // Dumps a heap profile of the process of the tab.
-  void HeapProfilerDump(
-      const WebViewId& view_id, const std::string& reason, Error** error);
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
+//#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
+//  // Dumps a heap profile of the process of the tab.
+//  void HeapProfilerDump(
+//      const WebViewId& view_id, const std::string& reason, Error** error);
+//#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
 
   void NavigateToURL(
       const WebViewId& view_id, const std::string& url, Error** error);
@@ -253,54 +253,54 @@ class Automation : public QObject {
                                   Error** error);
 
   // Gets the version of the runing browser.
-  void GetBrowserVersion(std::string* version);
+//  void GetBrowserVersion(std::string* version);
 
   // Gets the ChromeDriver automation version supported by the automation
   // server.
-  void GetChromeDriverAutomationVersion(int* version, Error** error);
+//  void GetChromeDriverAutomationVersion(int* version, Error** error);
 
   // Waits for all views to stop loading.
-  void WaitForAllViewsToStopLoading(Error** error);
+//  void WaitForAllViewsToStopLoading(Error** error);
 
   // Install a packed or unpacked extension. If the path ends with '.crx',
   // the extension is assumed to be packed.
-  void InstallExtension(const FilePath& path, std::string* extension_id,
-                        Error** error);
+//  void InstallExtension(const FilePath& path, std::string* extension_id,
+//                        Error** error);
 
   // Gets a list of dictionary information about all installed extensions.
-  void GetExtensionsInfo(base::ListValue* extensions_list, Error** error);
+//  void GetExtensionsInfo(base::ListValue* extensions_list, Error** error);
 
   // Gets a list of dictionary information about all installed extensions.
-  void IsPageActionVisible(const WebViewId& tab_id,
-                           const std::string& extension_id,
-                           bool* is_visible,
-                           Error** error);
+//  void IsPageActionVisible(const WebViewId& tab_id,
+//                           const std::string& extension_id,
+//                           bool* is_visible,
+//                           Error** error);
 
   // Sets whether the extension is enabled or not.
-  void SetExtensionState(const std::string& extension_id,
-                         bool enable,
-                         Error** error);
+//  void SetExtensionState(const std::string& extension_id,
+//                         bool enable,
+//                         Error** error);
 
   // Clicks the extension action button. If |browser_action| is false, the
   // page action will be clicked.
-  void ClickExtensionButton(const std::string& extension_id,
-                            bool browser_action,
-                            Error** error);
+//  void ClickExtensionButton(const std::string& extension_id,
+//                            bool browser_action,
+//                            Error** error);
 
   // Uninstalls the given extension.
-  void UninstallExtension(const std::string& extension_id, Error** error);
+//  void UninstallExtension(const std::string& extension_id, Error** error);
 
   // Set a local state preference, which is not associated with any profile.
   // Ownership of |value| is taken by this function.
-  void SetLocalStatePreference(const std::string& pref,
-                               base::Value* value,
-                               Error** error);
+//  void SetLocalStatePreference(const std::string& pref,
+//                               base::Value* value,
+//                               Error** error);
 
   // Set a user preference, which is associated with the current profile.
   // Ownership of |value| is taken by this fucntion.
-  void SetPreference(const std::string& pref,
-                     base::Value* value,
-                     Error** error);
+//  void SetPreference(const std::string& pref,
+//                     base::Value* value,
+//                     Error** error);
 
   // Gets the current geolocation.
   void GetGeolocation(scoped_ptr<base::DictionaryValue>* geolocation,

@@ -1674,10 +1674,10 @@ Error* Session::WaitForAllViewsToStopLoading() {
 
   logger_.Log(kFinerLogLevel, "Waiting for all views to stop loading...");
   Error* error = NULL;
-  RunSessionTask(base::Bind(
-      &Automation::WaitForAllViewsToStopLoading,
-      base::Unretained(automation_.get()),
-      &error));
+//  RunSessionTask(base::Bind(
+//      &Automation::WaitForAllViewsToStopLoading,
+//      base::Unretained(automation_.get()),
+//      &error));
   logger_.Log(kFinerLogLevel, "Done waiting for all views to stop loading");
   return error;
 }
@@ -1739,12 +1739,12 @@ Error* Session::SetExtensionState(
 Error* Session::ClickExtensionButton(
     const std::string& extension_id, bool browser_action) {
   Error* error = NULL;
-  RunSessionTask(base::Bind(
-      &Automation::ClickExtensionButton,
-      base::Unretained(automation_.get()),
-      extension_id,
-      browser_action,
-      &error));
+//  RunSessionTask(base::Bind(
+//      &Automation::ClickExtensionButton,
+//      base::Unretained(automation_.get()),
+//      extension_id,
+//      browser_action,
+//      &error));
   return error;
 }
 
