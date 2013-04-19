@@ -1597,7 +1597,7 @@ void Automation::FindNativeElement(const WebViewId& view_id,
     qDebug()<<"[WD]:"<<buff.data();
 
     FindNativeElements(view_id, root_element, locator, query, &elements, error);
-    if (*error == NULL)
+    if (*error == NULL && elements.size() != 0)
         *element = elements[0];
 }
 
