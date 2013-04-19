@@ -367,10 +367,10 @@ Error* Session::DragAndDropFilePaths(
 }
 
 Error* Session::NavigateToURL(const std::string& url) {
-  if (!current_target_.view_id.IsTab()) {
-    return new Error(kUnknownError,
-                     "The current target does not support navigation");
-  }
+//  if (!current_target_.view_id.IsTab()) {
+//    return new Error(kUnknownError,
+//                     "The current target does not support navigation");
+//  }
   Error* error = NULL;
   if (capabilities_.load_async) {
     RunSessionTask(base::Bind(

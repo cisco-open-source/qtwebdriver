@@ -111,24 +111,13 @@ WebViewId WebViewId::ForView(const AutomationId& view_id)
   return id;
 }
 
-WebViewId  WebViewId::ForQtView(QWidget *view)
+WebViewId  WebViewId::ForQtView(QWidget *view, int automationId)
 {
     WebViewId id;
     id.old_style_ = false;
     id.view_ = view;
 
-    int automationId;
-    QVariant viewAutomationId = view->property("automationId");
     QWebView* pView = qobject_cast<QWebView*>(view);
-    if (viewAutomationId.isValid())
-       automationId = viewAutomationId.toInt();
-    else
-    {
-//        qsrand(QTime::currentTime().msec());
-        automationId = qrand();
-        view->setProperty("automationId", automationId);
-    }
-
     if (pView != NULL)
     {
         AutomationId aId(AutomationId::kTypeTab, QString::number(automationId).toStdString());
@@ -200,10 +189,10 @@ bool WebViewId::old_style() const
   return old_style_;
 }
 
-QWidget* WebViewId::GetView() const
-{
-    return view_;
-}
+//QWidget* WebViewId::GetView() const
+//{
+//    return view_;
+//}
 
 /*
 // static
