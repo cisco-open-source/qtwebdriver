@@ -107,6 +107,7 @@
       '-fPIC',
       '-Wall',
       '-W',
+      '-Wno-unused-parameter',
     ],
 
     'defines': [
