@@ -50,6 +50,7 @@ class Error;
 class FramePath;
 
 typedef QHash<QString, QPointer<QWidget> > ElementMap;
+typedef QHash<int, QPointer<QWidget> > WindowsMap;
 
 //Notify automation module about end of execution of async script
 class JSNotifier : public QObject
@@ -425,10 +426,11 @@ class Automation : public QObject {
   QString GenerateElementKey(const QWidget* widget);
   QKeyEvent ConvertToQtKeyEvent(const WebKeyEvent &key_event);
   void BuildKeyMap();
-  bool checkView(const WebViewId &view_id);
+  QWidget *checkView(const WebViewId &view_id);
   void createUIXML(QWidget *parent, QIODevice *buff, ElementMap* elementsMap, Error **error, bool needAddWebSource = false);
   void FindNativeElementByXpath(QWidget *parent, ElementMap* elementsMap, const std::string &query, std::vector<ElementId>* elements, Error **error);
   void addWidgetToXML(QWidget* parent, ElementMap *elementsMap, QXmlStreamWriter *writer, bool needAddWebSource = false);
+  int checkViewInMap(QWidget* view);
 
   const Logger& logger_;
   // scoped_ptr<ProxyLauncher> launcher_;
@@ -439,6 +441,7 @@ class Automation : public QObject {
   bool isLoading;
   QMap<int, int> keyMap;
   QHash<QString, ElementMap* > windowsElementMap;
+  WindowsMap windowsMap;
 
   DISALLOW_COPY_AND_ASSIGN(Automation);
 

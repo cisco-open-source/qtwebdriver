@@ -73,7 +73,7 @@ class WebViewId {
 
     // Creates an ID for the given view ID.
   //static WebViewId ForView(const AutomationId& view_id, QWebView *view);
-  static WebViewId ForQtView(QWidget *view);
+  static WebViewId ForQtView(QWidget *view, int automationId);
 
   // Creates an ID for the given tab ID.
   //WebViewId ForOldStyleTab(int tab_id, QWebView *view);
@@ -108,7 +108,7 @@ class WebViewId {
   bool old_style() const;
 
     // return pointer to view widget
-  QWidget* GetView() const;
+//  QWidget* GetView() const;
 
  private:
   // Whether this ID is an old-style integer tab ID.
