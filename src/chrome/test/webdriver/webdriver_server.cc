@@ -65,7 +65,7 @@
 #include "chrome/test/webdriver/webdriver_util.h"
 #include "third_party/mongoose/mongoose.h"
 #include "base/json/json_reader.h"
-#include <QtWebkitWebDriver.h>
+#include <WebDriver.h>
 
 #if defined(OS_WIN)
 #include <time.h>
