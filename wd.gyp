@@ -25,6 +25,8 @@
           'target_name': 'WebDriverTest',
           'type': 'executable',
 
+          'product_name': 'WebDriver',
+
           'include_dirs': [
             'inc/',
             'src/',

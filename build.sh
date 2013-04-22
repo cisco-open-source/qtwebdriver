@@ -28,9 +28,9 @@ do
     mkdir -p bin/$platform/$mode/
     cp -f out/$platform/$mode/Default/libWebDriver.a bin/$platform/$mode/
     cp -f out/$platform/$mode/Default/lib.target/libWebDriver.so bin/$platform/$mode/ 2>/dev/null
-    if [ -f out/$platform/$mode/Default/WebDriverTest ]
+    if [ -f out/$platform/$mode/Default/WebDriver ]
     then
-      cp -f out/$platform/$mode/Default/WebDriverTest bin/$platform/$mode/
+      cp -f out/$platform/$mode/Default/WebDriver bin/$platform/$mode/
     fi
   done
 done
