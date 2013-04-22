@@ -7,14 +7,19 @@ static const QString WINDOW_TITLE = "CLick Test Window";
 
 ClickTestWidget::ClickTestWidget()
 {
-    connect(&(this->normalBtn), SIGNAL(clicked()), this, SLOT(OnNormalBtnClick()));
-    connect(&(this->checkBox), SIGNAL(clicked()), this, SLOT(OnCheckBoxClick()));
-    connect(&(this->btnOnScroolArea), SIGNAL(clicked()), this, SLOT(OnBtnOnScrollClick()));
+    this->normalBtn = new QPushButton(this);
+    this->checkBox = new QCheckBox(this);
+    this->scrollArea = new QScrollArea(this);
+    this->btnOnScroolArea = new QPushButton(this);
 
-    this->normalBtn.setObjectName("pushBtn");
-    this->checkBox.setObjectName("checkBox");
-    this->btnOnScroolArea.setObjectName("btnOnScroll");
-    this->scrollArea.setViewport(&btnOnScroolArea);
+    connect(this->normalBtn, SIGNAL(clicked()), this, SLOT(OnNormalBtnClick()));
+    connect(this->checkBox, SIGNAL(clicked()), this, SLOT(OnCheckBoxClick()));
+    connect(this->btnOnScroolArea, SIGNAL(clicked()), this, SLOT(OnBtnOnScrollClick()));
+
+    this->normalBtn->setObjectName("pushBtn");
+    this->checkBox->setObjectName("checkBox");
+    this->btnOnScroolArea->setObjectName("btnOnScroll");
+    this->scrollArea->setViewport(btnOnScroolArea);
 
     this->setWindowTitle("ClickTest");
 }
@@ -29,7 +34,7 @@ void ClickTestWidget::OnNormalBtnClick()
 
 void ClickTestWidget::OnCheckBoxClick()
 {
-    if (checkBox.isChecked())
+    if (checkBox->isChecked())
         this->setWindowTitle(WINDOW_TITLE);
 }
 

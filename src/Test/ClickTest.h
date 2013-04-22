@@ -11,6 +11,7 @@
 
 class ClickTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     ClickTestWidget();
     ~ClickTestWidget();
@@ -21,10 +22,10 @@ private slots:
     void OnBtnOnScrollClick();
 
 private:
-    QPushButton normalBtn;
-    QCheckBox checkBox;
-    QScrollArea scrollArea;
-    QPushButton btnOnScroolArea;
+    QPushButton *normalBtn;
+    QCheckBox *checkBox;
+    QScrollArea *scrollArea;
+    QPushButton *btnOnScroolArea;
 };
 
 #endif // CLICKTEST_H
