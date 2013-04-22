@@ -37,6 +37,11 @@
 
           'sources': [
             'src/Test/main.cc',
+            'src/Test/ClickTest.cc',
+            'src/Test/ClickTest.h',
+            'src/Test/WindowTest.cc',
+            'src/Test/WindowTest.h',
+            'src/moc_ClickTest.cc',
           ],
 
           'conditions': [
@@ -179,10 +184,6 @@
       ],
 
       'sources': [
-        'src/Test/ClickTest.cc',
-        'src/Test/ClickTest.h',
-        'src/Test/WindowTest.cc',
-        'src/Test/WindowTest.h',
         'src/base/at_exit.cc',
         'src/base/atomicops_internals_x86_gcc.cc',
         'src/base/base64.cc',
@@ -330,7 +331,6 @@
         'src/chrome/test/webdriver/webdriver_util.cc',
         'src/content/public/common/content_switches.cc',
         'src/moc_qtaskrunner.cc',
-        'src/moc_ClickTest.cc',
         'src/moc_qwebviewext.cc',
         'src/moc_webdriver_automation.cc',
         'src/net/base/file_stream.cc',
