@@ -161,18 +161,18 @@ bool KeyCodeFromShorthandKey(char16 key_utf16,
 
 namespace webdriver {
 
-WebKeyEvent CreateKeyDownEvent(ui::KeyboardCode key_code, int modifiers) {
-  return WebKeyEvent(automation::kRawKeyDownType, key_code, "", "", modifiers);
+KeyEvent CreateKeyDownEvent(ui::KeyboardCode key_code, int modifiers) {
+  return KeyEvent(automation::kRawKeyDownType, key_code, "", "", modifiers);
 }
 
-WebKeyEvent CreateKeyUpEvent(ui::KeyboardCode key_code, int modifiers) {
-  return WebKeyEvent(automation::kKeyUpType, key_code, "", "", modifiers);
+KeyEvent CreateKeyUpEvent(ui::KeyboardCode key_code, int modifiers) {
+  return KeyEvent(automation::kKeyUpType, key_code, "", "", modifiers);
 }
 
-WebKeyEvent CreateCharEvent(const std::string& unmodified_text,
+KeyEvent CreateCharEvent(const std::string& unmodified_text,
                             const std::string& modified_text,
                             int modifiers) {
-  return WebKeyEvent(automation::kCharType,
+  return KeyEvent(automation::kCharType,
                      ui::VKEY_UNKNOWN,
                      unmodified_text,
                      modified_text,
@@ -183,9 +183,9 @@ bool ConvertKeysToWebKeyEvents(const string16& client_keys,
                                const Logger& logger,
                                bool release_modifiers,
                                int* modifiers,
-                               std::vector<WebKeyEvent>* client_key_events,
+                               std::vector<KeyEvent>* client_key_events,
                                std::string* error_msg) {
-  std::vector<WebKeyEvent> key_events;
+  std::vector<KeyEvent> key_events;
 
   string16 keys = client_keys;
   // Add an implicit NULL character to the end of the input to depress all
@@ -307,8 +307,8 @@ bool ConvertKeysToWebKeyEvents(const string16& client_keys,
 
 
     if (unmodified_text.length() || modified_text.length()) {
-      key_events.push_back(WebKeyEvent(automation::kRawKeyDownType, key_code, modified_text, unmodified_text, all_modifiers));
-      key_events.push_back(WebKeyEvent(automation::kKeyUpType, key_code, modified_text, unmodified_text, all_modifiers));
+      key_events.push_back(KeyEvent(automation::kRawKeyDownType, key_code, modified_text, unmodified_text, all_modifiers));
+      key_events.push_back(KeyEvent(automation::kKeyUpType, key_code, modified_text, unmodified_text, all_modifiers));
     }
     else
     {

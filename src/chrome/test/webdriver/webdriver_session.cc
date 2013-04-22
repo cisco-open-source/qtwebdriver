@@ -65,7 +65,7 @@ const int kNewMouseAPIMinVersion = 1002;
 
 FrameId::FrameId() {}
 
-FrameId::FrameId(const WebViewId& view_id, const FramePath& frame_path)
+FrameId::FrameId(const ViewId& view_id, const FramePath& frame_path)
     : view_id(view_id),
       frame_path(frame_path) {
 }
@@ -74,7 +74,7 @@ Session::Session()
     : session_log_(new InMemoryLog()),
       logger_(kAllLogLevel),
       id_(GenerateRandomID()),
-      current_target_(FrameId(WebViewId(), FramePath())),
+      current_target_(FrameId(ViewId(), FramePath())),
       thread_(id_.c_str()),
       async_script_timeout_(0),
       implicit_wait_(0),
@@ -712,7 +712,7 @@ Error* Session::SetCookie(const std::string& url,
   return error;
 }
 
-Error* Session::GetViews(std::vector<WebViewInfo>* views) {
+Error* Session::GetViews(std::vector<ViewId>* views) {
   Error* error = NULL;
   RunSessionTask(base::Bind(
       &Automation::GetViews,
@@ -726,7 +726,7 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
   Error* error = NULL;
   bool does_exist = false;
 
-  WebViewId new_view;
+  ViewId new_view;
   bool isValid = StringToWebViewId(id_or_name, &new_view);
   if (isValid)
   {
@@ -742,16 +742,16 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
 
   if (!does_exist) {
     // See if any of the tab window names match |name|.
-    std::vector<WebViewInfo> views;
+    std::vector<ViewId> views;
     Error* error = GetViews(&views);
     if (error)
       return error;
     for (size_t i = 0; i < views.size(); ++i) {
-      if (views[i].view_id.IsTab())
+      if (views[i].IsTab())
       {
           std::string window_name;
           Error* error = ExecuteScriptAndParse(
-              FrameId(views[i].view_id, FramePath()),
+              FrameId(views[i], FramePath()),
               "function() { return window.name; }",
               "getWindowName",
               new ListValue(),
@@ -760,26 +760,26 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
             return error;
 
           if (id_or_name == window_name) {
-            new_view = views[i].view_id;
+            new_view = views[i];
             does_exist = true;
             break;
           }
       }
-      else if (views[i].view_id.IsApp())
+      else if (views[i].IsApp())
       {
           std::string window_name;
 
           RunSessionTask(base::Bind(
               &Automation::GetViewTitle,
               base::Unretained(automation_.get()),
-              views[i].view_id,
+              views[i],
               &window_name,
               &error));
           if (error)
             return error;
 
           if (id_or_name == window_name) {
-            new_view = views[i].view_id;
+            new_view = views[i];
             does_exist = true;
             break;
           }
@@ -891,7 +891,7 @@ Error* Session::CloseWindow() {
       &error));
 
   if (!error) {
-    std::vector<WebViewInfo> views;
+    std::vector<ViewId> views;
     scoped_ptr<Error> error(GetViews(&views));
     if (error.get() || views.empty()) {
       // The automation connection will soon be closed, if not already,
@@ -906,7 +906,7 @@ Error* Session::CloseWindow() {
   return error;
 }
 
-Error* Session::GetWindowBounds(const WebViewId& window, Rect* bounds) {
+Error* Session::GetWindowBounds(const ViewId& window, Rect* bounds) {
     if (window.IsApp()) {
         Error* error = NULL;
         RunSessionTask(base::Bind(
@@ -936,7 +936,7 @@ Error* Session::GetWindowBounds(const WebViewId& window, Rect* bounds) {
 }
 
 Error* Session::SetWindowBounds(
-    const WebViewId& window,
+    const ViewId& window,
     const Rect& bounds) {
   Error* error = NULL;
   RunSessionTask(base::Bind(
@@ -948,7 +948,7 @@ Error* Session::SetWindowBounds(
   return error;
 }
 
-Error* Session::MaximizeWindow(const WebViewId& window) {
+Error* Session::MaximizeWindow(const ViewId& window) {
   Error* error = NULL;
   RunSessionTask(base::Bind(
         &Automation::MaximizeView,
@@ -1705,7 +1705,7 @@ Error* Session::GetExtensionsInfo(base::ListValue* extensions_list) {
 }
 
 Error* Session::IsPageActionVisible(
-    const WebViewId& tab_id,
+    const ViewId& tab_id,
     const std::string& extension_id,
     bool* is_visible) {
 //  if (!tab_id.IsTab()) {
@@ -1967,7 +1967,7 @@ void Session::InitOnSessionThread(const Automation::BrowserOptions& options,
                                   int* build_no,
                                   Error** error) {
   automation_.reset(new Automation(logger_));
-  WebViewId current_view = automation_->Init(options, build_no, error);
+  ViewId current_view = automation_->Init(options, build_no, error);
   if (*error)
     return;
 
@@ -2037,7 +2037,7 @@ Error* Session::ExecuteScriptAndParseValue(const FrameId& frame_id,
 
 void Session::SendKeysOnSessionThread(const string16& keys,
                                       bool release_modifiers, Error** error) {
-  std::vector<WebKeyEvent> key_events;
+  std::vector<KeyEvent> key_events;
   std::string error_msg;
   if (!ConvertKeysToWebKeyEvents(keys, logger_, release_modifiers,
                                  &sticky_modifiers_, &key_events, &error_msg)) {
@@ -2081,7 +2081,7 @@ void Session::SendKeysOnElementSessionThread(const ElementId& element,
                                       const string16& keys,
                                       bool release_modifiers,
                                       Error** error) {
-  std::vector<WebKeyEvent> key_events;
+  std::vector<KeyEvent> key_events;
   std::string error_msg;
   if (!ConvertKeysToWebKeyEvents(keys, logger_, release_modifiers,
                                  &sticky_modifiers_, &key_events, &error_msg)) {
@@ -2139,12 +2139,12 @@ void Session::SendKeysOnElementSessionThread(const ElementId& element,
 //  return NULL;
 //}
 
-WebMouseEvent Session::CreateWebMouseEvent(
+MouseEvent Session::CreateWebMouseEvent(
     automation::MouseEventType type,
     automation::MouseButton button,
     const Point& point,
     int click_count) {
-  return WebMouseEvent(type, button, point.rounded_x(), point.rounded_y(),
+  return MouseEvent(type, button, point.rounded_x(), point.rounded_y(),
                        click_count, sticky_modifiers_);
 }
 

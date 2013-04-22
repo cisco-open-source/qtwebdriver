@@ -44,9 +44,9 @@ class ValueParser;
 // frame within a session.
 struct FrameId {
   FrameId();
-  FrameId(const WebViewId& view_id, const FramePath& frame_path);
+  FrameId(const ViewId& view_id, const FramePath& frame_path);
 
-  WebViewId view_id;
+  ViewId view_id;
   FramePath frame_path;
 };
 
@@ -151,7 +151,7 @@ class Session {
   Error* SetCookie(const std::string& url, base::DictionaryValue* cookie_dict);
 
   // Gets all the currently open views.
-  Error* GetViews(std::vector<WebViewInfo>* views);
+  Error* GetViews(std::vector<ViewId>* views);
 
   // Switches the view used by default. |id_or_name| is either a view ID
   // returned by |GetViews| or the name attribute of a DOM window.
@@ -182,13 +182,13 @@ class Session {
   Error* CloseWindow();
 
   // Gets the bounds for the specified window.
-  Error* GetWindowBounds(const WebViewId& window, Rect* bounds);
+  Error* GetWindowBounds(const ViewId& window, Rect* bounds);
 
   // Sets the bounds for the specified window.
-  Error* SetWindowBounds(const WebViewId& window, const Rect& bounds);
+  Error* SetWindowBounds(const ViewId& window, const Rect& bounds);
 
   // Maximizes the specified window.
-  Error* MaximizeWindow(const WebViewId& window);
+  Error* MaximizeWindow(const ViewId& window);
 
   // Gets the message of the currently active JavaScript modal dialog.
   Error* GetAlertMessage(std::string* text);
@@ -346,7 +346,7 @@ class Session {
 
   Error* GetExtensionsInfo(base::ListValue* extension_ids);
 
-  Error* IsPageActionVisible(const WebViewId& tab_id,
+  Error* IsPageActionVisible(const ViewId& tab_id,
                              const std::string& extension_id,
                              bool* is_visible);
 
@@ -456,7 +456,7 @@ class Session {
                                Error** error);
 
 //  Error* ProcessWebMouseEvents(const std::vector<WebMouseEvent>& events);
-  WebMouseEvent CreateWebMouseEvent(automation::MouseEventType type,
+  MouseEvent CreateWebMouseEvent(automation::MouseEventType type,
                                     automation::MouseButton button,
                                     const Point& point,
                                     int click_count);

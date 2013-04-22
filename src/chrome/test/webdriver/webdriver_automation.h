@@ -34,8 +34,8 @@
 class AutomationId;
 class AutomationProxy;
 // class ProxyLauncher;
-struct WebMouseEvent;
-struct WebViewInfo;
+struct MouseEvent;
+struct ViewId;
 class WebViewLocator;
 
 namespace base {
@@ -118,7 +118,7 @@ class Automation : public QObject {
   virtual ~Automation();
 
   // Start the system's default Chrome binary.
-  WebViewId Init(const BrowserOptions& options, int* build_no, Error** error);
+  ViewId Init(const BrowserOptions& options, int* build_no, Error** error);
 
   // Terminates this session and disconnects its automation proxy. After
   // invoking this method, the Automation can safely be deleted.
@@ -126,7 +126,7 @@ class Automation : public QObject {
 
   // Executes the given |script| in the specified frame of the current
   // tab. |result| will be set to the JSON result. Returns true on success.
-  void ExecuteScript(const WebViewId& view_id,
+  void ExecuteScript(const ViewId& view_id,
                      const FramePath& frame_path,
                      const std::string& script,
                      std::string* result,
@@ -134,30 +134,30 @@ class Automation : public QObject {
 
   // Sends a webkit key event to the current browser. Waits until the key has
   // been processed by the web page.
-  void SendWebKeyEvent(const WebViewId& view_id,
-                       const WebKeyEvent& key_event,
+  void SendWebKeyEvent(const ViewId& view_id,
+                       const KeyEvent& key_event,
                        Error** error);
 
-  void SendNativeElementWebKeyEvent(const WebViewId &view_id,
+  void SendNativeElementWebKeyEvent(const ViewId &view_id,
                                     const ElementId &element,
-                                    const WebKeyEvent &key_event,
+                                    const KeyEvent &key_event,
                                     Error **error);
 
   // Sends an OS level key event to the current browser. Waits until the key
   // has been processed by the browser.
-  void SendNativeKeyEvent(const WebViewId& view_id,
+  void SendNativeKeyEvent(const ViewId& view_id,
                           ui::KeyboardCode key_code,
                           int modifiers,
                           Error** error);
 
   // Sends a web mouse event to the given view. Waits until the event has
   // been processed by the view.
-  void SendWebMouseEvent(const WebViewId& view_id,
-                         const WebMouseEvent& event,
+  void SendWebMouseEvent(const ViewId& view_id,
+                         const MouseEvent& event,
                          Error** error);
 
   // Drag and drop the file paths to the given location.
-  void DragAndDropFilePaths(const WebViewId& view_id,
+  void DragAndDropFilePaths(const ViewId& view_id,
                             const Point& location,
                             const std::vector<FilePath::StringType>& paths,
                             Error** error);
@@ -166,31 +166,31 @@ class Automation : public QObject {
   // contain the entire page, including what is not in the current view
   // on the  screen.
   void CaptureEntirePageAsPNG(
-      const WebViewId& view_id, const FilePath& path, Error** error);
+      const ViewId& view_id, const FilePath& path, Error** error);
 
 #if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
   // Dumps a heap profile of the process of the tab.
   void HeapProfilerDump(
-      const WebViewId& view_id, const std::string& reason, Error** error);
+      const ViewId& view_id, const std::string& reason, Error** error);
 #endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
 
   void NavigateToURL(
-      const WebViewId& view_id, const std::string& url, Error** error);
+      const ViewId& view_id, const std::string& url, Error** error);
   void NavigateToURLAsync(
-      const WebViewId& view_id, const std::string& url, Error** error);
-  void GoForward(const WebViewId& view_id, Error** error);
-  void GoBack(const WebViewId& view_id, Error** error);
-  void Reload(const WebViewId& view_id, Error** error);
+      const ViewId& view_id, const std::string& url, Error** error);
+  void GoForward(const ViewId& view_id, Error** error);
+  void GoBack(const ViewId& view_id, Error** error);
+  void Reload(const ViewId& view_id, Error** error);
 
-  void GetCookies(const WebViewId& view_id,
+  void GetCookies(const ViewId& view_id,
                   const std::string& url,
                   base::ListValue** cookies,
                   Error** error);
-  void DeleteCookie(const WebViewId& view_id,
+  void DeleteCookie(const ViewId& view_id,
                     const std::string& url,
                     const std::string& cookie_name,
                     Error** error);
-  void SetCookie(const WebViewId& view_id,
+  void SetCookie(const ViewId& view_id,
                  const std::string& url,
                  base::DictionaryValue* cookie_dict,
                  Error** error);
@@ -198,60 +198,60 @@ class Automation : public QObject {
   // TODO(kkania): All of these mouse commands are deprecated and should be
   // removed when chrome build 1002 is no longer supported.
   // Use SendWebMouseEvent instead.
-  void MouseMoveDeprecated(const WebViewId& view_id,
+  void MouseMoveDeprecated(const ViewId& view_id,
                            const Point& p,
                            Error** error);
-  void MouseClickDeprecated(const WebViewId& view_id,
+  void MouseClickDeprecated(const ViewId& view_id,
                             const Point& p,
                             automation::MouseButton button,
                             Error** error);
-  void MouseDragDeprecated(const WebViewId& view_id,
+  void MouseDragDeprecated(const ViewId& view_id,
                            const Point& start,
                            const Point& end,
                            Error** error);
-  void MouseButtonDownDeprecated(const WebViewId& view_id,
+  void MouseButtonDownDeprecated(const ViewId& view_id,
                                  const Point& p,
                                  Error** error);
-  void MouseButtonUpDeprecated(const WebViewId& view_id,
+  void MouseButtonUpDeprecated(const ViewId& view_id,
                                const Point& p,
                                Error** error);
-  void MouseDoubleClickDeprecated(const WebViewId& view_id,
+  void MouseDoubleClickDeprecated(const ViewId& view_id,
                                   const Point& p,
                                   Error** error);
 
   // Get info for all views currently open.
-  void GetViews(std::vector<WebViewInfo>* views, Error** error);
+  void GetViews(std::vector<ViewId>* views, Error** error);
 
   // Check if the given view exists currently.
-  void DoesViewExist(WebViewId *view_id, bool* does_exist, Error** error);
+  void DoesViewExist(ViewId *view_id, bool* does_exist, Error** error);
 
   // Closes the given view.
-  void CloseView(const WebViewId& view_id, Error** error);
+  void CloseView(const ViewId& view_id, Error** error);
 
   // Gets the bounds for the given view.
-  void GetViewBounds(const WebViewId &view_id, Rect *bounds, Error **error);
+  void GetViewBounds(const ViewId &view_id, Rect *bounds, Error **error);
 
   // Gets view title
-  void GetViewTitle(const WebViewId &view_id, std::string* title, Error **error);
+  void GetViewTitle(const ViewId &view_id, std::string* title, Error **error);
 
   // Sets the bounds for the given view. The position should be in screen
   // coordinates, while the size should be the desired size of the view.
-  void SetViewBounds(const WebViewId& view_id,
+  void SetViewBounds(const ViewId& view_id,
                      const Rect& bounds,
                      Error** error);
 
   // Maximizes the given view.
-  void MaximizeView(const WebViewId& view_id, Error** error);
+  void MaximizeView(const ViewId& view_id, Error** error);
 
   // Gets the active JavaScript modal dialog's message.
-  void GetAppModalDialogMessage(const WebViewId& view_id, std::string* message, Error** error);
+  void GetAppModalDialogMessage(const ViewId& view_id, std::string* message, Error** error);
 
   // Accepts or dismisses the active JavaScript modal dialog.
-  void AcceptOrDismissAppModalDialog(const WebViewId& view_id, bool accept, Error** error);
+  void AcceptOrDismissAppModalDialog(const ViewId& view_id, bool accept, Error** error);
 
   // Accepts an active prompt JavaScript modal dialog, using the given
   // prompt text as the result of the prompt.
-  void AcceptPromptAppModalDialog(const WebViewId& view_id,
+  void AcceptPromptAppModalDialog(const ViewId& view_id,
                                   const std::string& prompt_text,
                                   Error** error);
 
@@ -274,7 +274,7 @@ class Automation : public QObject {
   void GetExtensionsInfo(base::ListValue* extensions_list, Error** error);
 
   // Gets a list of dictionary information about all installed extensions.
-  void IsPageActionVisible(const WebViewId& tab_id,
+  void IsPageActionVisible(const ViewId& tab_id,
                            const std::string& extension_id,
                            bool* is_visible,
                            Error** error);
@@ -314,97 +314,96 @@ class Automation : public QObject {
                            Error** error);
 
   // set unique id to the frame
-  void AddIdToCurrentFrame(const WebViewId &view_id, const FramePath &frame_path, Error **error);
+  void AddIdToCurrentFrame(const ViewId &view_id, const FramePath &frame_path, Error **error);
 
   // set text into Prompt text field
-  void SetAlertPromptText(const WebViewId& view_id, const std::string& text, Error **error);
+  void SetAlertPromptText(const ViewId& view_id, const std::string& text, Error **error);
 
 
   // get native element size
-  void GetNativeElementSize(const WebViewId& view_id,
+  void GetNativeElementSize(const ViewId& view_id,
                          const ElementId& element,
                          Size* size,
                          Error** error);
 
   // find native element
-  void FindNativeElement(const WebViewId& view_id,
+  void FindNativeElement(const ViewId& view_id,
                          const ElementId& root_element,
                          const std::string& locator,
                          const std::string& query,
                          ElementId* element,
                          Error** error);
 
-  void FindNativeElements(const WebViewId& view_id,
+  void FindNativeElements(const ViewId& view_id,
                          const ElementId& root_element,
                          const std::string& locator,
                          const std::string& query,
                          std::vector<ElementId>* elements,
                          Error** error);
 
-  void GetNativeElementWithFocus(const WebViewId& view_id,
+  void GetNativeElementWithFocus(const ViewId& view_id,
                          ElementId* element,
                          Error** error);
 
-  void GetNativeElementLocation(const WebViewId& view_id,
+  void GetNativeElementLocation(const ViewId& view_id,
                          const ElementId& element,
                          Point* location,
                          Error** error);
 
-  void GetNativeElementProperty(const WebViewId& view_id,
+  void GetNativeElementProperty(const ViewId& view_id,
                          const ElementId& element,
                          const std::string& name,
                          base::Value** value,
                          Error** error);
 
-  void NativeElementEquals(const WebViewId& view_id,
+  void NativeElementEquals(const ViewId& view_id,
                          const ElementId& element1,
                          const ElementId& element2,
                          bool* is_equals,
                          Error** error);
 
-  void GetNativeElementClickableLocation(const WebViewId& view_id,
+  void GetNativeElementClickableLocation(const ViewId& view_id,
                          const ElementId& element,
                          Point* location,
                          Error** error);
 
-  void GetNativeElementLocationInView(const WebViewId& view_id,
+  void GetNativeElementLocationInView(const ViewId& view_id,
                          const ElementId& element,
                          Point* location,
                          Error** error);
 
-  void ClearNativeElement(const WebViewId& view_id,
+  void ClearNativeElement(const ViewId& view_id,
                          const ElementId& element,
                          Error** error);
 
-  void IsNativeElementDisplayed(const WebViewId& view_id,
+  void IsNativeElementDisplayed(const ViewId& view_id,
                          const ElementId& element,
                          bool ignore_opacity,
                          bool* is_displayed,
                          Error** error);
 
-  void IsNativeElementEnabled(const WebViewId& view_id,
+  void IsNativeElementEnabled(const ViewId& view_id,
                          const ElementId& element,
                          bool* is_enabled,
                          Error** error);
 
-  void IsNativeElementSelected(const WebViewId& view_id,
+  void IsNativeElementSelected(const ViewId& view_id,
                          const ElementId& element,
                          bool* is_selected,
                          Error** error);
 
-  void GetNativeElementText(const WebViewId &view_id,
+  void GetNativeElementText(const ViewId &view_id,
                          const ElementId& element,
                          std::string* element_text,
                          Error **error);
 						 
-  void GetNativeSource(const WebViewId& view_id,
+  void GetNativeSource(const ViewId& view_id,
                          base::Value** result,
                          Error** error);
 
 
  private:
   AutomationProxy* automation() const;
-  QWebView* ConvertViewIdToPointer(const WebViewId& view_id);
   Error* DetermineBuildNumber();
   Error* CheckVersion(int min_required_build_no,
                       const std::string& error_msg);
@@ -421,12 +420,12 @@ class Automation : public QObject {
   Qt::MouseButton ConvertMouseButtonToQtMouseButton(automation::MouseButton button);
   QWebFrame* FindFrameByPath(QWebFrame* parent, const FramePath &frame_path);
   QWebFrame* FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path);
-  QWidget* GetNativeElement(const WebViewId &view_id, const ElementId &element);
+  QWidget* GetNativeElement(const ViewId &view_id, const ElementId &element);
   bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
   QString GenerateElementKey(const QWidget* widget);
-  QKeyEvent ConvertToQtKeyEvent(const WebKeyEvent &key_event);
+  QKeyEvent ConvertToQtKeyEvent(const KeyEvent &key_event);
   void BuildKeyMap();
-  QWidget *checkView(const WebViewId &view_id);
+  QWidget *checkView(const ViewId &view_id);
   void createUIXML(QWidget *parent, QIODevice *buff, ElementMap* elementsMap, Error **error, bool needAddWebSource = false);
   void FindNativeElementByXpath(QWidget *parent, ElementMap* elementsMap, const std::string &query, std::vector<ElementId>* elements, Error **error);
   void addWidgetToXML(QWidget* parent, ElementMap *elementsMap, QXmlStreamWriter *writer, bool needAddWebSource = false);

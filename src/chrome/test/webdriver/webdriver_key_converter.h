@@ -17,9 +17,9 @@ namespace webdriver {
 class Logger;
 
 // Convenience functions for creating |WebKeyEvent|s. Used by unittests.
-WebKeyEvent CreateKeyDownEvent(ui::KeyboardCode key_code, int modifiers);
-WebKeyEvent CreateKeyUpEvent(ui::KeyboardCode key_code, int modifiers);
-WebKeyEvent CreateCharEvent(const std::string& unmodified_text,
+KeyEvent CreateKeyDownEvent(ui::KeyboardCode key_code, int modifiers);
+KeyEvent CreateKeyUpEvent(ui::KeyboardCode key_code, int modifiers);
+KeyEvent CreateCharEvent(const std::string& unmodified_text,
                             const std::string& modified_text,
                             int modifiers);
 
@@ -33,7 +33,7 @@ bool ConvertKeysToWebKeyEvents(const string16& keys,
                                const Logger& logger,
                                bool release_modifiers,
                                int* modifiers,
-                               std::vector<WebKeyEvent>* key_events,
+                               std::vector<KeyEvent>* key_events,
                                std::string* error_msg);
 
 }  // namespace webdriver

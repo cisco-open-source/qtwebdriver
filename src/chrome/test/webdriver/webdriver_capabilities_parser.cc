@@ -13,7 +13,6 @@
 #include "chrome/test/webdriver/webdriver_error.h"
 #include "chrome/test/webdriver/webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_util.h"
-#include <QtCore/QDebug>
 
 using base::DictionaryValue;
 using base::Value;

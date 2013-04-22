@@ -76,12 +76,6 @@
 #include <sys/wait.h>
 #endif
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QApplication>
-#else
-#include <QtGui/QApplication>
-#endif
-
 namespace webdriver {
 
 namespace {
@@ -341,7 +335,6 @@ int RunChromeDriver() {
   // Don't call mg_stop because mongoose will hang if clients are still
   // connected when keep-alive is enabled.
   shutdown_event.Wait();
-//  return qApp->exec();
   return (EXIT_SUCCESS);
 }
 

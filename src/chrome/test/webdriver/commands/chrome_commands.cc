@@ -236,7 +236,7 @@ bool ViewsCommand::DoesGet() {
 }
 
 void ViewsCommand::ExecuteGet(Response* const response) {
-  std::vector<WebViewInfo> views;
+  std::vector<ViewId> views;
   Error* error = session_->GetViews(&views);
   if (error) {
     response->SetError(error);
@@ -245,11 +245,9 @@ void ViewsCommand::ExecuteGet(Response* const response) {
   ListValue* views_list = new ListValue();
   for (size_t i = 0; i < views.size(); ++i) {
     DictionaryValue* dict = new DictionaryValue();
-    AutomationId id = views[i].view_id.GetId();
-    dict->SetString("handle", WebViewIdToString(WebViewId::ForView(id)));
+    AutomationId id = views[i].GetId();
+    dict->SetString("handle", WebViewIdToString(ViewId::ForView(id)));
     dict->SetInteger("type", id.type());
-    if (!views[i].extension_id.empty())
-      dict->SetString("extension_id", views[i].extension_id);
     views_list->Append(dict);
   }
   response->SetValue(views_list);
