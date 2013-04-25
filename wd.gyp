@@ -48,9 +48,9 @@
           'sources': [
             'src/Test/main.cc',
             'src/Test/ClickTest.cc',
-	    'src/moc_ClickTest.cc',
+            'src/moc_ClickTest.cc',
             'src/Test/WindowTest.cc',
-	    'src/Test/FindingTest.cc'
+            'src/Test/FindingTest.cc'
           ],
 
           'rules': [ {
@@ -147,11 +147,6 @@
       [ '<(WD_CONFIG_QWIDGET_VIEW) == 1', {
         'defines': [
           'WD_CONFIG_QWIDGET_VIEW',
-        ],
-      } ],
-      [ '<(WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY) == 1', {
-        'defines': [
-          'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY',
         ],
       } ],
       [ '<(WD_CONFIG_QML_VIEW) == 1', {
