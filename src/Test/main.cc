@@ -15,8 +15,6 @@
 #endif
 
 #include <QtWebkitWebDriver.h>
-#include "WindowTest.h"
-#include "ClickTest.h"
 
 
 int main(int argc, char *argv[])
@@ -41,9 +39,6 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
     registerView<QWebView>("QWebView");
-    registerView<QWidget>("QWidget");
-    registerView<WindowTestWidget>("WindowTestWidget");
-    registerView<ClickTestWidget>("ClickTestWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
