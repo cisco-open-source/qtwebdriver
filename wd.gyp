@@ -105,6 +105,9 @@
   ],
 
   'target_defaults': {
+    # do not require cygwin
+    'msvs_cygwin_shell': 0,
+
     'cflags': [
       '-fPIC',
       '-Wall',
