@@ -17,8 +17,8 @@ namespace webdriver {
 namespace {
 
 bool GetWindowId(const std::string& window_id_string,
-                 const WebViewId& current_id,
-                 WebViewId* window_id,
+                 const ViewId& current_id,
+                 ViewId* window_id,
                  Response* const response) {
   if (window_id_string == "current") {
     *window_id = current_id;
@@ -51,8 +51,8 @@ bool WindowSizeCommand::DoesPost() {
 
 void WindowSizeCommand::ExecuteGet(Response* const response) {
   // Path segment: "/session/$sessionId/window/$windowHandle/size"
-  WebViewId window_id;
-  WebViewId current_id = session_->current_target().view_id;
+  ViewId window_id;
+  ViewId current_id = session_->current_target().view_id;
   if (!GetWindowId(GetPathVariable(4), current_id, &window_id, response))
     return;
 
@@ -70,8 +70,8 @@ void WindowSizeCommand::ExecuteGet(Response* const response) {
 
 void WindowSizeCommand::ExecutePost(Response* const response) {
   // Path segment: "/session/$sessionId/window/$windowHandle/size"
-  WebViewId window_id;
-  WebViewId current_id = session_->current_target().view_id;
+  ViewId window_id;
+  ViewId current_id = session_->current_target().view_id;
   if (!GetWindowId(GetPathVariable(4), current_id, &window_id, response))
     return;
 
@@ -114,8 +114,8 @@ bool WindowPositionCommand::DoesPost() {
 
 void WindowPositionCommand::ExecuteGet(Response* const response) {
   // Path segment: "/session/$sessionId/window/$windowHandle/position"
-  WebViewId window_id;
-  WebViewId current_id = session_->current_target().view_id;
+  ViewId window_id;
+  ViewId current_id = session_->current_target().view_id;
   if (!GetWindowId(GetPathVariable(4), current_id, &window_id, response))
     return;
 
@@ -133,8 +133,8 @@ void WindowPositionCommand::ExecuteGet(Response* const response) {
 
 void WindowPositionCommand::ExecutePost(Response* const response) {
   // Path segment: "/session/$sessionId/window/$windowHandle/position"
-  WebViewId window_id;
-  WebViewId current_id = session_->current_target().view_id;
+  ViewId window_id;
+  ViewId current_id = session_->current_target().view_id;
   if (!GetWindowId(GetPathVariable(4), current_id, &window_id, response))
     return;
 
@@ -173,8 +173,8 @@ bool WindowMaximizeCommand::DoesPost() {
 
 void WindowMaximizeCommand::ExecutePost(Response* const response) {
   // Path segment: "/session/$sessionId/window/$windowHandle/maximize"
-  WebViewId window_id;
-  WebViewId current_id = session_->current_target().view_id;
+  ViewId window_id;
+  ViewId current_id = session_->current_target().view_id;
   if (!GetWindowId(GetPathVariable(4), current_id, &window_id, response))
     return;
 

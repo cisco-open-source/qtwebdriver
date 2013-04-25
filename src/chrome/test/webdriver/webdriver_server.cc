@@ -35,7 +35,6 @@
 #include "chrome/test/webdriver/commands/alert_commands.h"
 #include "chrome/test/webdriver/commands/appcache_status_command.h"
 #include "chrome/test/webdriver/commands/browser_connection_commands.h"
-#include "chrome/test/webdriver/commands/chrome_commands.h"
 #include "chrome/test/webdriver/commands/cookie_commands.h"
 #include "chrome/test/webdriver/commands/create_session.h"
 #include "chrome/test/webdriver/commands/execute_async_script_command.h"
@@ -74,12 +73,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#endif
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QApplication>
-#else
-#include <QtGui/QApplication>
 #endif
 
 namespace webdriver {
@@ -175,15 +168,6 @@ void InitCallbacks(Dispatcher* dispatcher,
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
   dispatcher->Add<AppCacheStatusCommand>("/session/*/application_cache/status");
 
-  // Chrome-specific commands.
-  dispatcher->Add<ExtensionsCommand>("/session/*/chrome/extensions");
-  dispatcher->Add<ExtensionCommand>("/session/*/chrome/extension/*");
-  dispatcher->Add<ViewsCommand>("/session/*/chrome/views");
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-  dispatcher->Add<HeapProfilerDumpCommand>(
-      "/session/*/chrome/heapprofilerdump");
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-
   // HTML5 functions.
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");
   dispatcher->Add<LocalStorageCommand>("/session/*/local_storage");
@@ -253,7 +237,7 @@ int RunChromeDriver() {
   // Parse command line flags.
   std::string port = "9517";
   FilePath log_path;
-  std::string root = "./web";
+  std::string root;
   std::string url_base;
   int http_threads = 4;
   bool enable_keep_alive = false;
@@ -341,7 +325,6 @@ int RunChromeDriver() {
   // Don't call mg_stop because mongoose will hang if clients are still
   // connected when keep-alive is enabled.
   shutdown_event.Wait();
-//  return qApp->exec();
   return (EXIT_SUCCESS);
 }
 

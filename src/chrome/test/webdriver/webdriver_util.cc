@@ -22,8 +22,6 @@
 #include "chrome/common/zip.h"
 #include "chrome/test/automation/automation_json_requests.h"
 
-#include <QtCore/QDebug>
-
 using base::DictionaryValue;
 using base::ListValue;
 using base::Value;
@@ -501,14 +499,14 @@ bool StringToAutomationId(const std::string& string_id, AutomationId* id) {
   return true;
 }
 
-std::string WebViewIdToString(const WebViewId& view_id) {
+std::string WebViewIdToString(const ViewId& view_id) {
   return base::StringPrintf(
       "%s%s",
       view_id.old_style() ? "t" : "f",
       AutomationIdToString(view_id.GetId()).c_str());
 }
 
-bool StringToWebViewId(const std::string& string_id, WebViewId* view_id) {
+bool StringToWebViewId(const std::string& string_id, ViewId* view_id) {
   if (string_id.empty() || (string_id[0] != 'f' && string_id[0] != 't'))
     return false;
   bool old_style = string_id[0] == 't';
@@ -520,9 +518,9 @@ bool StringToWebViewId(const std::string& string_id, WebViewId* view_id) {
     int tab_id;
     if (!base::StringToInt(id.id(), &tab_id))
       return false;
-    *view_id = WebViewId::ForOldStyleTab(tab_id);
+    *view_id = ViewId::ForOldStyleTab(tab_id);
   } else {
-    *view_id = WebViewId::ForView(id);
+    *view_id = ViewId::ForView(id);
   }
   return true;
 }
