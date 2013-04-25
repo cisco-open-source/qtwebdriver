@@ -48,18 +48,12 @@
           'sources': [
             'src/Test/main.cc',
             'src/Test/ClickTest.cc',
+            'src/Test/ClickTest.h',
             'src/moc_ClickTest.cc',
             'src/Test/WindowTest.cc',
-            'src/Test/FindingTest.cc'
+	    'src/Test/FindingTest.cc',
+	    'src/Test/CoordinatesTest.cc'
           ],
-
-          'rules': [ {
-            'rule_name': 'generate_moc',
-            'extension': 'h',
-            'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
-            'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', 'src/moc_<(RULE_INPUT_ROOT).cc' ],
-            'message': 'Generating <(RULE_INPUT_ROOT).cc.',
-          } ],
 
           'conditions': [
             [ '<(QT5) == 1', {
