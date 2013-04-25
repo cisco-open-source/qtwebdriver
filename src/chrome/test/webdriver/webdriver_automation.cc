@@ -2242,11 +2242,9 @@ void Automation::addWidgetToXML(QWidget* parent, ElementMap* elementsMap, QXmlSt
 {
     writer->writeStartElement(parent->metaObject()->className());
 
-#ifdef  WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY
-    qDebug()<<"[WD]:"<< parent->metaObject()->className() <<" accessible name"<<parent->accessibleName();
-    if (!parent->accessibleName().isEmpty())
-        writer->writeAttribute("id", parent->accessibleName());
-#endif
+    if (!parent->objectName().isEmpty())
+        writer->writeAttribute("id", parent->objectName());
+
     if (!parent->windowTitle().isEmpty())
         writer->writeAttribute("name", parent->windowTitle());
 
