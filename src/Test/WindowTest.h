@@ -7,5 +7,5 @@ class WindowTestWidget : public QWidget
 {
 public:
     WindowTestWidget();
-    ~WindowTestWidget();
+    virtual ~WindowTestWidget();
 };

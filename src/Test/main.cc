@@ -17,6 +17,7 @@
 
 #include "WindowTest.h"
 #include "ClickTest.h"
+#include "FindingTest.h"
 #endif
 
 #include <WebDriver.h>
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
     registerView<QWidget>("QWidget");
     registerView<WindowTestWidget>("WindowTestWidget");
     registerView<ClickTestWidget>("ClickTestWidget");
+    registerView<FindingTestWidget>("FindingTestWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));

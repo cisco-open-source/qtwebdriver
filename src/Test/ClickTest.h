@@ -14,7 +14,7 @@ class ClickTestWidget : public QWidget
     Q_OBJECT
 public:
     ClickTestWidget();
-    ~ClickTestWidget();
+    virtual ~ClickTestWidget();
 
 private slots:
     void OnNormalBtnClick();
