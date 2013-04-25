@@ -15,7 +15,6 @@ report/*
 /bin/
 /lib/
 /out/
-/wd.gypi
 /wd.Makefile
 /Makefile
 /WebDriver.target.mk
