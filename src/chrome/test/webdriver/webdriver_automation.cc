@@ -96,19 +96,17 @@ Automation::BrowserOptions::~BrowserOptions() {}
 
 Automation::Automation(const Logger& logger)
     : logger_(logger),
-      build_no_(0),
       isLoading(false)
 {
 }
 
 Automation::~Automation() {}
 
-ViewId Automation::Init(const BrowserOptions& options, int* build_no, Error** error)
+ViewId Automation::Init(const BrowserOptions& options, Error** error)
 {
     qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
 
-	*build_no = build_no_;
 //Need to keep after merge sessionId remove
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
@@ -303,8 +301,6 @@ void Automation::ExecuteScript(const ViewId &view_id, const FramePath &frame_pat
     QWebFrame* frame = FindFrameByPath(view->page()->mainFrame(), frame_path);
     if (frame == NULL)
         frame = view->page()->mainFrame();
-
-//    qDebug()<<"[WD]:"<<script.c_str();
 
     std::string res;
     if (isAsync)
@@ -641,22 +637,6 @@ void Automation::CaptureEntirePageAsPNG(const ViewId &view_id, const FilePath &p
     }
 }
 
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-void Automation::HeapProfilerDump(const ViewId &view_id, const std::string &reason, Error **error)
-{
-  /*WebViewLocator view_locator;
-  *error = ConvertViewIdToLocator(view_id, &view_locator);
-  if (*error)
-    return;
-
-  automation::Error auto_error;
-  if (!SendHeapProfilerDumpJSONRequest(
-          automation(), view_locator, reason, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
-}
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-
 void Automation::NavigateToURL(const ViewId &view_id, const std::string &url, Error **error)
 {
     QWidget *view = checkView(view_id);
@@ -669,12 +649,10 @@ void Automation::NavigateToURL(const ViewId &view_id, const std::string &url, Er
 
     if (view_id.IsApp())
     {
-        qDebug()<<__LINE__;
         int automation_id = QString(view_id.GetId().id().c_str()).toInt();
         windowsMap.remove(automation_id);
         view->close();
         view->deleteLater();
-        qDebug()<<__LINE__;
         QWidget* newView = ViewFactory::GetInstance()->create(url);
         windowsMap.insert(automation_id, newView);
         newView->show();
@@ -1660,10 +1638,6 @@ void Automation::FindNativeElement(const ViewId& view_id,
 
     std::vector<ElementId> elements;
 
-    QBuffer buff;
-//    createUIXML(&buff);
-    qDebug()<<"[WD]:"<<buff.data();
-
     FindNativeElements(view_id, root_element, locator, query, &elements, error);
     if (*error == NULL && elements.size() != 0)
         *element = elements[0];
@@ -1737,7 +1711,6 @@ void Automation::FindNativeElements(const ViewId& view_id,
 QString Automation::GenerateElementKey(const QWidget* widget)
 {
     char key[16];
-//    qsrand(QTime::currentTime().msec());
 
     snprintf(key, 16, ":qtw:%08x", qrand());
     return QString(key);
@@ -1814,12 +1787,6 @@ void Automation::GetAppModalDialogMessage(const ViewId& view_id, std::string* me
         *error = new Error(kNoAlertOpenError);
       }
   }
-
-  // automation::Error auto_error;
-  /*if (!SendGetAppModalDialogMessageJSONRequest(
-          automation(), message, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
 }
 
 void Automation::AcceptOrDismissAppModalDialog(const ViewId& view_id, bool accept, Error** error)
@@ -1870,10 +1837,6 @@ void Automation::AcceptOrDismissAppModalDialog(const ViewId& view_id, bool accep
         *error = new Error(kNoAlertOpenError);
       }
   }
-  /*if (!SendAcceptOrDismissAppModalDialogJSONRequest(
-          automation(), accept, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
 }
 
 void Automation::AcceptPromptAppModalDialog(const ViewId& view_id,
@@ -1912,23 +1875,11 @@ void Automation::AcceptPromptAppModalDialog(const ViewId& view_id,
         *error = new Error(kNoAlertOpenError);
       }
   }
-
-  /*if (!SendAcceptPromptAppModalDialogJSONRequest(
-          automation(), prompt_text, &auto_error)) {
-    *error = Error::FromAutomationError(auto_error);
-  }*/
 }
 
 void Automation::GetBrowserVersion(std::string* version)
 {
   // *version = automation()->server_version();
-}
-
-void Automation::GetChromeDriverAutomationVersion(int* version, Error** error)
-{
-  /* automation::Error auto_error;
-  if (!SendGetChromeDriverAutomationVersion(automation(), version, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
 }
 
 void Automation::WaitForAllViewsToStopLoading(Error** error)
@@ -1938,135 +1889,8 @@ void Automation::WaitForAllViewsToStopLoading(Error** error)
     *error = Error::FromAutomationError(auto_error);*/
 }
 
-void Automation::InstallExtension(const FilePath &path, std::string *extension_id, Error **error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
 
-  automation::Error auto_error;
-  if (!SendInstallExtensionJSONRequest(
-          automation(), path, false /* with_ui *//*, extension_id,
-          &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
 
-void Automation::GetExtensionsInfo(
-    base::ListValue* extensions_list, Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
-
-  automation::Error auto_error;
-  if (!SendGetExtensionsInfoJSONRequest(
-          automation(), extensions_list, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
-
-void Automation::IsPageActionVisible(const ViewId &tab_id, const std::string &extension_id,
-                                     bool *is_visible, Error **error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
-
-  automation::Error auto_error;
-  if (!SendIsPageActionVisibleJSONRequest(
-          automation(), tab_id, extension_id, is_visible, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
-
-void Automation::SetExtensionState(
-    const std::string& extension_id,
-    bool enable,
-    Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
-
-  automation::Error auto_error;
-  if (!SendSetExtensionStateJSONRequest(
-          automation(), extension_id, enable /* enable *//*,
-          false /* allow_in_incognito *//*, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
-
-void Automation::ClickExtensionButton(
-    const std::string& extension_id,
-    bool browser_action,
-    Error** error)
-{
-  /*automation::Error auto_error;
-  if (!SendClickExtensionButtonJSONRequest(
-          automation(), extension_id, browser_action, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
-
-void Automation::UninstallExtension(
-    const std::string& extension_id, Error** error)
-{
-  /**error = CheckNewExtensionInterfaceSupported();
-  if (*error)
-    return;
-
-  automation::Error auto_error;
-  if (!SendUninstallExtensionJSONRequest(
-          automation(), extension_id, &auto_error))
-    *error = Error::FromAutomationError(auto_error);*/
-}
-
-void Automation::SetLocalStatePreference(const std::string &pref, base::Value *value, Error **error)
-{
-  /*scoped_ptr<Value> scoped_value(value);
-  // In version 927, SetLocalStatePrefs was changed from taking a browser
-  // handle to a browser index.
-  if (build_no_ >= 927) {
-    automation::Error auto_error;
-    if (!SendSetLocalStatePreferenceJSONRequest(
-            automation(), pref, scoped_value.release(), &auto_error))
-      *error = Error::FromAutomationError(auto_error);
-  } else {
-    std::string request, response;
-    DictionaryValue request_dict;
-    request_dict.SetString("command", "SetLocalStatePrefs");
-    request_dict.SetString("path", pref);
-    request_dict.Set("value", scoped_value.release());
-    base::JSONWriter::Write(&request_dict, &request);
-    if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
-            request, -1, &response)) {
-      *error = new Error(kUnknownError, base::StringPrintf(
-          "Failed to set local state pref '%s'", pref.c_str()));
-    }
-  }*/
-}
-
-void Automation::SetPreference(const std::string &pref, base::Value *value, Error **error)
-{
-  /*scoped_ptr<Value> scoped_value(value);
-  // Chrome 17 is on the 963 branch. The first released 18 build should have
-  // the new SetPrefs method which uses a browser index instead of handle.
-  if (build_no_ >= 964) {
-    automation::Error auto_error;
-    if (!SendSetPreferenceJSONRequest(
-            automation(), pref, scoped_value.release(), &auto_error))
-      *error = Error::FromAutomationError(auto_error);
-  } else {
-    std::string request, response;
-    DictionaryValue request_dict;
-    request_dict.SetString("command", "SetPrefs");
-    request_dict.SetInteger("windex", 0);
-    request_dict.SetString("path", pref);
-    request_dict.Set("value", scoped_value.release());
-    base::JSONWriter::Write(&request_dict, &request);
-    if (!automation()->GetBrowserWindow(0)->SendJSONRequest(
-            request, -1, &response)) {
-      *error = new Error(kUnknownError, base::StringPrintf(
-          "Failed to set pref '%s'", pref.c_str()));
-    }
-  }*/
-}
 
 void Automation::GetGeolocation(scoped_ptr<base::DictionaryValue> *geolocation, Error **error)
 {
@@ -2097,12 +1921,6 @@ void Automation::OverrideGeolocation(const DictionaryValue* geolocation,
 //  } else {
 //    *error = Error::FromAutomationError(auto_error);
 //  }
-}
-
-AutomationProxy* Automation::automation() const
-{
-    return NULL;
-    // return launcher_->automation();
 }
 
 Error* Automation::DetermineBuildNumber()
@@ -2583,20 +2401,5 @@ void JSNotifier::setResult(QVariant result)
     isCompleted = true;
     emit completed();
 }
-
-//bool Automation::eventFilter(QObject *obj, QEvent *event)
-// {
-//     if (obj == pWeb) {
-//         if (event->type() == QEvent::Drop) {
-//             qDebug()<<"[WD]:"<<&event;
-//             return false;
-//         }
-//         else
-//             return false;
-//     } else {
-
-//         return false;
-//     }
-// }
 
 }  // namespace webdriver

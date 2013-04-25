@@ -32,8 +32,6 @@
 #include "qwebviewext.h"
 
 class AutomationId;
-class AutomationProxy;
-// class ProxyLauncher;
 struct MouseEvent;
 struct ViewId;
 class WebViewLocator;
@@ -118,7 +116,7 @@ class Automation : public QObject {
   virtual ~Automation();
 
   // Start the system's default Chrome binary.
-  ViewId Init(const BrowserOptions& options, int* build_no, Error** error);
+  ViewId Init(const BrowserOptions& options, Error **error);
 
   // Terminates this session and disconnects its automation proxy. After
   // invoking this method, the Automation can safely be deleted.
@@ -167,12 +165,6 @@ class Automation : public QObject {
   // on the  screen.
   void CaptureEntirePageAsPNG(
       const ViewId& view_id, const FilePath& path, Error** error);
-
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-  // Dumps a heap profile of the process of the tab.
-  void HeapProfilerDump(
-      const ViewId& view_id, const std::string& reason, Error** error);
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
 
   void NavigateToURL(
       const ViewId& view_id, const std::string& url, Error** error);
@@ -258,52 +250,8 @@ class Automation : public QObject {
   // Gets the version of the runing browser.
   void GetBrowserVersion(std::string* version);
 
-  // Gets the ChromeDriver automation version supported by the automation
-  // server.
-  void GetChromeDriverAutomationVersion(int* version, Error** error);
-
   // Waits for all views to stop loading.
   void WaitForAllViewsToStopLoading(Error** error);
-
-  // Install a packed or unpacked extension. If the path ends with '.crx',
-  // the extension is assumed to be packed.
-  void InstallExtension(const FilePath& path, std::string* extension_id,
-                        Error** error);
-
-  // Gets a list of dictionary information about all installed extensions.
-  void GetExtensionsInfo(base::ListValue* extensions_list, Error** error);
-
-  // Gets a list of dictionary information about all installed extensions.
-  void IsPageActionVisible(const ViewId& tab_id,
-                           const std::string& extension_id,
-                           bool* is_visible,
-                           Error** error);
-
-  // Sets whether the extension is enabled or not.
-  void SetExtensionState(const std::string& extension_id,
-                         bool enable,
-                         Error** error);
-
-  // Clicks the extension action button. If |browser_action| is false, the
-  // page action will be clicked.
-  void ClickExtensionButton(const std::string& extension_id,
-                            bool browser_action,
-                            Error** error);
-
-  // Uninstalls the given extension.
-  void UninstallExtension(const std::string& extension_id, Error** error);
-
-  // Set a local state preference, which is not associated with any profile.
-  // Ownership of |value| is taken by this function.
-  void SetLocalStatePreference(const std::string& pref,
-                               base::Value* value,
-                               Error** error);
-
-  // Set a user preference, which is associated with the current profile.
-  // Ownership of |value| is taken by this fucntion.
-  void SetPreference(const std::string& pref,
-                     base::Value* value,
-                     Error** error);
 
   // Gets the current geolocation.
   void GetGeolocation(scoped_ptr<base::DictionaryValue>* geolocation,
@@ -403,7 +351,6 @@ class Automation : public QObject {
 
 
  private:
-  AutomationProxy* automation() const;
   Error* DetermineBuildNumber();
   Error* CheckVersion(int min_required_build_no,
                       const std::string& error_msg);
@@ -432,7 +379,6 @@ class Automation : public QObject {
   int checkViewInMap(QWidget* view);
 
   const Logger& logger_;
-  // scoped_ptr<ProxyLauncher> launcher_;
   int build_no_;
   scoped_ptr<base::DictionaryValue> geolocation_;
   int sessionId;
@@ -447,9 +393,6 @@ class Automation : public QObject {
 private slots:
   void pageLoadStarted();
   void pageLoadFinished();
-
-//protected:
-//     bool eventFilter(QObject *obj, QEvent *ev);
 
 };
 

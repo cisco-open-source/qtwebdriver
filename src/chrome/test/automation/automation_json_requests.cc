@@ -4,6 +4,7 @@
 
 #include "chrome/test/automation/automation_json_requests.h"
 
+
 KeyEvent::KeyEvent(automation::KeyEventTypes type,
                          ui::KeyboardCode key_code,
                          const std::string& unmodified_text,
@@ -64,8 +65,6 @@ ViewId ViewId::ForOldStyleTab(int tab_id)
   ViewId id;
   id.old_style_ = true;
   id.tab_id_ = tab_id;
-  //TODO: get *view by tab_id
-  //id.webView = view;
   return id;
 }
 
@@ -81,9 +80,6 @@ bool ViewId::IsValid() const {
 }
 
 AutomationId ViewId::GetId() const {
-  /*if (old_style_)
-    return AutomationId(AutomationId::kTypeTab, base::IntToString(tab_id_));
-  else*/
     return id_;
 }
 

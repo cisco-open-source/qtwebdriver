@@ -65,7 +65,6 @@ class ViewId {
   static ViewId ForQtView(QWidget *view, int automationId);
 
   // Creates an ID for the given tab ID.
-  //WebViewId ForOldStyleTab(int tab_id, QWebView *view);
   static ViewId ForOldStyleTab(int tab_id);
 
   // Creates an invalid ID.
