@@ -1,9 +1,13 @@
 /*
   CoordinatesTest.cc
   */
+#include <QtCore/qglobal.h>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QGridLayout>
+#else
 #include <QtGui/QGridLayout>
-#include <QtCore/QDebug>
+#endif
 
 #include "CoordinatesTest.h"
 
