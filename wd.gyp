@@ -43,7 +43,7 @@
             'src/Test/ClickTest.h',
             'src/moc_ClickTest.cc',
             'src/Test/WindowTest.cc',
-            'src/Test/FindingTest.cc',
+            'src/Test/FindingTest.cc'
           ],
 
           'rules': [ {
