@@ -20,7 +20,6 @@
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "FindingTest.h"
-#include "CoordinatesTest.h"
 
 #include <WebDriver.h>
 
