@@ -52,6 +52,7 @@
             'src/moc_ClickTest.cc',
             'src/Test/WindowTest.cc',
 	    'src/Test/FindingTest.cc',
+            'src/Test/CoordinatesTest.cc'
           ],
 
           'conditions': [
