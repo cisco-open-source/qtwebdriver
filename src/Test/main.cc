@@ -15,10 +15,11 @@
 
 #include <QtWebKit/QtWebKit>
 
+#endif
+
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "FindingTest.h"
-#endif
 
 #include <WebDriver.h>
 
