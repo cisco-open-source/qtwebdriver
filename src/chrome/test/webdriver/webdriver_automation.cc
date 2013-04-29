@@ -509,8 +509,11 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
     QMimeData data;
     QList<QUrl> urls;
 
+	// TODO: Win32 fix
+#if !defined(OS_WIN)
     for (uint i = 0; i < paths.size(); i++)
         urls.append(QUrl(paths.at(i).c_str()));
+#endif
 
     data.setUrls(urls);
 
@@ -617,7 +620,13 @@ void Automation::CaptureEntirePageAsPNG(const WebViewId &view_id, const FilePath
     QWidget *view = view_id.GetView();
 
     QPixmap pixmap = QPixmap::grabWidget(view);
-    bool saved = pixmap.save(path.value().c_str());
+	
+	// TODO: Win32 fix
+#if defined(OS_WIN)
+	bool saved = false;
+#else
+	bool saved = pixmap.save(path.value().c_str());
+#endif
 
     if (false == saved)
     {
@@ -1639,7 +1648,12 @@ QString Automation::GenerateElementKey(const QWidget* widget)
     char key[16];
     qsrand(QTime::currentTime().msec());
 
-    snprintf(key, 16, ":qtw:%08x", qrand());
+#if defined(OS_WIN)
+    _snprintf(key, 16, ":qtw:%08x", qrand());
+#else
+	snprintf(key, 16, ":qtw:%08x", qrand());
+#endif
+
     return QString(key);
 }
 

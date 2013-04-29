@@ -43,39 +43,66 @@
 
           'conditions': [
             [ '<(QT5) == 1', {
-              'libraries': [
-                '-L<(QT_LIB_PATH)',
-                '-lQt5WebKitWidgets',
-                '-lQt5OpenGL',
-                '-lQt5PrintSupport',
-                '-lQt5WebKit',
-                '-lQt5Script',
-                '-lQt5Network',
-                '-lQt5V8',
-                '-lQt5Widgets',
-                '-lQt5Quick',
-                '-lQt5Qml',
-                '-lQt5Sql',
-                '-lQt5Declarative',
-                '-lQt5XmlPatterns',
-                '-lQt5Xml',
-                '-lQt5Gui',
-                '-lQt5Core',
-                '-lpthread',
-                '-lrt',
-                '-ldl',
+              'conditions': [
+                ['OS=="linux"', {
+                  'libraries': [
+                    '-lQt5WebKitWidgets',
+                    '-lQt5OpenGL',
+                    '-lQt5PrintSupport',
+                    '-lQt5WebKit',
+                    '-lQt5Script',
+                    '-lQt5Network',
+                    '-lQt5V8',
+                    '-lQt5Widgets',
+                    '-lQt5Quick',
+                    '-lQt5Qml',
+                    '-lQt5Sql',
+                    '-lQt5Declarative',
+                    '-lQt5XmlPatterns',
+                    '-lQt5Xml',
+                    '-lQt5Gui',
+                    '-lQt5Core',
+                    '-lpthread',
+                    '-lrt',
+                    '-ldl',
+                  ],
+                } ],
+                [ 'OS=="win"', {
+                  #TODO: set here Qt5 libs
+                  'libraries': [
+                    '-l<(QT_LIB_PATH)/QtWebKit4',
+                    '-l<(QT_LIB_PATH)/QtNetwork4',
+                    '-l<(QT_LIB_PATH)/QtXml4',
+                    '-l<(QT_LIB_PATH)/QtGui4',
+                    '-l<(QT_LIB_PATH)/QtCore4',
+                  ],
+                } ],
               ],
             }, {
-              'libraries': [
-                '-L<(QT_LIB_PATH)',
-                '-lQtWebKit',
-                '-lQtNetwork',
-                '-lQtXml',
-                '-lQtGui',
-                '-lQtCore',
-                '-lpthread',
-                '-lrt',
-                '-ldl',
+              'conditions': [
+                ['OS=="linux"', {
+                  'libraries': [
+                    '-L<(QT_LIB_PATH)',
+                    '-lQtWebKit',
+                    '-lQtNetwork',
+                    '-lQtXml',
+                    '-lQtGui',
+                    '-lQtCore',
+                    '-lpthread',
+                    '-lrt',
+                    '-ldl',
+                  ],
+                } ],
+                [ 'OS=="win"', {
+                  'libraries': [
+                    '-l<(QT_LIB_PATH)/QtWebKit4',
+                    '-l<(QT_LIB_PATH)/QtNetwork4',
+                    '-l<(QT_LIB_PATH)/QtXml4',
+                    '-l<(QT_LIB_PATH)/QtGui4',
+                    '-l<(QT_LIB_PATH)/QtCore4',
+                    '-luser32.lib',
+                  ],
+                } ],
               ],
             } ],
 
@@ -167,9 +194,12 @@
       } ],
       [ 'OS == "win"', {
         'defines': [
-          '_WIN32',
-          'OS_WIN',
-		  'NOMINMAX',
+            '_WIN32',
+            'WIN32'
+            'OS_WIN',
+            'NOMINMAX',
+            '_UNICODE',
+            '_WINSOCKAPI_',
         ],
       } ]
     ],
@@ -179,8 +209,10 @@
     {
       'target_name': 'WebDriver',
       'type': 'static_library',
-
       'standalone_static_library': 1,
+      'msvs_configuration_attributes': {
+        'CharacterSet': '1'
+      },
 
       'include_dirs': [
         'inc/',
@@ -222,7 +254,6 @@
         'src/base/metrics/histogram_samples.cc',
         'src/base/metrics/sample_vector.cc',
         'src/base/metrics/statistics_recorder.cc',
-        'src/base/nix/xdg_util.cc',
         'src/base/path_service.cc',
         'src/base/pending_task.cc',
         'src/base/pickle.cc',
@@ -232,15 +263,13 @@
         'src/base/profiler/tracked_time.cc',
         'src/base/rand_util.cc',
         'src/base/run_loop.cc',
-        'src/base/scoped_temp_dir.cc',
-        'src/base/string16.cc',
+        'src/base/scoped_temp_dir.cc',        
         'src/base/string_number_conversions.cc',
         'src/base/string_piece.cc',
         'src/base/stringprintf.cc',
         'src/base/string_split.cc',
         'src/base/string_util.cc',
         'src/base/synchronization/lock.cc',
-        'src/base/sys_info_linux.cc',
         'src/base/task_runner.cc',
         'src/base/third_party/dmg_fp/dtoa.cc',
         'src/base/third_party/dmg_fp/g_fmt.cc',
@@ -333,7 +362,6 @@
         'src/qwebviewext.cc',
         'src/third_party/webdriver/atoms.cc',
         'src/third_party/zlib/adler32.c',
-        'src/third_party/zlib/contrib/minizip/ioapi.c',
         'src/third_party/zlib/contrib/minizip/unzip.c',
         'src/third_party/zlib/crc32.c',
         'src/third_party/zlib/infback.c',
@@ -371,10 +399,12 @@
             'OS_POSIX',
           ],
           'sources': [
+            'src/base/string16.cc',
             'src/base/time_posix.cc',
             'src/base/base_paths_posix.cc',
             'src/base/debug/debugger_posix.cc',
             'src/base/file_util_posix.cc',
+            'src/base/nix/xdg_util.cc',
             'src/base/platform_file_posix.cc',
             'src/base/rand_util_posix.cc',
             'src/base/safe_strerror_posix.cc',
@@ -391,7 +421,8 @@
             'src/net/base/file_stream_metrics_posix.cc',
             'src/net/base/file_stream_posix.cc',
             'src/net/base/net_errors_posix.cc',
-
+            'src/third_party/zlib/contrib/minizip/ioapi.c',
+            'src/base/sys_info_linux.cc',
           ],
         } ],
 
@@ -400,8 +431,15 @@
             '_WIN32',
             'OS_WIN',
             'NOMINMAX',
+            '_CRT_RAND_S',
+            'WIN32',
+            '_WINSOCKAPI_',
           ],
+          'msvs_configuration_attributes': {
+            'CharacterSet': '1'
+          },
           'sources': [
+            'src/base/cpu.cc',
             'src/base/time_win.cc',
             'src/base/base_paths_win.cc',
             'src/base/debug/debugger_win.cc',
@@ -416,10 +454,10 @@
             'src/base/threading/thread_local_win.cc',
             'src/base/threading/thread_local_storage_win.cc',
             'src/base/threading/worker_pool_win.cc',
-            'src/chrome/common/chrome_version_info_win.cc',
             'src/net/base/file_stream_win.cc',
             'src/net/base/file_stream_metrics_win.cc',
             'src/net/base/net_errors_win.cc',
+            'src/base/sys_info_win.cc',
           ],
         } ],
       ],

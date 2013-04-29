@@ -25,7 +25,8 @@
 #elif defined(CHROMIUM_BUILD)
 #define PRODUCT_STRING_PATH L"Chromium"
 #else
-#error Unknown branding
+// FIX Win32 compilation
+//#error Unknown branding
 #endif
 #endif  // defined(OS_WIN)
 
@@ -221,8 +222,9 @@ const wchar_t kMetroNavigationAndSearchMessage[] =
     L"CHROME_METRO_NAV_SEARCH_REQUEST";
 const wchar_t kMetroGetCurrentTabInfoMessage[] =
     L"CHROME_METRO_GET_CURRENT_TAB_INFO";
-const wchar_t kMetroRegistryPath[] =
-    L"Software\\" PRODUCT_STRING_PATH L"\\Metro";
+// Fix Win32 compilation
+//const wchar_t kMetroRegistryPath[] =
+//    L"Software\\" PRODUCT_STRING_PATH L"\\Metro";
 const wchar_t kLaunchModeValue[] = L"launch_mode";
 #endif
 
