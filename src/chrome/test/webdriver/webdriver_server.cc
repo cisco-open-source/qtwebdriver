@@ -23,7 +23,7 @@
 #include "base/stringprintf.h"
 #include "base/string_number_conversions.h"
 #include "base/string_split.h"
-//#include "base/string_util.h"
+#include "base/string_util.h"
 #include "base/synchronization/waitable_event.h"
 //#include "base/test/test_timeouts.h"
 //#include "base/threading/platform_thread.h"
@@ -327,6 +327,7 @@ int RunChromeDriver() {
   return (EXIT_SUCCESS);
 }
 
+#if !defined(OS_WIN)
 bool parse_config_to_cmd_line()
 {
     CommandLine* cmd_line = CommandLine::ForCurrentProcess();
@@ -382,12 +383,16 @@ bool parse_config_to_cmd_line()
         }
     }
 }
-
+#endif //!defined(OS_WIN)
 }  // namespace webdriver
 
 int main_server(int argc, char *argv[]) {
   CommandLine::Init(argc, argv);
+
+#if !defined(OS_WIN)
   webdriver::parse_config_to_cmd_line();
+#endif
+
   return webdriver::RunChromeDriver();
 }
 

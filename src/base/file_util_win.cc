@@ -418,8 +418,12 @@ bool CreateTemporaryDirInDir(const FilePath& base_dir,
     // the one exists, keep trying another path name until we reach some limit.
     string16 new_dir_name;
     new_dir_name.assign(prefix);
-    new_dir_name.append(base::IntToString16(::base::GetCurrentProcId()));
-    new_dir_name.push_back('_');
+    
+	// commented in order to fix Windows compilation and avoid process_util.h including
+	//new_dir_name.append(base::IntToString16(::base::GetCurrentProcId()));
+	new_dir_name.append(base::IntToString16(0));
+    
+	new_dir_name.push_back('_');
     new_dir_name.append(base::IntToString16(rand() % kint16max));
 
     path_to_create = base_dir.Append(new_dir_name);

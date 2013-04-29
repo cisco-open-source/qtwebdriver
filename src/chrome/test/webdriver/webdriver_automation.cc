@@ -1764,7 +1764,12 @@ QString Automation::GenerateElementKey(const QWidget* widget)
 {
     char key[16];
 
-    snprintf(key, 16, ":qtw:%08x", qrand());
+#if defined(OS_WIN)
+    _snprintf(key, 16, ":qtw:%08x", qrand());
+#else
+	snprintf(key, 16, ":qtw:%08x", qrand());
+#endif
+
     return QString(key);
 }
 
