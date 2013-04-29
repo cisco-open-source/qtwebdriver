@@ -46,6 +46,7 @@
               'conditions': [
                 ['OS=="linux"', {
                   'libraries': [
+                    '-L<(QT_LIB_PATH)',
                     '-lQt5WebKitWidgets',
                     '-lQt5OpenGL',
                     '-lQt5PrintSupport',
