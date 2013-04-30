@@ -1292,46 +1292,46 @@ void Automation::GetNativeElementProperty(const ViewId& view_id,
     qDebug() << "[WD] GetNativeElementProperty: " << name.c_str();
 
     QVariant propertyValue = pWidget->property(name.c_str());
-
-    if (!propertyValue.isValid())
-    {
-        qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " not found.";
-        *value = NULL;
-        return;
-    }
-
-    qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " value: " << propertyValue;
-
-    // convert QVariant to base::Value
     Value* val = NULL;
 
-    switch (propertyValue.type())
+    if (propertyValue.isValid())
     {
-    case QVariant::Bool:
-        val = Value::CreateBooleanValue(propertyValue.toBool());
-        break;
-    case QVariant::Int:
-        val = Value::CreateIntegerValue(propertyValue.toInt());
-        break;
-    case QVariant::Double:
-        val = Value::CreateDoubleValue(propertyValue.toDouble());
-        break;
-    case QVariant::String:
-        val = Value::CreateStringValue(propertyValue.toString().toStdString());
-        break;
-    default:
-        qWarning() << "[WD] GetNativeElementProperty: " << name.c_str() << ", cant handle type " <<  propertyValue.type();
+        qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " value: " << propertyValue;
+
+        // convert QVariant to base::Value
+
+
+        switch (propertyValue.type())
+        {
+        case QVariant::Bool:
+            val = Value::CreateBooleanValue(propertyValue.toBool());
+            break;
+        case QVariant::Int:
+            val = Value::CreateIntegerValue(propertyValue.toInt());
+            break;
+        case QVariant::Double:
+            val = Value::CreateDoubleValue(propertyValue.toDouble());
+            break;
+        case QVariant::String:
+            val = Value::CreateStringValue(propertyValue.toString().toStdString());
+            break;
+        default:
+            qWarning() << "[WD] GetNativeElementProperty: " << name.c_str() << ", cant handle type " <<  propertyValue.type();
+        }
+    }
+    else
+    {
+        qDebug() << "[WD] GetNativeElementProperty: " << name.c_str() << " not found.";
     }
 
     if (NULL == val)
     {
-        *value = NULL;
+        val = Value::CreateNullValue();
     }
-    else
-    {
-        scoped_ptr<Value> ret_value(val);
-        *value = static_cast<Value*>(ret_value.release());
-    }
+
+    scoped_ptr<Value> ret_value(val);
+    *value = static_cast<Value*>(ret_value.release());
+
 }
 
 void Automation::NativeElementEquals(const ViewId& view_id,
