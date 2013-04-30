@@ -2404,7 +2404,11 @@ Error* Session::GetScreenShot(std::string* png) {
   }
   Error* error = NULL;
 
+#if defined(OS_WIN)
+  FilePath path(L"/tmp/screen.png");
+#else
   FilePath path("/tmp/screen.png");
+#endif
 
   RunSessionTask(base::Bind(
       &Automation::CaptureEntirePageAsPNG,
