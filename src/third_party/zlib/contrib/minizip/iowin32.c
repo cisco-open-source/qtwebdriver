@@ -13,7 +13,7 @@
 
 #include <stdlib.h>
 
-#include "zlib.h"
+#include "third_party/zlib/zlib.h"
 #include "ioapi.h"
 #include "iowin32.h"
 
