@@ -10,6 +10,7 @@
     'WD_CONFIG_QML_VIEW%': '0',
     'WD_BUILD_MONGOOSE%': '0',
     'WD_BUILD_MODP_B64%': '0',
+    'MONGOOSE_INC_PATH%': '',
   },
 
   'conditions': [
@@ -97,15 +98,10 @@
 
     [ 'platform != "desktop"', {
       'variables': {
-		'QT_BIN_PATH': '<(ROOT_PATH)/<(CISCO_QT_BIN_PATH)',
-        'QT_INC_PATH': '<(ROOT_PATH)/<(CISCO_QT_INC_PATH)',
-        'QT_LIB_PATH': '<(ROOT_PATH)/<(CISCO_QT_LIB_PATH)',
-        'MONGOOSE_LIB_PATH': '<(ROOT_PATH)/<(CISCO_MONGOOSE_LIB_PATH)',
-        'MONGOOSE_INC_PATH':  '<(ROOT_PATH)/<(CISCO_MONGOOSE_INC_PATH)',
-        'MINIZIP_LIB_PATH': '<(ROOT_PATH)/<(CISCO_MINIZIP_LIB_PATH)',
-        'MINIZIP_INC_PATH':  '<(ROOT_PATH)/<(CISCO_MINIZIP_INC_PATH)',
-        'ZLIB_LIB_PATH': '<(ROOT_PATH)/<(CISCO_ZLIB_LIB_PATH)',
-        'ZLIB_INC_PATH':  '<(ROOT_PATH)/<(CISCO_ZLIB_INC_PATH)',
+		    'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
+        'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
+        'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)',
+        'MONGOOSE_INC_PATH':  '<(CISCO_MONGOOSE_INC_PATH)',
       },
     } ],
   ],
@@ -182,8 +178,6 @@
         'src/',
         '<(QT_INC_PATH)',
         '<(MONGOOSE_INC_PATH)',
-        '<(MINIZIP_INC_PATH)',
-        '<(ZLIB_INC_PATH)',
       ],
 
       'sources': [

@@ -5,6 +5,8 @@ mode=$3
 
 base_output_gen=`dirname ${output_gen}`
 
+current_dir=`pwd`
+
 if [ -z $platform ];
 then
   platforms="desktop flip"
@@ -22,6 +24,7 @@ for platform in $platforms
 do
   for mode in $modes
   do
+    cd $current_dir
     gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} --generator-output=${output_gen}/$platform/$mode wd.gyp
     [ $? -ne 0 ] && exit 1
     cd ${output_gen}/$platform/$mode
