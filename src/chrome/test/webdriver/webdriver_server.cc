@@ -409,7 +409,7 @@ int main_server(int argc, char *argv[]) {
 
 #if !defined(OS_WIN)
   webdriver::parse_config_to_cmd_line();
-#error "parse_config_to_cmd_line"
+//#error "parse_config_to_cmd_line"
 #endif
 
   return webdriver::RunChromeDriver();
