@@ -26,6 +26,10 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QLabel>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -36,6 +40,10 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
 #include <QtGui/QInputDialog>
+#include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
+#include <QtGui/QRadioButton>
+#include <QtGui/QLabel>
 #endif
 
 #include "webdriver_automation.h"
@@ -1616,6 +1624,34 @@ void Automation::GetNativeElementText(const ViewId &view_id,
     if (NULL != plainText)
     {
         *element_text = plainText->toPlainText().toStdString();
+        return;
+    }
+
+    QPushButton *pushButton = qobject_cast<QPushButton*>(pWidget);
+    if (NULL != pushButton)
+    {
+        *element_text = pushButton->text().toStdString();
+        return;
+    }
+
+    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
+    if (NULL != radioButton)
+    {
+        *element_text = radioButton->text().toStdString();
+        return;
+    }
+
+    QLabel *label = qobject_cast<QLabel*>(pWidget);
+    if (NULL != radioButton)
+    {
+        *element_text = label->text().toStdString();
+        return;
+    }
+
+    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
+    if (NULL != radioButton)
+    {
+        *element_text = radioButton->text().toStdString();
         return;
     }
 
