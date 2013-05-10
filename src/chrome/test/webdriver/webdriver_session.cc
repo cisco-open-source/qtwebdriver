@@ -48,6 +48,11 @@
 #include <QtGui/QApplication>
 #endif
 
+#if !defined(OS_WIN)
+#include <sys/types.h>
+#include <dirent.h>
+#endif
+
 using automation::kLeftButton;
 using automation::kMouseDown;
 using automation::kMouseMove;
@@ -116,7 +121,6 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
   logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
 
   Automation::BrowserOptions browser_options;
-  //browser_options.command = capabilities_.command;
   browser_options.channel_id = capabilities_.channel;
   browser_options.browser_start_window = capabilities_.browser_start_window;
   browser_options.detach_process = capabilities_.detach;
@@ -2418,7 +2422,31 @@ Error* Session::GetScreenShot(std::string* png) {
 
   FilePath path(buf);
 #else
-  FilePath path("/tmp/screen.png");
+  char* tmp_dir = getenv("TMPDIR");
+  char buf[PATH_MAX] = {0};
+
+  if (NULL != tmp_dir)
+  {
+      strcpy(buf, tmp_dir);
+      strcat(buf, "/screen.png");
+  }
+  else
+  {
+      DIR* dir = opendir("/tmp");
+
+      if (dir)
+      {
+          // tmp directory exists
+          closedir(dir);
+          strcpy(buf, "/tmp/screen.png");
+      }
+      else
+      {
+          strcpy(buf, "screen.png");
+      }
+  }
+
+  FilePath path(buf);
 #endif
 
   RunSessionTask(base::Bind(

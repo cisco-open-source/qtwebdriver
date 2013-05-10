@@ -321,8 +321,7 @@ int RunChromeDriver() {
 
   // The tests depend on parsing the first line ChromeDriver outputs,
   // so all other logging should happen after this.
-//  if (!cmd_line->HasSwitch("silent")) {
-
+  if (!cmd_line->HasSwitch("silent")) {
     std::cout << "************************"<< std::endl
               << "Started WebDriver" << std::endl
               << "port=" << port << std::endl
@@ -335,7 +334,7 @@ int RunChromeDriver() {
     else
       std::cout << "Log file could not be created. log = " << FileLog::Get()->path().value() << std::endl;
     std::cout << "************************"<< std::endl;
-//  }
+  }
 
   // Run until we receive command to shutdown.
   // Don't call mg_stop because mongoose will hang if clients are still
