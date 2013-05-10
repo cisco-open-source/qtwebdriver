@@ -115,7 +115,7 @@ ViewId Automation::Init(const BrowserOptions& options, Error** error)
     qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
 
-//Need to keep after merge sessionId remove
+    //Need to keep after merge sessionId remove
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
