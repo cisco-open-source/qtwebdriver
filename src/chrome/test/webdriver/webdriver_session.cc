@@ -2294,7 +2294,18 @@ Error* Session::GetScreenShot(std::string* png) {
   Error* error = NULL;
 
 #if defined(OS_WIN)
-  FilePath path(L"screen.png");
+  TCHAR buf[MAX_PATH];
+
+  if (GetTempPath(MAX_PATH, buf))
+  {
+      wcscat(buf, L"/screen.png");
+  }
+  else
+  {
+      wcscpy(buf, L"screen.png");
+  }
+
+  FilePath path(buf);
 #else
   FilePath path("/tmp/screen.png");
 #endif
