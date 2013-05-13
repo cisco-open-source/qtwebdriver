@@ -1,7 +1,13 @@
 #ifndef CLICKSCROLLINGTEST_H
 #define CLICKSCROLLINGTEST_H
 
+#include <QtCore/qglobal.h>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QMainWindow>
+#else
 #include <QtGui/QMainWindow>
+#endif
 
 namespace Ui {
 class ClickScrollingTest;
