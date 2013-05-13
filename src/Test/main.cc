@@ -21,6 +21,7 @@
 #include "ClickTest.h"
 #include "FindingTest.h"
 #include "CoordinatesTest.h"
+#include "ClickScrollingTest.h"
 
 #include <QtWebkitWebDriver.h>
 
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
     registerView<ClickTestWidget>("ClickTestWidget");
     registerView<FindingTestWidget>("FindingTestWidget");
     registerView<CoordinatesTestWidget>("CoordinatesTestWidget");
+    registerView<ClickScrollingTest>("ClickScrollingTest");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
