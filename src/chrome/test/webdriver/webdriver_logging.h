@@ -27,7 +27,6 @@ enum LogLevel {
   kWarningLogLevel = 900,
   kInfoLogLevel = 800,
   kFineLogLevel = 500,
-  kFinerLogLevel = 400,
   kAllLogLevel = -1000
 };
 
