@@ -166,6 +166,7 @@ void InitCallbacks(Dispatcher* dispatcher,
                                         "/session/*/timeouts/async_script");
   dispatcher->Add<ImplicitWaitCommand>( "/session/*/timeouts/implicit_wait");
   dispatcher->Add<LogCommand>(          "/session/*/log");
+  dispatcher->Add<LogTypesCommand>(     "/session/*/log/types");
   dispatcher->Add<FileUploadCommand>(   "/session/*/file");
 
   // Cookie functions.
