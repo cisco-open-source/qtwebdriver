@@ -47,6 +47,26 @@ LogLevel LogLevelFromString(const std::string& name) {
   return level;
 }
 
+std::string LogLevelToString(LogLevel level) {
+    switch(level){
+    case kOffLogLevel:
+        return "OFF";
+    case kSevereLogLevel:
+        return "SEVERE";
+    case kWarningLogLevel:
+        return "WARNING";
+    case kFineLogLevel:
+        return "FINE";
+    case kFinerLogLevel:
+        return "FINER";
+    case kAllLogLevel:
+        return "ALL";
+    }
+
+    // Default logging level is INFO.
+    return "INFO";
+}
+
 // static
 bool LogType::FromString(const std::string& name, LogType* log_type) {
   if (name == "driver") {
@@ -189,7 +209,7 @@ void InMemoryLog::Log(LogLevel level, const base::Time& time,
                       const std::string& message) {
   base::TimeDelta delta = time - base::Time::UnixEpoch();
   DictionaryValue* entry = new DictionaryValue();
-  entry->SetInteger("level", level);
+  entry->SetString("level", LogLevelToString(level));
   entry->SetDouble("timestamp", std::floor(delta.InMillisecondsF()));
   entry->SetString("message", message);
   base::AutoLock auto_lock(entries_lock_);
