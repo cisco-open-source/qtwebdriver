@@ -33,6 +33,7 @@ enum LogLevel {
 
 // |name| should be a webdriver log level, such as "INFO", "SEVERE", etc.
 LogLevel LogLevelFromString(const std::string& name);
+std::string LogLevelToString(LogLevel level);
 
 // Represents a type/source of a WebDriver log.
 class LogType {
