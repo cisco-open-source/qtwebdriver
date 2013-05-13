@@ -35,5 +35,9 @@ do
     [ $? -ne 0 ] && echo "**** ERROR: Can't create ${output_gen}/bin/$platform/$mode" && exit 1
     cp -f ${output_gen}/$platform/$mode/Default/libWebDriver.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
     cp -f ${output_gen}/$platform/$mode/Default/lib.target/libWebDriver.so ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    if [ -f ${output_gen}/$platform/$mode/Default/WebDriver ]
+    then
+      cp -f ${output_gen}/$platform/$mode/Default/WebDriver ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    fi
   done
 done
