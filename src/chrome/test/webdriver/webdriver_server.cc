@@ -267,6 +267,23 @@ int RunChromeDriver() {
   base::WaitableEvent shutdown_event(false, false);
   CommandLine* cmd_line = CommandLine::ForCurrentProcess();
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  // set default output mode
+  qInstallMessageHandler(normalMessageOutput);
+
+  // check if verbose mode
+  if (cmd_line->HasSwitch("verbose")) {
+      qInstallMessageHandler(verboseMessageOutput);
+  }
+
+  // check if silence mode
+  if (cmd_line->HasSwitch("silence")) {
+      std::ostream null_stream(0);
+      std::cerr.rdbuf(null_stream.rdbuf());
+      std::cout.rdbuf(null_stream.rdbuf());
+      qInstallMessageHandler(silentMessageOutput);
+  }
+#else
   // set default output mode
   qInstallMsgHandler(normalMessageOutput);
 
@@ -282,6 +299,7 @@ int RunChromeDriver() {
       std::cout.rdbuf(null_stream.rdbuf());
       qInstallMsgHandler(silentMessageOutput);
   }
+#endif
 
 //#if defined(OS_POSIX)
 //  signal(SIGPIPE, SIG_IGN);
