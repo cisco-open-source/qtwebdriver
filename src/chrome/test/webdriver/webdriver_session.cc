@@ -1669,13 +1669,11 @@ Error* Session::WaitForAllViewsToStopLoading() {
   if (!automation_.get())
     return NULL;
 
-  logger_.Log(kFinerLogLevel, "Waiting for all views to stop loading...");
   Error* error = NULL;
   RunSessionTask(base::Bind(
       &Automation::WaitForAllViewsToStopLoading,
       base::Unretained(automation_.get()),
       &error));
-  logger_.Log(kFinerLogLevel, "Done waiting for all views to stop loading");
   return error;
 }
 

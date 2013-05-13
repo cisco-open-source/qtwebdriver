@@ -39,8 +39,6 @@ LogLevel LogLevelFromString(const std::string& name) {
 
   } else if (upper_case_name == "FINE") {
     level = kFineLogLevel;
-  } else if (upper_case_name == "FINER") {
-    level = kFinerLogLevel;
   } else if (upper_case_name == "ALL" || upper_case_name == "FINEST") {
     level = kAllLogLevel;
   }
@@ -57,8 +55,6 @@ std::string LogLevelToString(LogLevel level) {
         return "WARNING";
     case kFineLogLevel:
         return "FINE";
-    case kFinerLogLevel:
-        return "FINER";
     case kAllLogLevel:
         return "ALL";
     }
@@ -156,9 +152,6 @@ void FileLog::Log(LogLevel level, const base::Time& time,
       break;
     case kFineLogLevel:
       level_name = "FINE";
-      break;
-    case kFinerLogLevel:
-      level_name = "FINER";
       break;
     default:
       break;
