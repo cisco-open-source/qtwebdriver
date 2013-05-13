@@ -119,6 +119,7 @@ class InMemoryLog : public LogHandler {
                    const std::string& message) OVERRIDE;
 
   const base::ListValue* entries_list() const;
+  void clear_entries_list();
 
  private:
   base::ListValue entries_list_;

@@ -1680,7 +1680,9 @@ Error* Session::WaitForAllViewsToStopLoading() {
 }
 
 base::ListValue* Session::GetLog() const {
-  return session_log_->entries_list()->DeepCopy();
+    base::ListValue* ret_val = session_log_->entries_list()->DeepCopy();
+    session_log_->clear_entries_list();
+    return ret_val;
 }
 
 Error* Session::GetBrowserConnectionState(bool* online) {
