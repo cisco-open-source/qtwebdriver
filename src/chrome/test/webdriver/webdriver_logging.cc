@@ -220,6 +220,11 @@ const ListValue* InMemoryLog::entries_list() const {
   return &entries_list_;
 }
 
+void InMemoryLog::clear_entries_list() {
+  base::AutoLock auto_lock(entries_lock_);
+  entries_list_.Clear();
+}
+
 Logger::Logger() : min_log_level_(kAllLogLevel) { }
 
 Logger::Logger(LogLevel level) : min_log_level_(level) { }
