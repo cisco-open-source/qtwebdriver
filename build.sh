@@ -6,6 +6,11 @@ mode=$3
 base_output_gen=`dirname ${output_gen}`
 
 current_dir=`pwd`
+if [ -z $output_gen ];
+then
+  output_gen="."
+  platform="desktop"
+fi
 
 if [ -z $platform ];
 then
