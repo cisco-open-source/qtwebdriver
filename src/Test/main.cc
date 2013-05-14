@@ -14,7 +14,7 @@
 #include <QtWebKit/QtWebKit>
 #endif
 
-#include <QtWebkitWebDriver.h>
+#include <WebDriver.h>
 
 
 int main(int argc, char *argv[])
