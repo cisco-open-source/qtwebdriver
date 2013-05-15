@@ -120,7 +120,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
 
             //check found widget if it is QWebView or top level widget
             QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
-            if ((pWebView != NULL))
+            if ((pWebView != NULL) && (!pWebView->isHidden()))
             {
                 qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 
@@ -259,14 +259,6 @@ void Automation::Terminate()
   {
       if (!pView->isHidden())
       {
-          // destroy children correctly
-          QList<QWidget*> childs = pView->findChildren<QWidget*>();
-          foreach(QWidget *child, childs)
-          {
-              child->setAttribute(Qt::WA_DeleteOnClose, true);
-              child->close();
-          }
-
           pView->setAttribute(Qt::WA_DeleteOnClose, true);
           pView->close();
       }
@@ -1045,14 +1037,7 @@ void Automation::CloseView(const WebViewId &view_id, Error **error)
     QWidget *view = view_id.GetView();
     logger_.Log(kWarningLogLevel, "Automation::CloseView");
 
-    // destroy children correctly
-    QList<QWidget*> childs = view->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
-        child->close();
-    }
-
+    view->setAttribute(Qt::WA_DeleteOnClose, true);
     view->close();
 }
 
