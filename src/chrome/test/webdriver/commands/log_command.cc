@@ -46,4 +46,24 @@ void LogCommand::ExecutePost(Response* const response) {
   }
 }
 
+LogTypesCommand::LogTypesCommand(
+    const std::vector<std::string>& path_segments,
+    DictionaryValue* parameters)
+    : WebDriverCommand(path_segments, parameters) {
+}
+
+LogTypesCommand::~LogTypesCommand() {
+}
+
+bool LogTypesCommand::DoesGet() {
+  return true;
+}
+
+void LogTypesCommand::ExecuteGet(Response* const response) {
+  base::ListValue* logTypes_list = new base::ListValue();
+  logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kDriver).ToString()));
+
+  response->SetValue(logTypes_list);
+}
+
 }  // namespace webdriver

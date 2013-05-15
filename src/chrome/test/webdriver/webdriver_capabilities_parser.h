@@ -72,7 +72,7 @@ struct Capabilities {
   // Path to a custom profile to use.
   FilePath profile;
 
-  // Name of the window to use for connecting to an already running QWebView.
+  // Name of the window to use for connecting to an already running QWidget subclass.
   std::string browser_start_window;
 
   // Name of the WebView class to create as "browser"

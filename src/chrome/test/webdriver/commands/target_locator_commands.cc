@@ -44,7 +44,7 @@ bool WindowHandlesCommand::DoesGet() {
 }
 
 void WindowHandlesCommand::ExecuteGet(Response* const response) {
-  std::vector<WebViewInfo> views;
+  std::vector<ViewId> views;
   Error* error = session_->GetViews(&views);
   if (error) {
     response->SetError(error);
@@ -52,11 +52,11 @@ void WindowHandlesCommand::ExecuteGet(Response* const response) {
   }
   base::ListValue* id_list = new base::ListValue();
   for (size_t i = 0; i < views.size(); ++i) {
-    if (!views[i].view_id.IsTab() &&
-        views[i].view_id.GetId().type() != AutomationId::kTypeAppShell)
+    if (!views[i].IsTab() &&
+        views[i].GetId().type() != AutomationId::kTypeAppShell)
       continue;
     id_list->Append(Value::CreateStringValue(
-        WebViewIdToString(views[i].view_id)));
+        WebViewIdToString(views[i])));
   }
   response->SetValue(id_list);
 }

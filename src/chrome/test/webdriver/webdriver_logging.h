@@ -27,12 +27,12 @@ enum LogLevel {
   kWarningLogLevel = 900,
   kInfoLogLevel = 800,
   kFineLogLevel = 500,
-  kFinerLogLevel = 400,
   kAllLogLevel = -1000
 };
 
 // |name| should be a webdriver log level, such as "INFO", "SEVERE", etc.
 LogLevel LogLevelFromString(const std::string& name);
+std::string LogLevelToString(LogLevel level);
 
 // Represents a type/source of a WebDriver log.
 class LogType {
@@ -118,6 +118,7 @@ class InMemoryLog : public LogHandler {
                    const std::string& message) OVERRIDE;
 
   const base::ListValue* entries_list() const;
+  void clear_entries_list();
 
  private:
   base::ListValue entries_list_;

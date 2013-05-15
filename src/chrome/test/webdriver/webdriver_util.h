@@ -16,7 +16,7 @@
 
 class AutomationId;
 class FilePath;
-class WebViewId;
+class ViewId;
 
 namespace webdriver {
 
@@ -62,10 +62,10 @@ std::string AutomationIdToString(const AutomationId& id);
 bool StringToAutomationId(const std::string& string_id, AutomationId* id);
 
 // Converts the web view ID to a string.
-std::string WebViewIdToString(const WebViewId& view_id);
+std::string WebViewIdToString(const ViewId& view_id);
 
 // Converts the string to a web view ID and returns true on success.
-bool StringToWebViewId(const std::string& string_id, WebViewId* view_id);
+bool StringToWebViewId(const std::string& string_id, ViewId* view_id);
 
 // Flattens the given list of strings into one.
 Error* FlattenStringArray(const ListValue* src, string16* dest);

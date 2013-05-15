@@ -40,13 +40,14 @@ namespace webdriver {
 class Error;
 class ValueParser;
 
+
 // A view ID and frame path combination that uniquely identifies a specific
 // frame within a session.
 struct FrameId {
   FrameId();
-  FrameId(const WebViewId& view_id, const FramePath& frame_path);
+  FrameId(const ViewId& view_id, const FramePath& frame_path);
 
-  WebViewId view_id;
+  ViewId view_id;
   FramePath frame_path;
 };
 
@@ -143,15 +144,12 @@ class Session {
   Error* GetURL(std::string* url);
   Error* GetTitle(std::string* tab_title);
   Error* GetScreenShot(std::string* png);
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-  Error* HeapProfilerDump(const std::string& reason);
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
   Error* GetCookies(const std::string& url, base::ListValue** cookies);
   Error* DeleteCookie(const std::string& url, const std::string& cookie_name);
   Error* SetCookie(const std::string& url, base::DictionaryValue* cookie_dict);
 
   // Gets all the currently open views.
-  Error* GetViews(std::vector<WebViewInfo>* views);
+  Error* GetViews(std::vector<ViewId>* views);
 
   // Switches the view used by default. |id_or_name| is either a view ID
   // returned by |GetViews| or the name attribute of a DOM window.
@@ -182,13 +180,13 @@ class Session {
   Error* CloseWindow();
 
   // Gets the bounds for the specified window.
-  Error* GetWindowBounds(const WebViewId& window, Rect* bounds);
+  Error* GetWindowBounds(const ViewId& window, Rect* bounds);
 
   // Sets the bounds for the specified window.
-  Error* SetWindowBounds(const WebViewId& window, const Rect& bounds);
+  Error* SetWindowBounds(const ViewId& window, const Rect& bounds);
 
   // Maximizes the specified window.
-  Error* MaximizeWindow(const WebViewId& window);
+  Error* MaximizeWindow(const ViewId& window);
 
   // Gets the message of the currently active JavaScript modal dialog.
   Error* GetAlertMessage(std::string* text);
@@ -341,30 +339,6 @@ class Session {
   // Waits for all views to stop loading. Returns true on success.
   Error* WaitForAllViewsToStopLoading();
 
-  // Install extension at |path|.
-  Error* InstallExtension(const FilePath& path, std::string* extension_id);
-
-  Error* GetExtensionsInfo(base::ListValue* extension_ids);
-
-  Error* IsPageActionVisible(const WebViewId& tab_id,
-                             const std::string& extension_id,
-                             bool* is_visible);
-
-  Error* SetExtensionState(const std::string& extension_id,
-                           bool enable);
-
-  Error* ClickExtensionButton(const std::string& extension_id,
-                              bool browser_action);
-
-  Error* UninstallExtension(const std::string& extension_id);
-
-  // Sets the preference to the given value. This function takes ownership
-  // of |value|. If the preference is a user preference (instead of local
-  // state preference) |is_user_pref| should be true.
-  Error* SetPreference(const std::string& pref,
-                       bool is_user_pref,
-                       base::Value* value);
-
   // Returns a copy of the current log entries. Caller is responsible for
   // returned value.
   base::ListValue* GetLog() const;
@@ -435,8 +409,7 @@ class Session {
       const base::Closure& task,
       base::WaitableEvent* done_event);
   void InitOnSessionThread(const Automation::BrowserOptions& options,
-                           int* build_no,
-                           Error** error);
+                           Error **error);
   void TerminateOnSessionThread();
 
   // Executes the given |script| in the context of the given frame.
@@ -456,7 +429,7 @@ class Session {
                                Error** error);
 
 //  Error* ProcessWebMouseEvents(const std::vector<WebMouseEvent>& events);
-  WebMouseEvent CreateWebMouseEvent(automation::MouseEventType type,
+  MouseEvent CreateWebMouseEvent(automation::MouseEventType type,
                                     automation::MouseButton button,
                                     const Point& point,
                                     int click_count);
@@ -487,9 +460,6 @@ class Session {
       bool center,
       bool verify_clickable_at_middle,
       Point* location);
-  Error* PostBrowserStartInit();
-  Error* InitForWebsiteTesting();
-  Error* SetPrefs();
 
   scoped_ptr<InMemoryLog> session_log_;
   Logger logger_;
@@ -528,11 +498,6 @@ class Session {
 
   // Current state of all modifier keys.
   int sticky_modifiers_;
-
-  // Chrome's build number. This is the 3rd number in Chrome's version string
-  // (e.g., 18.0.995.0 -> 995). Only valid after Chrome has started.
-  // See http://dev.chromium.org/releases/version-numbers.
-  int build_no_;
 
   QTaskRunner qtask;
   DISALLOW_COPY_AND_ASSIGN(Session);

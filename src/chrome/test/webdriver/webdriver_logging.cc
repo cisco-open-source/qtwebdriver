@@ -39,12 +39,28 @@ LogLevel LogLevelFromString(const std::string& name) {
 
   } else if (upper_case_name == "FINE") {
     level = kFineLogLevel;
-  } else if (upper_case_name == "FINER") {
-    level = kFinerLogLevel;
   } else if (upper_case_name == "ALL" || upper_case_name == "FINEST") {
     level = kAllLogLevel;
   }
   return level;
+}
+
+std::string LogLevelToString(LogLevel level) {
+    switch(level){
+    case kOffLogLevel:
+        return "OFF";
+    case kSevereLogLevel:
+        return "SEVERE";
+    case kWarningLogLevel:
+        return "WARNING";
+    case kFineLogLevel:
+        return "FINE";
+    case kAllLogLevel:
+        return "ALL";
+    }
+
+    // Default logging level is INFO.
+    return "INFO";
 }
 
 // static
@@ -137,9 +153,6 @@ void FileLog::Log(LogLevel level, const base::Time& time,
     case kFineLogLevel:
       level_name = "FINE";
       break;
-    case kFinerLogLevel:
-      level_name = "FINER";
-      break;
     default:
       break;
   }
@@ -189,7 +202,7 @@ void InMemoryLog::Log(LogLevel level, const base::Time& time,
                       const std::string& message) {
   base::TimeDelta delta = time - base::Time::UnixEpoch();
   DictionaryValue* entry = new DictionaryValue();
-  entry->SetInteger("level", level);
+  entry->SetString("level", LogLevelToString(level));
   entry->SetDouble("timestamp", std::floor(delta.InMillisecondsF()));
   entry->SetString("message", message);
   base::AutoLock auto_lock(entries_lock_);
@@ -198,6 +211,11 @@ void InMemoryLog::Log(LogLevel level, const base::Time& time,
 
 const ListValue* InMemoryLog::entries_list() const {
   return &entries_list_;
+}
+
+void InMemoryLog::clear_entries_list() {
+  base::AutoLock auto_lock(entries_lock_);
+  entries_list_.Clear();
 }
 
 Logger::Logger() : min_log_level_(kAllLogLevel) { }
