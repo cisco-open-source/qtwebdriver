@@ -332,7 +332,6 @@
         'src/base/values.cc',
         'src/chrome/common/automation_constants.cc',
         'src/chrome/common/automation_id.cc',
-        'src/chrome/common/chrome_constants.cc',
         'src/chrome/common/chrome_switches.cc',
         'src/chrome/common/chrome_version_info.cc',
         'src/chrome/common/zip.cc',
