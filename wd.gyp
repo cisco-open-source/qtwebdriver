@@ -11,6 +11,7 @@
     'WD_BUILD_MONGOOSE%': '0',
     'WD_BUILD_MODP_B64%': '0',
     'WD_CONFIG_XPATH%': '0',
+    'MONGOOSE_INC_PATH%': '',
   },
 
   'conditions': [
@@ -156,11 +157,12 @@
       ],
     } ],
 
-    [ 'platform == "flip"', {
+    [ 'platform != "desktop"', {
       'variables': {
-        'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
+		    'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
         'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
-        'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)'
+        'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)',
+        'MONGOOSE_INC_PATH':  '<(CISCO_MONGOOSE_INC_PATH)',
       },
     } ],
   ],
@@ -257,6 +259,7 @@
         'inc/',
         'src/',
         '<(QT_INC_PATH)',
+        '<(MONGOOSE_INC_PATH)',
       ],
 
       'sources': [
