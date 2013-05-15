@@ -29,7 +29,6 @@
 //#include "base/threading/platform_thread.h"
 //#include "base/time.h"
 //#include "base/utf_string_conversions.h"
-#include "chrome/common/chrome_constants.h"
 //#include "chrome/common/chrome_paths.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/webdriver/commands/alert_commands.h"

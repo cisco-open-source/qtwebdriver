@@ -28,8 +28,6 @@
 #include "base/time.h"
 #include "base/utf_string_conversions.h"
 #include "base/values.h"
-#include "chrome/app/chrome_command_ids.h"
-#include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/automation/automation_json_requests.h"
 #include "chrome/test/automation/value_conversion_util.h"

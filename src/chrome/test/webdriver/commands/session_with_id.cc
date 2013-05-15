@@ -8,8 +8,6 @@
 #include <string>
 
 #include "base/values.h"
-#include "chrome/app/chrome_command_ids.h"
-#include "chrome/common/chrome_constants.h"
 #include "chrome/test/webdriver/commands/response.h"
 #include "chrome/test/webdriver/webdriver_session.h"
 
