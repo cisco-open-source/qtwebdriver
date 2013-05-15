@@ -260,6 +260,8 @@ bool ConvertKeysToWebKeyEvents(const string16& client_keys,
       if (key_code == ui::VKEY_RETURN) {
         // For some reason Chrome expects a carriage return for the return key.
         modified_text = unmodified_text = "\r";
+      } else if (key_code == ui::VKEY_SPACE) {
+          modified_text = unmodified_text = " ";
       } else {
         // WebDriver assumes a numpad key should translate to the number,
         // which requires NumLock to be on with some platforms. This isn't
