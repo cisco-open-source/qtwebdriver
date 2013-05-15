@@ -109,23 +109,24 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
-    QWidget *pStartView = NULL;
+    QWebView *pStartView = NULL;
 
     //Searching for a allready opened window
     if (!options.browser_start_window.empty())
     {
         qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
-        foreach(QWidget* pWidget, qApp->allWidgets())
+        foreach(QWidget* pWidget, qApp->topLevelWidgets())
         {
 
             //check found widget if it is QWebView or top level widget
-            if ((pWidget != NULL) || pWidget->isTopLevel())
+            QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+            if ((pWebView != NULL))
             {
                 qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 
                 if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
                 {
-                    pStartView = pWidget;
+                    pStartView = pWebView;
 
                     qDebug()<<"[WD]: found view to attach: "<<pWidget<<pWidget->windowTitle();
 
@@ -140,21 +141,15 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         pStartView = ViewFactory::GetInstance()->create(options.browser_class);
 
     qDebug()<<"[WD]:"<<"Using window:"<<pStartView;
-    if (pStartView == NULL)
-    {
-        *error = new Error(kBadRequest, "Can't create WebView");
-        return;
-    }
 
     // TODO: save proxy settings for further usage
-    QWebView* pWebView = qobject_cast<QWebView*>(pStartView);
-    if (pWebView != NULL)
+    if (pStartView != NULL)
     {
         //proxy setup
         if (options.command.HasSwitch(switches::kNoProxyServer))
         {
             qDebug()<<"[WD]:" << "No proxy";
-            pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+            pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         }
         else if (options.command.HasSwitch(switches::kProxyServer))
         {
@@ -175,7 +170,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
                     if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
                     {
                         int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-                        pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                        pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
                     }
                 }
             }
@@ -199,12 +194,12 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
             {
                 int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-                pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
             }
         }
 
-        qDebug()<<"[WD]:" << "hostname = " << pWebView->page()->networkAccessManager()->proxy().hostName()
-                 << ", port = " << pWebView->page()->networkAccessManager()->proxy().port();
+        qDebug()<<"[WD]:" << "hostname = " << pStartView->page()->networkAccessManager()->proxy().hostName()
+                 << ", port = " << pStartView->page()->networkAccessManager()->proxy().port();
     }
 
     //handle initial window size and position

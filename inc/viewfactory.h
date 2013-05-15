@@ -5,22 +5,22 @@
 
 #include <QtCore/QGlobalStatic>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QWidget>
+#include <QtWebKitWidgets/QWebView>
 #else
-#include <QtGui/QWidget>
+#include <QtWebKit/QWebView>
 #endif
 
 class AbstractViewCreator
 {
 public:
-    virtual QWidget * create() const = 0;
+    virtual QWebView * create() const = 0;
 };
 
 template <class C>
 class ViewCreator: public AbstractViewCreator
 {
 public:
-    virtual QWidget* create() const { return new C(); }
+    virtual QWebView * create() const { return new C(); }
 };
 
 class ViewFactory
@@ -37,7 +37,7 @@ public:
             factory[id] = new ViewCreator<C>();
     }
 
-    QWidget* create(const std::string &id);
+    QWebView * create(const std::string &id);
 
 
 protected:
