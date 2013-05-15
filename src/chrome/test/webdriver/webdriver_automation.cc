@@ -1407,11 +1407,29 @@ void Automation::GetNativeElementClickableLocation(const WebViewId& view_id,
         return;
     }
 
-    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
+    QPoint pos;// = pWidget->mapTo(view, QPoint(0, 0));
 
-    // TODO: get pos in view, not in widget
-    pos.setX(pos.x() + pWidget->width()/2);
-    pos.setY(pos.y() + pWidget->height()/2);
+    if (qobject_cast<QRadioButton*>(pWidget) ||
+            qobject_cast<QCheckBox*>(pWidget))
+    {
+        QRect rect ;
+        QStyle::SubElement subElement;
+        QStyleOptionButton opt;
+        if (qobject_cast<QRadioButton*>(pWidget))
+        {
+            subElement = QStyle::SE_RadioButtonClickRect;
+        }
+
+        if (qobject_cast<QCheckBox*>(pWidget))
+        {
+            subElement = QStyle::SE_CheckBoxClickRect;
+        }
+        opt.initFrom(pWidget);
+        rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
+        pos = pWidget->mapTo(view,QPoint(rect.width()/2, rect.height()/2));
+    } else {
+        pos = pWidget->mapTo(view,QPoint(pWidget->width()/2, pWidget->height()/2));
+    }
 
     qDebug() << "[WD] GetNativeElementClickableLocation: " << pos;
 
@@ -2341,7 +2359,6 @@ QKeyEvent Automation::ConvertToQtKeyEvent(const WebKeyEvent &key_event)
     else
         keyCode = key_event.key_code;
     text = key_event.unmodified_text.c_str();
-
     return QKeyEvent(type, keyCode, modifiers, text);
 }
 
