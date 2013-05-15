@@ -44,6 +44,9 @@
             'src/Test/WindowTest.cc',
             'src/Test/WindowTest.h',
             'src/moc_ClickTest.cc',
+            'src/Test/ElementAttributeTest.cc',
+            'src/Test/ElementAttributeTest.h',
+            'out/moc_ElementAttributeTest.cc',
           ],
 
           'rules': [ {

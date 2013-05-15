@@ -15,10 +15,10 @@
 
 #include <QtWebKit/QtWebKit>
 
+#endif
 #include "WindowTest.h"
 #include "ClickTest.h"
-#endif
-
+#include "ElementAttributeTest.h"
 #include <WebDriver.h>
 
 int main(int argc, char *argv[])
@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     registerView<QWidget>("QWidget");
     registerView<WindowTestWidget>("WindowTestWidget");
     registerView<ClickTestWidget>("ClickTestWidget");
+    registerView<ElementAttributeTestWidget>("ElementAttributeTestWidget");
 
     QFutureWatcher<int> watcher;
     QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
