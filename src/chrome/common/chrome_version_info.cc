@@ -23,39 +23,39 @@ namespace chrome {
 
 VersionInfo::VersionInfo() {
   // The current module is already loaded in memory, so this will be cheap.
-  base::ThreadRestrictions::ScopedAllowIO allow_io;
-  version_info_.reset(FileVersionInfo::CreateFileVersionInfoForCurrentModule());
+  //base::ThreadRestrictions::ScopedAllowIO allow_io;
+  //version_info_.reset(FileVersionInfo::CreateFileVersionInfoForCurrentModule());
 }
 
 VersionInfo::~VersionInfo() {
 }
 
 bool VersionInfo::is_valid() const {
-  return version_info_.get() != NULL;
+  return false; //version_info_.get() != NULL;
 }
 
 std::string VersionInfo::Name() const {
-  if (!is_valid())
+  //if (!is_valid())
     return std::string();
-  return UTF16ToUTF8(version_info_->product_name());
+  //return UTF16ToUTF8(version_info_->product_name());
 }
 
 std::string VersionInfo::Version() const {
-  if (!is_valid())
+  //if (!is_valid())
     return std::string();
-  return UTF16ToUTF8(version_info_->product_version());
+  //return UTF16ToUTF8(version_info_->product_version());
 }
 
 std::string VersionInfo::LastChange() const {
-  if (!is_valid())
+  //if (!is_valid())
     return std::string();
-  return UTF16ToUTF8(version_info_->last_change());
+  //return UTF16ToUTF8(version_info_->last_change());
 }
 
 bool VersionInfo::IsOfficialBuild() const {
-  if (!is_valid())
+  //if (!is_valid())
     return false;
-  return version_info_->is_official_build();
+  //return version_info_->is_official_build();
 }
 
 #elif defined(OS_POSIX)

@@ -10,7 +10,7 @@
 #include "base/basictypes.h"
 #include "base/memory/scoped_ptr.h"
 
-class FileVersionInfo;
+//class FileVersionInfo;
 
 namespace chrome {
 
@@ -81,7 +81,7 @@ class VersionInfo {
 
  private:
 #if defined(OS_WIN) || defined(OS_MACOSX)
-  scoped_ptr<FileVersionInfo> version_info_;
+  //scoped_ptr<FileVersionInfo> version_info_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(VersionInfo);

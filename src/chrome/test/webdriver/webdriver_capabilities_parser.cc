@@ -426,7 +426,7 @@ Error* CapabilitiesParser::ParseNoProxy(const base::Value* option){
   std::string proxy_bypass_list;
   if (!option->GetAsString(&proxy_bypass_list))
     return CreateBadInputError("noProxy", Value::TYPE_STRING, option);
-  if (!proxy_bypass_list.empty())
+  //if (!proxy_bypass_list.empty())
     //caps_->command.AppendSwitchASCII(switches::kProxyBypassList,
 //                                     proxy_bypass_list);
   return NULL;
