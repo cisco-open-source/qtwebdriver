@@ -69,7 +69,6 @@
 #include "base/values.h"*/
 #include "chrome/common/automation_constants.h"
 //#include "chrome/common/automation_messages.h"
-//#include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_switches.h"
 //#include "chrome/common/url_constants.h"
 #include "chrome/test/automation/automation_json_requests.h"
@@ -115,7 +114,7 @@ ViewId Automation::Init(const BrowserOptions& options, Error** error)
     qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
 
-//Need to keep after merge sessionId remove
+    //Need to keep after merge sessionId remove
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
@@ -524,8 +523,18 @@ void Automation::DragAndDropFilePaths(const ViewId &view_id, const Point &locati
     QMimeData data;
     QList<QUrl> urls;
 
-    for (int i = 0; i < paths.size(); i++)
+#if defined(OS_POSIX)
+    for (uint i = 0; i < paths.size(); i++)
         urls.append(QUrl(paths.at(i).c_str()));
+#elif defined(OS_WIN)
+    QString string;
+
+    for (uint i = 0; i < paths.size(); i++)
+    {
+        string = QString::fromUtf16((ushort*)paths.at(i).c_str());
+        urls.append(QUrl(string));
+    }
+#endif // OS_WIN
 
     data.setUrls(urls);
 
@@ -634,7 +643,13 @@ void Automation::CaptureEntirePageAsPNG(const ViewId &view_id, const FilePath &p
     }
 
     QPixmap pixmap = QPixmap::grabWidget(view);
-    bool saved = pixmap.save(path.value().c_str());
+    bool saved = false;
+
+#if defined(OS_POSIX)
+    saved = pixmap.save(path.value().c_str());
+#elif defined(OS_WIN)
+    saved = pixmap.save(QString::fromUtf16((ushort*)path.value().c_str()));
+#endif // OS_WIN
 
     if (false == saved)
     {
@@ -1748,7 +1763,12 @@ QString Automation::GenerateElementKey(const QWidget* widget)
 {
     char key[16];
 
-    snprintf(key, 16, ":qtw:%08x", qrand());
+#if defined(OS_WIN)
+    _snprintf(key, 16, ":qtw:%08x", qrand());
+#else
+	snprintf(key, 16, ":qtw:%08x", qrand());
+#endif
+
     return QString(key);
 }
 

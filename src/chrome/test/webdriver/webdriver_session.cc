@@ -28,8 +28,6 @@
 #include "base/time.h"
 #include "base/utf_string_conversions.h"
 #include "base/values.h"
-#include "chrome/app/chrome_command_ids.h"
-#include "chrome/common/chrome_constants.h"
 #include "chrome/common/chrome_switches.h"
 #include "chrome/test/automation/automation_json_requests.h"
 #include "chrome/test/automation/value_conversion_util.h"
@@ -46,6 +44,11 @@
 #include <QtWidgets/QApplication>
 #else
 #include <QtGui/QApplication>
+#endif
+
+#if !defined(OS_WIN)
+#include <sys/types.h>
+#include <dirent.h>
 #endif
 
 using automation::kLeftButton;
@@ -116,7 +119,6 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
   logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
 
   Automation::BrowserOptions browser_options;
-  //browser_options.command = capabilities_.command;
   browser_options.channel_id = capabilities_.channel;
   browser_options.browser_start_window = capabilities_.browser_start_window;
   browser_options.detach_process = capabilities_.detach;
@@ -1669,18 +1671,18 @@ Error* Session::WaitForAllViewsToStopLoading() {
   if (!automation_.get())
     return NULL;
 
-  logger_.Log(kFinerLogLevel, "Waiting for all views to stop loading...");
   Error* error = NULL;
   RunSessionTask(base::Bind(
       &Automation::WaitForAllViewsToStopLoading,
       base::Unretained(automation_.get()),
       &error));
-  logger_.Log(kFinerLogLevel, "Done waiting for all views to stop loading");
   return error;
 }
 
 base::ListValue* Session::GetLog() const {
-  return session_log_->entries_list()->DeepCopy();
+    base::ListValue* ret_val = session_log_->entries_list()->DeepCopy();
+    session_log_->clear_entries_list();
+    return ret_val;
 }
 
 Error* Session::GetBrowserConnectionState(bool* online) {
@@ -2293,7 +2295,46 @@ Error* Session::GetScreenShot(std::string* png) {
   }
   Error* error = NULL;
 
-  FilePath path("/tmp/screen.png");
+#if defined(OS_WIN)
+  TCHAR buf[MAX_PATH];
+
+  if (GetTempPath(MAX_PATH, buf))
+  {
+      wcscat(buf, L"/screen.png");
+  }
+  else
+  {
+      wcscpy(buf, L"screen.png");
+  }
+
+  FilePath path(buf);
+#else
+  char* tmp_dir = getenv("TMPDIR");
+  char buf[PATH_MAX] = {0};
+
+  if (NULL != tmp_dir)
+  {
+      strcpy(buf, tmp_dir);
+      strcat(buf, "/screen.png");
+  }
+  else
+  {
+      DIR* dir = opendir("/tmp");
+
+      if (dir)
+      {
+          // tmp directory exists
+          closedir(dir);
+          strcpy(buf, "/tmp/screen.png");
+      }
+      else
+      {
+          strcpy(buf, "screen.png");
+      }
+  }
+
+  FilePath path(buf);
+#endif
 
   RunSessionTask(base::Bind(
       &Automation::CaptureEntirePageAsPNG,
