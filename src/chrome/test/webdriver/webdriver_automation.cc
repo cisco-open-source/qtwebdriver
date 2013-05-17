@@ -1657,16 +1657,16 @@ void Automation::GetNativeElementText(const ViewId &view_id,
     }
 
     QLabel *label = qobject_cast<QLabel*>(pWidget);
-    if (NULL != radioButton)
+    if (NULL != label)
     {
         *element_text = label->text().toStdString();
         return;
     }
 
     QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
-    if (NULL != radioButton)
+    if (NULL != checkBox)
     {
-        *element_text = radioButton->text().toStdString();
+        *element_text = checkBox->text().toStdString();
         return;
     }
 

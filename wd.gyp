@@ -48,7 +48,6 @@
             'src/Test/ClickScrollingTest.cc',
             'src/Test/ClickScrollingTest.h',
             'src/Test/ClickScrollingTest.ui',
-            '<(INTERMEDIATE_DIR)/ui_ClickScrollingTest.h',
             '<(INTERMEDIATE_DIR)/moc_ClickScrollingTest.cc',
             'src/Test/WindowTest.cc',
             'src/Test/FindingTest.cc',

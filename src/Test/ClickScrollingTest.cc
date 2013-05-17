@@ -7,7 +7,6 @@ ClickScrollingTest::ClickScrollingTest(QWidget *parent) :
     ui(new Ui::ClickScrollingTest)
 {
     ui->setupUi(this);
-    QRegion qregion = this->ui->scrollArea->viewport()->visibleRegion();
 
     connect(this->ui->visibleButton, SIGNAL(clicked()), this, SLOT(ClickOnVisibleButton()));
     connect(this->ui->buttonHiddenByOverflow, SIGNAL(clicked()), this, SLOT(ClickOnButtonHiddenByOverflow()));
