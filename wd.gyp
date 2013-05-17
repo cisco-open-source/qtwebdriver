@@ -55,7 +55,7 @@
             'rule_name': 'generate_ui',
             'extension': 'ui',
             'outputs': [ '<(RULE_INPUT_DIRNAME)/ui_<(RULE_INPUT_ROOT).h' ],
-            'action': [ '<(QT_BIN_PATH)/uic', '<(RULE_INPUT_PATH)', '-o', 'out/ui_<(RULE_INPUT_ROOT).h' ],
+            'action': [ '<(QT_BIN_PATH)/uic', '<(RULE_INPUT_PATH)', '-o', 'src/Test/ui_<(RULE_INPUT_ROOT).h' ],
             'message': 'Generating ui_<(RULE_INPUT_ROOT).h',
           },
           {
@@ -74,7 +74,6 @@
             'src/Test/ClickScrollingTest.cc',
             'src/Test/ClickScrollingTest.h',
             'src/Test/ClickScrollingTest.ui',
-            'out/ui_ClickScrollingTest.h',
             'out/moc_ClickScrollingTest.cc',
             'src/Test/WindowTest.cc',
             'src/Test/FindingTest.cc',
