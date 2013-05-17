@@ -3,14 +3,15 @@ output_gen=$1
 platform=$2
 mode=$3
 
-base_output_gen=`dirname ${output_gen}`
-
 current_dir=`pwd`
 if [ -z $output_gen ];
 then
-  output_gen="."
+  output_gen=`pwd`
   platform="desktop"
 fi
+
+output_gen=`readlink -f ${output_gen}`
+base_output_gen=`dirname ${output_gen}`
 
 if [ -z $platform ];
 then
