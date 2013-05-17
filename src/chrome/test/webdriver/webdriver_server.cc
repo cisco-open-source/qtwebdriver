@@ -277,10 +277,10 @@ void InitCallbacks(Dispatcher* dispatcher,
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");
   dispatcher->Add<LocalStorageCommand>("/session/*/local_storage");
   dispatcher->Add<LocalStorageSizeCommand>("/session/*/local_storage/size");
-  dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key*");
+  dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key/*");
   dispatcher->Add<SessionStorageCommand>("/session/*/session_storage");
   dispatcher->Add<SessionStorageSizeCommand>("/session/*/session_storage/size");
-  dispatcher->Add<SessionStorageKeyCommand>("/session/*/session_storage/key*");
+  dispatcher->Add<SessionStorageKeyCommand>("/session/*/session_storage/key/*");
 
   // Since the /session/* is a wild card that would match the above URIs, this
   // line MUST be after all other webdriver command callbacks.

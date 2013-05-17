@@ -20,3 +20,6 @@ report/*
 /WebDriver.target.mk
 /WebDriverTest.target.mk
 *.log
+WD.*
+desktop/
+flip/
