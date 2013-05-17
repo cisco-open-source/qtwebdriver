@@ -2,6 +2,7 @@
   'variables': {
     'DESKTOP_QT_BIN_PATH': 'c:/Qt/4_8_4/bin',
     'DESKTOP_QT_INC_PATH': 'c:/Qt/4_8_4/include',
-    'DESKTOP_QT_LIB_PATH': 'c:/Qt/4_8_4/lib'
+    'DESKTOP_QT_LIB_PATH': 'c:/Qt/4_8_4/lib',
+    'INTERMEDIATE_DIR':    'c:\\GIT\\wd\\mocs'
   },
 }

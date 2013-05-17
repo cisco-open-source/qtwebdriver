@@ -213,14 +213,17 @@
         ],
       } ]
     ],
-    'actions': [{
-      'action_name' : 'input_dir',
-      'inputs' : [],
-      'outputs': [
-        '<(INTERMEDIATE_DIR)',
-      ],
-      'action': ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
-    }],
+
+    'conditions': [ 
+      ['OS=="linux"', {
+        'actions': [ {
+          'action_name' : 'input_dir',
+          'inputs'      : [],
+          'outputs'     : ['<(INTERMEDIATE_DIR)'],
+          'action'      : ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],	    
+        } ],
+      } ]
+    ],     
 
     'rules': [         
     {
