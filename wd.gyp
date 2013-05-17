@@ -32,6 +32,7 @@
           'include_dirs': [
             'inc/',
             'src/',
+            '<(INTERMEDIATE_DIR)',
             '<(QT_INC_PATH)',
           ],
 
@@ -39,31 +40,16 @@
             'WebDriver',
           ],
 
-          'rules': [ {
-            'rule_name': 'generate_ui',
-            'extension': 'ui',
-            'outputs': [ '<(RULE_INPUT_DIRNAME)/ui_<(RULE_INPUT_ROOT).h' ],
-            'action': [ '<(QT_BIN_PATH)/uic', '<(RULE_INPUT_PATH)', '-o', 'out/ui_<(RULE_INPUT_ROOT).h' ],
-            'message': 'Generating ui_<(RULE_INPUT_ROOT).h',
-          },
-          {
-            'rule_name': 'generate_moc',
-            'extension': 'h',
-            'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
-            'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', 'out/moc_<(RULE_INPUT_ROOT).cc' ],
-            'message': 'Generating <(RULE_INPUT_ROOT).cc.',
-          } ],
-
           'sources': [
             'src/Test/main.cc',
             'src/Test/ClickTest.cc',
             'src/Test/ClickTest.h',
-            'out/moc_ClickTest.cc',
+            '<(INTERMEDIATE_DIR)/moc_ClickTest.cc',
             'src/Test/ClickScrollingTest.cc',
             'src/Test/ClickScrollingTest.h',
             'src/Test/ClickScrollingTest.ui',
-            'out/ui_ClickScrollingTest.h',
-            'out/moc_ClickScrollingTest.cc',
+            '<(INTERMEDIATE_DIR)/ui_ClickScrollingTest.h',
+            '<(INTERMEDIATE_DIR)/moc_ClickScrollingTest.cc',
             'src/Test/WindowTest.cc',
             'src/Test/FindingTest.cc',
             'src/Test/CoordinatesTest.cc'
@@ -244,6 +230,30 @@
         ],
       } ]
     ],
+    'actions': [{
+      'action_name' : 'input_dir',
+      'inputs' : [],
+      'outputs': [
+        '<(INTERMEDIATE_DIR)',
+      ],
+      'action': ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
+    }],
+
+    'rules': [         
+    {
+      'rule_name': 'generate_ui',
+      'extension': 'ui',
+      'outputs': [ '<(RULE_INPUT_DIRNAME)/ui_<(RULE_INPUT_ROOT).h' ],
+      'action': [ '<(QT_BIN_PATH)/uic', '<(RULE_INPUT_PATH)', '-o', '<(INTERMEDIATE_DIR)/ui_<(RULE_INPUT_ROOT).h' ],
+      'message': 'Generating ui_<(RULE_INPUT_ROOT).h',
+    },
+    {
+      'rule_name': 'generate_moc',
+      'extension': 'h',
+      'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
+      'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', '<(INTERMEDIATE_DIR)/moc_<(RULE_INPUT_ROOT).cc' ],
+      'message': 'Generating <(RULE_INPUT_ROOT).cc.',
+    } ],
   },
 
   'targets': [
@@ -259,6 +269,7 @@
         'inc/',
         'src/',
         '<(QT_INC_PATH)',
+        '<(INTERMEDIATE_DIR)',
         '<(MONGOOSE_INC_PATH)',
       ],
 
@@ -387,9 +398,9 @@
         'src/chrome/test/webdriver/webdriver_switches.cc',
         'src/chrome/test/webdriver/webdriver_util.cc',
         'src/content/public/common/content_switches.cc',
-        'src/moc_qtaskrunner.cc',
-        'src/moc_qwebviewext.cc',
-        'src/moc_webdriver_automation.cc',
+        '<(INTERMEDIATE_DIR)/moc_qtaskrunner.cc',
+        '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
+        '<(INTERMEDIATE_DIR)/moc_webdriver_automation.cc',
         'src/net/base/file_stream.cc',
         'src/net/base/file_stream_metrics.cc',
         'src/net/base/file_stream_net_log_parameters.cc',
@@ -412,14 +423,6 @@
         'src/third_party/zlib/zutil.c',
         'src/viewfactory.cc',
       ],
-
-      'rules': [ {
-        'rule_name': 'generate_moc',
-        'extension': 'h',
-        'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
-        'action': [ '<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '-o', 'src/moc_<(RULE_INPUT_ROOT).cc' ],
-        'message': 'Generating <(RULE_INPUT_ROOT).cc.',
-      } ],
 
       'conditions': [
         [ '<(WD_BUILD_MONGOOSE) == 1', {
