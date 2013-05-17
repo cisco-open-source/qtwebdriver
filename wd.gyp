@@ -40,6 +40,7 @@
             'WebDriver',
           ],
 
+
           'sources': [
             'src/Test/main.cc',
             'src/Test/ClickTest.cc',
@@ -51,7 +52,10 @@
             '<(INTERMEDIATE_DIR)/moc_ClickScrollingTest.cc',
             'src/Test/WindowTest.cc',
             'src/Test/FindingTest.cc',
-            'src/Test/CoordinatesTest.cc'
+            'src/Test/CoordinatesTest.cc',
+	          'src/Test/ElementAttributeTest.cc',
+            'src/Test/ElementAttributeTest.h',
+            '<(INTERMEDIATE_DIR)/moc_ElementAttributeTest.cc',
           ],
 
           'conditions': [
