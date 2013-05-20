@@ -1,7 +1,6 @@
-// TODO: put this on init
-// Overwrite mongoose's default handler for /favicon.ico to always return a
-// 204 response so we don't spam the logs with 404s.
-AddCallback("/favicon.ico", &SendNoContentResponse, NULL);
+
+#include "webdriver_server.h"
+#include "webdriver_route_table.h"
 
 
 
@@ -11,21 +10,17 @@ AddCallback("/favicon.ico", &SendNoContentResponse, NULL);
 
 
 
-
+// TODO: review all headers
 
 //#include "base/command_line.h"
 //#include "base/format_macros.h"
 #include "base/json/json_reader.h"
-#include "base/logging.h"
 #include "base/memory/scoped_ptr.h"
-//#include "base/message_loop_proxy.h"
 #include "base/string_split.h"
 #include "base/string_util.h"
 #include "base/stringprintf.h"
 #include "base/synchronization/waitable_event.h"
 #include "base/sys_info.h"
-//#include "base/threading/platform_thread.h"
-//#include "base/threading/thread.h"
 #include "chrome/common/chrome_version_info.h"
 #include "chrome/test/webdriver/commands/command.h"
 #include "chrome/test/webdriver/http_response.h"
@@ -34,7 +29,80 @@ AddCallback("/favicon.ico", &SendNoContentResponse, NULL);
 #include "chrome/test/webdriver/webdriver_switches.h"
 #include "chrome/test/webdriver/webdriver_util.h"
 
+
 namespace webdriver {
+
+void* ProcessHttpRequest(mg_event event_raised,
+                         struct mg_connection* connection,
+                         const struct mg_request_info* request_info);
+
+Server::Server()
+    : options_(CommandLine::NO_PROGRAM),
+    routeTable_(NULL),
+    mg_ctx_(NULL) {
+    
+    routeTable_ = new DefaultRouteTable();
+}
+
+Server::~Server() {};
+
+int Server::Init(int argc, char *argv[]) {
+    int ret_val = 0;
+
+    // TODO: check if we already inited
+
+    options_.InitFromArgv(argc, argv);
+
+#if !defined(OS_WIN)    
+    ret_val = ParseConfigToOptions();
+    if (ret_val)
+        return ret_val;
+#endif
+
+    ret_val = InitMongooseOptions();
+    if (ret_val)
+        return ret_val;
+
+    ret_val = InitLogging();
+    if (ret_val)
+        return ret_val;
+
+    if (options_->HasSwitch("url-base"))
+        url_base_ = options_->GetSwitchValueASCII("url-base");
+
+    std::string chromedriver_info = base::StringPrintf("ChromeDriver %s", "QtWebKit");
+    FileLog::Get()->Log(kInfoLogLevel, base::Time::Now(), chromedriver_info);
+
+    // TODO: TBD
+
+}
+
+void Server::SetRouteTable(RouteTable* routeTable) {
+    // TODO: implement
+}
+
+int Server::Start() {
+    // TODO: check state
+
+    scoped_array<const char*> opts(new const char*[mg_options_.size() + 1]);
+    for (size_t i = 0; i < mg_options_.size(); ++i) {
+        opts[i] = mg_options_[i].c_str();
+    }
+    opts[mg_options_.size()] = NULL;
+
+    // Initialize SHTTPD context.
+    mg_ctx_ = mg_start(&ProcessHttpRequest,
+                        routeTable_,
+                        opts.get());
+    if (mg_ctx_ == NULL) {
+        std::cerr << "Port already in use. Exiting..." << std::endl;
+#if defined(OS_WIN)
+        return WSAEADDRINUSE;
+#else
+        return EADDRINUSE;
+#endif
+    }
+}
 
 // Maximum safe size of HTTP response message. Any larger than this,
 // the message may not be transferred at all.
@@ -62,7 +130,18 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     Response response;
     std::string uri(request_info->uri);
 
-    AbstractCommandCreator* cmdCreator = routeTable->GetRouteForURL(uri);
+    // Overwrite mongoose's default handler for /favicon.ico to always return a
+    // 204 response so we don't spam the logs with 404s.
+    if (uri == "/favicon.ico") {
+        SendNoContentResponse();
+        return true;
+    }
+
+    // remove url_base from uri
+    uri = uri.substr(url_base_.length());
+
+
+    AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri);
     if (NULL == cmdCreator)
     {
         // TODO: print log
@@ -197,11 +276,8 @@ bool Server::ParseRequestInfo(const struct mg_request_info* const request_info,
     else if (*method == "PUT")
         *method = "POST";
 
-    // TODO: bad solution to have url_base in session_manager. Get it from RouteTable?
-    // fix this
     std::string uri(request_info->uri);
-    SessionManager* manager = SessionManager::GetInstance();
-    uri = uri.substr(manager->url_base().length());
+    uri = uri.substr(url_base_.length());
 
     base::SplitString(uri, '/', path_segments);
 
@@ -300,6 +376,134 @@ void Server::DispatchCommand(Command* const command,
     }
     command->Finish(response);
 }
+
+int Server::InitMongooseOptions() {
+    std::string port = "9517";
+    std::string root;
+    int http_threads = 4;
+    bool enable_keep_alive = false;
+
+    if (options_->HasSwitch("port"))
+        port = options_->GetSwitchValueASCII("port");
+    // The 'root' flag allows the user to specify a location to serve files from.
+    // If it is not given, a callback will be registered to forbid all file
+    // requests.
+    if (options_->HasSwitch("root"))
+        root = options_->GetSwitchValueASCII("root");
+    if (options_->HasSwitch("http-threads")) {
+        if (!base::StringToInt(options_->GetSwitchValueASCII("http-threads"),
+                           &http_threads)) {
+            std::cerr << "'http-threads' option must be an integer";
+            return 1;
+        }
+    }
+//  if (options_->HasSwitch(kEnableKeepAlive))
+//      enable_keep_alive = true;
+
+    mg_options_->push_back("listening_ports");
+    mg_options_->push_back(port);
+    mg_options_->push_back("enable_keep_alive");
+    mg_options_->push_back(enable_keep_alive ? "yes" : "no");
+    mg_options_->push_back("num_threads");
+    mg_options_->push_back(base::IntToString(http_threads));
+    if (!root.empty()) {
+        mg_options_->push_back("document_root");
+        mg_options_->push_back(root);
+    }
+    mg_options_->push_back("extra_mime_types");
+    mg_options_->push_back(".xhtml=application/xhtml+xml");
+
+    return 0;
+}
+
+int Server::InitLogging() {
+    FilePath log_path;
+
+    if (cmd_line->HasSwitch("log-path"))
+        log_path = cmd_line->GetSwitchValuePath("log-path");
+
+    // Init global file log.
+    FileLog* log;
+
+    if (log_path.empty()) {
+        log = FileLog::CreateFileLog(FILE_PATH_LITERAL("webdriver.log"), kAllLogLevel);
+    } else {
+        log = new FileLog(log_path, kAllLogLevel);
+    }
+
+    FileLog::SetGlobalLog(log);
+
+    if (cmd_line->HasSwitch("verbose")) {
+        // TODO: handle
+    }
+
+    // check if silence mode
+    if (cmd_line->HasSwitch("silence")) {
+        // TODO: handle
+    }
+
+    if (log->IsOpen())
+        return 0;
+
+    std::cerr << "ERROR: InitLogging failed.";
+    return 1;
+}
+
+#if !defined(OS_WIN)
+int ParseConfigToOptions() {
+    if (options_->HasSwitch("config"))
+    {
+        //parse json config file and set value
+        std::string config_json;
+        std::string configPathString = options_->GetSwitchValueASCII("config");
+
+        FilePath configPath(configPathString);
+
+        if (file_util::ReadFileToString(configPath, &config_json))
+        {
+            scoped_ptr<Value> value(base::JSONReader::ReadAndReturnError(
+                config_json, base::JSON_ALLOW_TRAILING_COMMAS, NULL, NULL));
+            if (!value.get())
+            {
+                std::cout << "Failed to parse config file" << std::endl;
+                return 1;
+            }
+
+            if (value->GetType() != Value::TYPE_DICTIONARY)
+            {
+                std::cerr << "Execute script returned non-dict: " + JsonStringify(value.get()) << std::endl;
+                return 2;
+            }
+
+            DictionaryValue* result_dict = static_cast<DictionaryValue*>(value.get());
+
+            int port;
+            std::string root;
+            std::string url_base;
+            int http_threads;
+            std::string log_path;
+            if (result_dict->GetInteger("port", &port))
+                options_->AppendSwitchASCII("port", base::IntToString(port));
+            if (result_dict->GetString("root", &root))
+                options_->AppendSwitchASCII("root", root);
+            if (result_dict->GetString("url-base", &url_base))
+                options_->AppendSwitchASCII("url-base", url_base);
+            if (result_dict->GetInteger("http-threads", &http_threads))
+                options_->AppendSwitchASCII("http-threads", base::IntToString(http_threads));
+            if (result_dict->GetString("log-path", &log_path))
+                options_->AppendSwitchASCII("log-path", log_path);
+
+            return 0;
+
+        }
+        else
+        {
+            std::cerr << "can't read file" << std::endl;
+            return 1;
+        }
+    }
+}
+#endif //!defined(OS_WIN)
 
 }  // namespace webdriver
 

@@ -14,8 +14,7 @@
 namespace webdriver {
 
 
-RouteTable::RouteTable(const std::string& url_base)
-    : url_base_(url_base) {
+RouteTable::RouteTable(){
 }
 
 RouteTable::~RouteTable() {}

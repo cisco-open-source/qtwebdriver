@@ -53,10 +53,8 @@ class RouteTable {
 public:
 
     /// Creates a new RouteTable that will register all URL commands with the
-    /// given context. Each command's pattern will be prefixed with the provided
-    /// root.
-    /// @param root root path, url path common for all commands
-    explicit RouteTable(const std::string& root);
+    /// given context.
+    explicit RouteTable();
     ~RouteTable();
 
     /// Registers a command for a WebDriver command using the given URL pattern.
@@ -86,7 +84,6 @@ private:
                   AbstractCommandCreator* creator);
 
     std::vector<webdriver::internal::RouteDetails> routes_;
-    const std::string url_base_;
 
     DISALLOW_COPY_AND_ASSIGN(RouteTable);
 };
@@ -94,7 +91,7 @@ private:
 
 template <typename CommandType>
 void RouteTable::Add(const std::string& pattern) {
-    AddRoute(url_base_ + pattern, new CommandCreator<CommandType>);
+    AddRoute(pattern, new CommandCreator<CommandType>);
 }
 
 }  // namespace webdriver

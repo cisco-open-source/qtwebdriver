@@ -18,17 +18,30 @@ class HttpResponse;
 class Server {
 public:
 
-    // Creates a new Server
+    /// Creates a new Server with DefaultRouteTable.
     Server();
     ~Server();
 
-    // init server, parse arguments as options
-    int init(int argc, char *argv[]);
+    /// Init server, parse arguments as options. 
+    /// @param argc count of arguments
+    /// @param argv array of arguments
+    /// @return 0 - if init was success, error code otherwise.
+    int Init(int argc, char *argv[]);
 
-    // start server
-    int start();
+    /// Set route table for this server. Server should be stopped.
+    /// @param routeTable routeTable to set
+    void SetRouteTable(RouteTable* routeTable);
+
+    /// Start server 
+    /// @return 0 - if success, error code otherwise.
+    int Start();
 
 private:
+    RouteTable* routeTable_;
+    CommandLine options_;
+    std::vector<std::string> mg_options_;
+    std::string url_base_;
+    struct mg_context* mg_ctx_;
 
     // Converts a |Response| into a |HttpResponse| to be returned to the client.
     // This function is exposed for testing.
@@ -68,6 +81,12 @@ private:
 
     void WriteHttpResponse(struct mg_connection* connection,
                        const HttpResponse& response);
+
+    int InitMongooseOptions();
+
+#if !defined(OS_WIN)
+    bool ParseConfigToOptions();
+#endif
 
 
     DISALLOW_COPY_AND_ASSIGN(Server);
