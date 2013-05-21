@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_TEST_WEBDRIVER_WEBDRIVER_SWITCHES_H_
-#define CHROME_TEST_WEBDRIVER_WEBDRIVER_SWITCHES_H_
+#ifndef WEBDRIVER_WEBDRIVER_SWITCHES_H_
+#define WEBDRIVER_WEBDRIVER_SWITCHES_H_
 
 namespace webdriver {
 
@@ -11,4 +11,4 @@ extern const char kEnableKeepAlive[];
 
 }  // namespace webdriver
 
-#endif  // CHROME_TEST_WEBDRIVER_WEBDRIVER_SWITCHES_H_
+#endif  // WEBDRIVER_WEBDRIVER_SWITCHES_H_
