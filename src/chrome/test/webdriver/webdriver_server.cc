@@ -284,6 +284,7 @@ void InitCallbacks(Dispatcher* dispatcher,
 
   // Since the /session/* is a wild card that would match the above URIs, this
   // line MUST be after all other webdriver command callbacks.
+  dispatcher->SetNotImplemented("/session/*/*");
   dispatcher->Add<SessionWithID>("/session/*");
 
   if (forbid_other_requests)
