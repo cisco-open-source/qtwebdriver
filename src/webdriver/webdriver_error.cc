@@ -2,17 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/test/webdriver/webdriver_error.h"
+#include "webdriver_error.h"
 
 #include <sstream>
-
-#include "chrome/common/automation_constants.h"
 
 namespace webdriver {
 
 namespace {
 
-// Returns the string equivalent of the given |ErrorCode|.
+// Returns the string equivalent of the given ErrorCode.
 const char* DefaultMessageForErrorCode(ErrorCode code) {
   switch (code) {
     case kSuccess:
@@ -52,48 +50,6 @@ const char* DefaultMessageForErrorCode(ErrorCode code) {
 
 }  // namespace
 
-// static
-Error* Error::FromAutomationError(const automation::Error& error) {
-  ErrorCode code = kUnknownError;
-  switch (error.code()) {
-    case automation::kNoJavaScriptModalDialogOpen:
-      code = kNoAlertOpenError;
-      break;
-    case automation::kBlockedByModalDialog:
-      code = kUnexpectedAlertOpen;
-      break;
-    case automation::kInvalidId:
-      code = kNoSuchWindow;
-    default:
-      break;
-  }
-
-  // In Chrome 17 and before, the automation error was just a string.
-  // Compare against some strings that correspond to webdriver errors.
-  // TODO(kkania): Remove these comparisons when Chrome 17 is unsupported.
-  if (code == kUnknownError) {
-    if (error.message() ==
-            "Command cannot be performed because a modal dialog is active" ||
-        error.message() ==
-            "Could not complete script execution because a modal "
-                "dialog is active") {
-      code = kUnexpectedAlertOpen;
-    } else if (error.message() == "No modal dialog is showing" ||
-               error.message() == "No JavaScript modal dialog is showing") {
-      code = kNoAlertOpenError;
-    }
-  }
-
-  // If the automation error code did not refer to a webdriver error code
-  // (besides unknown), include the error message from chrome. Otherwise,
-  // include the webdriver error code and the webdriver error message.
-  if (code == kUnknownError) {
-    return new Error(code, error.message());
-  } else {
-    return new Error(code);
-  }
-}
-
 Error::Error(ErrorCode code)
     : code_(code),
       details_(DefaultMessageForErrorCode(code)) {
@@ -107,15 +63,15 @@ Error::~Error() {
 }
 
 void Error::AddDetails(const std::string& details) {
-  details_ = details + ";\n " + details_;
+    details_ = details + ";\n " + details_;
 }
 
 ErrorCode Error::code() const {
-  return code_;
+    return code_;
 }
 
 const std::string& Error::details() const {
-  return details_;
+    return details_;
 }
 
 }  // namespace webdriver
