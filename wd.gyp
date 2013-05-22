@@ -10,7 +10,7 @@
     'WD_CONFIG_QML_VIEW%': '0',
     'WD_BUILD_MONGOOSE%': '0',
     'WD_BUILD_MODP_B64%': '0',
-    'MONGOOSE_INC_PATH%': '',
+    'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
   },
 
   'conditions': [
