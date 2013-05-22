@@ -10,7 +10,7 @@
 
 #include "base/basictypes.h"
 #include "chrome/test/webdriver/commands/response.h"
-#include "third_party/mongoose/mongoose.h"
+#include "mongoose.h"
 
 namespace base {
 class DictionaryValue;
