@@ -119,6 +119,30 @@ private:
     DISALLOW_COPY_AND_ASSIGN(FileLog);
 };
 
+/// stdout log handler
+class StdOutLog : public LogHandler {
+public:
+    static void SetGlobalLog(StdOutLog* log);
+    static StdOutLog* Get();
+
+    /// Creates a log 
+    StdOutLog(LogLevel level);
+
+    virtual ~StdOutLog();
+
+    virtual void Log(LogLevel level, const base::Time& time,
+                   const std::string& message) OVERRIDE;
+
+    void set_min_log_level(LogLevel level);
+
+private:
+    static StdOutLog* singleton_;
+
+    LogLevel min_log_level_;
+
+    DISALLOW_COPY_AND_ASSIGN(StdOutLog);
+};
+
 class InMemoryLog : public LogHandler {
 public:
     InMemoryLog();
@@ -152,6 +176,17 @@ public:
 private:
     std::vector<LogHandler*> handlers_;
     LogLevel min_log_level_;
+};
+
+
+/// Logs some messages int oglobal FileLog and StdOutLog
+class GlobalLogger {
+public:
+    static void Log(LogLevel level, const std::string& message);
+    static void set_min_log_level(LogLevel level);
+private:
+    GlobalLogger();
+    static LogLevel min_log_level_;    
 };
 
 }  // namespace webdriver

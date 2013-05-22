@@ -11,11 +11,11 @@
 #include "base/string_util.h"
 #include "base/stringprintf.h"
 #include "base/values.h"
-#include "chrome/test/webdriver/commands/response.h"
-#include "chrome/test/webdriver/webdriver_error.h"
-#include "chrome/test/webdriver/webdriver_logging.h"
+#include "commands/response.h"
+#include "webdriver_error.h"
+#include "webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_session.h"
-#include "chrome/test/webdriver/webdriver_session_manager.h"
+#include "webdriver_session_manager.h"
 #include "chrome/test/webdriver/webdriver_util.h"
 
 namespace webdriver {

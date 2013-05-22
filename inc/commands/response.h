@@ -9,7 +9,7 @@
 #include <string>
 
 #include "base/values.h"
-#include "chrome/test/webdriver/webdriver_error.h"
+#include "webdriver_error.h"
 
 namespace webdriver {
 

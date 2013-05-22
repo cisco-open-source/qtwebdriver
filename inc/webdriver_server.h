@@ -5,6 +5,11 @@
 #include <vector>
 
 #include "base/basictypes.h"
+#include "base/command_line.h"
+
+struct mg_context;
+struct mg_connection;
+struct mg_request_info;
 
 namespace base {
 class DictionaryValue;
@@ -12,8 +17,10 @@ class DictionaryValue;
 
 namespace webdriver {
 
+class RouteTable;
 class Command;
 class HttpResponse;
+class Response;
 
 class Server {
 public:
@@ -37,11 +44,15 @@ public:
     int Start();
 
 private:
-    RouteTable* routeTable_;
     CommandLine options_;
+    RouteTable* routeTable_;
     std::vector<std::string> mg_options_;
     std::string url_base_;
     struct mg_context* mg_ctx_;
+
+    static void* ProcessHttpRequestCb(int event_raised,
+                              struct mg_connection* connection,
+                              const struct mg_request_info* request_info);
 
     // Converts a |Response| into a |HttpResponse| to be returned to the client.
     // This function is exposed for testing.
@@ -65,7 +76,7 @@ private:
                       struct mg_connection* const connection,
                       std::string* method,
                       std::vector<std::string>* path_segments,
-                      DictionaryValue** parameters,
+                      base::DictionaryValue** parameters,
                       Response* const response);
 
     void ReadRequestBody(const struct mg_request_info* const request_info,
@@ -84,8 +95,10 @@ private:
 
     int InitMongooseOptions();
 
+    int InitLogging();
+
 #if !defined(OS_WIN)
-    bool ParseConfigToOptions();
+    int ParseConfigToOptions();
 #endif
 
 

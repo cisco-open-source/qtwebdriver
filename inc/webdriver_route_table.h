@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "base/basictypes.h"
+#include "base/memory/ref_counted.h"
+
 namespace base {
 class DictionaryValue;
 }
@@ -12,33 +15,15 @@ namespace webdriver {
 
 class Command;
 
-namespace internal {
-
-class AbstractCommandCreator;
-
-struct RouteDetails {
-    RouteDetails() {
-    }
-
-    RouteDetails(const std::string &uri_regex,
-                 AbstractCommandCreator* creator)
-        : uri_regex_(uri_regex),
-          creator_(creator) {
-    }
-
-    std::string uri_regex_;
-    AbstractCommandCreator* creator_;
-};
-
-}  // namespace internal
-
 /// @brief  base class for command creator
-class AbstractCommandCreator
+class AbstractCommandCreator : public base::RefCounted<AbstractCommandCreator>
 {
 public:
     virtual Command* create(const std::vector<std::string>& path_segments,
-                            const DictionaryValue* const parameters) const = 0;
+                            const base::DictionaryValue* const parameters) const = 0;
 };
+
+typedef scoped_refptr<AbstractCommandCreator> CommandCreatorPtr;
 
 // Template class for creating command of WebDriver REST service.
 template <class C>
@@ -46,16 +31,37 @@ class CommandCreator: public AbstractCommandCreator
 {
 public:
     virtual Command* create(const std::vector<std::string>& path_segments,
-                            const DictionaryValue* const parameters) const { return new C(path_segments, parameters); }
+                            const base::DictionaryValue* const parameters) const { return new C(path_segments, parameters); }
 };
 
+namespace internal {
+
+struct RouteDetails {
+    RouteDetails() {
+    }
+
+    RouteDetails(const std::string &uri_regex,
+                 const webdriver::CommandCreatorPtr& creator)
+        : uri_regex_(uri_regex),
+          creator_(creator) {
+    }
+
+    std::string uri_regex_;
+    webdriver::CommandCreatorPtr creator_;
+};
+
+}  // namespace internal
+
+/// Container for routes. Each route is a pair - url pattern and command creator.
+/// url pattern is string. Some path segments in this url pattern can be wildcarded with single '*'.
+/// In example - "/session/*/log"
 class RouteTable {
 public:
 
     /// Creates a new RouteTable that will register all URL commands with the
     /// given context.
     explicit RouteTable();
-    ~RouteTable();
+    virtual ~RouteTable();
 
     /// Registers a command for a WebDriver command using the given URL pattern.
     /// @tparam <CommandType> class of command to handle this route. Must be subtype of webdriver::Command
@@ -75,24 +81,37 @@ public:
     bool HasRoute(const std::string& pattern);
 
     /// Find matched route for given url and retrieve CommandCreator for this route.
-    /// @param pattern url pattern of route to retrieve
+    /// @param url url to handle
     /// @return pointer to CommandCreator, NULL if route not found
-    AbstractCommandCreator* GetRouteForURL(const std::string& url);
+    CommandCreatorPtr GetRouteForURL(const std::string& url);
+
+    /// Returns list of registered routes
+    /// @return vector of registered patterns
+    std::vector<std::string> GetRoutes();
 
 private:
     void AddRoute(const std::string& uri_pattern,
-                  AbstractCommandCreator* creator);
+                  const CommandCreatorPtr& creator);
+
+    // return true if pattern1 is bestmatch then pattern2
+    bool CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2);
 
     std::vector<webdriver::internal::RouteDetails> routes_;
-
-    DISALLOW_COPY_AND_ASSIGN(RouteTable);
 };
-
 
 template <typename CommandType>
 void RouteTable::Add(const std::string& pattern) {
-    AddRoute(pattern, new CommandCreator<CommandType>);
+    AddRoute(pattern, make_scoped_refptr(new CommandCreator<CommandType>));
 }
+
+/// Subclass of RouteTable with default WD commands set.
+class DefaultRouteTable : public RouteTable {
+public:
+
+    /// Creates a new DefaultRouteTable with default WD commands set.
+    explicit DefaultRouteTable();
+    virtual ~DefaultRouteTable();
+};
 
 }  // namespace webdriver
 

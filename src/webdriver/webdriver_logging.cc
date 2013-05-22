@@ -5,6 +5,7 @@
 #include "webdriver_logging.h"
 
 #include <cmath>
+#include <iostream>
 
 #include "base/file_path.h"
 #include "base/file_util.h"
@@ -21,6 +22,8 @@ using base::Value;
 namespace webdriver {
 
 FileLog* FileLog::singleton_ = NULL;
+StdOutLog* StdOutLog::singleton_ = NULL;
+LogLevel GlobalLogger::min_log_level_ = kAllLogLevel;    
 
 double start_time = 0;
 
@@ -56,10 +59,10 @@ std::string LogLevelToString(LogLevel level) {
         return "FINE";
     case kAllLogLevel:
         return "ALL";
+    case kInfoLogLevel:
+    default:
+        return "INFO";
     }
-
-    // Default logging level is INFO.
-    return "INFO";
 }
 
 // static
@@ -193,6 +196,55 @@ const FilePath& FileLog::path() const {
     return path_;
 }
 
+// static
+void StdOutLog::SetGlobalLog(StdOutLog* log) {
+    singleton_ = log;
+}
+
+// static
+StdOutLog* StdOutLog::Get() {
+    return singleton_;
+}
+
+StdOutLog::StdOutLog(LogLevel level)
+    : min_log_level_(level) {
+}
+
+StdOutLog::~StdOutLog() { }
+
+void StdOutLog::Log(LogLevel level, const base::Time& time,
+                  const std::string& message) {
+    if (level < min_log_level_)
+        return;
+
+    const char* level_name = "UNKNOWN";
+    switch (level) {
+        case kOffLogLevel:
+            level_name = "OFF";
+            break;
+        case kSevereLogLevel:
+            level_name = "SEVERE";
+            break;
+        case kWarningLogLevel:
+            level_name = "WARNING";
+            break;
+        case kInfoLogLevel:
+            level_name = "INFO";
+            break;
+        case kFineLogLevel:
+            level_name = "FINE";
+            break;
+        default:
+            break;
+    }
+
+    std::cout << "[" << level_name << "] " << message << std::endl;
+}
+
+void StdOutLog::set_min_log_level(LogLevel level) {
+    min_log_level_ = level;
+}
+
 InMemoryLog::InMemoryLog() { }
 
 InMemoryLog::~InMemoryLog() {  }
@@ -238,6 +290,25 @@ void Logger::AddHandler(LogHandler* log_handler) {
 }
 
 void Logger::set_min_log_level(LogLevel level) {
+    min_log_level_ = level;
+}
+
+void GlobalLogger::Log(LogLevel level, const std::string& message) {
+    if (level < min_log_level_)
+        return;
+
+    base::Time time = base::Time::Now();
+    FileLog* flog = FileLog::Get();
+    StdOutLog* slog = StdOutLog::Get();
+
+    if (flog)
+        flog->Log(level, time, message);
+
+    if (slog)
+        slog->Log(level, time, message);
+}
+
+void GlobalLogger::set_min_log_level(LogLevel level) {
     min_log_level_ = level;
 }
 

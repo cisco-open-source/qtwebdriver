@@ -7,6 +7,7 @@
 #include "base/base64.h"
 #include "base/json/json_writer.h"
 #include "base/values.h"
+#include "base/logging.h"
 
 using base::DictionaryValue;
 using base::Value;

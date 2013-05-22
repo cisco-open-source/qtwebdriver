@@ -24,7 +24,7 @@
 #include "CoordinatesTest.h"
 #include "ClickScrollingTest.h"
 
-#include <QtWebkitWebDriver.h>
+#include <webdriver_server.h>
 
 
 int main(int argc, char *argv[])
@@ -48,19 +48,27 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
-    registerView<QWebView>("QWebView");
-    registerView<QWidget>("QWidget");
-    registerView<WindowTestWidget>("WindowTestWidget");
-    registerView<ClickTestWidget>("ClickTestWidget");
-    registerView<ElementAttributeTestWidget>("ElementAttributeTestWidget");
-    registerView<FindingTestWidget>("FindingTestWidget");
-    registerView<CoordinatesTestWidget>("CoordinatesTestWidget");
-    registerView<ClickScrollingTest>("ClickScrollingTest");
+    //registerView<QWebView>("QWebView");
+    //registerView<QWidget>("QWidget");
+    //registerView<WindowTestWidget>("WindowTestWidget");
+    //registerView<ClickTestWidget>("ClickTestWidget");
+    //registerView<ElementAttributeTestWidget>("ElementAttributeTestWidget");
+    //registerView<FindingTestWidget>("FindingTestWidget");
+    //registerView<CoordinatesTestWidget>("CoordinatesTestWidget");
+    //registerView<ClickScrollingTest>("ClickScrollingTest");
 
-    QFutureWatcher<int> watcher;
-    QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
-    QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
-    watcher.setFuture(future);
+    //QFutureWatcher<int> watcher;
+    //QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
+    //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
+    //watcher.setFuture(future);
+
+    webdriver::Server wd_server;
+    if (0 != wd_server.Init(argc, argv)) 
+    {
+        return 1;
+    }
+
+    wd_server.Start();
 
     return app.exec();
 }
