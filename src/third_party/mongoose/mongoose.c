@@ -58,7 +58,7 @@
   #endif
 #define _WIN32_WINNT 0x0400 // To make it link in VS2005
 #include <windows.h>
-#include <winsock2.h>
+//#include <winsock2.h>
 
 #ifndef PATH_MAX
 #define PATH_MAX MAX_PATH

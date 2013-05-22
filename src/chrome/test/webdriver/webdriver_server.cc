@@ -466,17 +466,15 @@ int RunChromeDriver() {
   return (EXIT_SUCCESS);
 }
 
-#if !defined(OS_WIN)
 bool parse_config_to_cmd_line()
 {
     CommandLine* cmd_line = CommandLine::ForCurrentProcess();
+    
     if (cmd_line->HasSwitch("config"))
     {
         //parse json config file and set value
         std::string config_json;
-        std::string configPathString = cmd_line->GetSwitchValueASCII("config");
-
-        FilePath configPath(configPathString);
+        FilePath configPath(cmd_line->GetSwitchValueNative("config"));
 
         if (file_util::ReadFileToString(configPath, &config_json))
         {
@@ -511,9 +509,6 @@ bool parse_config_to_cmd_line()
                 cmd_line->AppendSwitchASCII("http-threads", base::IntToString(http_threads));
             if (result_dict->GetString("log-path", &log_path))
                 cmd_line->AppendSwitchASCII("log-path", log_path);
-
-            return true;
-
         }
         else
         {
@@ -521,16 +516,15 @@ bool parse_config_to_cmd_line()
             return false;
         }
     }
+
+    return true;
 }
-#endif //!defined(OS_WIN)
 }  // namespace webdriver
 
 int main_server(int argc, char *argv[]) {
   CommandLine::Init(argc, argv);
 
-#if !defined(OS_WIN)
   webdriver::parse_config_to_cmd_line();
-#endif
 
   return webdriver::RunChromeDriver();
 }
