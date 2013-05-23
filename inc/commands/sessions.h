@@ -1,8 +1,7 @@
 #ifndef SESSIONS_H
 #define SESSIONS_H
 
-#include "chrome/test/webdriver/commands/command.h"
-
+#include "commands/command.h"
 
 namespace webdriver {
 
@@ -13,15 +12,14 @@ class Sessions : public Command
 public:
     Sessions(const std::vector<std::string>& path_segments,
              const DictionaryValue* const parameters);
-virtual ~Sessions();
+	virtual ~Sessions();
 
-virtual bool DoesGet() OVERRIDE;
+	virtual bool DoesGet() OVERRIDE;
 
-virtual void ExecuteGet(Response* const response) OVERRIDE;
+	virtual void ExecuteGet(Response* const response) OVERRIDE;
 
 private:
-  DISALLOW_COPY_AND_ASSIGN(Sessions);
-
+  	DISALLOW_COPY_AND_ASSIGN(Sessions);
 };
 
 }
