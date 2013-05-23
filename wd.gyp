@@ -483,7 +483,6 @@
             'src/base/message_pump_win.cc',
             'src/base/process_util.cc',
             'src/base/process_util_win.cc',
-            'src/third_party/zlib/contrib/minizip/iowin32.c',
           ],
         } ],
       ],

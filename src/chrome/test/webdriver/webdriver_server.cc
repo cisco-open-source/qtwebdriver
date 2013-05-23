@@ -355,6 +355,10 @@ int RunChromeDriver() {
      return (EXIT_SUCCESS);
   }
 
+#if defined(OS_WIN)
+  system("qtvars.bat vsvars");
+#endif
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
   // set default output mode
   qInstallMessageHandler(normalMessageOutput);
