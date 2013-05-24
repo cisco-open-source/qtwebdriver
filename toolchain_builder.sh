@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BCM_TOOLCAIN_DIR=/opt/softs/compilers/others/Broadcom/BCM_LNX_1_0_0
-CHANELD_TOOLCAIN_DIR=/opt/softs/toolchains/CANALD_KAONCO1200C_BCM7356_LNUX_01/v0.5_REL.8/platform_cfg/linux/compiler/mips4k_gcc_x86_linux_22
+CHANALD_TOOLCAIN_DIR=/opt/softs/toolchains/CANALD_KAONCO1200C_BCM7356_LNUX_01/v0.5_REL.8/platform_cfg/linux/compiler/mips4k_gcc_x86_linux_22
 NEWCO_TOOLCHAIN_DIR=/opt/softs/toolchains/NEWCO_HUMAXHDR1002S_BCM7356_LNUX_01/I.18.01.03.01_Evolution_MOR_Release6_Integration_ioctl_hijack/platform_cfg/linux/compiler/mips4k_gcc_x86_linux_11
 REF_TOOLCHAIN_DIR=/opt/softs/toolchains/REF_BCM97425_BCM7425_LNUX_01/M6.0.67_6.1_ioctl_hijack/platform_cfg/linux/compiler/mips4k_gcc_x86_linux_12
 ST40_CC14_0_1_TOOLCHAIN_DIR=/opt/softs/compilers/st/st40/LINUX_4.2.4.jan0711/STLinux-2.3/devkit/sh4_uclibc
@@ -26,10 +26,10 @@ function SetPlatformVariable
 			export CXX=${BCM_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
 			export LINK=${BCM_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
 			;;
-		CHANELD)
-			export CC=${CHANELD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-gcc
-			export CXX=${CHANELD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
-			export LINK=${CHANELD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
+		CHANALD)
+			export CC=${CHANALD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-gcc
+			export CXX=${CHANALD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
+			export LINK=${CHANALD_TOOLCAIN_DIR}/bin/mipsel-linux-uclibc-g++
 			;;
 		NEWCO)
 			export CC=${NEWCO_TOOLCHAIN_DIR}/bin/mipsel-linux-uclibc-gcc
@@ -78,7 +78,7 @@ fi
 if [ "$TARGET_LIST" = "all" ]
 then
 	echo "TARGET = all"
-	TARGET_LIST="desktop BCM CHANELD REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOOD"
+	TARGET_LIST="desktop BCM CHANALD REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOO"
 fi
 
 if [ -z $MODE_LIST ]
@@ -92,7 +92,7 @@ then
 	OUTDIR=`pwd`
 fi
 
-SUPPORTED_TARGETS="desktop,BCM,CHANELD,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO"
+SUPPORTED_TARGETS="desktop,BCM,CHANALD,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO"
 SUPPORTED_MODES="release_dbg,release"
 
 for TmpTarget in $TARGET_LIST
