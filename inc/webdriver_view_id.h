@@ -9,6 +9,10 @@
 
 namespace webdriver {
 
+typedef void* ViewHandle;
+typedef unsigned long int ViewType;
+#define INVALID_HANDLE  (0)
+
 /// This class represents a Webdriver View ID. These IDs are mapped to objects in a page.
 class ViewId {
 public:

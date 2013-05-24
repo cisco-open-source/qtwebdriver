@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/test/webdriver/frame_path.h"
+#include "frame_path.h"
 
 #include "base/string_split.h"
 
@@ -17,59 +17,59 @@ FramePath::FramePath(const std::string& path) : path_(path) {}
 FramePath::~FramePath() {}
 
 FramePath& FramePath::operator=(const FramePath& other) {
-  path_ = other.path_;
-  return *this;
+    path_ = other.path_;
+    return *this;
 }
 
 bool FramePath::operator==(const FramePath& other) const {
-  return path_ == other.path_;
+    return path_ == other.path_;
 }
 
 FramePath FramePath::Append(const FramePath& path) const {
-  return Append(path.path_);
+    return Append(path.path_);
 }
 
 FramePath FramePath::Append(const std::string& path) const {
-  // An empty path refers to the root frame, so just return it.
-  if (path.empty())
-    return *this;
+    // An empty path refers to the root frame, so just return it.
+    if (path.empty())
+        return *this;
 
-  // Don't append a separator if the current path is empty.
-  std::string new_path = path_;
-  if (path_.length())
-    new_path += "\n";
-  return FramePath(new_path + path);
+    // Don't append a separator if the current path is empty.
+    std::string new_path = path_;
+    if (path_.length())
+        new_path += "\n";
+    return FramePath(new_path + path);
 }
 
 FramePath FramePath::Parent() const {
-  size_t i = path_.find_last_of("\n");
-  if (i != std::string::npos)
-    return FramePath(path_.substr(0, i));
-  return FramePath();
+    size_t i = path_.find_last_of("\n");
+    if (i != std::string::npos)
+        return FramePath(path_.substr(0, i));
+    return FramePath();
 }
 
 FramePath FramePath::BaseName() const {
-  size_t i = path_.find_last_of("\n");
-  if (i != std::string::npos)
-    return FramePath(path_.substr(i + 1));
-  return *this;
+    size_t i = path_.find_last_of("\n");
+    if (i != std::string::npos)
+        return FramePath(path_.substr(i + 1));
+    return *this;
 }
 
 void FramePath::GetComponents(std::vector<std::string>* components) const {
-  if (IsSubframe())
-    base::SplitString(path_, '\n', components);
+    if (IsSubframe())
+        base::SplitString(path_, '\n', components);
 }
 
 bool FramePath::IsRootFrame() const {
-  return path_.empty();
+    return path_.empty();
 }
 
 bool FramePath::IsSubframe() const {
-  return path_.length();
+    return path_.length();
 }
 
 const std::string& FramePath::value() const {
-  return path_;
+    return path_;
 }
 
 }  // namespace webdriver

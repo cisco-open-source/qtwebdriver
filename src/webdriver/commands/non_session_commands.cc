@@ -10,7 +10,6 @@
 #include "webdriver_error.h"
 
 #include "base/stringprintf.h"
-
 #include "base/sys_info.h"
 //#include "chrome/common/chrome_version_info.h"
 
@@ -63,6 +62,11 @@ bool GlobalLogCommand::DoesGet() {
 void GlobalLogCommand::ExecuteGet(Response* const response) {
     //TODO: send content of global FileLog
     // in what format? JSON? Plain text?
+
+    DictionaryValue* tmp_result = new DictionaryValue;
+    tmp_result->SetString("msg", "please implement me!");
+
+    response->SetValue(tmp_result);
 }
 
 }  // namespace webdriver

@@ -15,6 +15,8 @@ class Value;
 
 namespace webdriver {
 
+typedef void* ElementHandle;        
+
 /// This class represents a WebDriver Element ID. These IDs are mapped to
 /// objects in a page.
 class ElementId {

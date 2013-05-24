@@ -29,6 +29,7 @@
 #include "webdriver_logging.h"
 #include "webdriver_switches.h"
 #include "webdriver_util.h"
+#include "webdriver_session_manager.h"
 
 
 namespace webdriver {
@@ -37,8 +38,6 @@ Server::Server()
     : options_(CommandLine::NO_PROGRAM),
       routeTable_(NULL),
       mg_ctx_(NULL) {
-    
-    routeTable_ = new DefaultRouteTable();
 }
 
 Server::~Server() {};
@@ -72,16 +71,20 @@ int Server::Init(int argc, char *argv[]) {
     if (options_.HasSwitch("url-base"))
         url_base_ = options_.GetSwitchValueASCII("url-base");
 
+    SessionManager::GetInstance()->set_url_base(url_base_);
+
     std::string chromedriver_info = base::StringPrintf("ChromeDriver %s", "QtWebKit");
     GlobalLogger::Log(kInfoLogLevel, chromedriver_info);
 
-    // TODO: TBD
+    // set default route table
+    routeTable_.reset(new DefaultRouteTable());
 
     return 0;
 }
 
 void Server::SetRouteTable(RouteTable* routeTable) {
-    // TODO: implement
+    // TODO: check state
+    routeTable_.reset(new RouteTable(*routeTable));
 }
 
 int Server::Start() {
@@ -180,6 +183,8 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     SendResponse(connection,
                 request_info->request_method,
                 response);
+
+    GlobalLogger::Log(kFineLogLevel, "ProcessHttpRequest - processing finished: " + uri);
     
     return true;
 }

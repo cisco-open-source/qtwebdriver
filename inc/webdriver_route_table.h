@@ -61,6 +61,13 @@ public:
     /// Creates a new RouteTable that will register all URL commands with the
     /// given context.
     explicit RouteTable();
+
+    /// Copy constructor
+    RouteTable(const RouteTable &obj);
+ 
+    /// assignment operator
+    RouteTable& operator= (const RouteTable &obj);
+
     virtual ~RouteTable();
 
     /// Registers a command for a WebDriver command using the given URL pattern.
@@ -95,6 +102,8 @@ private:
 
     // return true if pattern1 is bestmatch then pattern2
     bool CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2);
+
+    bool MatchPattern(const std::string& url, const std::string& pattern);
 
     std::vector<webdriver::internal::RouteDetails> routes_;
 };

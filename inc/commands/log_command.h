@@ -21,7 +21,7 @@ class Response;
 class LogCommand : public WebDriverCommand {
 public:
   	LogCommand(const std::vector<std::string>& path_segments,
-             base::DictionaryValue* parameters);
+             const base::DictionaryValue* parameters);
   	virtual ~LogCommand();
 
   	virtual bool DoesPost() OVERRIDE;
@@ -34,7 +34,7 @@ private:
 class LogTypesCommand : public WebDriverCommand {
 public:
   	LogTypesCommand(const std::vector<std::string>& path_segments,
-             base::DictionaryValue* parameters);
+             const base::DictionaryValue* parameters);
   	virtual ~LogTypesCommand();
 
   	virtual bool DoesGet() OVERRIDE;

@@ -14,9 +14,9 @@
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_logging.h"
-#include "chrome/test/webdriver/webdriver_session.h"
+#include "webdriver_session.h"
 #include "webdriver_session_manager.h"
-#include "chrome/test/webdriver/webdriver_util.h"
+#include "webdriver_util.h"
 
 namespace webdriver {
 

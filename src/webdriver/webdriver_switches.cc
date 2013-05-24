@@ -6,8 +6,15 @@
 
 namespace webdriver {
 
-/// Instructs the mongoose webserver to enable HTTP persistent
-/// connections.
-const char kEnableKeepAlive[] = "enable-keep-alive";
+const char Switches::kEnableKeepAlive[] = "enable-keep-alive";
+
+const char Switches::kProxyAutoDetect[] = "proxy-auto-detect";
+
+const char Switches::kProxyPacUrl[] = "proxy-pac-url";
+
+const char Switches::kProxyServer[] = "proxy-server";
+
+const char Switches::kNoProxyServer[] = "no-proxy-server";
+
 
 }  // namespace webdriver

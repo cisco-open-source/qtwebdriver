@@ -5,6 +5,7 @@
 #include "webdriver_element_id.h"
 
 #include "base/values.h"
+#include "base/logging.h"
 
 namespace {
 

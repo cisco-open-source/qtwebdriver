@@ -11,12 +11,28 @@
 
 #include "webdriver_route_patterns.h"
 #include "commands/non_session_commands.h"
+#include "commands/create_session.h"
+#include "commands/session_with_id.h"
+#include "commands/sessions.h"
+#include "commands/set_timeout_commands.h"
+#include "commands/log_command.h"
 #include "webdriver_logging.h"
+#include "base/string_split.h"
+
 
 namespace webdriver {
 
 
 RouteTable::RouteTable(){
+}
+
+RouteTable::RouteTable(const RouteTable &obj)
+    : routes_(obj.routes_) {
+}
+ 
+RouteTable& RouteTable::operator= (const RouteTable &obj) {
+    routes_ = obj.routes_;
+    return *this;
 }
 
 RouteTable::~RouteTable() {}
@@ -67,9 +83,7 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url) {
     for (route = routes_.begin();
          route < routes_.end();
          ++route) {
-        // TODO: implement MatchPattern
-        //if (MatchPattern(url, route->uri_regex_))
-        {
+        if (MatchPattern(url, route->uri_regex_)) {
             return route->creator_;
         }
     }
@@ -80,7 +94,10 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url) {
 
 void RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
-    // TODO: add custom command check
+    // custom command check
+    if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
+        // TODO: validate custom command syntax
+    }
 
     std::vector<webdriver::internal::RouteDetails>::iterator route;
     for (route = routes_.begin();
@@ -104,6 +121,30 @@ void RouteTable::AddRoute(const std::string& uri_pattern,
                          creator));
 }
 
+bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern) {
+    std::vector<std::string> url_segments;
+    std::vector<std::string> pattern_segments;
+
+    base::SplitString(url, '/', &url_segments);
+    base::SplitString(pattern, '/', &pattern_segments);
+
+    unsigned int segments_num = url_segments.size();
+
+    if (segments_num != pattern_segments.size()) {
+        // different segments num
+        return false;
+    }
+
+    for (unsigned int i = 0; i < segments_num; i++) {
+        if (pattern_segments.at(i) == "*")
+            continue;
+        if (pattern_segments.at(i) != url_segments.at(i))
+            return false;
+    }
+
+    return true;
+}
+
 bool RouteTable::CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2) { 
     // TODO: implement
     return false;
@@ -115,6 +156,13 @@ DefaultRouteTable::DefaultRouteTable()
     // Place default commands registration here
     Add<StatusCommand>(CommandRoutes::kStatus);
     Add<GlobalLogCommand>(CommandRoutes::kGetLog);
+    Add<CreateSession>(CommandRoutes::kNewSession);
+    Add<SessionWithID>(CommandRoutes::kSession);
+    Add<Sessions>(CommandRoutes::kSessions);
+    Add<SetAsyncScriptTimeoutCommand>(CommandRoutes::kSetScriptTimeout);
+    Add<ImplicitWaitCommand>(CommandRoutes::kImplicitlyWait);
+    Add<LogTypesCommand>(CommandRoutes::kGetAvailableLogTypes);
+    Add<LogCommand>(CommandRoutes::kGetSessionLogs);
    
 }
 

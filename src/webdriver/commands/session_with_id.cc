@@ -8,6 +8,7 @@
 #include <string>
 
 #include "base/values.h"
+#include "base/sys_info.h"
 #include "commands/response.h"
 #include "webdriver_session.h"
 
@@ -28,12 +29,13 @@ bool SessionWithID::DoesDelete() {
 }
 
 void SessionWithID::ExecuteGet(Response* const response) {
+    // TODO: finish implementation
     DictionaryValue *temp_value = new DictionaryValue();
 
     // Standard capabilities defined at
     // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
-    temp_value->SetString("browserName", "QtWebkit");
-    temp_value->SetString("version", session_->GetBrowserVersion());
+    //temp_value->SetString("browserName", "QtWebkit");
+    //temp_value->SetString("version", session_->GetBrowserVersion());
 
     DictionaryValue* os_info = new DictionaryValue;
     temp_value->SetString("platform", base::SysInfo::OperatingSystemName());

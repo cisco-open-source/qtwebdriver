@@ -23,6 +23,10 @@ public:
     static const char kNewSession[];
     static const char kSession[];
     static const char kSessions[];
+    static const char kImplicitlyWait[];
+    static const char kSetScriptTimeout[];
+    static const char kGetAvailableLogTypes[];
+    static const char kGetSessionLogs[];
 
 // TODO:
 /*    
@@ -77,9 +81,6 @@ public:
     static const char kDismissAlert[];
     static const char kGetAlertText[];
     static const char kSetAlertValue[];
-    static const char kSetTimeout[];
-    static const char kImplicitlyWait[];
-    static const char kSetScriptTimeout[];
     static const char kExecuteSQL[];
     static const char kGetLocation[];
     static const char kSetLocation[];
@@ -126,8 +127,6 @@ public:
     static const char kGetWindowSize[];
     static const char kGetWindowPosition[];
     static const char kMaximizeWindow[];
-    static const char kGetAvailableLogTypes[];
-    static const char kGetSessionLogs[];
 */    
 private:
     static std::set<std::string> standardCommandRoutes;

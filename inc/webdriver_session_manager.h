@@ -48,10 +48,16 @@ public:
     /// @return vector of pairs (sessionId, pointer to Session)
     std::map<std::string, Session*> GetSessions();
 
+    const std::string& url_base() const;
+
+    void set_url_base(const std::string& url_base);
+
 private:
     SessionManager();
     ~SessionManager();
     friend struct DefaultSingletonTraits<SessionManager>;
+
+    std::string url_base_;
 
     std::map<std::string, Session*> map_;
     mutable base::Lock map_lock_;

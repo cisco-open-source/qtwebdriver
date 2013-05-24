@@ -14,6 +14,10 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kNewSession);
 		standardCommandRoutes.insert(kSession);
 		standardCommandRoutes.insert(kSessions);
+		standardCommandRoutes.insert(kImplicitlyWait);
+		standardCommandRoutes.insert(kSetScriptTimeout);
+		standardCommandRoutes.insert(kGetAvailableLogTypes);
+		standardCommandRoutes.insert(kGetSessionLogs);
 
 	}
 
@@ -28,6 +32,11 @@ const char CommandRoutes::kGetLog[] = "/log";
 const char CommandRoutes::kNewSession[] = "/session";
 const char CommandRoutes::kSession[] = "/session/*";
 const char CommandRoutes::kSessions[] = "/sessions";
+const char CommandRoutes::kImplicitlyWait[] = "/session/*/timeouts/implicit_wait";
+const char CommandRoutes::kSetScriptTimeout[] = "/session/*/timeouts/async_script";
+const char CommandRoutes::kGetAvailableLogTypes[] = "/session/*/log/types";
+const char CommandRoutes::kGetSessionLogs[] = "/session/*/log";
+
 
 /*
 
@@ -84,8 +93,6 @@ const char CommandRoutes::kAcceptAlert[] = "acceptAlert";
 const char CommandRoutes::kDismissAlert[] = "dismissAlert";
 const char CommandRoutes::kGetAlertText[] = "getAlertText";
 const char CommandRoutes::kSetAlertValue[] = "setAlertValue";
-const char CommandRoutes::kSetTimeout[] = "setTimeout";
-const char CommandRoutes::kImplicitlyWait[] = "implicitlyWait";
 const char CommandRoutes::kSetScriptTimeout[] = "setScriptTimeout";
 const char CommandRoutes::kExecuteSQL[] = "executeSQL";
 const char CommandRoutes::kGetLocation[] = "getLocation";
@@ -134,9 +141,6 @@ const char CommandRoutes::kSetWindowPosition[] = "setWindowPosition";
 const char CommandRoutes::kGetWindowSize[] = "getWindowSize";
 const char CommandRoutes::kGetWindowPosition[] = "getWindowPosition";
 const char CommandRoutes::kMaximizeWindow[] = "maximizeWindow";
-const char CommandRoutes::kGetAvailableLogTypes[] = "getAvailableLogTypes";
-const char CommandRoutes::kGetLog[] = "getLog";
-const char CommandRoutes::kGetSessionLogs[] = "getSessionLogs";
 */
 
 } // namespace webdriver

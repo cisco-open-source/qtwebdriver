@@ -14,7 +14,7 @@ namespace webdriver {
 
 LogCommand::LogCommand(
     const std::vector<std::string>& path_segments,
-    DictionaryValue* parameters)
+    const DictionaryValue* parameters)
     : WebDriverCommand(path_segments, parameters) {
 }
 
@@ -48,7 +48,7 @@ void LogCommand::ExecutePost(Response* const response) {
 
 LogTypesCommand::LogTypesCommand(
     const std::vector<std::string>& path_segments,
-    DictionaryValue* parameters)
+    const DictionaryValue* parameters)
     : WebDriverCommand(path_segments, parameters) {
 }
 

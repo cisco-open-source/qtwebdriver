@@ -7,7 +7,26 @@
 
 namespace webdriver {
 
-extern const char kEnableKeepAlive[];
+class Switches {
+public:
+	/// Instructs the mongoose webserver to enable HTTP persistent
+	/// connections.
+	static const char kEnableKeepAlive[];
+
+	/// Forces proxy auto-detection.
+	static const char kProxyAutoDetect[];
+
+	/// Uses the pac script at the given URL
+	static const char kProxyPacUrl[];
+
+	/// Uses a specified proxy server, overrides system settings. This switch only
+	/// affects HTTP and HTTPS requests.
+	static const char kProxyServer[];
+
+	/// Don't use a proxy server, always make direct connections. Overrides any
+	/// other proxy server flags that are passed.
+	static const char kNoProxyServer[];
+};
 
 }  // namespace webdriver
 

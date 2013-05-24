@@ -1,11 +1,12 @@
-#include "sessions.h"
+#include "commands/sessions.h"
 #include <map>
 #include <string>
 
 #include "base/values.h"
-#include "chrome/test/webdriver/commands/response.h"
-#include "chrome/test/webdriver/webdriver_session_manager.h"
-#include "chrome/test/webdriver/webdriver_session.h"
+#include "base/sys_info.h"
+#include "commands/response.h"
+#include "webdriver_session_manager.h"
+#include "webdriver_session.h"
 
 namespace webdriver {
 
@@ -16,14 +17,14 @@ Sessions::Sessions(const std::vector<std::string>& path_segments,
 Sessions::~Sessions() {}
 
 bool Sessions::DoesGet() {
-  return true;
+    return true;
 }
 
 void Sessions::ExecuteGet(Response* const response) {
+    // TODO: finish implementation
   ListValue *temp_value = new ListValue();
 
   std::map<std::string, Session*> sessions = SessionManager::GetInstance()->GetSessions();
-
 
   std::map<std::string, Session*>::iterator sessionsItr = sessions.begin();
 
@@ -40,20 +41,10 @@ void Sessions::ExecuteGet(Response* const response) {
 
       // Standard capabilities defined at
       // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
-      capabilities_value->SetString("browserName", "QtWebkit");
-      capabilities_value->SetString("version", session->GetBrowserVersion());
+      //capabilities_value->SetString("browserName", "QtWebkit");
+      //capabilities_value->SetString("version", session->GetBrowserVersion());
 
-    #if defined(OS_WIN)
-      capabilities_value->SetString("platform", "windows");
-    #elif defined(OS_MACOSX)
-      capabilities_value->SetString("platform", "mac");
-    #elif defined(OS_CHROMEOS)
-      capabilities_value->SetString("platform", "chromeos");
-    #elif defined(OS_LINUX)
-      capabilities_value->SetString("platform", "linux");
-    #else
-      capabilities_value->SetString("platform", "unknown");
-    #endif
+      capabilities_value->SetString("platform", base::SysInfo::OperatingSystemName());
 
       capabilities_value->SetBoolean("javascriptEnabled", true);
       capabilities_value->SetBoolean("takesScreenshot", true);

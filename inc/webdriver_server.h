@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "base/basictypes.h"
+#include "base/memory/scoped_ptr.h"
 #include "base/command_line.h"
 
 struct mg_context;
@@ -25,18 +26,18 @@ class Response;
 class Server {
 public:
 
-    /// Creates a new Server with DefaultRouteTable.
+    /// Creates a new Server.
     Server();
     ~Server();
 
-    /// Init server, parse arguments as options. 
+    /// Init server, parse arguments as options, creates DefaultRouteTable. 
     /// @param argc count of arguments
     /// @param argv array of arguments
     /// @return 0 - if init was success, error code otherwise.
     int Init(int argc, char *argv[]);
 
     /// Set route table for this server. Server should be stopped.
-    /// @param routeTable routeTable to set
+    /// @param routeTable routeTable to set. Server keeps own copy of RouteTable.
     void SetRouteTable(RouteTable* routeTable);
 
     /// Start server 
@@ -45,7 +46,7 @@ public:
 
 private:
     CommandLine options_;
-    RouteTable* routeTable_;
+    scoped_ptr<RouteTable> routeTable_;
     std::vector<std::string> mg_options_;
     std::string url_base_;
     struct mg_context* mg_ctx_;
