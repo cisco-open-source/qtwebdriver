@@ -16,6 +16,38 @@
 
 #include <WebDriver.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <signal.h>
+#endif
+
+#include "ServerThread.h"
+
+ServerThread* pServerThread;
+ 
+#if defined(_WIN32)
+BOOL CtrlHandler(DWORD fdwCtrlType)
+{
+  switch (fdwCtrlType)
+  {
+    // Handle the CTRL-C signal.
+    case CTRL_BREAK_EVENT:
+    case CTRL_C_EVENT:
+      qDebug() << "try to stop thread";
+      pServerThread->terminate();
+      
+      while (!pServerThread->isFinished()) {}
+ 
+      if (!pServerThread->isRunning())
+        qDebug() << "thread is stopped";
+
+      return TRUE;
+      
+    default:
+      return FALSE;
+  }
+}
+#endif //_WIN32
 
 int main(int argc, char *argv[])
 {
@@ -39,11 +71,21 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 
 //    registerView<QWebView>("QWebView");
+#if defined(_WIN32)
+    SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE);
+#endif //_WIN32
 
-    QFutureWatcher<int> watcher;
-    QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
-    QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
-    watcher.setFuture(future);
+    //QFutureWatcher<int> watcher;
+    //QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
+    //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
+    //watcher.setFuture(future);
+    pServerThread = new ServerThread;
+    QObject::connect(pServerThread, SIGNAL(finished()), qApp, SLOT(quit()));
 
+    pServerThread->argc = argc;
+    pServerThread->argv = argv;
+    pServerThread->start();
+       
     return app.exec();
 }
+

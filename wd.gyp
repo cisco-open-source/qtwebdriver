@@ -385,6 +385,7 @@
         '<(INTERMEDIATE_DIR)/moc_qtaskrunner.cc',
         '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
         '<(INTERMEDIATE_DIR)/moc_webdriver_automation.cc',
+        '<(INTERMEDIATE_DIR)/moc_ServerThread.cc',
         'src/net/base/file_stream.cc',
         'src/net/base/file_stream_metrics.cc',
         'src/net/base/file_stream_net_log_parameters.cc',
@@ -397,6 +398,8 @@
         'src/qwebviewext.cc',
         'src/third_party/webdriver/atoms.cc',
         'src/viewfactory.cc',
+        'src/ServerThread.h',
+        'src/ServerThread.cc',
       ],
 
       'conditions': [
