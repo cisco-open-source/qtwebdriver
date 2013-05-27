@@ -2,6 +2,7 @@
 output_gen=$1
 platform=$2
 mode=$3
+qt_dir=$4
 
 current_dir=`pwd`
 if [ -z $output_gen ];
@@ -31,7 +32,7 @@ do
   for mode in $modes
   do
     cd $current_dir
-    gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} --generator-output=${output_gen}/$platform/$mode wd.gyp
+    gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} -D QT_DIR=${qt_dir} --generator-output=${output_gen}/$platform/$mode wd.gyp
     [ $? -ne 0 ] && exit 1
     cd ${output_gen}/$platform/$mode
     [ $? -ne 0 ] && echo "**** ERROR: Can't access to ${output_gen}/$platform/$mode" && exit 1
