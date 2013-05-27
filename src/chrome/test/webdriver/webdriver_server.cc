@@ -331,18 +331,18 @@ int RunChromeDriver() {
   // check if --help CL argument is present
   if (cmd_line->HasSwitch("help")) {
     std::cout << "Usage: WebDriver [--OPTION=VALUE]..."                                             << std::endl
-              << "Starts WebDriver server"                                                          << std::endl
+              << "Starts QtWebDriver server"                                                        << std::endl
               << ""                                                                                 << std::endl
               << "OPTION         DEFAULT VALUE      DESCRIPTION"                                    << std::endl
               << "http-threads   4                  The number of threads to use for handling"      << std::endl
               << "                                  HTTP requests"                                  << std::endl
-              << "log-path       ./webdriver.log    The path to use for the ChromeDriver server"    << std::endl
+              << "log-path       ./webdriver.log    The path to use for the QtWebDriver server"     << std::endl
               << "                                  log"                                            << std::endl
               << "root           ./web              The path of location to serve files from"       << std::endl
-              << "port           9517               The port that ChromeDriver listens on"          << std::endl
-              << "silence        false              If true, ChromeDriver will not log anything"    << std::endl
+              << "port           9517               The port that QtWebDriver listens on"           << std::endl
+              << "silence        false              If true, QtWebDriver will not log anything"     << std::endl
               << "                                  to stdout/stderr"                               << std::endl
-              << "verbose        false              If true, ChromeDriver will log lots of stuff"   << std::endl
+              << "verbose        false              If true, QtWebDriver will log lots of stuff"    << std::endl
               << "                                  to stdout/stderr"                               << std::endl
               << "url-base                          The URL path prefix to use for all incoming"    << std::endl
               << "                                  WebDriver REST requests. A prefix and postfix"  << std::endl
