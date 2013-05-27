@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/test/webdriver/commands/source_command.h"
+#include "commands/source_command.h"
 
 #include <string>
 
 #include "base/values.h"
-#include "chrome/test/webdriver/commands/response.h"
-#include "chrome/test/webdriver/webdriver_error.h"
-#include "chrome/test/webdriver/webdriver_session.h"
+#include "commands/response.h"
+#include "webdriver_error.h"
+#include "webdriver_session.h"
 
 namespace webdriver {
 
@@ -24,18 +24,18 @@ SourceCommand::SourceCommand(const std::vector<std::string>& path_segments,
 SourceCommand::~SourceCommand() {}
 
 bool SourceCommand::DoesGet() {
-  return true;
+    return true;
 }
 
 void SourceCommand::ExecuteGet(Response* const response) {
-  ListValue args;
-  Value* result = NULL;
-  Error* error = session_->GetSource(kSource, &args, &result);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(result);
+    ListValue args;
+    Value* result = NULL;
+    Error* error = session_->GetSource(kSource, &args, &result);
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+    response->SetValue(result);
 }
 
 }  // namespace webdriver

@@ -18,6 +18,9 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSetScriptTimeout);
 		standardCommandRoutes.insert(kGetAvailableLogTypes);
 		standardCommandRoutes.insert(kGetSessionLogs);
+		standardCommandRoutes.insert(kWindowSize);
+		standardCommandRoutes.insert(kWindowPosition);
+		standardCommandRoutes.insert(kMaximizeWindow);
 
 	}
 
@@ -36,7 +39,9 @@ const char CommandRoutes::kImplicitlyWait[] = "/session/*/timeouts/implicit_wait
 const char CommandRoutes::kSetScriptTimeout[] = "/session/*/timeouts/async_script";
 const char CommandRoutes::kGetAvailableLogTypes[] = "/session/*/log/types";
 const char CommandRoutes::kGetSessionLogs[] = "/session/*/log";
-
+const char CommandRoutes::kWindowSize[] = "/session/*/window/*/size";
+const char CommandRoutes::kWindowPosition[] = "/session/*/window/*/position";
+const char CommandRoutes::kMaximizeWindow[] = "/session/*/window/*/maximize";
 
 /*
 
@@ -136,11 +141,6 @@ const char CommandRoutes::kTouchScroll[] = "touchScroll";
 const char CommandRoutes::kTouchDoubleTap[] = "touchDoubleTap";
 const char CommandRoutes::kTouchLongPress[] = "touchLongPress";
 const char CommandRoutes::kTouchFlick[] = "touchFlick";
-const char CommandRoutes::kSetWindowSize[] = "setWindowSize";
-const char CommandRoutes::kSetWindowPosition[] = "setWindowPosition";
-const char CommandRoutes::kGetWindowSize[] = "getWindowSize";
-const char CommandRoutes::kGetWindowPosition[] = "getWindowPosition";
-const char CommandRoutes::kMaximizeWindow[] = "maximizeWindow";
 */
 
 } // namespace webdriver

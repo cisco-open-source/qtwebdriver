@@ -105,7 +105,7 @@ public:
     const Capabilities& capabilities() const;
 
     /// Gets list of enumerated viewIds
-    /// @param[out] vector of viewIds to return
+    /// @param[out] views vector of viewIds to return
     void GetViews(std::vector<ViewId>* views) const;
 
     /// Get ViewHandle for given ViewId
@@ -119,20 +119,27 @@ public:
     /// @return elementHandle
     ElementHandle GetElementHandle(const ViewId& viewId, const ElementId& elementId) const;
 
-    /// Invalidate elementId in specific view
+    /// Invalidate elementId in specific view. Remove it from map
     /// @param viewId requested view
     /// @param elementId element to invalidate
-    void RemoveElement(const ViewId& viewId, const ElementId& elementId) const;
+    void RemoveElement(const ViewId& viewId, const ElementId& elementId);
+
+    
 
 
 
 private:
+    typedef std::map<std::string, ElementHandle> ElementsMap;
+    typedef std::map<std::string, ElementsMap> ViewsElementsMap;
+    typedef std::map<std::string, ViewHandle> ViewsMap;
+
+    void InitOnSessionThread(Error **error);
+    void TerminateOnSessionThread();
   
   void RunClosureOnSessionThread(
       const base::Closure& task,
       base::WaitableEvent* done_event);
-  void InitOnSessionThread(Error **error);
-  void TerminateOnSessionThread();
+    
 
 
     scoped_ptr<InMemoryLog> session_log_;

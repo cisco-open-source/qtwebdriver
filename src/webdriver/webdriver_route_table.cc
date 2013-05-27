@@ -16,6 +16,7 @@
 #include "commands/sessions.h"
 #include "commands/set_timeout_commands.h"
 #include "commands/log_command.h"
+#include "commands/window_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -163,7 +164,10 @@ DefaultRouteTable::DefaultRouteTable()
     Add<ImplicitWaitCommand>(CommandRoutes::kImplicitlyWait);
     Add<LogTypesCommand>(CommandRoutes::kGetAvailableLogTypes);
     Add<LogCommand>(CommandRoutes::kGetSessionLogs);
-   
+    Add<WindowSizeCommand>(CommandRoutes::kWindowSize);
+    Add<WindowPositionCommand>(CommandRoutes::kWindowPosition);
+    Add<WindowMaximizeCommand>(CommandRoutes::kMaximizeWindow);
+  
 }
 
 DefaultRouteTable::~DefaultRouteTable() {}

@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "chrome/test/webdriver/commands/title_command.h"
+#include "commands/title_command.h"
 
 #include <string>
 
-#include "chrome/test/webdriver/commands/response.h"
-#include "chrome/test/webdriver/webdriver_error.h"
-#include "chrome/test/webdriver/webdriver_session.h"
+#include "commands/response.h"
+#include "webdriver_error.h"
+#include "webdriver_session.h"
 
 namespace webdriver {
 
@@ -19,17 +19,17 @@ TitleCommand::TitleCommand(const std::vector<std::string>& path_segments,
 TitleCommand::~TitleCommand() {}
 
 bool TitleCommand::DoesGet() {
-  return true;
+    return true;
 }
 
 void TitleCommand::ExecuteGet(Response* const response) {
-  std::string title;
-  Error* error = session_->GetTitle(&title);
-  if (error) {
-    response->SetError(error);
-    return;
-  }
-  response->SetValue(new StringValue(title));
+    std::string title;
+    Error* error = session_->GetTitle(&title);
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+    response->SetValue(new StringValue(title));
 }
 
 }  // namespace webdriver

@@ -27,6 +27,10 @@ public:
     static const char kSetScriptTimeout[];
     static const char kGetAvailableLogTypes[];
     static const char kGetSessionLogs[];
+    static const char kWindowSize[];
+    static const char kWindowPosition[];
+    static const char kMaximizeWindow[];
+
 
 // TODO:
 /*    
@@ -122,11 +126,6 @@ public:
     static const char kTouchDoubleTap[];
     static const char kTouchLongPress[];
     static const char kTouchFlick[];
-    static const char kSetWindowSize[];
-    static const char kSetWindowPosition[];
-    static const char kGetWindowSize[];
-    static const char kGetWindowPosition[];
-    static const char kMaximizeWindow[];
 */    
 private:
     static std::set<std::string> standardCommandRoutes;

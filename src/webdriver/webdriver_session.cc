@@ -86,16 +86,13 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
     }
     logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
 
-    // TODO: perform init related to view
+    RunSessionTask(base::Bind(
+            &Session::InitOnSessionThread,
+            base::Unretained(this),
+            &error));
 
-//  RunSessionTask(base::Bind(
-      //&Session::InitOnSessionThread,
-      //base::Unretained(this),
-      //browser_options,
-      //&error));
-
-    //if (error)
-        //Terminate();
+    if (error)
+        Terminate();
 
     return error;
 }
@@ -233,16 +230,16 @@ ElementHandle Session::GetElementHandle(const ViewId& viewId, const ElementId& e
     return it_el->second;
 }
 
-void Session::RemoveElement(const ViewId& viewId, const ElementId& elementId) const {
-    // TODO:
-//    ViewsElementsMap::iterator it_view;
+void Session::RemoveElement(const ViewId& viewId, const ElementId& elementId) {
+    ViewsElementsMap::iterator it_view;
 
-//    it_view = elements_.find(viewId.id());
-//    if (it_view == elements_.end())
-//        return;
+    it_view = elements_.find(viewId.id());
+    if (it_view == elements_.end())
+        return;
 
-//    it_view->second.erase(elementId.id());
+    it_view->second.erase(elementId.id());
 }
+
 
 
 
@@ -272,7 +269,15 @@ void Session::RunClosureOnSessionThread(const base::Closure& task,
 }
 
 void Session::InitOnSessionThread(Error** error) {
-/*  
+    std::vector<ViewId> views;
+
+    // TODO: enumerate views
+    // create new one if need or attach to existed
+    // set current view
+    // handle capabilities
+    //ViewEnumerator::EnumerateViews(this, &views);
+
+/*
   ViewId current_view = automation_->Init(options, error);
   if (*error)
     return;
@@ -281,7 +286,8 @@ void Session::InitOnSessionThread(Error** error) {
     *error = new Error(kUnknownError, "No view ids after initialization");
     return;
   }
-  current_target_ = FrameId(current_view, FramePath());*/
+  current_target_ = FrameId(current_view, FramePath());
+  */
 }
 
 
