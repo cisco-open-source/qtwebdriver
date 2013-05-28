@@ -23,6 +23,12 @@
 #include "commands/keys_command.h"
 #include "commands/mouse_commands.h"
 #include "commands/webelement_commands.h"
+#include "commands/find_element_commands.h"
+#include "commands/target_locator_commands.h"
+#include "commands/source_command.h"
+#include "commands/url_command.h"
+#include "commands/execute_command.h"
+#include "commands/execute_async_script_command.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -161,63 +167,63 @@ DefaultRouteTable::DefaultRouteTable()
     : RouteTable() {
 
     // Place default commands registration here
-    Add<StatusCommand>(CommandRoutes::kStatus);
-    Add<GlobalLogCommand>(CommandRoutes::kGetLog);
-    Add<CreateSession>(CommandRoutes::kNewSession);
-    Add<SessionWithID>(CommandRoutes::kSession);
-    Add<Sessions>(CommandRoutes::kSessions);
-    Add<SetAsyncScriptTimeoutCommand>(CommandRoutes::kSetScriptTimeout);
-    Add<ImplicitWaitCommand>(CommandRoutes::kImplicitlyWait);
-    Add<LogTypesCommand>(CommandRoutes::kGetAvailableLogTypes);
-    Add<LogCommand>(CommandRoutes::kGetSessionLogs);
-    Add<WindowSizeCommand>(CommandRoutes::kWindowSize);
-    Add<WindowPositionCommand>(CommandRoutes::kWindowPosition);
-    Add<WindowMaximizeCommand>(CommandRoutes::kMaximizeWindow);
-    Add<TitleCommand>(CommandRoutes::kGetTitle);
-    Add<ForwardCommand>(CommandRoutes::kGoForward);
-    Add<BackCommand>(CommandRoutes::kGoBack);
-    Add<RefreshCommand>(CommandRoutes::kRefresh);
-    Add<ScreenshotCommand>(CommandRoutes::kScreenshot);
-    Add<KeysCommand>(CommandRoutes::kSendKeys);
-    Add<MoveAndClickCommand>(CommandRoutes::kClickElement);
-    Add<HoverCommand>(CommandRoutes::kHoverOverElement);
-    Add<ClickCommand>(CommandRoutes::kMouseClick);
-    Add<DoubleClickCommand>(CommandRoutes::kMouseDoubleClick);
-    Add<ButtonDownCommand>(CommandRoutes::kMouseButtonDown);
-    Add<ButtonUpCommand>(CommandRoutes::kMouseButtonUp);
-    Add<MoveToCommand>(CommandRoutes::kMouseMoveTo);
-
-    Add<ElementClearCommand>(CommandRoutes::kClearElement);
-    Add<ElementValueCommand>(CommandRoutes::kSendKeysToElement);
-    Add<ElementSubmitCommand>(CommandRoutes::kSubmitElement);
-    Add<ElementTextCommand>(CommandRoutes::kGetElementText);
-    Add<ElementNameCommand>(CommandRoutes::kGetElementTagName);
-    Add<ElementSelectedCommand>(CommandRoutes::kIsElementSelected);
-    Add<ElementEnabledCommand>(CommandRoutes::kIsElementEnabled);
-    Add<ElementDisplayedCommand>(CommandRoutes::kIsElementDisplayed);
-    Add<ElementLocationCommand>(CommandRoutes::kGetElementLocation);
-    Add<ElementLocationInViewCommand>(CommandRoutes::kGetElementLocationInView);
-    Add<ElementSizeCommand>(CommandRoutes::kGetElementSize);
-    Add<ElementAttributeCommand>(CommandRoutes::kGetElementAttribute);
-    Add<ElementCssCommand>(CommandRoutes::kGetElementValueOfCssProperty);
-    Add<ElementEqualsCommand>(CommandRoutes::kElementEquals);
+    Add<StatusCommand>                  (CommandRoutes::kStatus);
+    Add<GlobalLogCommand>               (CommandRoutes::kGetLog);
+    Add<CreateSession>                  (CommandRoutes::kNewSession);
+    Add<SessionWithID>                  (CommandRoutes::kSession);
+    Add<Sessions>                       (CommandRoutes::kSessions);
+    Add<SetAsyncScriptTimeoutCommand>   (CommandRoutes::kSetScriptTimeout);
+    Add<ImplicitWaitCommand>            (CommandRoutes::kImplicitlyWait);
+    Add<LogTypesCommand>                (CommandRoutes::kGetAvailableLogTypes);
+    Add<LogCommand>                     (CommandRoutes::kGetSessionLogs);
+    Add<WindowSizeCommand>              (CommandRoutes::kWindowSize);
+    Add<WindowPositionCommand>          (CommandRoutes::kWindowPosition);
+    Add<WindowMaximizeCommand>          (CommandRoutes::kMaximizeWindow);
+    Add<TitleCommand>                   (CommandRoutes::kGetTitle);
+    Add<ForwardCommand>                 (CommandRoutes::kGoForward);
+    Add<BackCommand>                    (CommandRoutes::kGoBack);
+    Add<RefreshCommand>                 (CommandRoutes::kRefresh);
+    Add<ScreenshotCommand>              (CommandRoutes::kScreenshot);
+    Add<KeysCommand>                    (CommandRoutes::kSendKeys);
+    Add<MoveAndClickCommand>            (CommandRoutes::kClickElement);
+    Add<HoverCommand>                   (CommandRoutes::kHoverOverElement);
+    Add<ClickCommand>                   (CommandRoutes::kMouseClick);
+    Add<DoubleClickCommand>             (CommandRoutes::kMouseDoubleClick);
+    Add<ButtonDownCommand>              (CommandRoutes::kMouseButtonDown);
+    Add<ButtonUpCommand>                (CommandRoutes::kMouseButtonUp);
+    Add<MoveToCommand>                  (CommandRoutes::kMouseMoveTo);
+    Add<ElementClearCommand>            (CommandRoutes::kClearElement);
+    Add<ElementValueCommand>            (CommandRoutes::kSendKeysToElement);
+    Add<ElementSubmitCommand>           (CommandRoutes::kSubmitElement);
+    Add<ElementTextCommand>             (CommandRoutes::kGetElementText);
+    Add<ElementNameCommand>             (CommandRoutes::kGetElementTagName);
+    Add<ElementSelectedCommand>         (CommandRoutes::kIsElementSelected);
+    Add<ElementEnabledCommand>          (CommandRoutes::kIsElementEnabled);
+    Add<ElementDisplayedCommand>        (CommandRoutes::kIsElementDisplayed);
+    Add<ElementLocationCommand>         (CommandRoutes::kGetElementLocation);
+    Add<ElementLocationInViewCommand>   (CommandRoutes::kGetElementLocationInView);
+    Add<ElementSizeCommand>             (CommandRoutes::kGetElementSize);
+    Add<ElementAttributeCommand>        (CommandRoutes::kGetElementAttribute);
+    Add<ElementCssCommand>              (CommandRoutes::kGetElementCssProp);
+    Add<ElementEqualsCommand>           (CommandRoutes::kElementEquals);
+    Add<FindOneElementCommand>          (CommandRoutes::kFindElement);
+    Add<FindManyElementsCommand>        (CommandRoutes::kFindElements);
+    Add<SwitchFrameCommand>             (CommandRoutes::kSwitchToFrame);
+    Add<ActiveElementCommand>           (CommandRoutes::kGetActiveElement);
+    Add<WindowHandleCommand>            (CommandRoutes::kGetCurrentWindowHandle);
+    Add<WindowHandlesCommand>           (CommandRoutes::kGetWindowHandles);
+    Add<WindowCommand>                  (CommandRoutes::kWindowCmd);
+    Add<SourceCommand>                  (CommandRoutes::kGetPageSource);
+    Add<URLCommand>                     (CommandRoutes::kUrlCmd);
+    Add<ExecuteCommand>                 (CommandRoutes::kExecuteScript);
+    Add<ExecuteAsyncScriptCommand>      (CommandRoutes::kExecuteAsyncScript);
 
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
-  dispatcher->AddLog("/log");
-
-  dispatcher->Add<CreateSession>("/session");
-
-  dispatcher->Add<Sessions>("/sessions");
-
   // WebElement commands
-  dispatcher->Add<FindOneElementCommand>(  "/session/*/element");
-  dispatcher->Add<FindManyElementsCommand>("/session/*/elements");
-  dispatcher->Add<ActiveElementCommand>(   "/session/*/element/active");
-  dispatcher->Add<FindOneElementCommand>(  "/session/*/element/*/element");
-  dispatcher->Add<FindManyElementsCommand>("/session/*/elements/*/elements");
+  
   
 
 
@@ -232,18 +238,11 @@ dispatcher->AddShutdown("/shutdown", shutdown_event);
   dispatcher->Add<AcceptAlertCommand>(  "/session/*/accept_alert");
   dispatcher->Add<AlertTextCommand>(    "/session/*/alert_text");
     dispatcher->Add<DismissAlertCommand>( "/session/*/dismiss_alert");
-  dispatcher->Add<ExecuteCommand>(      "/session/*/execute");
-  dispatcher->Add<ExecuteAsyncScriptCommand>(
-                                        "/session/*/execute_async");
   
-  dispatcher->Add<SwitchFrameCommand>(  "/session/*/frame");
   
-  dispatcher->Add<SourceCommand>(       "/session/*/source");
-  dispatcher->Add<URLCommand>(          "/session/*/url");
-  dispatcher->Add<WindowCommand>(       "/session/*/window");
-  dispatcher->Add<WindowHandleCommand>( "/session/*/window_handle");
-  dispatcher->Add<WindowHandlesCommand>("/session/*/window_handles");
-
+ 
+    
+  
   // Cookie functions.
   dispatcher->Add<CookieCommand>(     "/session/*/cookie");
   dispatcher->Add<NamedCookieCommand>("/session/*/cookie/*");

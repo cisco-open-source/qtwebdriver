@@ -55,9 +55,19 @@ public:
     static const char kGetElementLocationInView[];
     static const char kGetElementSize[];
     static const char kGetElementAttribute[];
-    static const char kGetElementValueOfCssProperty[];
+    static const char kGetElementCssProp[];
     static const char kElementEquals[];
-    
+    static const char kFindElement[];
+    static const char kFindElements[];
+    static const char kSwitchToFrame[];
+    static const char kGetActiveElement[];
+    static const char kGetCurrentWindowHandle[];
+    static const char kGetWindowHandles[];
+    static const char kWindowCmd[];
+    static const char kGetPageSource[];
+    static const char kUrlCmd[];
+    static const char kExecuteScript[];
+    static const char kExecuteAsyncScript[];
 
 // TODO:
 /*    
@@ -67,20 +77,15 @@ public:
     static const char kGetCookies[];
     static const char kDeleteCookie[];
     static const char kDeleteAllCookies[];
-    static const char kFindElement[];
-    static const char kFindElements[];
+    
     static const char kFindChildElement[];
     static const char kFindChildElements[];
     
     static const char kSendKeysToActiveElement[];
     
-    static const char kGetCurrentWindowHandle[];
-    static const char kGetWindowHandles[];
-    static const char kSwitchToWindow[];
-    static const char kSwitchToFrame[];
-    static const char kGetActiveElement[];
-    static const char kGetCurrentUrl[];
-    static const char kGetPageSource[];
+    
+    
+   
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];
     static const char kSetBrowserVisible[];

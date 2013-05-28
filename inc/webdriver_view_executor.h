@@ -44,6 +44,7 @@ public:
     virtual void GoBack(Error** error) = 0;
     virtual void Reload(Error** error) = 0;
     virtual void GetScreenShot(std::string* png, Error** error) = 0;
+    virtual void GetSource(std::string* source, Error** error) = 0;
     virtual void SendKeys(const string16& keys, Error** error) = 0;
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;
     virtual void MouseDoubleClick(Error** error) = 0;
@@ -71,6 +72,32 @@ public:
     virtual void ElementSubmit(const ElementId& element, Error** error) = 0;
     virtual void GetElementText(const ElementId& element, std::string* element_text, Error** error) = 0;
     virtual void GetElementCssProperty(const ElementId& element, const std::string& property, base::Value** value, Error** error) = 0;
+    virtual void FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) = 0;
+    virtual void FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) = 0;
+    virtual void ActiveElement(ElementId* element, Error** error) = 0;
+    virtual void Close(Error** error) = 0;
+    /// set view as current
+    virtual void SwitchTo(Error** error) = 0;
+    /// Switches the frame used by default. |name_or_id| is either the name or id
+    /// of a frame element.
+    virtual void SwitchToFrameWithNameOrId(const std::string& name_or_id, Error** error) = 0;
+    /// Switches the frame used by default. |index| is the zero-based frame index.
+    virtual void SwitchToFrameWithIndex(int index, Error** error) = 0;
+    /// Switches to the frame identified by the given |element|. The element must
+    /// be either an IFRAME or FRAME element.
+    virtual void SwitchToFrameWithElement(const ElementId& element, Error** error) = 0;
+    /// Switches the target frame to the topmost frame.
+    virtual void SwitchToTopFrame(Error** error) = 0;
+    virtual void NavigateToURL(const std::string& url, Error** error) = 0;
+    virtual void GetURL(std::string* url, Error** error) = 0;
+    virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
+    virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
+
+
+
+
+
+
 
 
 

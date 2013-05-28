@@ -44,9 +44,21 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kGetElementLocationInView);
 		standardCommandRoutes.insert(kGetElementSize);
 		standardCommandRoutes.insert(kGetElementAttribute);
-		standardCommandRoutes.insert(kGetElementValueOfCssProperty);
+		standardCommandRoutes.insert(kGetElementCssProp);
 		standardCommandRoutes.insert(kElementEquals);
-		
+		standardCommandRoutes.insert(kFindElement);
+		standardCommandRoutes.insert(kFindElements);
+		standardCommandRoutes.insert(kSwitchToFrame);
+		standardCommandRoutes.insert(kGetActiveElement);
+		standardCommandRoutes.insert(kGetCurrentWindowHandle);
+		standardCommandRoutes.insert(kGetWindowHandles);
+		standardCommandRoutes.insert(kWindowCmd);
+		standardCommandRoutes.insert(kGetPageSource);
+		standardCommandRoutes.insert(kUrlCmd);
+		standardCommandRoutes.insert(kExecuteScript);
+		standardCommandRoutes.insert(kExecuteAsyncScript);
+
+
 	}
 
 	// check if paatern is presence in set
@@ -55,46 +67,56 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 	return (got != standardCommandRoutes.end());
 }
 
-const char CommandRoutes::kStatus[] = "/status";
-const char CommandRoutes::kGetLog[] = "/log";
-const char CommandRoutes::kNewSession[] = "/session";
-const char CommandRoutes::kSession[] = "/session/*";
-const char CommandRoutes::kSessions[] = "/sessions";
-const char CommandRoutes::kImplicitlyWait[] = "/session/*/timeouts/implicit_wait";
-const char CommandRoutes::kSetScriptTimeout[] = "/session/*/timeouts/async_script";
-const char CommandRoutes::kGetAvailableLogTypes[] = "/session/*/log/types";
-const char CommandRoutes::kGetSessionLogs[] = "/session/*/log";
-const char CommandRoutes::kWindowSize[] = "/session/*/window/*/size";
-const char CommandRoutes::kWindowPosition[] = "/session/*/window/*/position";
-const char CommandRoutes::kMaximizeWindow[] = "/session/*/window/*/maximize";
-const char CommandRoutes::kGetTitle[] = "/session/*/title";
-const char CommandRoutes::kGoForward[] = "/session/*/forward";
-const char CommandRoutes::kGoBack[] = "/session/*/back";
-const char CommandRoutes::kRefresh[] = "/session/*/refresh";
-const char CommandRoutes::kScreenshot[] = "/session/*/screenshot";
-const char CommandRoutes::kSendKeys[] = "/session/*/keys";
-const char CommandRoutes::kClickElement[] = "/session/*/element/*/click";
-const char CommandRoutes::kHoverOverElement[] = "/session/*/element/*/hover";
-const char CommandRoutes::kMouseClick[] = "/session/*/click";
-const char CommandRoutes::kMouseDoubleClick[] = "/session/*/doubleclick";
-const char CommandRoutes::kMouseButtonDown[] = "/session/*/buttondown";
-const char CommandRoutes::kMouseButtonUp[] = "/session/*/buttonup";
-const char CommandRoutes::kMouseMoveTo[] = "/session/*/moveto";
-const char CommandRoutes::kClearElement[] = "/session/*/element/*/clear";
-const char CommandRoutes::kSendKeysToElement[] = "/session/*/element/*/value";
-const char CommandRoutes::kSubmitElement[] = "/session/*/element/*/submit";
-const char CommandRoutes::kGetElementText[] = "/session/*/element/*/text";
-const char CommandRoutes::kGetElementTagName[] = "/session/*/element/*/name";
-const char CommandRoutes::kIsElementSelected[] = "/session/*/element/*/selected";
-const char CommandRoutes::kIsElementEnabled[] = "/session/*/element/*/enabled";
-const char CommandRoutes::kIsElementDisplayed[] = "/session/*/element/*/displayed";
-const char CommandRoutes::kGetElementLocation[] = "/session/*/element/*/location";
-const char CommandRoutes::kGetElementLocationInView[] = "/session/*/element/*/location_in_view";
-const char CommandRoutes::kGetElementSize[] = "/session/*/element/*/size";
-const char CommandRoutes::kGetElementAttribute[] = "/session/*/element/*/attribute/*";
-const char CommandRoutes::kGetElementValueOfCssProperty[] = "/session/*/element/*/css/*";
-const char CommandRoutes::kElementEquals[] = "/session/*/element/*/equals/*";
-
+const char CommandRoutes::kStatus[] 					= "/status";
+const char CommandRoutes::kGetLog[] 					= "/log";
+const char CommandRoutes::kNewSession[] 				= "/session";
+const char CommandRoutes::kSession[] 					= "/session/*";
+const char CommandRoutes::kSessions[] 					= "/sessions";
+const char CommandRoutes::kImplicitlyWait[] 			= "/session/*/timeouts/implicit_wait";
+const char CommandRoutes::kSetScriptTimeout[] 			= "/session/*/timeouts/async_script";
+const char CommandRoutes::kGetAvailableLogTypes[] 		= "/session/*/log/types";
+const char CommandRoutes::kGetSessionLogs[] 			= "/session/*/log";
+const char CommandRoutes::kWindowSize[] 				= "/session/*/window/*/size";
+const char CommandRoutes::kWindowPosition[] 			= "/session/*/window/*/position";
+const char CommandRoutes::kMaximizeWindow[] 			= "/session/*/window/*/maximize";
+const char CommandRoutes::kGetTitle[] 					= "/session/*/title";
+const char CommandRoutes::kGoForward[] 					= "/session/*/forward";
+const char CommandRoutes::kGoBack[] 					= "/session/*/back";
+const char CommandRoutes::kRefresh[] 					= "/session/*/refresh";
+const char CommandRoutes::kScreenshot[] 				= "/session/*/screenshot";
+const char CommandRoutes::kSendKeys[] 					= "/session/*/keys";
+const char CommandRoutes::kClickElement[] 				= "/session/*/element/*/click";
+const char CommandRoutes::kHoverOverElement[] 			= "/session/*/element/*/hover";
+const char CommandRoutes::kMouseClick[] 				= "/session/*/click";
+const char CommandRoutes::kMouseDoubleClick[] 			= "/session/*/doubleclick";
+const char CommandRoutes::kMouseButtonDown[]			= "/session/*/buttondown";
+const char CommandRoutes::kMouseButtonUp[] 				= "/session/*/buttonup";
+const char CommandRoutes::kMouseMoveTo[] 				= "/session/*/moveto";
+const char CommandRoutes::kClearElement[] 				= "/session/*/element/*/clear";
+const char CommandRoutes::kSendKeysToElement[] 			= "/session/*/element/*/value";
+const char CommandRoutes::kSubmitElement[] 				= "/session/*/element/*/submit";
+const char CommandRoutes::kGetElementText[] 			= "/session/*/element/*/text";
+const char CommandRoutes::kGetElementTagName[] 			= "/session/*/element/*/name";
+const char CommandRoutes::kIsElementSelected[] 			= "/session/*/element/*/selected";
+const char CommandRoutes::kIsElementEnabled[] 			= "/session/*/element/*/enabled";
+const char CommandRoutes::kIsElementDisplayed[]			= "/session/*/element/*/displayed";
+const char CommandRoutes::kGetElementLocation[] 		= "/session/*/element/*/location";
+const char CommandRoutes::kGetElementLocationInView[] 	= "/session/*/element/*/location_in_view";
+const char CommandRoutes::kGetElementSize[] 			= "/session/*/element/*/size";
+const char CommandRoutes::kGetElementAttribute[] 		= "/session/*/element/*/attribute/*";
+const char CommandRoutes::kGetElementCssProp[] 			= "/session/*/element/*/css/*";
+const char CommandRoutes::kElementEquals[] 				= "/session/*/element/*/equals/*";
+const char CommandRoutes::kFindElement[] 				= "/session/*/element/*/element";
+const char CommandRoutes::kFindElements[] 				= "/session/*/elements/*/elements";
+const char CommandRoutes::kSwitchToFrame[] 				= "/session/*/frame";
+const char CommandRoutes::kGetActiveElement[] 			= "/session/*/element/active";
+const char CommandRoutes::kGetCurrentWindowHandle[]		= "/session/*/window_handle";
+const char CommandRoutes::kGetWindowHandles[] 			= "/session/*/window_handle";
+const char CommandRoutes::kWindowCmd[] 					= "/session/*/window";
+const char CommandRoutes::kGetPageSource[] 				= "/session/*/source";
+const char CommandRoutes::kUrlCmd[] 					= "/session/*/url";
+const char CommandRoutes::kExecuteScript[] 				= "/session/*/execute";
+const char CommandRoutes::kExecuteAsyncScript[] 		= "/session/*/execute_async";
 
 
 /*
@@ -105,20 +127,10 @@ const char CommandRoutes::kGetCookie[] = "getCookie";
 const char CommandRoutes::kGetCookies[] = "getCookies";
 const char CommandRoutes::kDeleteCookie[] = "deleteCookie";
 const char CommandRoutes::kDeleteAllCookies[] = "deleteAllCookies";
-const char CommandRoutes::kFindElement[] = "findElement";
-const char CommandRoutes::kFindElements[] = "findElements";
 const char CommandRoutes::kFindChildElement[] = "findChildElement";
 const char CommandRoutes::kFindChildElements[] = "findChildElements";
 const char CommandRoutes::kSendKeysToActiveElement[] = "sendKeysToActiveElement";
-const char CommandRoutes::kGetCurrentWindowHandle[] = "getCurrentWindowHandle";
-const char CommandRoutes::kGetWindowHandles[] = "getWindowHandles";
-const char CommandRoutes::kSwitchToWindow[] = "switchToWindow";
-const char CommandRoutes::kSwitchToFrame[] = "switchToFrame";
-const char CommandRoutes::kGetActiveElement[] = "getActiveElement";
-const char CommandRoutes::kGetCurrentUrl[] = "getCurrentUrl";
-const char CommandRoutes::kGetPageSource[] = "getPageSource";
-const char CommandRoutes::kExecuteScript[] = "executeScript";
-const char CommandRoutes::kExecuteAsyncScript[] = "executeAsyncScript";
+
 const char CommandRoutes::kSetBrowserVisible[] = "setBrowserVisible";
 const char CommandRoutes::kIsBrowserVisible[] = "isBrowserVisible";
 const char CommandRoutes::kGetAlert[] = "getAlert";

@@ -7,19 +7,17 @@
 #include <string>
 
 #include "base/values.h"
+#include "base/bind.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_session.h"
+#include "webdriver_view_executor.h"
 
 namespace webdriver {
 
-// Private atom to find source code of the page.
-const char* const kSource =
-    "return new XMLSerializer().serializeToString(document);";
-
 SourceCommand::SourceCommand(const std::vector<std::string>& path_segments,
                              const DictionaryValue* const parameters)
-    : WebDriverCommand(path_segments, parameters) {}
+    : ViewWebDriverCommand(path_segments, parameters) {}
 
 SourceCommand::~SourceCommand() {}
 
@@ -28,14 +26,21 @@ bool SourceCommand::DoesGet() {
 }
 
 void SourceCommand::ExecuteGet(Response* const response) {
-    ListValue args;
-    Value* result = NULL;
-    Error* error = session_->GetSource(kSource, &args, &result);
+    std::string page_source;
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetSource,
+            base::Unretained(executor_.get()),
+            &page_source,
+            &error));
+    
     if (error) {
         response->SetError(error);
         return;
     }
-    response->SetValue(result);
+
+    response->SetValue(new StringValue(page_source));
 }
 
 }  // namespace webdriver
