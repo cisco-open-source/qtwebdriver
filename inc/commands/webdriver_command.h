@@ -18,6 +18,7 @@ namespace webdriver {
 
 class Response;
 class Session;
+class ViewCmdExecutor;
 
 /// All URLs that are found in the document:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol
@@ -45,6 +46,22 @@ protected:
     std::string session_id_;
 
     DISALLOW_COPY_AND_ASSIGN(WebDriverCommand);
+};
+
+/// Handles commands that interact with current view.
+class ViewWebDriverCommand : public WebDriverCommand {
+public:
+    ViewWebDriverCommand(const std::vector<std::string>& path_segments,
+                    const base::DictionaryValue* const parameters);
+    virtual ~ViewWebDriverCommand();
+
+    virtual bool Init(Response* const response) OVERRIDE;
+
+protected:
+    scoped_ptr<ViewCmdExecutor> executor_;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(ViewWebDriverCommand);
 };
 
 }  // namespace webdriver

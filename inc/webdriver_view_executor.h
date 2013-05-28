@@ -6,14 +6,28 @@
 #include <map>
 
 #include "base/basictypes.h"
+#include "base/string16.h"
 #include "webdriver_view_id.h"
+#include "webdriver_element_id.h"
 
+namespace base {
+class Value;    
+}
 
 namespace webdriver {
 
 class Session;
 class Error;
 class Rect;
+class Point;
+class Size;
+
+/// @enum MouseButton button codes
+enum MouseButton {
+    kLeftButton = 0,
+    kMiddleButton = 1,
+    kRightButton = 2
+};
 
 
 /// base class for custom view's executors
@@ -26,7 +40,49 @@ public:
     virtual void GetBounds(Rect *bounds, Error **error) = 0;
     virtual void SetBounds(const Rect& bounds, Error** error) = 0;
     virtual void Maximize(Error** error) = 0;
+    virtual void GoForward(Error** error) = 0;
+    virtual void GoBack(Error** error) = 0;
+    virtual void Reload(Error** error) = 0;
+    virtual void GetScreenShot(std::string* png, Error** error) = 0;
+    virtual void SendKeys(const string16& keys, Error** error) = 0;
+    virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;
+    virtual void MouseDoubleClick(Error** error) = 0;
+    virtual void MouseButtonUp(Error** error) = 0;
+    virtual void MouseButtonDown(Error** error) = 0;
+    virtual void MouseClick(MouseButton button, Error** error) = 0;
+    /// move mouse to position: cur_point + offset
+    virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
+    /// Move the mouse by an offset of the specificed element
+    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) = 0;
+    /// the mouse will be moved to the center of the element
+    virtual void MouseMove(const ElementId& element, Error** error) = 0;
+    virtual void ClickElement(const ElementId& element, Error** error) = 0;
+    virtual void GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) = 0;
+    virtual void ClearElement(const ElementId& element, Error** error) = 0;
+    virtual void IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) = 0;
+    virtual void IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) = 0;
+    virtual void ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) = 0;
+    virtual void GetElementLocation(const ElementId& element, Point* location, Error** error) = 0;
+    virtual void GetElementLocationInView(const ElementId& element, Point* location, Error** error) = 0;
+    virtual void GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) = 0;
+    virtual void IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) = 0;
+    virtual void SetOptionElementSelected(const ElementId& element, bool selected, Error** error) = 0;
+    virtual void GetElementSize(const ElementId& element, Size* size, Error** error) = 0;
+    virtual void ElementSubmit(const ElementId& element, Error** error) = 0;
+    virtual void GetElementText(const ElementId& element, std::string* element_text, Error** error) = 0;
+    virtual void GetElementCssProperty(const ElementId& element, const std::string& property, base::Value** value, Error** error) = 0;
 
+
+
+
+
+
+
+
+
+
+
+ 
   
 
 private:

@@ -6,15 +6,18 @@
 
 #include <string>
 
+#include "base/bind.h"
+
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_session.h"
+#include "webdriver_view_executor.h"
 
 namespace webdriver {
 
 TitleCommand::TitleCommand(const std::vector<std::string>& path_segments,
                            const DictionaryValue* const parameters)
-    : WebDriverCommand(path_segments, parameters) {}
+    : ViewWebDriverCommand(path_segments, parameters) {}
 
 TitleCommand::~TitleCommand() {}
 
@@ -24,7 +27,14 @@ bool TitleCommand::DoesGet() {
 
 void TitleCommand::ExecuteGet(Response* const response) {
     std::string title;
-    Error* error = session_->GetTitle(&title);
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetTitle,
+            base::Unretained(executor_.get()),
+            &title,
+            &error));
+
     if (error) {
         response->SetError(error);
         return;

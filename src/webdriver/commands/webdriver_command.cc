@@ -17,6 +17,7 @@
 #include "webdriver_session.h"
 #include "webdriver_session_manager.h"
 #include "webdriver_util.h"
+#include "webdriver_view_executor.h"
 
 namespace webdriver {
 
@@ -87,5 +88,30 @@ void WebDriverCommand::Finish(Response* const response) {
 bool WebDriverCommand::ShouldRunPreAndPostCommandHandlers() {
     return true;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ViewWebDriverCommand::ViewWebDriverCommand(
+    const std::vector<std::string>& path_segments,
+    const DictionaryValue* const parameters)
+    : WebDriverCommand(path_segments, parameters),
+      executor_(NULL) {}
+
+ViewWebDriverCommand::~ViewWebDriverCommand() {}
+
+bool ViewWebDriverCommand::Init(Response* const response) {
+    if (!WebDriverCommand::Init(response))
+        return false;
+
+    // get executor for current view
+    executor_.reset(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_));
+    if (NULL == executor_.get()) {
+        response->SetError(new Error(kBadRequest, "cant get view executor."));
+        return false;
+    }
+
+    return true;
+}
+
 
 }  // namespace webdriver

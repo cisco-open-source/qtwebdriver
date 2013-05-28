@@ -30,14 +30,38 @@ public:
     static const char kWindowSize[];
     static const char kWindowPosition[];
     static const char kMaximizeWindow[];
-
+    static const char kGetTitle[];
+    static const char kGoForward[];
+    static const char kGoBack[];
+    static const char kRefresh[];
+    static const char kScreenshot[];
+    static const char kSendKeys[];
+    static const char kClickElement[];
+    static const char kHoverOverElement[];
+    static const char kMouseClick[];
+    static const char kMouseDoubleClick[];
+    static const char kMouseButtonDown[];
+    static const char kMouseButtonUp[];
+    static const char kMouseMoveTo[];
+    static const char kClearElement[];
+    static const char kSendKeysToElement[];
+    static const char kSubmitElement[];
+    static const char kGetElementText[];
+    static const char kGetElementTagName[];
+    static const char kIsElementSelected[];
+    static const char kIsElementEnabled[];
+    static const char kIsElementDisplayed[];
+    static const char kGetElementLocation[];
+    static const char kGetElementLocationInView[];
+    static const char kGetElementSize[];
+    static const char kGetElementAttribute[];
+    static const char kGetElementValueOfCssProperty[];
+    static const char kElementEquals[];
+    
 
 // TODO:
 /*    
     static const char kGet[];
-    static const char kGoBack[];
-    static const char kGoForward[];
-    static const char kRefresh[];
     static const char kAddCookie[];
     static const char kGetCookie[];
     static const char kGetCookies[];
@@ -47,13 +71,9 @@ public:
     static const char kFindElements[];
     static const char kFindChildElement[];
     static const char kFindChildElements[];
-    static const char kClearElement[];
-    static const char kClickElement[];
-    static const char kHoverOverElement[];
-    static const char kSendKeysToElement[];
+    
     static const char kSendKeysToActiveElement[];
-    static const char kSubmitElement[];
-    static const char kUploadFile[];
+    
     static const char kGetCurrentWindowHandle[];
     static const char kGetWindowHandles[];
     static const char kSwitchToWindow[];
@@ -61,25 +81,11 @@ public:
     static const char kGetActiveElement[];
     static const char kGetCurrentUrl[];
     static const char kGetPageSource[];
-    static const char kGetTitle[];
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];
     static const char kSetBrowserVisible[];
     static const char kIsBrowserVisible[];
-    static const char kGetElementText[];
-    static const char kGetElementValue[];
-    static const char kGetElementTagName[];
-    static const char kDragElement[];
-    static const char kIsElementSelected[];
-    static const char kIsElementEnabled[];
-    static const char kIsElementDisplayed[];
-    static const char kGetElementLocation[];
-    static const char kGetElementLocationOnceScrolledIntoView[];
-    static const char kGetElementSize[];
-    static const char kGetElementAttribute[];
-    static const char kGetElementValueOfCssProperty[];
-    static const char kElementEquals[];
-    static const char kScreenshot[];
+
     static const char kGetAlert[];
     static const char kAcceptAlert[];
     static const char kDismissAlert[];
@@ -107,12 +113,7 @@ public:
     static const char kGetSessionStorageSize[];
     static const char kSetScreenOrientation[];
     static const char kGetScreenOrientation[];
-    static const char kMouseClick[];
-    static const char kMouseDoubleClick[];
-    static const char kMouseButtonDown[];
-    static const char kMouseButtonUp[];
-    static const char kMouseMoveTo[];
-    static const char kSendKeys[];
+    
     static const char kImeGetAvailableEngines[];
     static const char kImeGetActiveEngine[];
     static const char kImeIsActivated[];
