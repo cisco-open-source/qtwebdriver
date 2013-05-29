@@ -334,7 +334,6 @@
         'src/chrome/common/automation_id.cc',
         'src/chrome/common/chrome_constants.cc',
         'src/chrome/common/chrome_switches.cc',
-        'src/chrome/common/chrome_version_info.cc',
         'src/chrome/test/automation/automation_json_requests.cc',
         'src/chrome/test/automation/value_conversion_traits.cc',
         'src/chrome/test/webdriver/commands/alert_commands.cc',
@@ -400,6 +399,8 @@
         'src/viewfactory.cc',
         'src/ServerThread.h',
         'src/ServerThread.cc',
+	'src/versioninfo.cc',
+        'src/wdversion.cc',
       ],
 
       'conditions': [
@@ -439,7 +440,6 @@
             'src/base/threading/thread_local_posix.cc',
             'src/base/threading/thread_local_storage_posix.cc',
             'src/base/threading/worker_pool_posix.cc',
-            'src/chrome/common/chrome_version_info_posix.cc',
             'src/net/base/file_stream_metrics_posix.cc',
             'src/net/base/file_stream_posix.cc',
             'src/net/base/net_errors_posix.cc',

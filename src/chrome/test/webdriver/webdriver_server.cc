@@ -64,6 +64,7 @@
 #include "chrome/test/webdriver/webdriver_util.h"
 #include "mongoose.h"
 #include "base/json/json_reader.h"
+#include "versioninfo.h"
 #include <WebDriver.h>
 
 #if defined(OS_WIN)
@@ -355,6 +356,15 @@ int RunChromeDriver() {
      return (EXIT_SUCCESS);
   }
 
+  if (cmd_line->HasSwitch("version"))
+  {
+    VersionInfo version_info;
+    std::cout <<version_info.CreateVersionString()<< std::endl;
+
+
+     return (EXIT_SUCCESS);
+  }
+
 #if defined(OS_WIN)
   system("qtvars.bat vsvars");
 #endif
@@ -538,6 +548,7 @@ bool parse_config_to_cmd_line()
                 cmd_line->AppendSwitchASCII("http-threads", base::IntToString(http_threads));
             if (result_dict->GetString("log-path", &log_path))
                 cmd_line->AppendSwitchASCII("log-path", log_path);
+
         }
         else
         {
