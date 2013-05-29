@@ -104,28 +104,29 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     qDebug()<<"[WD]:"<<"*************INIT SESSION******************";
     BuildKeyMap();
 
-	*build_no = build_no_;
-//Need to keep after merge sessionId remove
+    *build_no = build_no_;
+    //Need to keep after merge sessionId remove
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
-    QWidget *pStartView = NULL;
+    QWebView *pStartView = NULL;
 
     //Searching for a allready opened window
     if (!options.browser_start_window.empty())
     {
         qDebug()<<"[WD]:"<<"Browser Start Window: "<<options.browser_start_window.c_str();
-        foreach(QWidget* pWidget, qApp->allWidgets())
+        foreach(QWidget* pWidget, qApp->topLevelWidgets())
         {
 
             //check found widget if it is QWebView or top level widget
-            if ((pWidget != NULL) || pWidget->isTopLevel())
+            QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+            if ((pWebView != NULL) && (!pWebView->isHidden()))
             {
                 qDebug()<<"[WD]:"<<"looking for start window: "<<pWidget<<pWidget->windowTitle();
 
                 if ((options.browser_start_window == pWidget->windowTitle().toStdString()) || (options.browser_start_window == "*"))
                 {
-                    pStartView = pWidget;
+                    pStartView = pWebView;
 
                     qDebug()<<"[WD]: found view to attach: "<<pWidget<<pWidget->windowTitle();
 
@@ -140,21 +141,15 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
         pStartView = ViewFactory::GetInstance()->create(options.browser_class);
 
     qDebug()<<"[WD]:"<<"Using window:"<<pStartView;
-    if (pStartView == NULL)
-    {
-        *error = new Error(kBadRequest, "Can't create WebView");
-        return;
-    }
 
     // TODO: save proxy settings for further usage
-    QWebView* pWebView = qobject_cast<QWebView*>(pStartView);
-    if (pWebView != NULL)
+    if (pStartView != NULL)
     {
         //proxy setup
         if (options.command.HasSwitch(switches::kNoProxyServer))
         {
             qDebug()<<"[WD]:" << "No proxy";
-            pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+            pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
         }
         else if (options.command.HasSwitch(switches::kProxyServer))
         {
@@ -175,7 +170,7 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
                     if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
                     {
                         int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-                        pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                        pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
                     }
                 }
             }
@@ -199,12 +194,12 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
             if (proxyUrl.isValid() && !proxyUrl.host().isEmpty())
             {
                 int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
-                pWebView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
+                pStartView->page()->networkAccessManager()->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort));
             }
         }
 
-        qDebug()<<"[WD]:" << "hostname = " << pWebView->page()->networkAccessManager()->proxy().hostName()
-                 << ", port = " << pWebView->page()->networkAccessManager()->proxy().port();
+        qDebug()<<"[WD]:" << "hostname = " << pStartView->page()->networkAccessManager()->proxy().hostName()
+                 << ", port = " << pStartView->page()->networkAccessManager()->proxy().port();
     }
 
     //handle initial window size and position
@@ -264,14 +259,6 @@ void Automation::Terminate()
   {
       if (!pView->isHidden())
       {
-          // destroy children correctly
-          QList<QWidget*> childs = pView->findChildren<QWidget*>();
-          foreach(QWidget *child, childs)
-          {
-              child->setAttribute(Qt::WA_DeleteOnClose, true);
-              child->close();
-          }
-
           pView->setAttribute(Qt::WA_DeleteOnClose, true);
           pView->close();
       }
@@ -509,8 +496,18 @@ void Automation::DragAndDropFilePaths(const WebViewId &view_id, const Point &loc
     QMimeData data;
     QList<QUrl> urls;
 
+#if defined(OS_POSIX)
     for (uint i = 0; i < paths.size(); i++)
         urls.append(QUrl(paths.at(i).c_str()));
+#elif defined(OS_WIN)
+    QString string;
+
+    for (uint i = 0; i < paths.size(); i++)
+    {
+        string = QString::fromUtf16((ushort*)paths.at(i).c_str());
+        urls.append(QUrl(string));
+    }
+#endif // OS_WIN
 
     data.setUrls(urls);
 
@@ -615,9 +612,15 @@ void Automation::CaptureEntirePageAsPNG(const WebViewId &view_id, const FilePath
     }
 
     QWidget *view = view_id.GetView();
-
     QPixmap pixmap = QPixmap::grabWidget(view);
-    bool saved = pixmap.save(path.value().c_str());
+
+    bool saved = false;
+
+#if defined(OS_POSIX)
+    saved = pixmap.save(path.value().c_str());
+#elif defined(OS_WIN)
+    saved = pixmap.save(QString::fromUtf16((ushort*)path.value().c_str()));
+#endif // OS_WIN
 
     if (false == saved)
     {
@@ -1034,14 +1037,7 @@ void Automation::CloseView(const WebViewId &view_id, Error **error)
     QWidget *view = view_id.GetView();
     logger_.Log(kWarningLogLevel, "Automation::CloseView");
 
-    // destroy children correctly
-    QList<QWidget*> childs = view->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
-        child->close();
-    }
-
+    view->setAttribute(Qt::WA_DeleteOnClose, true);
     view->close();
 }
 
@@ -1639,7 +1635,12 @@ QString Automation::GenerateElementKey(const QWidget* widget)
     char key[16];
     qsrand(QTime::currentTime().msec());
 
-    snprintf(key, 16, ":qtw:%08x", qrand());
+#if defined(OS_WIN)
+    _snprintf(key, 16, ":qtw:%08x", qrand());
+#else
+	snprintf(key, 16, ":qtw:%08x", qrand());
+#endif
+
     return QString(key);
 }
 

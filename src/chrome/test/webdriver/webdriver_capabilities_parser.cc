@@ -107,7 +107,6 @@ Error* CapabilitiesParser::Parse() {
     parser_map["chrome.localState"] = &CapabilitiesParser::ParseLocalState;
     parser_map["chrome.nativeEvents"] = &CapabilitiesParser::ParseNativeEvents;
     parser_map["chrome.prefs"] = &CapabilitiesParser::ParsePrefs;
-    parser_map["chrome.profile"] = &CapabilitiesParser::ParseProfile;
     parser_map["chrome.switches"] = &CapabilitiesParser::ParseArgs;
     parser_map["switches"] = &CapabilitiesParser::ParseArgs;
     parser_map["chrome.noWebsiteTestingDefaults"] =
@@ -124,7 +123,6 @@ Error* CapabilitiesParser::Parse() {
     parser_map["localState"] = &CapabilitiesParser::ParseLocalState;
     parser_map["nativeEvents"] = &CapabilitiesParser::ParseNativeEvents;
     parser_map["prefs"] = &CapabilitiesParser::ParsePrefs;
-    parser_map["profile"] = &CapabilitiesParser::ParseProfile;
     parser_map["noWebsiteTestingDefaults"] =
         &CapabilitiesParser::ParseNoWebsiteTestingDefaults;
     parser_map["switches"] = &CapabilitiesParser::ParseArgs;
@@ -274,17 +272,6 @@ Error* CapabilitiesParser::ParsePrefs(const Value* option) {
   return NULL;
 }
 
-Error* CapabilitiesParser::ParseProfile(const Value* option) {
-  std::string profile_base64;
-  if (!option->GetAsString(&profile_base64))
-    return CreateBadInputError("profile", Value::TYPE_STRING, option);
-  std::string error_msg;
-  caps_->profile = root_.AppendASCII("profile");
-  if (!Base64DecodeAndUnzip(caps_->profile, profile_base64, &error_msg))
-    return new Error(kUnknownError, "unable to unpack profile: " + error_msg);
-  return NULL;
-}
-
 Error* CapabilitiesParser::ParseProxy(const base::Value* option) {
   const DictionaryValue* options;
   if (!option->GetAsDictionary(&options))
@@ -427,7 +414,7 @@ Error* CapabilitiesParser::ParseNoProxy(const base::Value* option){
   std::string proxy_bypass_list;
   if (!option->GetAsString(&proxy_bypass_list))
     return CreateBadInputError("noProxy", Value::TYPE_STRING, option);
-  if (!proxy_bypass_list.empty())
+  //if (!proxy_bypass_list.empty())
     //caps_->command.AppendSwitchASCII(switches::kProxyBypassList,
 //                                     proxy_bypass_list);
   return NULL;

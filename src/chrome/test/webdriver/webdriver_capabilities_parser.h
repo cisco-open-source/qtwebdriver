@@ -114,7 +114,6 @@ class CapabilitiesParser {
   Error* ParseNativeEvents(const base::Value* option);
   Error* ParseNoProxy(const base::Value* option);
   Error* ParsePrefs(const base::Value* option);
-  Error* ParseProfile(const base::Value* option);
   Error* ParseProxy(const base::Value* option);
   Error* ParseProxyAutoDetect(const base::DictionaryValue* options);
   Error* ParseProxyAutoconfigUrl(const base::DictionaryValue* options);

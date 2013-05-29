@@ -15,9 +15,12 @@ report/*
 /bin/
 /lib/
 /out/
-/wd.gypi
 /wd.Makefile
 /Makefile
 /WebDriver.target.mk
 /WebDriverTest.target.mk
 *.log
+WD.*
+desktop/
+flip/
+src/wdversion.cc

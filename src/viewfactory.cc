@@ -15,7 +15,7 @@ ViewFactory* ViewFactory::GetInstance()
     return instance;
 }
 
-QWidget* ViewFactory::create(const std::string &id)
+QWebView* ViewFactory::create(const std::string &id)
 {
     FactoryMap::iterator it = factory.find(id);
     if (it != factory.end())
@@ -29,17 +29,8 @@ QWidget* ViewFactory::create(const std::string &id)
         FactoryMap::iterator it = factory.begin();
         for (it; it != factory.end(); ++it)
         {
-            QWidget* retWidget;
-
-            retWidget = it->second->create();
-            QWebView* retView = qobject_cast<QWebView*> (retWidget);
-            if (retView)
-            {
-                qDebug()<<"[WD]:"<<"ViewFactory create first found registered QWebView subclass:"<<QString(it->first.c_str());
-                return retView;
-            }
-            else
-                delete retWidget;
+            qDebug()<<"[WD]:"<<"ViewFactory create first found registered QWebView subclass:"<<QString(it->first.c_str());
+            return it->second->create();
         }
         qDebug()<<"[WD]:"<<"ViewFactory create default QWebViewExt";
         return new QWebViewExt;

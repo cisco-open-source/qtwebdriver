@@ -23,7 +23,7 @@
 #include "base/stringprintf.h"
 #include "base/string_number_conversions.h"
 #include "base/string_split.h"
-//#include "base/string_util.h"
+#include "base/string_util.h"
 #include "base/synchronization/waitable_event.h"
 //#include "base/test/test_timeouts.h"
 //#include "base/threading/platform_thread.h"
@@ -40,7 +40,6 @@
 #include "chrome/test/webdriver/commands/create_session.h"
 #include "chrome/test/webdriver/commands/execute_async_script_command.h"
 #include "chrome/test/webdriver/commands/execute_command.h"
-#include "chrome/test/webdriver/commands/file_upload_command.h"
 #include "chrome/test/webdriver/commands/find_element_commands.h"
 #include "chrome/test/webdriver/commands/html5_location_commands.h"
 #include "chrome/test/webdriver/commands/html5_storage_commands.h"
@@ -63,9 +62,10 @@
 #include "chrome/test/webdriver/webdriver_session_manager.h"
 #include "chrome/test/webdriver/webdriver_switches.h"
 #include "chrome/test/webdriver/webdriver_util.h"
-#include "third_party/mongoose/mongoose.h"
+#include "mongoose.h"
 #include "base/json/json_reader.h"
-#include <QtWebkitWebDriver.h>
+#include "versioninfo.h"
+#include <WebDriver.h>
 
 #if defined(OS_WIN)
 #include <time.h>
@@ -85,6 +85,94 @@
 namespace webdriver {
 
 namespace {
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void silentMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    // keep silence
+    return;
+}
+
+void normalMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    switch (type) {
+    case QtDebugMsg:
+        // keep silence
+        break;
+    case QtWarningMsg:
+        fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
+    case QtCriticalMsg:
+        fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
+    case QtFatalMsg:
+        fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        abort();
+    }
+}
+
+void verboseMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    switch (type) {
+    case QtDebugMsg:
+        fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
+    case QtWarningMsg:
+        fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
+    case QtCriticalMsg:
+        fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
+    case QtFatalMsg:
+        fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        abort();
+    }
+}
+#else
+void silentMessageOutput(QtMsgType type, const char *msg)
+{
+    // keep silence
+    return;
+}
+
+void normalMessageOutput(QtMsgType type, const char *msg)
+{
+     switch (type) {
+     case QtDebugMsg:
+         // keep silence
+         break;
+     case QtWarningMsg:
+         fprintf(stderr, "Warning: %s\n", msg);
+         break;
+     case QtCriticalMsg:
+         fprintf(stderr, "Critical: %s\n", msg);
+         break;
+     case QtFatalMsg:
+         fprintf(stderr, "Fatal: %s\n", msg);
+         abort();
+     }
+}
+
+void verboseMessageOutput(QtMsgType type, const char *msg)
+{
+     switch (type) {
+     case QtDebugMsg:
+         fprintf(stderr, "Debug: %s\n", msg);
+         break;
+     case QtWarningMsg:
+         fprintf(stderr, "Warning: %s\n", msg);
+         break;
+     case QtCriticalMsg:
+         fprintf(stderr, "Critical: %s\n", msg);
+         break;
+     case QtFatalMsg:
+         fprintf(stderr, "Fatal: %s\n", msg);
+         abort();
+     }
+}
+#endif
 
 void InitCallbacks(Dispatcher* dispatcher,
                    base::WaitableEvent* shutdown_event,
@@ -166,7 +254,7 @@ void InitCallbacks(Dispatcher* dispatcher,
                                         "/session/*/timeouts/async_script");
   dispatcher->Add<ImplicitWaitCommand>( "/session/*/timeouts/implicit_wait");
   dispatcher->Add<LogCommand>(          "/session/*/log");
-  dispatcher->Add<FileUploadCommand>(   "/session/*/file");
+  dispatcher->Add<LogTypesCommand>(     "/session/*/log/types");
 
   // Cookie functions.
   dispatcher->Add<CookieCommand>(     "/session/*/cookie");
@@ -188,13 +276,14 @@ void InitCallbacks(Dispatcher* dispatcher,
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");
   dispatcher->Add<LocalStorageCommand>("/session/*/local_storage");
   dispatcher->Add<LocalStorageSizeCommand>("/session/*/local_storage/size");
-  dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key*");
+  dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key/*");
   dispatcher->Add<SessionStorageCommand>("/session/*/session_storage");
   dispatcher->Add<SessionStorageSizeCommand>("/session/*/session_storage/size");
-  dispatcher->Add<SessionStorageKeyCommand>("/session/*/session_storage/key*");
+  dispatcher->Add<SessionStorageKeyCommand>("/session/*/session_storage/key/*");
 
   // Since the /session/* is a wild card that would match the above URIs, this
   // line MUST be after all other webdriver command callbacks.
+  dispatcher->SetNotImplemented("/session/*/*");
   dispatcher->Add<SessionWithID>("/session/*");
 
   if (forbid_other_requests)
@@ -239,6 +328,78 @@ int RunChromeDriver() {
   base::AtExitManager exit;
   base::WaitableEvent shutdown_event(false, false);
   CommandLine* cmd_line = CommandLine::ForCurrentProcess();
+
+  // check if --help CL argument is present
+  if (cmd_line->HasSwitch("help")) {
+    std::cout << "Usage: WebDriver [--OPTION=VALUE]..."                                             << std::endl
+              << "Starts QtWebDriver server"                                                        << std::endl
+              << ""                                                                                 << std::endl
+              << "OPTION         DEFAULT VALUE      DESCRIPTION"                                    << std::endl
+              << "http-threads   4                  The number of threads to use for handling"      << std::endl
+              << "                                  HTTP requests"                                  << std::endl
+              << "log-path       ./webdriver.log    The path to use for the QtWebDriver server"     << std::endl
+              << "                                  log"                                            << std::endl
+              << "root           ./web              The path of location to serve files from"       << std::endl
+              << "port           9517               The port that QtWebDriver listens on"           << std::endl
+              << "silence        false              If true, QtWebDriver will not log anything"     << std::endl
+              << "                                  to stdout/stderr"                               << std::endl
+              << "verbose        false              If true, QtWebDriver will log lots of stuff"    << std::endl
+              << "                                  to stdout/stderr"                               << std::endl
+              << "url-base                          The URL path prefix to use for all incoming"    << std::endl
+              << "                                  WebDriver REST requests. A prefix and postfix"  << std::endl
+              << "                                  '/' will automatically be appended if not"      << std::endl
+              << "                                  present"                                        << std::endl
+              << "config                            The path to config file (e.g. config.json) in"  << std::endl
+              << "                                  JSON format with specified WD parameters as"    << std::endl
+              << "                                  described above (port, root, etc.)"             << std::endl;
+
+     return (EXIT_SUCCESS);
+  }
+
+  if (cmd_line->HasSwitch("version"))
+  {
+    VersionInfo version_info;
+    std::cout <<version_info.CreateVersionString()<< std::endl;
+    return (EXIT_SUCCESS);
+  }
+
+#if defined(OS_WIN)
+  system("qtvars.bat vsvars");
+#endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  // set default output mode
+  qInstallMessageHandler(normalMessageOutput);
+
+  // check if verbose mode
+  if (cmd_line->HasSwitch("verbose")) {
+      qInstallMessageHandler(verboseMessageOutput);
+  }
+
+  // check if silence mode
+  if (cmd_line->HasSwitch("silence")) {
+      std::ostream null_stream(0);
+      std::cerr.rdbuf(null_stream.rdbuf());
+      std::cout.rdbuf(null_stream.rdbuf());
+      qInstallMessageHandler(silentMessageOutput);
+  }
+#else
+  // set default output mode
+  qInstallMsgHandler(normalMessageOutput);
+
+  // check if verbose mode
+  if (cmd_line->HasSwitch("verbose")) {
+      qInstallMsgHandler(verboseMessageOutput);
+  }
+
+  // check if silence mode
+  if (cmd_line->HasSwitch("silence")) {
+      std::ostream null_stream(0);
+      std::cerr.rdbuf(null_stream.rdbuf());
+      std::cout.rdbuf(null_stream.rdbuf());
+      qInstallMsgHandler(silentMessageOutput);
+  }
+#endif
 
 //#if defined(OS_POSIX)
 //  signal(SIGPIPE, SIG_IGN);
@@ -321,21 +482,18 @@ int RunChromeDriver() {
 
   // The tests depend on parsing the first line ChromeDriver outputs,
   // so all other logging should happen after this.
-//  if (!cmd_line->HasSwitch("silent")) {
-
-    std::cout << "************************"<< std::endl
-              << "Started WebDriver" << std::endl
-              << "port=" << port << std::endl
-              << "root=" << root << std::endl
-              << "url-base=" << url_base << std::endl
-              << "http-threads=" << http_threads << std::endl
-              /*<< "version=" << chrome::kChromeVersion << std::endl*/;
-    if (logging_success)
+  std::cout << "************************"<< std::endl
+            << "Started WebDriver" << std::endl
+            << "port=" << port << std::endl
+            << "root=" << root << std::endl
+            << "url-base=" << url_base << std::endl
+            << "http-threads=" << http_threads << std::endl
+            /*<< "version=" << chrome::kChromeVersion << std::endl*/;
+  if (logging_success)
       std::cout << "log=" << FileLog::Get()->path().value() << std::endl;
-    else
+  else
       std::cout << "Log file could not be created. log = " << FileLog::Get()->path().value() << std::endl;
-    std::cout << "************************"<< std::endl;
-//  }
+  std::cout << "************************"<< std::endl;
 
   // Run until we receive command to shutdown.
   // Don't call mg_stop because mongoose will hang if clients are still
@@ -348,13 +506,12 @@ int RunChromeDriver() {
 bool parse_config_to_cmd_line()
 {
     CommandLine* cmd_line = CommandLine::ForCurrentProcess();
+    
     if (cmd_line->HasSwitch("config"))
     {
         //parse json config file and set value
         std::string config_json;
-        std::string configPathString = cmd_line->GetSwitchValueASCII("config");
-
-        FilePath configPath(configPathString);
+        FilePath configPath(cmd_line->GetSwitchValueNative("config"));
 
         if (file_util::ReadFileToString(configPath, &config_json))
         {
@@ -390,8 +547,6 @@ bool parse_config_to_cmd_line()
             if (result_dict->GetString("log-path", &log_path))
                 cmd_line->AppendSwitchASCII("log-path", log_path);
 
-            return true;
-
         }
         else
         {
@@ -399,13 +554,16 @@ bool parse_config_to_cmd_line()
             return false;
         }
     }
-}
 
+    return true;
+}
 }  // namespace webdriver
 
 int main_server(int argc, char *argv[]) {
   CommandLine::Init(argc, argv);
+
   webdriver::parse_config_to_cmd_line();
+
   return webdriver::RunChromeDriver();
 }
 

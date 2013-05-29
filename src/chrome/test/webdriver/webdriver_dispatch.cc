@@ -25,13 +25,13 @@
 #include "base/sys_info.h"
 //#include "base/threading/platform_thread.h"
 //#include "base/threading/thread.h"
-#include "chrome/common/chrome_version_info.h"
 #include "chrome/test/webdriver/commands/command.h"
 #include "chrome/test/webdriver/http_response.h"
 #include "chrome/test/webdriver/webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_session_manager.h"
 #include "chrome/test/webdriver/webdriver_switches.h"
 #include "chrome/test/webdriver/webdriver_util.h"
+#include "versioninfo.h"
 
 #include <QtCore/QDebug>
 
@@ -118,11 +118,11 @@ void SendStatus(struct mg_connection* connection,
                 const struct mg_request_info* request_info,
                 void* user_data) {
   //TODO: need to check what info we shoud send
-  chrome::VersionInfo version_info;
+  VersionInfo version_info;
 
   DictionaryValue* build_info = new DictionaryValue;
   build_info->SetString("time",
-                        base::StringPrintf("%s %s PST", __DATE__, __TIME__));
+                        base::StringPrintf("%s PST", version_info.BuildDateTime().c_str()));
   build_info->SetString("version", version_info.Version());
   build_info->SetString("revision", version_info.LastChange());
 
