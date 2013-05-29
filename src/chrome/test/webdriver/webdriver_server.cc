@@ -360,9 +360,7 @@ int RunChromeDriver() {
   {
     VersionInfo version_info;
     std::cout <<version_info.CreateVersionString()<< std::endl;
-
-
-     return (EXIT_SUCCESS);
+    return (EXIT_SUCCESS);
   }
 
 #if defined(OS_WIN)
