@@ -150,8 +150,6 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     Response response;
     std::string uri(request_info->uri);
 
-    GlobalLogger::Log(kFineLogLevel, "ProcessHttpRequest - got new request: " + uri);
-
     // Overwrite mongoose's default handler for /favicon.ico to always return a
     // 204 response so we don't spam the logs with 404s.
     if (uri == "/favicon.ico") {
@@ -159,13 +157,15 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
         return true;
     }
 
+    GlobalLogger::Log(kFineLogLevel, ">>>>> ProcessHttpRequest - got new request: " + uri);
+
     // remove url_base from uri
     uri = uri.substr(url_base_.length());
 
     AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri);
     if (NULL == cmdCreator)
     {
-        GlobalLogger::Log(kInfoLogLevel, "ProcessHttpRequest - no route for url: " + uri);
+        GlobalLogger::Log(kInfoLogLevel, "<<<<< ProcessHttpRequest - no route for url: " + uri);
         return false;
     }
 

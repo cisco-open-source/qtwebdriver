@@ -68,6 +68,11 @@ public:
     static const char kUrlCmd[];
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];
+    static const char kGetAppCache[];
+    static const char kAlertText[];
+    static const char kAcceptAlert[];
+    static const char kDismissAlert[];
+    
 
 // TODO:
 /*    
@@ -91,15 +96,10 @@ public:
     static const char kSetBrowserVisible[];
     static const char kIsBrowserVisible[];
 
-    static const char kGetAlert[];
-    static const char kAcceptAlert[];
-    static const char kDismissAlert[];
-    static const char kGetAlertText[];
-    static const char kSetAlertValue[];
     static const char kExecuteSQL[];
     static const char kGetLocation[];
     static const char kSetLocation[];
-    static const char kGetAppCache[];
+    
     static const char kGetStatus[];
     static const char kClearAppCache[];
     static const char kIsBrowserOnline[];

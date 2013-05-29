@@ -13,6 +13,9 @@
 namespace webdriver {
 
 class Response;
+class Session;
+class Error;
+class ViewId;
 
 /// Create a new session which is a new instance of the chrome browser with no
 /// page loaded.  A new session ID is passed back to the user which is used for
@@ -30,6 +33,8 @@ public:
   	virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
+	Error* SwitchToView(Session* session, const ViewId& viewId);
+	
   	DISALLOW_COPY_AND_ASSIGN(CreateSession);
 };
 

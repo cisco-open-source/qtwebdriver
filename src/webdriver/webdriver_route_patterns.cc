@@ -57,7 +57,10 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kUrlCmd);
 		standardCommandRoutes.insert(kExecuteScript);
 		standardCommandRoutes.insert(kExecuteAsyncScript);
-
+		standardCommandRoutes.insert(kGetAppCache);
+		standardCommandRoutes.insert(kAlertText);
+		standardCommandRoutes.insert(kAcceptAlert);
+		standardCommandRoutes.insert(kDismissAlert);
 
 	}
 
@@ -117,7 +120,10 @@ const char CommandRoutes::kGetPageSource[] 				= "/session/*/source";
 const char CommandRoutes::kUrlCmd[] 					= "/session/*/url";
 const char CommandRoutes::kExecuteScript[] 				= "/session/*/execute";
 const char CommandRoutes::kExecuteAsyncScript[] 		= "/session/*/execute_async";
-
+const char CommandRoutes::kGetAppCache[] 				= "/session/*/application_cache/status";
+const char CommandRoutes::kAlertText[] 					= "/session/*/alert_text";
+const char CommandRoutes::kAcceptAlert[] 				= "/session/*/accept_alert";
+const char CommandRoutes::kDismissAlert[] 				= "/session/*/dismiss_alert";
 
 /*
 
@@ -133,16 +139,11 @@ const char CommandRoutes::kSendKeysToActiveElement[] = "sendKeysToActiveElement"
 
 const char CommandRoutes::kSetBrowserVisible[] = "setBrowserVisible";
 const char CommandRoutes::kIsBrowserVisible[] = "isBrowserVisible";
-const char CommandRoutes::kGetAlert[] = "getAlert";
-const char CommandRoutes::kAcceptAlert[] = "acceptAlert";
-const char CommandRoutes::kDismissAlert[] = "dismissAlert";
-const char CommandRoutes::kGetAlertText[] = "getAlertText";
-const char CommandRoutes::kSetAlertValue[] = "setAlertValue";
 const char CommandRoutes::kSetScriptTimeout[] = "setScriptTimeout";
 const char CommandRoutes::kExecuteSQL[] = "executeSQL";
 const char CommandRoutes::kGetLocation[] = "getLocation";
 const char CommandRoutes::kSetLocation[] = "setLocation";
-const char CommandRoutes::kGetAppCache[] = "getAppCache";
+
 const char CommandRoutes::kGetStatus[] = "getStatus";
 const char CommandRoutes::kClearAppCache[] = "clearAppCache";
 const char CommandRoutes::kIsBrowserOnline[] = "isBrowserOnline";

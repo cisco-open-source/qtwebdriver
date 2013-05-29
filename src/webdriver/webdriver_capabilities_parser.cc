@@ -83,11 +83,13 @@ Error* CapabilitiesParser::Parse() {
     parser_map["nativeEvents"] = &CapabilitiesParser::ParseNativeEvents;
     parser_map["browserStartWindow"] = &CapabilitiesParser::ParseBrowserStartWindow;
     parser_map["browserClass"] = &CapabilitiesParser::ParseBrowserClass;
+    parser_map["browserName"] = &CapabilitiesParser::ParseBrowserName;
 
     DictionaryValue::key_iterator key_iter = dict_->begin_keys();
     for (; key_iter != dict_->end_keys(); ++key_iter) {
         if (parser_map.find(*key_iter) == parser_map.end()) {
-            return new Error(kBadRequest, "Unrecognized capability: " +  *key_iter);
+            logger_.Log(kWarningLogLevel, "Unrecognized capability: " +  *key_iter);
+            continue;
         }
 
         const Value* option = NULL;
@@ -296,6 +298,12 @@ Error* CapabilitiesParser::ParseBrowserStartWindow(const Value* option) {
 Error* CapabilitiesParser::ParseBrowserClass(const Value* option) {
     if (!option->GetAsString(&caps_->browser_class))
         return CreateBadInputError("browserClass", Value::TYPE_STRING, option);
+    return NULL;
+}
+
+Error* CapabilitiesParser::ParseBrowserName(const Value* option) {
+    if (!option->GetAsString(&caps_->browser_name))
+        return CreateBadInputError("browserName", Value::TYPE_STRING, option);
     return NULL;
 }
 

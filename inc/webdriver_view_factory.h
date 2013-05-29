@@ -51,16 +51,16 @@ public:
     /// creates new view of specified class
     /// @param[in] session pointer to session
     /// @param[in] className requested class name
-    /// @param[out] handle returned handle, INVALID_HANDLE - if view was not created.
+    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
     /// @return true if handled
-    virtual bool CreateViewByClassName(Session* session, const std::string& className, ViewHandle* handle) const = 0;
+    virtual bool CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const = 0;
 
     /// creates new view that can handle specified url
     /// @param[in] session pointer to session
     /// @param[in] url url to handle
-    /// @param[out] handle returned handle, INVALID_HANDLE - if view was not created.
+    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
     /// @return true if handled
-    virtual bool CreateViewForUrl(Session* session, const std::string& url, ViewHandle* handle) const = 0;    
+    virtual bool CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const = 0;    
 
 private:
     template <class C>
@@ -82,14 +82,14 @@ public:
     /// creates new view of specified class
     /// @param[in] session pointer to session
     /// @param[in] className requested class name
-    /// @param[out] handle returned handle, INVALID_HANDLE - if view was not created.
-    void CreateViewByClassName(Session* session, const std::string& className, ViewHandle* handle) const;
+    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
+    void CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const;
 
     /// creates new view that can handle specified url
     /// @param[in] session pointer to session
     /// @param[in] url url to handle
-    /// @param[out] handle returned handle, INVALID_HANDLE - if view was not created.
-    void CreateViewForUrl(Session* session, const std::string& url, ViewHandle* handle) const;    
+    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
+    void CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const;    
 
 
     /// add new view's creator

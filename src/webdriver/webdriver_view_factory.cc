@@ -11,6 +11,9 @@ ViewCreator::ViewCreator() {
 
 ViewFactory* ViewFactory::instance = NULL;
 
+ViewFactory::ViewFactory() {
+}
+
 ViewFactory* ViewFactory::GetInstance() {
 	if (NULL == instance) {
 		instance = new ViewFactory();
@@ -19,13 +22,13 @@ ViewFactory* ViewFactory::GetInstance() {
 	return instance;
 }
 
-void ViewFactory::CreateViewByClassName(Session* session, const std::string& className, ViewHandle* handle) const {
+void ViewFactory::CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const {
 	CreatorsList::const_iterator creator;
 
 	session->logger().Log(kInfoLogLevel, "ViewFactory::CreateViewByClassName - " + className);
 
 	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewByClassName(session, className, handle)) {
+		if ((*creator)->CreateViewByClassName(session, className, viewId)) {
 			// succed, return
 			return;
 		}
@@ -33,18 +36,18 @@ void ViewFactory::CreateViewByClassName(Session* session, const std::string& cla
 
 	session->logger().Log(kSevereLogLevel, "ViewFactory::CreateViewByClassName - cant create view.");
 
-	*handle = INVALID_HANDLE;
+	*viewId = ViewId();
 
 	return;
 }
 
-void ViewFactory::CreateViewForUrl(Session* session, const std::string& url, ViewHandle* handle) const {
+void ViewFactory::CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const {
 	CreatorsList::const_iterator creator;
 
 	session->logger().Log(kInfoLogLevel, "ViewFactory::CreateViewForUrl - " + url);
 
 	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewForUrl(session, url, handle)) {
+		if ((*creator)->CreateViewForUrl(session, url, viewId)) {
 			// succed, return
 			return;
 		}
@@ -52,7 +55,7 @@ void ViewFactory::CreateViewForUrl(Session* session, const std::string& url, Vie
 
 	session->logger().Log(kSevereLogLevel, "ViewFactory::CreateViewForUrl - cant create view.");
 
-	*handle = INVALID_HANDLE;
+	*viewId = ViewId();
 
 	return;
 }

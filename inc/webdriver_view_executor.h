@@ -92,6 +92,10 @@ public:
     virtual void GetURL(std::string* url, Error** error) = 0;
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
+    virtual void GetAppCacheStatus(int* status, Error** error) = 0;
+    virtual void GetAlertMessage(std::string* text, Error** error) = 0;
+    virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error) = 0;
+    virtual void AcceptOrDismissAlert(bool accept, Error** error) = 0;
 
 
 

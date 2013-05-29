@@ -133,7 +133,7 @@ Error* WindowCommand::GetViewTitle(const ViewId& viewId, std::string* title) {
 
     session_->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::GetTitle,
-                base::Unretained(executor_.get()),
+                base::Unretained(executor.get()),
                 title,
                 &error));
 
@@ -150,7 +150,7 @@ Error* WindowCommand::SwitchToView(const ViewId& viewId) {
 
     session_->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::SwitchTo,
-                base::Unretained(executor_.get()),
+                base::Unretained(executor.get()),
                 &error));
 
     return error;

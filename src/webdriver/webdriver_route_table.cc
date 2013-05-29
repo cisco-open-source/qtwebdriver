@@ -29,6 +29,8 @@
 #include "commands/url_command.h"
 #include "commands/execute_command.h"
 #include "commands/execute_async_script_command.h"
+#include "commands/appcache_status_command.h"
+#include "commands/alert_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -217,6 +219,10 @@ DefaultRouteTable::DefaultRouteTable()
     Add<URLCommand>                     (CommandRoutes::kUrlCmd);
     Add<ExecuteCommand>                 (CommandRoutes::kExecuteScript);
     Add<ExecuteAsyncScriptCommand>      (CommandRoutes::kExecuteAsyncScript);
+    Add<AppCacheStatusCommand>          (CommandRoutes::kGetAppCache);
+    Add<AlertTextCommand>               (CommandRoutes::kAlertText);
+    Add<AcceptAlertCommand>             (CommandRoutes::kAcceptAlert);
+    Add<DismissAlertCommand>            (CommandRoutes::kDismissAlert);
 
 
 #if 0
@@ -235,9 +241,7 @@ dispatcher->AddShutdown("/shutdown", shutdown_event);
   // fetch the page title. If mapped first, this would overwrite the handler
   // for /session/*/element/*/attribute/title, which should fetch the title
   // attribute of the element.
-  dispatcher->Add<AcceptAlertCommand>(  "/session/*/accept_alert");
-  dispatcher->Add<AlertTextCommand>(    "/session/*/alert_text");
-    dispatcher->Add<DismissAlertCommand>( "/session/*/dismiss_alert");
+  
   
   
  
@@ -248,7 +252,7 @@ dispatcher->AddShutdown("/shutdown", shutdown_event);
   dispatcher->Add<NamedCookieCommand>("/session/*/cookie/*");
 
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
-  dispatcher->Add<AppCacheStatusCommand>("/session/*/application_cache/status");
+  
 
   // HTML5 functions.
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");

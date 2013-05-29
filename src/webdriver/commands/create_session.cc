@@ -9,10 +9,14 @@
 #include "base/file_path.h"
 #include "base/scoped_temp_dir.h"
 #include "base/values.h"
+#include "base/bind.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_session.h"
 #include "webdriver_session_manager.h"
+#include "webdriver_view_executor.h"
+#include "webdriver_view_enumerator.h"
+#include "webdriver_view_factory.h"
 
 namespace webdriver {
 
@@ -45,6 +49,47 @@ void CreateSession::ExecutePost(Response* const response) {
         return;
     }
 
+    std::string browser_start_window = session->capabilities().browser_start_window;
+    std::string window_class = session->capabilities().browser_class;
+    ViewId startView;
+
+    if (!browser_start_window.empty()) {
+        // enumerate all views
+        std::vector<ViewId> views;
+
+        session->RunSessionTask(base::Bind(
+            &ViewEnumerator::EnumerateViews,
+            session,
+            &views));
+
+        // TODO: implement attach functionality
+        // find view to attach
+    }
+
+    if (!startView.is_valid()) {
+        // create view
+        session->RunSessionTask(base::Bind(
+            &ViewFactory::CreateViewByClassName,
+            base::Unretained(ViewFactory::GetInstance()),
+            session,
+            window_class,
+            &startView));
+    }
+
+    if (!startView.is_valid()) {
+        response->SetError(new Error(kUnknownError, "No view ids after initialization"));
+        session->Terminate();
+        return;   
+    }
+
+    // set current view
+    error = SwitchToView(session, startView);
+    if (error) {
+        response->SetError(error);
+        session->Terminate();
+        return;
+    }
+
     // Redirect to a relative URI. Although prohibited by the HTTP standard,
     // this is what the IEDriver does. Finding the actual IP address is
     // difficult, and returning the hostname causes perf problems with the python
@@ -54,6 +99,24 @@ void CreateSession::ExecutePost(Response* const response) {
             << session->id();
     response->SetStatus(kSeeOther);
     response->SetValue(Value::CreateStringValue(stream.str()));
+}
+
+Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
+    typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;        
+
+    Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
+
+    if (NULL == executor.get()) {
+        return new Error(kBadRequest, "cant get view executor.");
+    }
+
+    session->RunSessionTask(base::Bind(
+                &ViewCmdExecutor::SwitchTo,
+                base::Unretained(executor.get()),
+                &error));
+
+    return error;
 }
 
 }  // namespace webdriver
