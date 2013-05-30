@@ -53,6 +53,11 @@ void CreateSession::ExecutePost(Response* const response) {
     std::string window_class = session->capabilities().browser_class;
     ViewId startView;
 
+    session->logger().Log(kInfoLogLevel,
+        "Session("+session->id()+
+        ") browser class("+window_class+
+        ") start window("+browser_start_window+").");
+
     if (!browser_start_window.empty()) {
         // enumerate all views
         std::vector<ViewId> views;
@@ -77,6 +82,7 @@ void CreateSession::ExecutePost(Response* const response) {
     }
 
     if (!startView.is_valid()) {
+        session->logger().Log(kSevereLogLevel, "Session("+session->id()+") no view ids.");
         response->SetError(new Error(kUnknownError, "No view ids after initialization"));
         session->Terminate();
         return;   

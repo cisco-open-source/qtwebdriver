@@ -25,6 +25,11 @@ class Response;
 
 class Server {
 public:
+    enum State {
+      STATE_UNCONFIGURED = 0,
+      STATE_IDLE = 1,
+      STATE_RUNNING = 2
+    };
 
     /// Creates a new Server.
     Server();
@@ -50,6 +55,7 @@ private:
     std::vector<std::string> mg_options_;
     std::string url_base_;
     struct mg_context* mg_ctx_;
+    State state_;
 
     static void* ProcessHttpRequestCb(int event_raised,
                               struct mg_connection* connection,

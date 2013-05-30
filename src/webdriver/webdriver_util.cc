@@ -18,8 +18,6 @@
 #include "base/string_split.h"
 #include "base/string_util.h"
 #include "base/third_party/icu/icu_utf.h"
-#include "chrome/common/automation_id.h"
-#include "chrome/test/automation/automation_json_requests.h"
 
 using base::DictionaryValue;
 using base::ListValue;
@@ -147,7 +145,7 @@ Error* FlattenStringArray(const ListValue* src, string16* dest) {
         for (size_t j = 0; j < keys_list_part.size(); ++j) {
             if (CBU16_IS_SURROGATE(keys_list_part[j])) {
                 return new Error(kBadRequest,
-                         "ChromeDriver only supports characters in the BMP");
+                         "WebDriver only supports characters in the BMP");
             }
         }
         keys.append(keys_list_part);

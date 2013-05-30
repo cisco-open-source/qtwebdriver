@@ -228,25 +228,6 @@ DefaultRouteTable::DefaultRouteTable()
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
-  // WebElement commands
-  
-  
-
-
-  // Mouse Commands
-
-  // All session based commands should be listed after the element based
-  // commands to avoid potential mapping conflicts from an overzealous
-  // wildcard match. For example, /session/*/title maps to the handler to
-  // fetch the page title. If mapped first, this would overwrite the handler
-  // for /session/*/element/*/attribute/title, which should fetch the title
-  // attribute of the element.
-  
-  
-  
- 
-    
-  
   // Cookie functions.
   dispatcher->Add<CookieCommand>(     "/session/*/cookie");
   dispatcher->Add<NamedCookieCommand>("/session/*/cookie/*");

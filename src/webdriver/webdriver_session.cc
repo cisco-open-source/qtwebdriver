@@ -30,6 +30,7 @@
 #include "base/values.h"
 #include "webdriver_error.h"
 #include "webdriver_session_manager.h"
+#include "webdriver_view_runner.h"
 #include "webdriver_util.h"
 
 #if !defined(OS_WIN)
@@ -47,7 +48,8 @@ Session::Session()
       current_frame_path_(FramePath()),
       thread_(id_.c_str()),
       async_script_timeout_(0),
-      implicit_wait_(0)
+      implicit_wait_(0),
+      view_runner_(ViewRunner::CreateRunner())
 {
     SessionManager::GetInstance()->Add(this);
     logger_.AddHandler(session_log_.get());
@@ -63,10 +65,11 @@ Session::~Session() {
 
 Error* Session::Init(const DictionaryValue* capabilities_dict) {
 
-//  if (!thread_.Start()) {
-//    delete this;
-//    return new Error(kUnknownError, "Cannot start session thread");
-//  }
+    if (!thread_.Start()) {
+        delete this;
+        return new Error(kUnknownError, "Cannot start session thread");
+    }
+
 //  qtask.moveToThread(QApplication::instance()->thread());
 
     if (!temp_dir_.CreateUniqueTempDir()) {
@@ -85,11 +88,6 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
         return error;
     }
     logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
-
-    RunSessionTask(base::Bind(
-            &Session::InitOnSessionThread,
-            base::Unretained(this),
-            &error));
 
     if (error)
         Terminate();
@@ -130,7 +128,7 @@ Error* Session::AfterExecuteCommand() {
 void Session::Terminate() {
     logger_.Log(kInfoLogLevel, "Session("+id_+") terminate.");
 
-    // TODO: close all views and cleanup ressources
+    // TODO: cleanup ressources
     delete this;
 }
 
@@ -144,6 +142,10 @@ const FramePath& Session::current_frame() const {
 
 const ViewId& Session::current_view() const {
     return current_view_id_;
+}
+
+void Session::set_current_view(const ViewId& viewId) {
+    current_view_id_ = viewId;
 }
 
 void Session::set_async_script_timeout(int timeout_ms) {
@@ -185,15 +187,14 @@ base::ListValue* Session::GetLog() const {
 }
 
 void Session::RunSessionTask(const base::Closure& task) {
-    // TODO: implement
-    //base::WaitableEvent done_event(false, false);
-    //thread_.message_loop_proxy()->PostTask(FROM_HERE, base::Bind(
-        //&Session::RunClosureOnSessionThread,
-        //base::Unretained(this),
-        //task,
-        //&done_event));
+    base::WaitableEvent done_event(false, false);
+    thread_.message_loop_proxy()->PostTask(FROM_HERE, base::Bind(
+        &Session::RunClosureOnSessionThread,
+        base::Unretained(this),
+        task,
+        &done_event));
     // See SetCookie for why it is essential that we wait here.
-    //done_event.Wait();
+    done_event.Wait();
 }
 
 void Session::GetViews(std::vector<ViewId>* views) const {
@@ -213,6 +214,21 @@ ViewHandle Session::GetViewHandle(const ViewId& viewId) const {
     if (it == views_.end())
         return INVALID_HANDLE;
     return it->second;
+}
+
+bool Session::AddNewView(const ViewHandle handle, ViewId* viewId) {
+    ViewId newView(GenerateRandomID());
+
+    views_[newView.id()] = handle;
+
+    *viewId = newView;
+
+    return true;   
+}
+
+void Session::RemoveView(const ViewId& viewId) {
+    elements_.erase(viewId.id());
+    views_.erase(viewId.id());
 }
 
 ElementHandle Session::GetElementHandle(const ViewId& viewId, const ElementId& elementId) const {
@@ -240,56 +256,11 @@ void Session::RemoveElement(const ViewId& viewId, const ElementId& elementId) {
     it_view->second.erase(elementId.id());
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void Session::RunClosureOnSessionThread(const base::Closure& task,
                                         base::WaitableEvent* done_event) {
+    view_runner_->RunClosure(task, done_event);
 //    QMetaObject::invokeMethod(&qtask, "runTask", Qt::BlockingQueuedConnection, Q_ARG(const base::Closure&, task));
 //    done_event->Signal();
 }
-
-void Session::InitOnSessionThread(Error** error) {
-    std::vector<ViewId> views;
-
-    // TODO: enumerate views
-    // create new one if need or attach to existed
-    // set current view
-    // handle capabilities
-    //ViewEnumerator::EnumerateViews(this, &views);
-
-/*
-  ViewId current_view = automation_->Init(options, error);
-  if (*error)
-    return;
-
-  if (!current_view.IsValid()) {
-    *error = new Error(kUnknownError, "No view ids after initialization");
-    return;
-  }
-  current_target_ = FrameId(current_view, FramePath());
-  */
-}
-
-
 
 }  // namespace webdriver

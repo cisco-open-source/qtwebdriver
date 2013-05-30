@@ -25,6 +25,7 @@
 #include "ClickScrollingTest.h"
 
 #include <webdriver_server.h>
+#include <extension_qt/web_view_creator.h>
 
 
 int main(int argc, char *argv[])
@@ -61,6 +62,12 @@ int main(int argc, char *argv[])
     //QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
     //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
     //watcher.setFuture(future);
+
+    webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
+    webCreator->RegisterViewClass<QWebView>("QWebView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
+
+
 
     webdriver::Server wd_server;
     if (0 != wd_server.Init(argc, argv)) 

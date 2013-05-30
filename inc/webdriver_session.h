@@ -36,6 +36,7 @@ namespace webdriver {
 
 class Error;
 class ValueParser;
+class ViewRunner;
 
 typedef std::map<std::string, ElementHandle> ElementsMap;
 typedef std::map<std::string, ElementsMap> ViewsElementsMap;
@@ -90,6 +91,8 @@ public:
 
     const ViewId& current_view() const;
 
+    void set_current_view(const ViewId& viewId);
+
     void set_async_script_timeout(int timeout_ms);
     int async_script_timeout() const;
 
@@ -113,6 +116,16 @@ public:
     /// @return viewHandle for given viewId
     ViewHandle GetViewHandle(const ViewId& viewId) const;
 
+    /// Put ViewHandle in map and return new ViewId for this handle
+    /// @param handle handle to put
+    /// @param[out] viewId returned viewId
+    /// @return true if ok
+    bool AddNewView(const ViewHandle handle, ViewId* viewId);
+
+    /// Invalidate viewIdRemove it from map
+    /// @param viewId requested view
+    void RemoveView(const ViewId& viewId);
+
     /// Get elementHandle for given elementId in specific view
     /// @param viewId requested view
     /// @param elementId requested element
@@ -133,14 +146,9 @@ private:
     typedef std::map<std::string, ElementsMap> ViewsElementsMap;
     typedef std::map<std::string, ViewHandle> ViewsMap;
 
-    void InitOnSessionThread(Error **error);
-    void TerminateOnSessionThread();
-  
-  void RunClosureOnSessionThread(
-      const base::Closure& task,
-      base::WaitableEvent* done_event);
-    
-
+    void RunClosureOnSessionThread(
+        const base::Closure& task,
+        base::WaitableEvent* done_event);
 
     scoped_ptr<InMemoryLog> session_log_;
     Logger logger_;
@@ -155,7 +163,7 @@ private:
     // contains mapping viewId on viewHandle
     ViewsMap views_;
 
-  base::Thread thread_;
+    base::Thread thread_;
 
     // Timeout (in ms) for asynchronous script execution.
     int async_script_timeout_;
@@ -168,8 +176,8 @@ private:
   // If the target frame is window.top, this will be empty.
   std::vector<ElementId> frame_elements_;
 
-  // Last mouse position. Advanced APIs need this value.
-  Point mouse_position_;
+    // Last mouse position. Advanced APIs need this value.
+    Point mouse_position_;
 
   // Chrome does not have an individual method for setting the prompt text
   // of an alert. Instead, when the WebDriver client wants to set the text,
@@ -183,8 +191,8 @@ private:
     ScopedTempDir temp_dir_;
     Capabilities capabilities_;
 
+    scoped_ptr<ViewRunner> view_runner_;
 
-//  QTaskRunner qtask;
     DISALLOW_COPY_AND_ASSIGN(Session);
 };
 

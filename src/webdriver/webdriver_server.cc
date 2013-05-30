@@ -8,12 +8,6 @@
 
 #include <iostream>
 
-
-
-
-
-// TODO: review all headers
-
 //#include "base/command_line.h"
 //#include "base/format_macros.h"
 #include "base/json/json_reader.h"
@@ -21,7 +15,6 @@
 #include "base/string_split.h"
 #include "base/string_util.h"
 #include "base/stringprintf.h"
-#include "base/synchronization/waitable_event.h"
 #include "base/sys_info.h"
 #include "base/string_number_conversions.h"
 #include "chrome/common/chrome_version_info.h"
@@ -37,7 +30,8 @@ namespace webdriver {
 Server::Server()
     : options_(CommandLine::NO_PROGRAM),
       routeTable_(NULL),
-      mg_ctx_(NULL) {
+      mg_ctx_(NULL),
+      state_(STATE_UNCONFIGURED) {
 }
 
 Server::~Server() {};
@@ -45,7 +39,10 @@ Server::~Server() {};
 int Server::Init(int argc, char *argv[]) {
     int ret_val = 0;
 
-    // TODO: check if we already inited
+    if (state_ != STATE_UNCONFIGURED) {
+        std::cerr << "Init failure: can't init twice." << std::endl;    
+        return 1;
+    }
 
     options_.InitFromArgv(argc, argv);
 
@@ -79,15 +76,22 @@ int Server::Init(int argc, char *argv[]) {
     // set default route table
     routeTable_.reset(new DefaultRouteTable());
 
+    state_ = STATE_IDLE;
+
     return 0;
 }
 
 void Server::SetRouteTable(RouteTable* routeTable) {
-    // TODO: check state
-    routeTable_.reset(new RouteTable(*routeTable));
+    if (state_ == STATE_IDLE) {
+        routeTable_.reset(new RouteTable(*routeTable));
+    }
 }
 
 int Server::Start() {
+    if (state_ != STATE_IDLE) {
+        return 1;
+    }
+    
     GlobalLogger::Log(kInfoLogLevel, "Server::Start()");
 
     {
@@ -99,8 +103,6 @@ int Server::Start() {
         }
         GlobalLogger::Log(kFineLogLevel, "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
     }
-
-    // TODO: check state
 
     scoped_array<const char*> opts(new const char*[mg_options_.size() + 1]);
     for (size_t i = 0; i < mg_options_.size(); ++i) {
@@ -120,6 +122,8 @@ int Server::Start() {
         return EADDRINUSE;
 #endif
     }
+
+    state_ = STATE_RUNNING;
 
     return 0;
 }
@@ -184,7 +188,7 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
                 request_info->request_method,
                 response);
 
-    GlobalLogger::Log(kFineLogLevel, "ProcessHttpRequest - processing finished: " + uri);
+    GlobalLogger::Log(kFineLogLevel, "<<<<< ProcessHttpRequest - processing finished: " + uri);
     
     return true;
 }

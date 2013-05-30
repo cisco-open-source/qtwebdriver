@@ -8,9 +8,12 @@
 #include <string>
 
 #include "base/values.h"
+#include "base/bind.h"
 #include "base/sys_info.h"
 #include "commands/response.h"
 #include "webdriver_session.h"
+#include "webdriver_view_enumerator.h"
+#include "webdriver_view_executor.h"
 
 namespace webdriver {
 
@@ -62,8 +65,41 @@ void SessionWithID::ExecuteGet(Response* const response) {
 }
 
 void SessionWithID::ExecuteDelete(Response* const response) {
+    // close all views
+    std::vector<ViewId> views;
+
+    session_->RunSessionTask(base::Bind(
+        &ViewEnumerator::EnumerateViews,
+        session_,
+        &views));
+
+    for (size_t i = 0; i < views.size(); ++i) {
+        CloseView(views[i]);
+    }
     // Session manages its own lifetime, so do not call delete.
     session_->Terminate();
+}
+
+void SessionWithID::CloseView(const ViewId& viewId) {
+    typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;        
+
+    Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_, viewId));
+
+    if (NULL == executor.get()) {
+        session_->logger().Log(kSevereLogLevel, "Cant get executor.");
+        return;
+    }
+
+    session_->RunSessionTask(base::Bind(
+                &ViewCmdExecutor::SwitchTo,
+                base::Unretained(executor.get()),
+                &error));
+
+    if (error) {
+        session_->logger().Log(kSevereLogLevel, "Cant close view: "+error->details());
+        delete error;
+    }
 }
 
 bool SessionWithID::ShouldRunPreAndPostCommandHandlers() {

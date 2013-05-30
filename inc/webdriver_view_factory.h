@@ -28,14 +28,17 @@ public:
 };
 */
 
+typedef ViewHandle (*CreateViewMethod)(void);
+
+template <class C>
+ViewHandle createView(void) { return static_cast<ViewHandle>(new C());}
+
 /// base class for custom view's creators
 class ViewCreator
 {
-private:
-    typedef ViewHandle (ViewCreator::*CreateViewMethod)(void);
 public:
     ViewCreator();
-    ~ViewCreator(){}
+    virtual ~ViewCreator(){}
 
     /// register class for specific class name
     /// @tparam <C> class for view
@@ -62,13 +65,10 @@ public:
     /// @return true if handled
     virtual bool CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const = 0;    
 
-private:
-    template <class C>
-    void createView(void) const { return static_cast<ViewHandle>(new C());}
-
+protected:
     typedef std::map<std::string, CreateViewMethod> FactoryMap;
     FactoryMap factory;
-
+private:
     DISALLOW_COPY_AND_ASSIGN(ViewCreator);
 };
 

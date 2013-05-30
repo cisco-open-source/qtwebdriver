@@ -14,6 +14,7 @@
 namespace webdriver {
 
 class Response;
+class ViewId;
 
 /// Retrieve the capabilities of the specified session. If the HTTP Delete
 /// method is used then all chrome instances linked to the session ID are
@@ -37,6 +38,8 @@ public:
   	virtual bool ShouldRunPreAndPostCommandHandlers() OVERRIDE;
 
 private:
+	  void CloseView(const ViewId& viewId);
+
   	DISALLOW_COPY_AND_ASSIGN(SessionWithID);
 };
 

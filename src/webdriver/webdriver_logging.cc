@@ -223,10 +223,10 @@ void StdOutLog::Log(LogLevel level, const base::Time& time,
             level_name = "OFF";
             break;
         case kSevereLogLevel:
-            level_name = "SEVERE";
+            level_name = "SEVR";
             break;
         case kWarningLogLevel:
-            level_name = "WARNING";
+            level_name = "WARN";
             break;
         case kInfoLogLevel:
             level_name = "INFO";
@@ -238,7 +238,10 @@ void StdOutLog::Log(LogLevel level, const base::Time& time,
             break;
     }
 
-    std::cout << "[" << level_name << "] " << message << std::endl;
+    std::string entry = base::StringPrintf(
+        "[%4s]: ", level_name);
+
+    std::cout << entry << message << std::endl;
 }
 
 void StdOutLog::set_min_log_level(LogLevel level) {
