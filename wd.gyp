@@ -274,12 +274,6 @@
       ],
 
       'sources': [
-#        'src/chrome/common/automation_constants.cc',
-#        'src/chrome/common/automation_id.cc',
-#        'src/chrome/common/chrome_switches.cc',
-#        'src/chrome/common/chrome_version_info.cc',
-#        'src/chrome/test/automation/automation_json_requests.cc',
-#        'src/chrome/test/automation/value_conversion_traits.cc',
         'src/webdriver/commands/alert_commands.cc',
         'src/webdriver/commands/appcache_status_command.cc',
 #        'src/webdriver/commands/browser_connection_commands.cc',
@@ -311,6 +305,7 @@
         'src/webdriver/webdriver_route_patterns.cc',
         'src/webdriver/frame_path.cc',
         'src/webdriver/http_response.cc',
+        #'src/webdriver/value_conversion_traits.cc',
 #        'src/chrome/test/webdriver/webdriver_automation.h',
 #        'src/chrome/test/webdriver/webdriver_automation.cc',
         'src/webdriver/webdriver_basic_types.cc',
@@ -330,7 +325,13 @@
         'src/webdriver/webdriver_session_manager.cc',
         'src/webdriver/webdriver_switches.cc',
         'src/webdriver/webdriver_util.cc',
-#        'src/content/public/common/content_switches.cc',
+        'src/webdriver/webdriver_view_runner.cc',
+
+
+        # TODO: files below belong to custom implementation
+        'src/webdriver/extension_qt/web_view_creator.cc',
+        'src/webdriver/extension_qt/q_view_executor.cc',
+        'src/webdriver/extension_qt/web_view_executor.cc',
 #        '<(INTERMEDIATE_DIR)/moc_qtaskrunner.cc',
 #        '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
 #        '<(INTERMEDIATE_DIR)/moc_webdriver_automation.cc',
@@ -344,7 +345,7 @@
 #        'src/qtaskrunner.cc',
 #        'src/qwebviewext.h',
 #        'src/qwebviewext.cc',
-#        'src/third_party/webdriver/atoms.cc',
+        'src/third_party/webdriver/atoms.cc',
       ],
 
       'conditions': [

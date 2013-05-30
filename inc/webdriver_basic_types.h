@@ -5,7 +5,7 @@
 #ifndef WEBDRIVER_WEBDRIVER_BASIC_TYPES_H_
 #define WEBDRIVER_WEBDRIVER_BASIC_TYPES_H_
 
-#include "chrome/test/automation/value_conversion_traits.h"
+#include "value_conversion_traits.h"
 
 namespace base {
 class Value;

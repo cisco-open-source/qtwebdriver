@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_TEST_AUTOMATION_VALUE_CONVERSION_UTIL_H_
-#define CHROME_TEST_AUTOMATION_VALUE_CONVERSION_UTIL_H_
+#ifndef WEBDRIVER_VALUE_CONVERSION_UTIL_H_
+#define WEBDRIVER_VALUE_CONVERSION_UTIL_H_
 
 #include <string>
 
 #include "base/values.h"
-#include "chrome/test/automation/value_conversion_traits.h"
+#include "value_conversion_traits.h"
 
 // Creates a value from the given parameter. Will not return NULL.
 template <typename T>
@@ -100,4 +100,4 @@ bool SetFromListValue(const base::ListValue* list, T1* t1, T2* t2, T3* t3) {
   return true;
 }
 
-#endif  // CHROME_TEST_AUTOMATION_VALUE_CONVERSION_UTIL_H_
+#endif  // WEBDRIVER_VALUE_CONVERSION_UTIL_H_

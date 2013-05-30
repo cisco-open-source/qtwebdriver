@@ -1,82 +1,1117 @@
 #include "extension_qt/web_view_executor.h"
 
+#include "base/stringprintf.h"
+#include "base/string_number_conversions.h"
+#include "base/json/json_reader.h"
+#include "base/json/json_writer.h"
+
+#include "third_party/webdriver/atoms.h"
+
+#include "value_conversion_util.h"
+#include "webdriver_session.h"
+#include "webdriver_util.h"
+
 namespace webdriver {
 
 WebViewCmdExecutorCreator::WebViewCmdExecutorCreator(){}
 
 ViewCmdExecutor* WebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) {
-	return new QWebViewCmdExecutor(session, viewId);
+	//return new QWebViewCmdExecutor(session, viewId);
+	return NULL;
 }
 
-bool WebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) {
+bool WebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) {
 	// TODO: implement
 	return true;
 }
 
-QWebViewCmdExecutor(Session* session, ViewId viewId)
+QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
 	: QViewCmdExecutor(session, viewId) {}
 
-//virtual void CanHandleUrl(const std::string& url, bool* can, Error **error) = 0;
-//    virtual void GetTitle(std::string* title, Error **error);
-//    virtual void GetBounds(Rect *bounds, Error **error);
-//    virtual void SetBounds(const Rect& bounds, Error** error);
-//    virtual void Maximize(Error** error);
-//    virtual void GoForward(Error** error) = 0;
-//    virtual void GoBack(Error** error) = 0;
-//    virtual void Reload(Error** error) = 0;
-//    virtual void GetScreenShot(std::string* png, Error** error);
-//    virtual void GetSource(std::string* source, Error** error) = 0;
-//    virtual void SendKeys(const string16& keys, Error** error);
-//    virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;
-//    virtual void MouseDoubleClick(Error** error) = 0;
-//    virtual void MouseButtonUp(Error** error) = 0;
-//    virtual void MouseButtonDown(Error** error) = 0;
-//    virtual void MouseClick(MouseButton button, Error** error) = 0;
-//    /// move mouse to position: cur_point + offset
+Error* QWebViewCmdExecutor::checkView(const ViewId& viewId, QWebView** webView) {
+    QWidget* pWidget = static_cast<QWidget*>(session_->GetViewHandle(viewId));
+
+	QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+	if (NULL == pWebView) {
+        return new Error(kNoSuchWindow);
+    }
+
+    *webView = pWebView;
+
+    return NULL;
+}	
+
+void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
+	// TODO: implement
+	// check if url starts with http:// file:// https://
+	*can = true;
+}
+
+void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    const char* kGetTitleScript =
+      	"function() {"
+      	"  if (document.title)"
+      	"    return document.title;"
+      	"  else"
+      	"    return document.URL;"
+      	"}";
+  	*error = ExecuteScriptAndParse(
+  							GetFrame(view, session_->current_frame()),
+                            kGetTitleScript,
+                            "getTitle",
+                            new ListValue(),
+                            CreateDirectValueParser(title));
+}
+
+void QWebViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+	const char* kGetWindowBoundsScript =
+      	"function() {"
+      	"  return {"
+      	"    'left': window.screenX,"
+      	"    'top': window.screenY,"
+      	"    'width': window.outerWidth,"
+      	"    'height': window.outerHeight"
+      	"  }"
+      	"}";
+  	*error = ExecuteScriptAndParse(
+		      	GetFrame(view, session_->current_frame()),
+		      	kGetWindowBoundsScript,
+		      	"getWindowBoundsScript",
+		      	new ListValue(),
+		      	CreateDirectValueParser(bounds));
+}
+
+void QWebViewCmdExecutor::GoForward(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    QWebHistory *history = view->history();
+    history->forward();
+}
+
+void QWebViewCmdExecutor::GoBack(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    QWebHistory *history = view->history();
+    history->back();
+}
+
+void QWebViewCmdExecutor::Reload(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    view->reload();
+}
+
+void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    const char* kSource =
+    	"return new XMLSerializer().serializeToString(document);";
+
+    *error = ExecuteScriptAndParse(
+		      	GetFrame(view, session_->current_frame()),
+		      	kSource,
+		      	"getSource",
+		      	new ListValue(),
+		      	CreateDirectValueParser(source));
+}
+
+void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "sendkeys not implemented, TBD.");
+}
+
+// TODO:
+// void QWebViewCmdExecutor::MouseDoubleClick(Error** error) = 0;
+// void QWebViewCmdExecutor::MouseButtonUp(Error** error) = 0;
+// void QWebViewCmdExecutor::MouseButtonDown(Error** error) = 0;
+// void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) = 0;
 //    virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
-//    /// Move the mouse by an offset of the specificed element
 //    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) = 0;
-//    /// the mouse will be moved to the center of the element
 //    virtual void MouseMove(const ElementId& element, Error** error) = 0;
 //    virtual void ClickElement(const ElementId& element, Error** error) = 0;
-//    virtual void GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) = 0;
-//    virtual void ClearElement(const ElementId& element, Error** error) = 0;
-//    virtual void IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) = 0;
-//    virtual void IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) = 0;
-//    virtual void ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) = 0;
-//    virtual void GetElementLocation(const ElementId& element, Point* location, Error** error) = 0;
-//    virtual void GetElementLocationInView(const ElementId& element, Point* location, Error** error) = 0;
-//    virtual void GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) = 0;
-//    virtual void IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) = 0;
-//    virtual void SetOptionElementSelected(const ElementId& element, bool selected, Error** error) = 0;
-//    virtual void GetElementSize(const ElementId& element, Size* size, Error** error) = 0;
-//    virtual void ElementSubmit(const ElementId& element, Error** error) = 0;
-//    virtual void GetElementText(const ElementId& element, std::string* element_text, Error** error) = 0;
-//    virtual void GetElementCssProperty(const ElementId& element, const std::string& property, base::Value** value, Error** error) = 0;
-//    virtual void FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) = 0;
-//    virtual void FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) = 0;
-//    virtual void ActiveElement(ElementId* element, Error** error) = 0;
-//    virtual void Close(Error** error);
-//    /// set view as current
-//    virtual void SwitchTo(Error** error);
-//    /// Switches the frame used by default. |name_or_id| is either the name or id
-//    /// of a frame element.
-//    virtual void SwitchToFrameWithNameOrId(const std::string& name_or_id, Error** error) = 0;
-//    /// Switches the frame used by default. |index| is the zero-based frame index.
-//    virtual void SwitchToFrameWithIndex(int index, Error** error) = 0;
-//    /// Switches to the frame identified by the given |element|. The element must
-//    /// be either an IFRAME or FRAME element.
-//    virtual void SwitchToFrameWithElement(const ElementId& element, Error** error) = 0;
-//    /// Switches the target frame to the topmost frame.
-//    virtual void SwitchToTopFrame(Error** error) = 0;
-//    virtual void NavigateToURL(const std::string& url, Error** error) = 0;
-//    virtual void GetURL(std::string* url, Error** error) = 0;
-//    virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
-//    virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;
-//    virtual void GetAppCacheStatus(int* status, Error** error) = 0;
-//    virtual void GetAlertMessage(std::string* text, Error** error);
-//    virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error);
-//    virtual void AcceptOrDismissAlert(bool accept, Error** error);
+
+
+void QWebViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+				    GetFrame(view, session_->current_frame()),
+				    atoms::asString(atoms::GET_ATTRIBUTE),
+				    "getAttribute",
+				    CreateListValueFrom(element, key),
+				    CreateDirectValueParser(value));
+}
+
+void QWebViewCmdExecutor::ClearElement(const ElementId& element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::string script = base::StringPrintf(
+        "(%s).apply(null, arguments);", atoms::asString(atoms::CLEAR).c_str());
+
+    ListValue args;
+  	args.Append(element.ToValue());
+
+    Value* value = NULL;
+    *error = ExecuteScript(
+    				GetFrame(view, session_->current_frame()),
+				    script,
+				    &args,
+				    &value);
+    scoped_ptr<Value> scoped_value(value);
+}
+
+void QWebViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::IS_DISPLAYED),
+      			"isDisplayed",
+      			CreateListValueFrom(element, ignore_opacity),
+      			CreateDirectValueParser(is_displayed));
+}
+
+void QWebViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::IS_ENABLED),
+      			"isEnabled",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(is_enabled));
+}
+
+void QWebViewCmdExecutor::ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    const std::string script = "function(el1, el2) { return el1 == el2; }";
+
+  	*error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			script,
+      			"elementEquals",
+      			CreateListValueFrom(element1, element2),
+      			CreateDirectValueParser(is_equal));
+}
+
+void QWebViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::GET_LOCATION),
+      			"getLocation",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(location));
+}
+
+void QWebViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    Size size;
+  	GetElementSize(element, &size, &err);
+  	if (err) {
+  		*error = err;
+  		return;
+  	}
+	    
+  	*error = GetElementRegionInView(
+  			view,
+  	      	element,
+  	      	Rect(Point(0, 0), size),
+  	      	false, // cente,
+  	      	false, // verify_clickable_at_middle
+  	      	location);
+}
+
+void QWebViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+	*error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			"function(elem) { return elem.tagName.toLowerCase() }",
+      			"getElementTagName",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(tag_name));    
+}
+
+void QWebViewCmdExecutor::IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::IS_SELECTED),
+      			"isSelected",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(is_selected));
+}
+
+void QWebViewCmdExecutor::SetOptionElementSelected(const ElementId& element, bool selected, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // This wrapper ensures the script is started successfully and
+  	// allows for an alert to happen when the option selection occurs.
+  	// See selenium bug 2671.
+  	const char kSetSelectedWrapper[] =
+      	"var args = [].slice.apply(arguments);"
+      	"args[args.length - 1]();"
+      	"return (%s).apply(null, args.slice(0, args.length - 1));";
+  	Value* value = NULL;
+  	*error = ExecuteAsyncScript(
+  				GetFrame(view, session_->current_frame()),
+      			base::StringPrintf(kSetSelectedWrapper,
+                         atoms::asString(atoms::CLICK).c_str()),
+      			CreateListValueFrom(element, selected),
+      			&value);
+  	scoped_ptr<Value> scoped_value(value);
+}
+
+void QWebViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+	*error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
+      			"getFirstClientRect",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(size));    
+}
+
+void QWebViewCmdExecutor::ElementSubmit(const ElementId& element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::string script = base::StringPrintf(
+      	"(%s).apply(null, arguments);", atoms::asString(atoms::SUBMIT).c_str());
+
+  	ListValue args;
+  	args.Append(element.ToValue());
+
+  	Value* result = NULL;
+  	*error = ExecuteScript(
+  					GetFrame(view, session_->current_frame()),
+  					script, &args, &result);
+  	scoped_ptr<Value> scoped_value(result);
+}
+
+void QWebViewCmdExecutor::GetElementText(const ElementId& element, std::string* element_text, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::GET_TEXT),
+      			"getText",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(element_text));
+}
+
+void QWebViewCmdExecutor::GetElementCssProperty(const ElementId& element, const std::string& property, base::Value** value, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::string script = base::StringPrintf(
+      	"return (%s).apply(null, arguments);",
+      	atoms::asString(atoms::GET_EFFECTIVE_STYLE).c_str());
+
+  	ListValue args;
+  	args.Append(element.ToValue());
+  	args.Append(Value::CreateStringValue(property));
+
+  	Value* result = NULL;
+  	*error = ExecuteScript(
+  				GetFrame(view, session_->current_frame()),
+  				script, &args, &result);
+	scoped_ptr<Value> scoped_value(result);
+}
+
+void QWebViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::vector<ElementId> elements;
+    err = FindElementsHelper(
+    			GetFrame(view, session_->current_frame()),
+    			root_element, locator, query, true, &elements);
+    if (!err)
+      *element = elements[0];
+
+    *error = err;
+}
+
+void QWebViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = FindElementsHelper(
+    			GetFrame(view, session_->current_frame()),
+    			root_element, locator, query, false, elements);
+}
+
+void QWebViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::string script = "function() { return document.activeElement || document.body; }";
+
+  	*error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			script,
+      			"activeElement",
+      			new ListValue(),
+      			CreateDirectValueParser(element));
+}
+
+void QWebViewCmdExecutor::SwitchTo(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "SwitchTo not implemented, TBD.");
+
+}
+
+void QWebViewCmdExecutor::SwitchToFrameWithNameOrId(const std::string& name_or_id, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "SwitchToFrameWithNameOrId not implemented, TBD.");
+
+}
+
+void QWebViewCmdExecutor::SwitchToFrameWithIndex(int index, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "SwitchToFrameWithIndex not implemented, TBD.");
+}
+
+void QWebViewCmdExecutor::SwitchToFrameWithElement(const ElementId& element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "SwitchToFrameWithElement not implemented, TBD.");
+}
+
+void QWebViewCmdExecutor::SwitchToTopFrame(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "SwitchToTopFrame not implemented, TBD.");
+}
+
+void QWebViewCmdExecutor::NavigateToURL(const std::string& url, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // this is async
+    // TODO: implement sync load
+    QUrl address(QString(url.c_str()));
+    view->load(address);
+}
+
+void QWebViewCmdExecutor::GetURL(std::string* url, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+    				GetFrame(view, session_->current_frame()),
+    				"function() { return document.URL }",
+                    "getUrl",
+                    new ListValue(),
+                    CreateDirectValueParser(url));
+}
+
+void QWebViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScript(
+    			GetFrame(view, session_->current_frame()),
+    			script,
+    			args,
+    			value);
+}
+
+void QWebViewCmdExecutor::ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteAsyncScript(
+    			GetFrame(view, session_->current_frame()),
+    			script,
+    			args,
+    			value);
+}
+
+void QWebViewCmdExecutor::GetAppCacheStatus(int* status, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+      			GetFrame(view, session_->current_frame()),
+      			atoms::asString(atoms::GET_APPCACHE_STATUS),
+      			"getAppcacheStatus",
+      			new ListValue(),
+      			CreateDirectValueParser(status));
+}
+
+QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
+    if (frame_path.value().empty())
+        return NULL;
+
+    QStringList frame_path_list = QString(frame_path.value().c_str()).split("\n");
+    QWebFrame* frame = parent;
+    QString frame_path_str;
+
+    for(int i = 0; i < frame_path_list.size(); ++i)
+    {
+        frame_path_str = frame_path_list.at(i);
+        foreach(QWebFrame* pFrame, frame->childFrames())
+        {
+            QString frame_id = pFrame->property("frame_id").toString();
+            if(frame_id == frame_path_str)
+            {
+                if (i == (frame_path_list.size() - 1))
+                    return pFrame;
+                else
+                {
+                    frame = pFrame;
+                    break;
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+Error* QWebViewCmdExecutor::ExecuteScriptAndParse(QWebFrame* frame,
+                                    const std::string& anonymous_func_script,
+                                    const std::string& script_name,
+                                    const ListValue* args,
+                                    const ValueParser* parser) {
+  	scoped_ptr<const ListValue> scoped_args(args);
+  	scoped_ptr<const ValueParser> scoped_parser(parser);
+  	std::string called_script = base::StringPrintf(
+      	"return (%s).apply(null, arguments);", anonymous_func_script.c_str());
+  	Value* unscoped_value = NULL;
+  	Error* error = ExecuteScript(frame, called_script, args, &unscoped_value);
+  	if (error) {
+    	error->AddDetails(script_name + " execution failed");
+    	return error;
+  	}
+
+  	scoped_ptr<Value> value(unscoped_value);
+  	std::string error_msg;
+  	if (!parser->Parse(value.get())) {
+	    error_msg = base::StringPrintf("%s returned invalid value: %s",
+        	script_name.c_str(), JsonStringify(value.get()).c_str());
+    	return new Error(kUnknownError, error_msg);
+  	}
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::ExecuteAsyncScript(QWebFrame* frame,
+                                   const std::string& script,
+                                   const ListValue* const args,
+                                   Value** value) {
+
+  	std::string args_as_json;
+  	base::JSONWriter::Write(static_cast<const Value* const>(args),
+                          	&args_as_json);
+
+  	int timeout_ms = session_->async_script_timeout();
+
+  	// Every injected script is fed through the executeScript atom. This atom
+  	// will catch any errors that are thrown and convert them to the
+  	// appropriate JSON structure.
+  	std::string jscript = base::StringPrintf(
+      	"(%s).apply(null, [function(){%s},%s,%d,%s,true]);",
+      	atoms::asString(atoms::EXECUTE_ASYNC_SCRIPT).c_str(),
+      	script.c_str(),
+      	args_as_json.c_str(),
+      	timeout_ms,
+      	"function(result) {jsnotify.setResult(result);}");
+
+  	return ExecuteScriptAndParseValue(frame, jscript, value, true);
+}
+
+Error* QWebViewCmdExecutor::ExecuteScript(QWebFrame* frame,
+                              const std::string& script,
+                              const ListValue* const args,
+                              Value** value) {
+  	std::string args_as_json;
+  	base::JSONWriter::Write(static_cast<const Value* const>(args),
+                          	&args_as_json);
+
+  	// Every injected script is fed through the executeScript atom. This atom
+  	// will catch any errors that are thrown and convert them to the
+  	// appropriate JSON structure.
+  	std::string jscript = base::StringPrintf(
+      	"function runScript() {return %s.apply(null,"
+      	"[function(){%s\n},%s,true])}; runScript()",
+      	atoms::asString(atoms::EXECUTE_SCRIPT).c_str(), script.c_str(),
+      	args_as_json.c_str());
+
+  	return ExecuteScriptAndParseValue(frame, jscript, value, false);
+}
+
+Error* QWebViewCmdExecutor::ExecuteScriptAndParseValue(QWebFrame* frame,
+                                           const std::string& script,
+                                           Value** script_result, bool isAsync) {
+  	std::string response_json;
+  	Error* error = ExecuteScriptImpl(frame, script, &response_json, isAsync);
+  	if (error)
+	    return error;
+
+  	scoped_ptr<Value> value(base::JSONReader::ReadAndReturnError(
+      	response_json, base::JSON_ALLOW_TRAILING_COMMAS, NULL, NULL));
+  	if (!value.get())
+	    return new Error(kUnknownError, "Failed to parse script result");
+  	if (value->GetType() != Value::TYPE_DICTIONARY)
+	    return new Error(kUnknownError, "Execute script returned non-dict: " +
+                         JsonStringify(value.get()));
+  	DictionaryValue* result_dict = static_cast<DictionaryValue*>(value.get());
+
+  	int status;
+  	if (!result_dict->GetInteger("status", &status))
+	    return new Error(kUnknownError, "Execute script did not return status: " +
+                         JsonStringify(result_dict));
+  	ErrorCode code = static_cast<ErrorCode>(status);
+  	if (code != kSuccess) {
+	    DictionaryValue* error_dict;
+	    std::string error_msg;
+	    if (result_dict->GetDictionary("value", &error_dict))
+      		error_dict->GetString("message", &error_msg);
+    	if (error_msg.empty())
+      		error_msg = "Script failed with error code: " + base::IntToString(code);
+    	return new Error(code, error_msg);
+  	}
+
+  	Value* tmp;
+  	if (result_dict->Get("value", &tmp)) {
+	    *script_result= tmp->DeepCopy();
+  	} else {
+	    // "value" was not defined in the returned dictionary; set to null.
+	    *script_result= Value::CreateNullValue();
+  	}
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::ExecuteScriptImpl(QWebFrame* frame,
+                               const std::string &script,
+                               std::string *result,
+                               bool isAsync)
+{
+	std::string res;
+    if (isAsync)
+    {
+    	// TODO: implement
+/*        JSNotifier* jsNotify = new JSNotifier();
+        frame->addToJavaScriptWindowObject("jsnotify", jsNotify );
+        connect(jsNotify, SIGNAL(completed()), &loop, SLOT(quit()));
+        frame->evaluateJavaScript(script.c_str());
+        if (!jsNotify->IsCompleted())
+            loop.exec();
+        res = jsNotify->getResult().toString().toStdString();
+        jsNotify->deleteLater();
+*/
+    }
+    else
+    {
+        QVariant f1result = frame->evaluateJavaScript(script.c_str());
+        res = f1result.toString().toStdString();
+    }
+    *result = res;
+
+    session_->logger().Log(kFineLogLevel, "ExecuteScriptImpl - "+res);
+
+    return NULL;
+}
+
+QWebFrame* QWebViewCmdExecutor::GetFrame(QWebView* view, const FramePath& frame_path) {
+	QWebFrame* frame = FindFrameByPath(view->page()->mainFrame(), frame_path);
+    if (frame == NULL)
+        frame = view->page()->mainFrame();
+
+    return frame;
+}
+
+Error* QWebViewCmdExecutor::FindElementsHelper(QWebFrame* frame,
+                                   const ElementId& root_element,
+                                   const std::string& locator,
+                                   const std::string& query,
+                                   bool find_one,
+                                   std::vector<ElementId>* elements) {
+  	CHECK(root_element.is_valid());
+  	base::Time start_time = base::Time::Now();
+  	while (true) {
+	    std::vector<ElementId> temp_elements;
+	    Error* error = ExecuteFindElementScriptAndParse(
+	    	    	frame, root_element, locator, query, find_one, &temp_elements);
+    	if (error)
+      		return error;
+
+    	if (temp_elements.size() > 0u) {
+      		elements->swap(temp_elements);
+      		break;
+    	}
+
+    	if ((base::Time::Now() - start_time).InMilliseconds() > session_->implicit_wait()) {
+    	  	if (find_one)
+	        	return new Error(kNoSuchElement);
+      		break;
+    	}
+    	base::PlatformThread::Sleep(base::TimeDelta::FromMilliseconds(50));
+  	}
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::ExecuteFindElementScriptAndParse(
+    	QWebFrame* frame,
+    	const ElementId& root_element,
+    	const std::string& locator,
+    	const std::string& query,
+    	bool find_one,
+    	std::vector<ElementId>* elements) {
+	CHECK(root_element.is_valid());
+
+  	class FindElementsParser : public ValueParser {
+   	public:
+	    explicit FindElementsParser(std::vector<ElementId>* elements)
+        	: elements_(elements) { }
+
+    	virtual ~FindElementsParser() { }
+
+    	virtual bool Parse(base::Value* value) const OVERRIDE {
+      		if (!value->IsType(Value::TYPE_LIST))
+        		return false;
+      		ListValue* list = static_cast<ListValue*>(value);
+      		for (size_t i = 0; i < list->GetSize(); ++i) {
+        		ElementId element;
+        		Value* element_value = NULL;
+        		if (!list->Get(i, &element_value))
+          			return false;
+        		if (!SetFromValue(element_value, &element))
+          			return false;
+        		elements_->push_back(element);
+      		}
+      		return true;
+    	}
+   	private:
+	    std::vector<ElementId>* elements_;
+  	};
+
+  	class FindElementParser : public ValueParser {
+   	public:
+	    explicit FindElementParser(std::vector<ElementId>* elements)
+        	: elements_(elements) { }
+
+    	virtual ~FindElementParser() { }
+
+    	virtual bool Parse(base::Value* value) const OVERRIDE {
+      		if (value->IsType(Value::TYPE_NULL))
+        		return true;
+      		ElementId element;
+      		bool set = SetFromValue(value, &element);
+      		if (set)
+        		elements_->push_back(element);
+      		return set;
+    	}
+   	private:
+	    std::vector<ElementId>* elements_;
+  	};
+
+  	DictionaryValue locator_dict;
+  	locator_dict.SetString(locator, query);
+  	std::vector<ElementId> temp_elements;
+  	Error* error = NULL;
+  	if (find_one) {
+	    error = ExecuteScriptAndParse(
+          	frame,
+          	atoms::asString(atoms::FIND_ELEMENT),
+          	"findElement",
+          	CreateListValueFrom(&locator_dict, root_element),
+          	new FindElementParser(&temp_elements));
+  	} else {
+	    error = ExecuteScriptAndParse(
+          	frame,
+          	atoms::asString(atoms::FIND_ELEMENTS),
+          	"findElements",
+          	CreateListValueFrom(&locator_dict, root_element),
+          	new FindElementsParser(&temp_elements));
+  	}
+  	if (!error)
+	    elements->swap(temp_elements);
+  	return error;
+}
+
+Error* QWebViewCmdExecutor::GetElementRegionInView(
+		QWebView* view,
+    	const ElementId& element,
+    	const Rect& region,
+    	bool center,
+    	bool verify_clickable_at_middle,
+    	Point* location) {
+
+  	CHECK(element.is_valid());
+
+  	Point region_offset = region.origin();
+  	Size region_size = region.size();
+  	Error* error = GetElementRegionInViewHelper(
+				  		GetFrame(view, session_->current_frame()),
+				  		element, region, center, verify_clickable_at_middle,
+					    &region_offset);
+  	if (error)
+    	return error;
+
+  	for (FramePath frame_path = session_->current_frame();
+       	frame_path.IsSubframe();
+       	frame_path = frame_path.Parent()) {
+    	// Find the frame element for the current frame path.
+    	ElementId frame_element;
+    	std::string frameBasePath = base::StringPrintf("//*[@wd_frame_id_ = '%s']", frame_path.BaseName().value().c_str());
+
+    	QWebFrame* cur_frame = GetFrame(view, frame_path);
+    	std::vector<ElementId> elements;
+    	error = FindElementsHelper(
+        	cur_frame,
+        	ElementId(""),
+        	LocatorType::kXpath, frameBasePath, true, &elements);
+    	if (error) {
+      		std::string context = base::StringPrintf(
+          		"Could not find frame element (%s) in frame (%s)",
+          		frame_path.BaseName().value().c_str(),
+          		frame_path.Parent().value().c_str());
+      		error->AddDetails(context);
+      		return error;
+    	}
+
+    	frame_element = elements[0];
+    	// Modify |region_offset| by the frame's border.
+    	int border_left, border_top;
+    	error = GetElementBorder(
+        	cur_frame, frame_element, &border_left, &border_top);
+    	if (error)
+      		return error;
+   		region_offset.Offset(border_left, border_top);
+
+    	error = GetElementRegionInViewHelper(
+        	cur_frame, frame_element, Rect(region_offset, region_size),
+        	center, verify_clickable_at_middle, &region_offset);
+    	if (error)
+      	return error;
+  	}
+  	*location = region_offset;
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::GetElementRegionInViewHelper(
+    	QWebFrame* frame,
+    	const ElementId& element,
+    	const Rect& region,
+    	bool center,
+    	bool verify_clickable_at_middle,
+    	Point* location) {
+  	Point temp_location;
+  	Error* error = ExecuteScriptAndParse(
+				      	frame,
+				      	atoms::asString(atoms::GET_LOCATION_IN_VIEW),
+				      	"getLocationInView",
+				      	CreateListValueFrom(element, center, region),
+				      	CreateDirectValueParser(&temp_location));
+
+  	if (verify_clickable_at_middle) {
+	    Point middle_point = temp_location;
+	    middle_point.Offset(region.width() / 2, region.height() / 2);
+	    error = VerifyElementIsClickable(frame, element, middle_point);
+	    if (error)
+      		return error;
+  	}
+  	*location = temp_location;
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::VerifyElementIsClickable(
+	    QWebFrame* frame,
+	    const ElementId& element,
+	    const Point& location) {
+  	class IsElementClickableParser : public ValueParser {
+   	public:
+	    IsElementClickableParser(bool* clickable, std::string* message)
+        	: clickable_(clickable), message_(message) { }
+
+    	virtual ~IsElementClickableParser() { }
+
+    	virtual bool Parse(base::Value* value) const OVERRIDE {
+      		if (!value->IsType(Value::TYPE_DICTIONARY))
+        		return false;
+      		DictionaryValue* dict = static_cast<DictionaryValue*>(value);
+      		dict->GetString("message", message_);
+      		return dict->GetBoolean("clickable", clickable_);
+    	}
+
+   	private:
+	    bool* clickable_;
+	    std::string* message_;
+  	};
+
+  	bool clickable;
+  	std::string message;
+  	Error* error = ExecuteScriptAndParse(
+				      	frame,
+				      	atoms::asString(atoms::IS_ELEMENT_CLICKABLE),
+				      	"isElementClickable",
+				      	CreateListValueFrom(element, location),
+				      	new IsElementClickableParser(&clickable, &message));
+  	if (error)
+	    return error;
+
+  	if (!clickable) {
+	    if (message.empty())
+      		message = "element is not clickable";
+    	return new Error(kUnknownError, message);
+  	}
+  	if (message.length()) {
+	    session_->logger().Log(kWarningLogLevel, message);
+  	}
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::GetElementBorder(QWebFrame* frame,
+                                const ElementId& element,
+                                int* border_left,
+                                int* border_top) {
+  	std::string border_left_str, border_top_str;
+  	Error* error = GetElementEffectiveStyle(
+      					frame,
+      					element,
+      					"border-left-width",
+      					&border_left_str);
+  	if (error)
+	    return error;
+  	error = GetElementEffectiveStyle(
+      			frame, element, "border-top-width", &border_top_str);
+  	if (error)
+	    return error;
+
+  	base::StringToInt(border_left_str, border_left);
+  	base::StringToInt(border_top_str, border_top);
+  	return NULL;
+}
+
+Error* QWebViewCmdExecutor::GetElementEffectiveStyle(
+		    	QWebFrame* frame,
+		    	const ElementId& element,
+		    	const std::string& prop,
+		    	std::string* value) {
+
+  	return ExecuteScriptAndParse(
+      			frame,
+      			atoms::asString(atoms::GET_EFFECTIVE_STYLE),
+      			"getEffectiveStyle",
+      			CreateListValueFrom(element, prop),
+      			CreateDirectValueParser(value));
+}
 
 
 

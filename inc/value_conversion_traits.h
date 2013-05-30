@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef CHROME_TEST_AUTOMATION_VALUE_CONVERSION_TRAITS_H_
-#define CHROME_TEST_AUTOMATION_VALUE_CONVERSION_TRAITS_H_
+#ifndef WEBDRIVER_VALUE_CONVERSION_TRAITS_H_
+#define WEBDRIVER_VALUE_CONVERSION_TRAITS_H_
 
 #include <string>
 
@@ -74,4 +74,4 @@ struct ValueConversionTraits<base::DictionaryValue*> {
   static bool CanConvert(const base::Value* value);
 };
 
-#endif  // CHROME_TEST_AUTOMATION_VALUE_CONVERSION_TRAITS_H_
+#endif  // WEBDRIVER_VALUE_CONVERSION_TRAITS_H_

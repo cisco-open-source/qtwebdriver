@@ -11,10 +11,9 @@
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/values.h"
-#include "chrome/test/automation/value_conversion_traits.h"
+#include "value_conversion_traits.h"
 #include "webdriver_error.h"
 
-class AutomationId;
 class FilePath;
 class ViewId;
 
