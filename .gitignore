@@ -24,3 +24,4 @@ WD.*
 desktop/
 flip/
 src/wdversion.cc
+wd.gypi
