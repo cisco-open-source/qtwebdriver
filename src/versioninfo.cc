@@ -38,7 +38,9 @@ std::string VersionInfo::BuildDateTime() const
 std::string VersionInfo::CreateVersionString() const
 {
     std::string current_version;
-    current_version = Name() + "-" + Version();
+    current_version = "Version:    "+ Name() + "-" + Version() +
+                    "\nBuild Time: "+ BuildDateTime() +
+                    "\nRevision:   " + LastChange();
     return current_version;
 }
 

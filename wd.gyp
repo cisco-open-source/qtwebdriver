@@ -339,7 +339,6 @@
         'src/chrome/test/webdriver/commands/alert_commands.cc',
         'src/chrome/test/webdriver/commands/appcache_status_command.cc',
         'src/chrome/test/webdriver/commands/browser_connection_commands.cc',
-        'src/chrome/test/webdriver/commands/chrome_commands.cc',
         'src/chrome/test/webdriver/commands/command.cc',
         'src/chrome/test/webdriver/commands/cookie_commands.cc',
         'src/chrome/test/webdriver/commands/create_session.cc',

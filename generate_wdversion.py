@@ -1,7 +1,7 @@
 import subprocess as sp
 
 filename = "./src/wdversion.cc"
-p = sp.Popen(["git", "describe" , "--abbrev=10", "--dirty", "--always"], stdin=sp.PIPE, stdout=sp.PIPE, close_fds=True)
+p = sp.Popen(["git", "describe" , "--abbrev=10", "--dirty", "--always"], stdin=sp.PIPE, stdout=sp.PIPE)
 
 data = p.stdout.readline()
 
