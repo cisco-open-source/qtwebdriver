@@ -210,6 +210,8 @@ DefaultRouteTable::DefaultRouteTable()
     Add<ElementEqualsCommand>           (CommandRoutes::kElementEquals);
     Add<FindOneElementCommand>          (CommandRoutes::kFindElement);
     Add<FindManyElementsCommand>        (CommandRoutes::kFindElements);
+    Add<FindOneElementCommand>          (CommandRoutes::kFindChildElement);
+    Add<FindManyElementsCommand>        (CommandRoutes::kFindChildElements);
     Add<SwitchFrameCommand>             (CommandRoutes::kSwitchToFrame);
     Add<ActiveElementCommand>           (CommandRoutes::kGetActiveElement);
     Add<WindowHandleCommand>            (CommandRoutes::kGetCurrentWindowHandle);

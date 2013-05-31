@@ -46,6 +46,8 @@ public:
     static const char kClearElement[];
     static const char kSendKeysToElement[];
     static const char kSubmitElement[];
+    static const char kFindChildElement[];
+    static const char kFindChildElements[];
     static const char kGetElementText[];
     static const char kGetElementTagName[];
     static const char kIsElementSelected[];
