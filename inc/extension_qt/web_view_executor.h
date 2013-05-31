@@ -1,5 +1,5 @@
-#ifndef WEBDRIVER_QT_WEB_VIEW_CREATOR_H_
-#define WEBDRIVER_QT_WEB_VIEW_CREATOR_H_
+#ifndef WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
+#define WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
 
 #include "extension_qt/q_view_executor.h"
 
@@ -10,16 +10,16 @@ namespace webdriver {
 class FramePath;	
 class ValueParser;
 
-class WebViewCmdExecutorCreator {
+class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
-    WebViewCmdExecutorCreator();
-    ~WebViewCmdExecutorCreator(){}
+    QWebViewCmdExecutorCreator();
+    virtual ~QWebViewCmdExecutorCreator(){}
 
-    virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId);
-    virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL);
+    virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
+    virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const;
 private:
 
-    DISALLOW_COPY_AND_ASSIGN(WebViewCmdExecutorCreator);
+    DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutorCreator);
 };	
 
 /// QWebView based view's implementation
@@ -36,17 +36,17 @@ public:
     virtual void Reload(Error** error);
     virtual void GetSource(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
-    virtual void MouseDoubleClick(Error** error) = 0;
-    virtual void MouseButtonUp(Error** error) = 0;
-    virtual void MouseButtonDown(Error** error) = 0;
-    virtual void MouseClick(MouseButton button, Error** error) = 0;
+    virtual void MouseDoubleClick(Error** error);
+    virtual void MouseButtonUp(Error** error);
+    virtual void MouseButtonDown(Error** error);
+    virtual void MouseClick(MouseButton button, Error** error);
     /// move mouse to position: cur_point + offset
-    virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
+    virtual void MouseMove(const int x_offset, const int y_offset, Error** error);
     /// Move the mouse by an offset of the specificed element
-    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) = 0;
+    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error);
     /// the mouse will be moved to the center of the element
-    virtual void MouseMove(const ElementId& element, Error** error) = 0;
-    virtual void ClickElement(const ElementId& element, Error** error) = 0;
+    virtual void MouseMove(const ElementId& element, Error** error);
+    virtual void ClickElement(const ElementId& element, Error** error);
     virtual void GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error);
     virtual void ClearElement(const ElementId& element, Error** error);
     virtual void IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error);
@@ -147,6 +147,25 @@ protected:
 		    	const std::string& prop,
 		    	std::string* value);
 
+	QWebFrame* FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path);
+
+	void AddIdToCurrentFrame(QWebView* view, const FramePath &frame_path);
+
+	Error* SwitchToFrameWithJavaScriptLocatedFrame(
+								QWebView* view,
+								QWebFrame* frame,
+    							const std::string& script,
+    							base::ListValue* args);
+
+	Error* GetElementFirstClientRect(QWebFrame* frame,
+                                    const ElementId& element,
+                                    Rect* rect);
+
+	Error* GetClickableLocation(QWebView* view, const ElementId& element, Point* location);
+
+	Error* ToggleOptionElement(const ElementId& element);
+
+
 
 
     
@@ -156,4 +175,4 @@ private:
 
 }  // namespace webdriver
 
-#endif  // WEBDRIVER_QT_WEB_VIEW_CREATOR_H_
+#endif  // WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_

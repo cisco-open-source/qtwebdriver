@@ -60,6 +60,8 @@ void CreateSession::ExecutePost(Response* const response) {
 
     if (!browser_start_window.empty()) {
         // enumerate all views
+        session->logger().Log(kFineLogLevel, "Trying to attach to window - "+browser_start_window);
+
         std::vector<ViewId> views;
 
         session->RunSessionTask(base::Bind(
@@ -72,6 +74,7 @@ void CreateSession::ExecutePost(Response* const response) {
     }
 
     if (!startView.is_valid()) {
+        session->logger().Log(kFineLogLevel, "Trying to create window - "+window_class);
         // create view
         session->RunSessionTask(base::Bind(
             &ViewFactory::CreateViewByClassName,
@@ -116,6 +119,8 @@ Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
     if (NULL == executor.get()) {
         return new Error(kBadRequest, "cant get view executor.");
     }
+
+    session->logger().Log(kFineLogLevel, "start view ("+viewId.id()+")");
 
     session->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::SwitchTo,

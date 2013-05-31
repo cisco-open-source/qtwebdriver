@@ -89,6 +89,8 @@ public:
 
     const FramePath& current_frame() const;
 
+    void set_current_frame(const FramePath& frame);
+
     const ViewId& current_view() const;
 
     void set_current_view(const ViewId& viewId);
@@ -100,6 +102,8 @@ public:
     int implicit_wait() const;
 
     const Point& get_mouse_position() const;
+
+    void set_mouse_position(const Point& point);
 
     const Logger& logger() const;
 
@@ -137,9 +141,11 @@ public:
     /// @param elementId element to invalidate
     void RemoveElement(const ViewId& viewId, const ElementId& elementId);
 
-    
-
-
+    // TODO: review this logic with frames and refactor if possible
+    // Vector of the |ElementId|s for each frame of the current target frame
+    // path. The first refers to the first frame element in the root document.
+    // If the target frame is window.top, this will be empty.
+    std::vector<ElementId> frame_elements_;
 
 private:
     typedef std::map<std::string, ElementHandle> ElementsMap;
@@ -170,11 +176,6 @@ private:
 
     // Time (in ms) of how long to wait while searching for a single element.
     int implicit_wait_;
-
-  // Vector of the |ElementId|s for each frame of the current target frame
-  // path. The first refers to the first frame element in the root document.
-  // If the target frame is window.top, this will be empty.
-  std::vector<ElementId> frame_elements_;
 
     // Last mouse position. Advanced APIs need this value.
     Point mouse_position_;

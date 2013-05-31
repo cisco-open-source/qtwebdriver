@@ -5,6 +5,8 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
+#include <QtGui/QMessageBox>
+#include <QtGui/QInputDialog>
 
 namespace webdriver {
 
@@ -23,6 +25,7 @@ Error* QViewCmdExecutor::checkView(const ViewId& viewId, QWidget** widget) {
     QWidget* pWidget = static_cast<QWidget*>(handle);
 
     if (NULL == pWidget) {
+        session_->logger().Log(kWarningLogLevel, "checkView - no such view("+viewId.id()+")");
         return new Error(kNoSuchWindow);
     }
 
@@ -140,36 +143,106 @@ void QViewCmdExecutor::Close(Error** error) {
 }
 
 void QViewCmdExecutor::SwitchTo(Error** error) {
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
     session_->set_current_view(view_id_);
 
-    // TODO: clear frame_elements and current_frame
+    session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
 }
 
 void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
-    // TODO: implement
-    session_->logger().Log(kSevereLogLevel, "GetAlertMessage - not implemented, TBD");
-    *error = new Error(kUnknownError, "GetAlertMessage - not implemented, TBD");
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    // QMessageBox::information(pWeb, "Alert", message->c_str(), QMessageBox::Ok);
+    QMessageBox *msgBox = view->findChild<QMessageBox*>();
+    if (NULL != msgBox) {
+        *text = msgBox->text().toStdString();
+    } else {
+        QInputDialog *msgbox = view->findChild<QInputDialog*>();
+
+        if (NULL != msgbox) {
+            *text = msgbox->labelText().toStdString();
+        } else {
+            *error = new Error(kNoAlertOpenError);
+        }
+    }
 }
 
 void QViewCmdExecutor::SetAlertPromptText(const std::string& alert_prompt_text, Error** error) {
-    // TODO: implement
-    session_->logger().Log(kSevereLogLevel, "SetAlertPromptText - not implemented, TBD");
-    *error = new Error(kUnknownError, "SetAlertPromptText - not implemented, TBD");
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    std::string message_text;
+    GetAlertMessage(&message_text, &err);
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QInputDialog *alert = view->findChild<QInputDialog*>();
+
+    if (NULL != alert) {
+        alert->setTextValue(alert_prompt_text.c_str());
+    } else {
+        // in python ELEMENT_NOT_VISIBLE = 11
+        // kNoAlertError = 27
+        *error = new Error(kElementNotVisible);
+    }
 }
 
 void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
-    // TODO: implement
-    session_->logger().Log(kSevereLogLevel, "AcceptOrDismissAlert - not implemented, TBD");
-    *error = new Error(kUnknownError, "AcceptOrDismissAlert - not implemented, TBD");
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (error) {
+        *error = err;
+        return;
+    }
+
+    QMessageBox *msgBox = view->findChild<QMessageBox*>();
+
+    if(NULL != msgBox) {
+        if(accept) {
+            msgBox->accept();
+        } else {
+            msgBox->close();
+        }
+    } else {
+        QInputDialog *msgbox = view->findChild<QInputDialog*>();
+        if(NULL != msgbox) {
+            if(accept) {
+                msgbox->accept();
+            } else {
+                msgbox->close();
+            }
+        } else {
+            *error = new Error(kNoAlertOpenError);
+        }
+    }
 }
 
-Rect QViewCmdExecutor::ConvertQRectToRect(const QRect &rect)
-{
+Rect QViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {
     return Rect(rect.x(), rect.y(), rect.width(), rect.height());
 }
 
-QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect)
-{
+QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
     QRect resultRect;
     resultRect.setX(rect.x());
     resultRect.setY(rect.y());
@@ -177,6 +250,28 @@ QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect)
     resultRect.setHeight(rect.height());
 
     return resultRect;
+}
+
+QPoint QViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
+    QPoint resultPoint;
+    resultPoint.setX(p.x());
+    resultPoint.setY(p.y());
+
+    return resultPoint;
+}
+
+Qt::MouseButton QViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseButton button) {
+    Qt::MouseButton result = Qt::NoButton;
+
+    switch(button)
+    {
+        case kLeftButton: result = Qt::LeftButton; break;
+        case kMiddleButton: result = Qt::MidButton; break;
+        case kRightButton: result = Qt::RightButton; break;
+        default: result = Qt::NoButton;
+    }
+
+    return result;
 }
 
 } // namespace webdriver     

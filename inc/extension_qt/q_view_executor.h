@@ -13,9 +13,9 @@
 
 namespace webdriver {
 
-#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
-#define NOT_IMPLEMENTED_IMPL    {*error = new Error(kUnknownError, "Command not implemented.");}
-#define RET_IF_ERROR(e)         {if(e) {*error = e; return;}}
+//#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
+//#define NOT_IMPLEMENTED_IMPL    {*error = new Error(kUnknownError, "Command not implemented.");}
+//#define RET_IF_ERROR(e)         {if(e) {*error = e; return;}}
 
 /// base class for QT based view's implementation
 class QViewCmdExecutor : public ViewCmdExecutor {
@@ -47,6 +47,8 @@ protected:
     Error* checkView(const ViewId& viewId, QWidget** widget);
     Rect ConvertQRectToRect(const QRect &rect);
     QRect ConvertRectToQRect(const Rect &rect);
+    QPoint ConvertPointToQPoint(const Point &p);
+    Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
 private:
     DISALLOW_COPY_AND_ASSIGN(QViewCmdExecutor);
 };

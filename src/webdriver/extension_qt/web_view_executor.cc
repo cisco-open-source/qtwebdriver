@@ -11,28 +11,32 @@
 #include "webdriver_session.h"
 #include "webdriver_util.h"
 
+#include <QtGui/QApplication>
+
 namespace webdriver {
 
-WebViewCmdExecutorCreator::WebViewCmdExecutorCreator(){}
+QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
+	: ViewCmdExecutorCreator() { }
 
-ViewCmdExecutor* WebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) {
-	//return new QWebViewCmdExecutor(session, viewId);
-	return NULL;
+ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
+	return new QWebViewCmdExecutor(session, viewId);
 }
 
-bool WebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) {
+bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
 	// TODO: implement
 	return true;
 }
 
 QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
-	: QViewCmdExecutor(session, viewId) {}
+	: QViewCmdExecutor(session, viewId) {
+}
 
 Error* QWebViewCmdExecutor::checkView(const ViewId& viewId, QWebView** webView) {
     QWidget* pWidget = static_cast<QWidget*>(session_->GetViewHandle(viewId));
 
 	QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
 	if (NULL == pWebView) {
+		session_->logger().Log(kWarningLogLevel, "checkView - no such web view("+viewId.id()+")");
         return new Error(kNoSuchWindow);
     }
 
@@ -51,7 +55,7 @@ void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -75,7 +79,7 @@ void QWebViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -101,7 +105,7 @@ void QWebViewCmdExecutor::GoForward(Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -114,7 +118,7 @@ void QWebViewCmdExecutor::GoBack(Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -127,7 +131,7 @@ void QWebViewCmdExecutor::Reload(Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -139,7 +143,7 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -159,7 +163,7 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -168,22 +172,197 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
     *error = new Error(kUnknownError, "sendkeys not implemented, TBD.");
 }
 
-// TODO:
-// void QWebViewCmdExecutor::MouseDoubleClick(Error** error) = 0;
-// void QWebViewCmdExecutor::MouseButtonUp(Error** error) = 0;
-// void QWebViewCmdExecutor::MouseButtonDown(Error** error) = 0;
-// void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) = 0;
-//    virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
-//    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) = 0;
-//    virtual void MouseMove(const ElementId& element, Error** error) = 0;
-//    virtual void ClickElement(const ElementId& element, Error** error) = 0;
+void QWebViewCmdExecutor::MouseDoubleClick(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
 
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+
+    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view, dbEvent);
+    QApplication::postEvent(view, releaseEvent);
+}
+
+void QWebViewCmdExecutor::MouseButtonUp(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, releaseEvent);
+}
+
+void QWebViewCmdExecutor::MouseButtonDown(Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::sendEvent(view, pressEvent);
+}
+
+void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+
+    Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view, pressEvent);
+    QApplication::postEvent(view, releaseEvent);
+    if (Qt::RightButton == mouseButton) {
+        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
+        QApplication::postEvent(view, contextEvent);
+    }
+}
+
+void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    Point prev_pos = session_->get_mouse_position();
+    prev_pos.Offset(x_offset, y_offset);
+
+	QPoint point = ConvertPointToQPoint(prev_pos);
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, moveEvent);
+
+    session_->set_mouse_position(prev_pos);
+}
+
+void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    // TODO: implement
+    *error = new Error(kUnknownError, "MouseMove not implemented, TBD.");
+}
+
+void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    Point location;
+    err = GetClickableLocation(view, element, &location);
+    if (err) {
+    	*error = err;
+    	return;
+    }
+
+    QPoint point = ConvertPointToQPoint(location);
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, moveEvent);
+
+    session_->set_mouse_position(location);
+}
+
+void QWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
+	QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string tag_name;
+    GetElementTagName(element, &tag_name, &err);
+    if (err) {
+    	*error = err;
+      	return;
+    }
+
+    if (tag_name == "option") {
+      	const char* kCanOptionBeToggledScript =
+          	"function(option) {"
+          	"  for (var parent = option.parentElement;"
+          	"       parent;"
+          	"       parent = parent.parentElement) {"
+          	"    if (parent.tagName.toLowerCase() == 'select') {"
+          	"      return parent.multiple;"
+          	"    }"
+          	"  }"
+          	"  throw new Error('Option element is not in a select');"
+          	"}";
+      	bool can_be_toggled;
+      	err = ExecuteScriptAndParse(
+          	GetFrame(view, session_->current_frame()),
+          	kCanOptionBeToggledScript,
+          	"canOptionBeToggled",
+          	CreateListValueFrom(element),
+          	CreateDirectValueParser(&can_be_toggled));
+      	if (err) {
+      		*error = err;
+      		return;
+      	}
+
+      	if (can_be_toggled) {
+        	err = ToggleOptionElement(element);
+      	} else {
+	        SetOptionElementSelected(element, true, &err);
+      	}
+    } else {
+      	Point location;
+
+      	err = GetClickableLocation(view, element, &location);
+      	if (!err) {
+      		session_->set_mouse_position(location);
+      		MouseClick(kLeftButton, &err);
+      	}
+    }
+
+    if (err) *error = err;
+}
 
 void QWebViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -200,7 +379,7 @@ void QWebViewCmdExecutor::ClearElement(const ElementId& element, Error** error) 
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -224,7 +403,7 @@ void QWebViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool igno
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -241,7 +420,7 @@ void QWebViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_en
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -258,7 +437,7 @@ void QWebViewCmdExecutor::ElementEquals(const ElementId& element1, const Element
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -277,7 +456,7 @@ void QWebViewCmdExecutor::GetElementLocation(const ElementId& element, Point* lo
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -294,7 +473,7 @@ void QWebViewCmdExecutor::GetElementLocationInView(const ElementId& element, Poi
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -319,7 +498,7 @@ void QWebViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -336,7 +515,7 @@ void QWebViewCmdExecutor::IsOptionElementSelected(const ElementId& element, bool
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -353,7 +532,7 @@ void QWebViewCmdExecutor::SetOptionElementSelected(const ElementId& element, boo
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -379,24 +558,24 @@ void QWebViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, E
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
 	*error = ExecuteScriptAndParse(
       			GetFrame(view, session_->current_frame()),
-      			atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
-      			"getFirstClientRect",
+      			atoms::asString(atoms::GET_SIZE),
+      			"getSize",
       			CreateListValueFrom(element),
-      			CreateDirectValueParser(size));    
+      			CreateDirectValueParser(size));
 }
 
 void QWebViewCmdExecutor::ElementSubmit(const ElementId& element, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -418,7 +597,7 @@ void QWebViewCmdExecutor::GetElementText(const ElementId& element, std::string* 
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -435,7 +614,7 @@ void QWebViewCmdExecutor::GetElementCssProperty(const ElementId& element, const 
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -459,7 +638,7 @@ void QWebViewCmdExecutor::FindElement(const ElementId& root_element, const std::
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -478,7 +657,7 @@ void QWebViewCmdExecutor::FindElements(const ElementId& root_element, const std:
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -492,7 +671,7 @@ void QWebViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -511,74 +690,121 @@ void QWebViewCmdExecutor::SwitchTo(Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "SwitchTo not implemented, TBD.");
+    session_->set_current_view(view_id_);
 
+    session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
+
+    // reset frame path
+    session_->frame_elements_.clear();
+    session_->set_current_frame(FramePath());
 }
 
 void QWebViewCmdExecutor::SwitchToFrameWithNameOrId(const std::string& name_or_id, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "SwitchToFrameWithNameOrId not implemented, TBD.");
-
+    std::string script =
+      	"function(arg) {"
+      	"  var xpath = '(/html/body//iframe|/html/frameset/frame)';"
+      	"  var sub = function(s) { return s.replace(/\\$/g, arg); };"
+      	"  xpath += sub('[@name=\"$\" or @id=\"$\"]');"
+      	"  return document.evaluate(xpath, document, null, "
+      	"      XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
+      	"}";
+  	*error = SwitchToFrameWithJavaScriptLocatedFrame(
+  					view,
+  					GetFrame(view, session_->current_frame()),
+      				script, CreateListValueFrom(name_or_id));
 }
 
 void QWebViewCmdExecutor::SwitchToFrameWithIndex(int index, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "SwitchToFrameWithIndex not implemented, TBD.");
+    // We cannot simply index into window.frames because we need to know the
+  	// tagName of the frameElement. If child frame N is from another domain, then
+  	// the following will run afoul of the same origin policy:
+  	//   window.frames[N].frameElement;
+  	// Instead of indexing window.frames, we use an XPath expression to index
+  	// into the list of all IFRAME and FRAME elements on the page - if we find
+  	// something, then that XPath expression can be used as the new frame's XPath.
+  	std::string script =
+      	"function(index) {"
+      	"  var xpathIndex = '[' + (index + 1) + ']';"
+      	"  var xpath = '(/html/body//iframe|/html/frameset/frame)' + "
+      	"              xpathIndex;"
+      	"  return document.evaluate(xpath, document, null, "
+      	"      XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;"
+      	"}";
+  	*error = SwitchToFrameWithJavaScriptLocatedFrame(
+  					view,
+  					GetFrame(view, session_->current_frame()),
+      				script, CreateListValueFrom(index));
 }
 
 void QWebViewCmdExecutor::SwitchToFrameWithElement(const ElementId& element, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "SwitchToFrameWithElement not implemented, TBD.");
+    // TODO(jleyba): Extract this, and the other frame switch methods to an atom.
+  	std::string script =
+      	"function(elem) {"
+      	"  if (elem.nodeType != 1 || !/^i?frame$/i.test(elem.tagName)) {"
+      	"    console.error('Element is not a frame');"
+      	"    return null;"
+      	"  }"
+      	"  for (var i = 0; i < window.frames.length; i++) {"
+      	"    if (elem.contentWindow == window.frames[i]) {"
+      	"      return elem;"
+      	"    }"
+      	"  }"
+      	"  console.info('Frame is not connected to this DOM tree');"
+      	"  return null;"
+      	"}";
+  	*error = SwitchToFrameWithJavaScriptLocatedFrame(
+  			view,
+  			GetFrame(view, session_->current_frame()),
+      		script, CreateListValueFrom(element));
 }
 
 void QWebViewCmdExecutor::SwitchToTopFrame(Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "SwitchToTopFrame not implemented, TBD.");
+    session_->frame_elements_.clear();
+    session_->set_current_frame(FramePath());
 }
 
 void QWebViewCmdExecutor::NavigateToURL(const std::string& url, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -593,7 +819,7 @@ void QWebViewCmdExecutor::GetURL(std::string* url, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -610,7 +836,7 @@ void QWebViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -626,7 +852,7 @@ void QWebViewCmdExecutor::ExecuteAsyncScript(const std::string& script, const ba
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -642,7 +868,7 @@ void QWebViewCmdExecutor::GetAppCacheStatus(int* status, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -1112,6 +1338,170 @@ Error* QWebViewCmdExecutor::GetElementEffectiveStyle(
       			CreateListValueFrom(element, prop),
       			CreateDirectValueParser(value));
 }
+
+Error* QWebViewCmdExecutor::SwitchToFrameWithJavaScriptLocatedFrame(
+								QWebView* view,
+								QWebFrame* frame,
+    							const std::string& script,
+    							ListValue* args) {
+  	class SwitchFrameValueParser : public ValueParser {
+   	public:
+	    SwitchFrameValueParser(
+        	bool* found_frame, ElementId* frame)
+        	: found_frame_(found_frame), frame_(frame) { }
+
+    	virtual ~SwitchFrameValueParser() { }
+
+    	virtual bool Parse(base::Value* value) const OVERRIDE {
+      		if (value->IsType(Value::TYPE_NULL)) {
+        		*found_frame_ = false;
+        		return true;
+      		}
+      		ElementId id(value);
+      		if (!id.is_valid()) {
+        		return false;
+      		}
+      		*frame_ = id;
+      		*found_frame_ = true;
+      		return true;
+    	}
+
+   	private:
+	    bool* found_frame_;
+	    ElementId* frame_;
+  	};
+
+  	bool found_frame;
+  	ElementId new_frame_element;
+  	Error* error = ExecuteScriptAndParse(
+      				frame, script, "switchFrame", args,
+      				new SwitchFrameValueParser(&found_frame, &new_frame_element));
+  	if (error)
+	    return error;
+
+  	if (!found_frame)
+	    return new Error(kNoSuchFrame);
+
+  	std::string frame_id = GenerateRandomID();
+  	error = ExecuteScriptAndParse(
+      			frame,
+              	"function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);  console.log(meta); console.log(child);}",
+      			"setFrameId",
+      			CreateListValueFrom(new_frame_element, frame_id),
+      			CreateDirectValueParser(kSkipParsing));
+  	if (error)
+	    return error;
+
+	AddIdToCurrentFrame(view, FramePath(frame_id));
+
+  	session_->frame_elements_.push_back(new_frame_element);
+  	FramePath frame_path = session_->current_frame();
+  	session_->set_current_frame(frame_path.Append(
+      		base::StringPrintf("%s", frame_id.c_str())));
+  	return NULL;
+}
+
+void QWebViewCmdExecutor::AddIdToCurrentFrame(QWebView* view, const FramePath &frame_path) {
+    QWebFrame *pFrame = FindFrameByMeta(view->page()->mainFrame(), frame_path);
+
+    pFrame->setProperty("frame_id", QString(frame_path.value().c_str()));
+}
+
+QWebFrame* QWebViewCmdExecutor::FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path) {
+    if (frame_path.value().empty())
+        return NULL;
+
+    foreach(QWebFrame *childFrame, parent->childFrames())
+    {
+        QString frameId = childFrame->metaData().value("wd_frame_id_");
+        if (frameId == QString(frame_path.value().c_str()))
+        {
+            return childFrame;
+        }
+        else
+        {
+            QWebFrame *pFrame = FindFrameByMeta(childFrame, frame_path);
+            if (pFrame != NULL)
+                return pFrame;
+        }
+
+    }
+    return NULL;
+}
+
+Error* QWebViewCmdExecutor::GetElementFirstClientRect(QWebFrame* frame,
+                                    const ElementId& element,
+                                    Rect* rect) {
+
+	return ExecuteScriptAndParse(
+      			frame,
+      			atoms::asString(atoms::GET_FIRST_CLIENT_RECT),
+      			"getFirstClientRect",
+      			CreateListValueFrom(element),
+      			CreateDirectValueParser(rect));
+}
+
+Error* QWebViewCmdExecutor::GetClickableLocation(QWebView* view, const ElementId& element, Point* location) {
+	bool is_displayed = false;
+	Error* error = NULL;
+  	IsElementDisplayed(element,
+  				 true /* ignore_opacity */,
+  				 &is_displayed,
+  				 &error);
+  	if (error)
+	    return error;
+  	if (!is_displayed)
+	    return new Error(kElementNotVisible, "Element must be displayed to click");
+
+  	// We try 3 methods to determine clickable location. This mostly follows
+  	// what FirefoxDriver does. Try the first client rect, then the bounding
+  	// client rect, and lastly the size of the element (via closure).
+  	// SVG is one case that doesn't have a first client rect.
+  	Rect rect;
+  	scoped_ptr<Error> ignore_error(GetElementFirstClientRect(GetFrame(view, session_->current_frame()),element, &rect));
+  	if (ignore_error.get()) {
+	    Rect client_rect;
+	    ignore_error.reset(ExecuteScriptAndParse(
+        	GetFrame(view, session_->current_frame()),
+        	"function(elem) { return elem.getBoundingClientRect() }",
+        	"getBoundingClientRect",
+        	CreateListValueFrom(element),
+        	CreateDirectValueParser(&client_rect)));
+    	rect = Rect(0, 0, client_rect.width(), client_rect.height());
+  	}
+  	if (ignore_error.get()) {
+	    Size size;
+	    Error* tmp_err = NULL;
+	    GetElementSize(element, &size, &tmp_err);
+	    ignore_error.reset(tmp_err);
+	    rect = Rect(0, 0, size.width(), size.height());
+  	}
+  	if (ignore_error.get()) {
+	    return new Error(kUnknownError,
+                     "Unable to determine clickable location of element");
+  	}
+  	error = GetElementRegionInView(
+  		view,
+      	element, rect, true /* center */, true /* verify_clickable_at_middle */,
+      	location);
+  	if (error)
+	    return error;
+  	location->Offset(rect.width() / 2, rect.height() / 2);
+  	return NULL;
+}	
+
+Error* QWebViewCmdExecutor::ToggleOptionElement(const ElementId& element) {
+  	bool is_selected;
+  	Error* error = NULL;
+  	IsOptionElementSelected(element, &is_selected, &error);
+  	if (error)
+	    return error;
+
+	SetOptionElementSelected(element, !is_selected, &error);
+
+	return error;
+}
+
 
 
 

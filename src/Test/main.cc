@@ -24,8 +24,10 @@
 #include "CoordinatesTest.h"
 #include "ClickScrollingTest.h"
 
-#include <webdriver_server.h>
-#include <extension_qt/web_view_creator.h>
+#include "webdriver_server.h"
+#include "extension_qt/web_view_creator.h"
+#include "extension_qt/web_view_executor.h"
+#include "extension_qt/q_view_runner.h"
 
 
 int main(int argc, char *argv[])
@@ -63,11 +65,14 @@ int main(int argc, char *argv[])
     //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
     //watcher.setFuture(future);
 
+    webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
+
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebView>("QWebView");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
 
-
+//    webdriver::ViewCmdExecutorCreator* webExCreator = new webdriver::QWebViewCmdExecutorCreator();
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
 
     webdriver::Server wd_server;
     if (0 != wd_server.Init(argc, argv)) 

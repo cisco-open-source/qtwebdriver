@@ -16,9 +16,10 @@ namespace webdriver {
 /// base class for runner for view operations.
 /// Contains default imlementation.
 class ViewRunner {
-private:
+protected:
     typedef ViewRunner* (*CreateRunnerMethod)(void);
 public:
+    ViewRunner();
     virtual ~ViewRunner() {};
 
     /// run view operation in runner context
@@ -38,13 +39,12 @@ public:
         create = &createRunner<C>;
     }
 
-private:
-    ViewRunner();
-
+protected:
     template <class C>
     static ViewRunner* createRunner(void) { return static_cast<ViewRunner*>(new C());}
 
     static CreateRunnerMethod create;
+private:
 
     DISALLOW_COPY_AND_ASSIGN(ViewRunner);
 };

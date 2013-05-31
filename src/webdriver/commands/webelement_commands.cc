@@ -33,7 +33,7 @@ WebElementCommand::WebElementCommand(
 WebElementCommand::~WebElementCommand() {}
 
 bool WebElementCommand::Init(Response* const response) {
-    if (!WebDriverCommand::Init(response))
+    if (!ViewWebDriverCommand::Init(response))
         return false;
 
     // There should be at least 5 segments to match

@@ -36,6 +36,10 @@ bool QWebViewCreator::CreateViewByClassName(Session* session, const std::string&
             session->logger().Log(kInfoLogLevel,
                 "QWebViewCreator created view(" + newView.id() +
                 ") by class name - "+className);
+
+            // show
+            QWidget* widget = static_cast<QWidget*>(handle);
+            widget->show();
             return true;
         }
     }

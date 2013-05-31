@@ -169,7 +169,7 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri);
     if (NULL == cmdCreator)
     {
-        GlobalLogger::Log(kInfoLogLevel, "<<<<< ProcessHttpRequest - no route for url: " + uri);
+        GlobalLogger::Log(kWarningLogLevel, "<<<<< ProcessHttpRequest - no route for url: " + uri);
         return false;
     }
 

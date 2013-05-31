@@ -111,7 +111,7 @@ private:
 class ViewCmdExecutorCreator {
 public:
     ViewCmdExecutorCreator();
-    ~ViewCmdExecutorCreator(){}
+    virtual ~ViewCmdExecutorCreator(){}
 
     /// custom method, creates executor for specified view
     /// @param session pointer to session

@@ -140,6 +140,10 @@ const FramePath& Session::current_frame() const {
     return current_frame_path_;
 }
 
+void Session::set_current_frame(const FramePath& frame) {
+    current_frame_path_ = frame;
+}
+
 const ViewId& Session::current_view() const {
     return current_view_id_;
 }
@@ -166,6 +170,10 @@ int Session::implicit_wait() const {
 
 const Point& Session::get_mouse_position() const {
     return mouse_position_;
+}
+
+void Session::set_mouse_position(const Point& point) {
+    mouse_position_ = point;
 }
 
 const Logger& Session::logger() const {
