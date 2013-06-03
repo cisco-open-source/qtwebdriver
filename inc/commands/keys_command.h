@@ -20,7 +20,7 @@ class Error;
 class Response;
 
 /// Send a sequence of key strokes to the page.
-class KeysCommand : public ViewWebDriverCommand {
+class KeysCommand : public ViewCommand {
 public:
   	KeysCommand(const std::vector<std::string>& path_segments,
               const DictionaryValue* const parameters);

@@ -16,7 +16,7 @@ class Response;
 
 /// A call with HTTP GET will return the title of the tab. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/title
-class TitleCommand : public ViewWebDriverCommand {
+class TitleCommand : public ViewCommand {
 public:
   	TitleCommand(const std::vector<std::string>& path_segments,
                const DictionaryValue* const parameters);

@@ -23,7 +23,7 @@ class Response;
 /// specified in the arguments array as WebElement JSON arguments. Likewise,
 /// any WebElements in the script result will be returned to the client as
 /// WebElement JSON objects.
-class ExecuteAsyncScriptCommand : public ViewWebDriverCommand {
+class ExecuteAsyncScriptCommand : public ViewCommand {
 public:
   	ExecuteAsyncScriptCommand(const std::vector<std::string>& path_segments,
                             const base::DictionaryValue* const parameters);

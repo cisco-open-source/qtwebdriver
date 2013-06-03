@@ -20,7 +20,7 @@ class Response;
 /// any WebElements in the script result will be returned to the client as
 /// WebElement JSON objects. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/execute
-class ExecuteCommand : public ViewWebDriverCommand {
+class ExecuteCommand : public ViewCommand {
 public:
   	ExecuteCommand(const std::vector<std::string>& path_segments,
                  const DictionaryValue* const parameters);

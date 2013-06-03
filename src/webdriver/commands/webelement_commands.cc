@@ -27,13 +27,13 @@ namespace webdriver {
 WebElementCommand::WebElementCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters)
-    : ViewWebDriverCommand(path_segments, parameters),
+    : ViewCommand(path_segments, parameters),
       path_segments_(path_segments) {}
 
 WebElementCommand::~WebElementCommand() {}
 
 bool WebElementCommand::Init(Response* const response) {
-    if (!ViewWebDriverCommand::Init(response))
+    if (!ViewCommand::Init(response))
         return false;
 
     // There should be at least 5 segments to match

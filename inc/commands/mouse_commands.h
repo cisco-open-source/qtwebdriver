@@ -55,7 +55,7 @@ private:
 /// - /session/:sessionId/buttondown
 /// - /session/:sessionId/buttonup
 /// - /session/:sessionId/doubleclick
-class AdvancedMouseCommand : public ViewWebDriverCommand {
+class AdvancedMouseCommand : public ViewCommand {
 public:
     AdvancedMouseCommand(const std::vector<std::string>& path_segments,
                         const base::DictionaryValue* const parameters);

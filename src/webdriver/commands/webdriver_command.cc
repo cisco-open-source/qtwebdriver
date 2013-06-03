@@ -91,15 +91,15 @@ bool WebDriverCommand::ShouldRunPreAndPostCommandHandlers() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ViewWebDriverCommand::ViewWebDriverCommand(
+ViewCommand::ViewCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters)
     : WebDriverCommand(path_segments, parameters),
       executor_(NULL) {}
 
-ViewWebDriverCommand::~ViewWebDriverCommand() {}
+ViewCommand::~ViewCommand() {}
 
-bool ViewWebDriverCommand::Init(Response* const response) {
+bool ViewCommand::Init(Response* const response) {
     if (!WebDriverCommand::Init(response))
         return false;
 

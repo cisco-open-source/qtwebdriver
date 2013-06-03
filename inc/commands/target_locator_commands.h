@@ -53,7 +53,7 @@ private:
 /// Switches to the given window as the default window to execute commands on
 /// or closes it.
 /// REST URL: /session/:sessionId/window
-class WindowCommand : public ViewWebDriverCommand {
+class WindowCommand : public ViewCommand {
 public:
     WindowCommand(const std::vector<std::string>& path_segments,
                 const base::DictionaryValue* parameters);
@@ -76,7 +76,7 @@ private:
 
 /// Switches to the given frame as the default frame to execute commands in.
 /// REST URL: /session/:sessionId/frame
-class SwitchFrameCommand : public ViewWebDriverCommand {
+class SwitchFrameCommand : public ViewCommand {
 public:
     SwitchFrameCommand(const std::vector<std::string>& path_segments,
                      const base::DictionaryValue* parameters);
@@ -92,7 +92,7 @@ private:
 };
 
 /// Retrieves the active element on the current page.
-class ActiveElementCommand : public ViewWebDriverCommand {
+class ActiveElementCommand : public ViewCommand {
 public:
     ActiveElementCommand(const std::vector<std::string>& path_segments,
                        const base::DictionaryValue* parameters);

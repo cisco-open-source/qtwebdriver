@@ -15,7 +15,7 @@ namespace webdriver {
 
 ForwardCommand::ForwardCommand(const std::vector<std::string>& path_segments,
                  const DictionaryValue* const parameters)
-      : ViewWebDriverCommand(path_segments, parameters) {}
+      : ViewCommand(path_segments, parameters) {}
 
 ForwardCommand::~ForwardCommand() {}
 
@@ -37,7 +37,7 @@ void ForwardCommand::ExecutePost(Response* const response) {
 
 BackCommand::BackCommand(const std::vector<std::string>& path_segments,
               const DictionaryValue* const parameters)
-      : ViewWebDriverCommand(path_segments, parameters) {}
+      : ViewCommand(path_segments, parameters) {}
 
 BackCommand::~BackCommand() {}
 
@@ -59,7 +59,7 @@ void BackCommand::ExecutePost(Response* const response) {
 
 RefreshCommand::RefreshCommand(const std::vector<std::string>& path_segments,
                                const DictionaryValue* const parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 RefreshCommand::~RefreshCommand() {}
 

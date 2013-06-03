@@ -65,7 +65,7 @@ void WindowHandlesCommand::ExecuteGet(Response* const response) {
 WindowCommand::WindowCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 WindowCommand::~WindowCommand() {}
 
@@ -185,7 +185,7 @@ bool WindowCommand::ShouldRunPreAndPostCommandHandlers() {
 SwitchFrameCommand::SwitchFrameCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 SwitchFrameCommand::~SwitchFrameCommand() {}
 
@@ -248,7 +248,7 @@ bool SwitchFrameCommand::GetWebElementParameter(const std::string& key,
 ActiveElementCommand::ActiveElementCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 ActiveElementCommand::~ActiveElementCommand() {}
 

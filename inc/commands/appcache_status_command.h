@@ -18,7 +18,7 @@ namespace webdriver {
 
 class Response;
 
-class AppCacheStatusCommand : public ViewWebDriverCommand {
+class AppCacheStatusCommand : public ViewCommand {
 public:
   	AppCacheStatusCommand(const std::vector<std::string>& path_segments,
                         const base::DictionaryValue* const parameters);

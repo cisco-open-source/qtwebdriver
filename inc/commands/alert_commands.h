@@ -19,7 +19,7 @@ namespace webdriver {
 class Response;
 
 /// Gets the message of the JavaScript modal dialog, or sets the prompt text.
-class AlertTextCommand : public ViewWebDriverCommand {
+class AlertTextCommand : public ViewCommand {
  public:
     AlertTextCommand(const std::vector<std::string>& path_segments,
                    const base::DictionaryValue* parameters);
@@ -34,7 +34,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(AlertTextCommand);
 };
 
-class AcceptAlertCommand : public ViewWebDriverCommand {
+class AcceptAlertCommand : public ViewCommand {
 public:
     AcceptAlertCommand(const std::vector<std::string>& path_segments,
                      const base::DictionaryValue* parameters);
@@ -47,7 +47,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(AcceptAlertCommand);
 };
 
-class DismissAlertCommand : public ViewWebDriverCommand {
+class DismissAlertCommand : public ViewCommand {
 public:
     DismissAlertCommand(const std::vector<std::string>& path_segments,
                       const base::DictionaryValue* parameters);

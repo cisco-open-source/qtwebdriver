@@ -16,7 +16,7 @@ namespace webdriver {
 AlertTextCommand::AlertTextCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {
+    : ViewCommand(path_segments, parameters) {
 }
 
 AlertTextCommand::~AlertTextCommand() {
@@ -71,7 +71,7 @@ void AlertTextCommand::ExecutePost(Response* const response) {
 AcceptAlertCommand::AcceptAlertCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {
+    : ViewCommand(path_segments, parameters) {
 }
 
 AcceptAlertCommand::~AcceptAlertCommand() {
@@ -97,7 +97,7 @@ void AcceptAlertCommand::ExecutePost(Response* const response) {
 DismissAlertCommand::DismissAlertCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {
+    : ViewCommand(path_segments, parameters) {
 }
 
 DismissAlertCommand::~DismissAlertCommand() {

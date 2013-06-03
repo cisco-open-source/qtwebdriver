@@ -17,7 +17,7 @@ namespace webdriver {
 
 ExecuteCommand::ExecuteCommand(const std::vector<std::string>& path_segments,
                                const DictionaryValue* const parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 ExecuteCommand::~ExecuteCommand() {}
 

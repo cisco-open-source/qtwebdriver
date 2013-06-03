@@ -17,7 +17,7 @@ class Response;
 /// Controls navigate to new web pages for the current tab.  A call with
 /// and HTTP GET will return the URL of the tab. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/url
-class URLCommand : public ViewWebDriverCommand {
+class URLCommand : public ViewCommand {
 public:
   	URLCommand(const std::vector<std::string>& path_segments,
              const DictionaryValue* const parameters);

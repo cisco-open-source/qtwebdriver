@@ -49,11 +49,11 @@ protected:
 };
 
 /// Handles commands that interact with current view.
-class ViewWebDriverCommand : public WebDriverCommand {
+class ViewCommand : public WebDriverCommand {
 public:
-    ViewWebDriverCommand(const std::vector<std::string>& path_segments,
+    ViewCommand(const std::vector<std::string>& path_segments,
                     const base::DictionaryValue* const parameters);
-    virtual ~ViewWebDriverCommand();
+    virtual ~ViewCommand();
 
     virtual bool Init(Response* const response) OVERRIDE;
 
@@ -61,7 +61,7 @@ protected:
     scoped_ptr<ViewCmdExecutor> executor_;
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(ViewWebDriverCommand);
+    DISALLOW_COPY_AND_ASSIGN(ViewCommand);
 };
 
 }  // namespace webdriver

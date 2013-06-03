@@ -16,7 +16,7 @@ class Response;
 
 /// Navigate forward in the browser history, if possible. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/forward
-class ForwardCommand : public ViewWebDriverCommand {
+class ForwardCommand : public ViewCommand {
 public:
     ForwardCommand(const std::vector<std::string>& path_segments,
                     const DictionaryValue* const parameters);
@@ -31,7 +31,7 @@ private:
 
 /// Navigate backwards in the browser history, if possible. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/back
-class BackCommand : public ViewWebDriverCommand {
+class BackCommand : public ViewCommand {
 public:
     BackCommand(const std::vector<std::string>& path_segments,
                 const DictionaryValue* const parameters);
@@ -46,7 +46,7 @@ private:
 
 /// Performs a reload on the current page. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/refresh
-class RefreshCommand : public ViewWebDriverCommand {
+class RefreshCommand : public ViewCommand {
 public:
     RefreshCommand(const std::vector<std::string>& path_segments,
                     const DictionaryValue* const parameters);

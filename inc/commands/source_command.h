@@ -20,7 +20,7 @@ class Response;
 
 /// Gets the page source. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/source
-class SourceCommand : public ViewWebDriverCommand {
+class SourceCommand : public ViewCommand {
 public:
   	SourceCommand(const std::vector<std::string>& path_segments,
                 const base::DictionaryValue* const parameters);

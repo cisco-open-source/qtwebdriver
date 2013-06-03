@@ -20,7 +20,7 @@ class Response;
 
 /// Take a screenshot of the current page.  See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/screenshot
-class ScreenshotCommand : public ViewWebDriverCommand {
+class ScreenshotCommand : public ViewCommand {
 public:
   	ScreenshotCommand(const std::vector<std::string>& path_segments,
                     const base::DictionaryValue* const parameters);

@@ -26,7 +26,7 @@ class Response;
 
 /// Handles commands that interact with a web element in the WebDriver REST
 /// service.
-class WebElementCommand : public ViewWebDriverCommand {
+class WebElementCommand : public ViewCommand {
 public:
     WebElementCommand(const std::vector<std::string>& path_segments,
                     const base::DictionaryValue* const parameters);

@@ -19,7 +19,7 @@ namespace webdriver {
 
 ScreenshotCommand::ScreenshotCommand(const std::vector<std::string>& ps,
                                      const DictionaryValue* const parameters)
-    : ViewWebDriverCommand(ps, parameters) {}
+    : ViewCommand(ps, parameters) {}
 
 ScreenshotCommand::~ScreenshotCommand() {}
 

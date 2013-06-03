@@ -75,7 +75,7 @@ void HoverCommand::ExecutePost(Response* response) {
 AdvancedMouseCommand::AdvancedMouseCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters)
-    : ViewWebDriverCommand(path_segments, parameters) {}
+    : ViewCommand(path_segments, parameters) {}
 
 AdvancedMouseCommand::~AdvancedMouseCommand() {}
 

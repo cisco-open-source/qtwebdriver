@@ -18,7 +18,7 @@ FindElementCommand::FindElementCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters,
     const bool find_one_element)
-    : ViewWebDriverCommand(path_segments, parameters),
+    : ViewCommand(path_segments, parameters),
       find_one_element_(find_one_element) {}
 
 FindElementCommand::~FindElementCommand() {}
