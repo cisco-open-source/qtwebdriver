@@ -38,7 +38,7 @@ void QViewCmdExecutor::GetTitle(std::string* title, Error **error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -52,7 +52,7 @@ void QViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -64,7 +64,7 @@ void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -76,7 +76,7 @@ void QViewCmdExecutor::Maximize(Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -93,7 +93,7 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -127,7 +127,7 @@ void QViewCmdExecutor::Close(Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -137,7 +137,17 @@ void QViewCmdExecutor::Close(Error** error) {
         return;
     }
 
+    session_->logger().Log(kInfoLogLevel, "close View("+view_id_.id()+")");
+
     session_->RemoveView(view_id_);
+
+    // destroy children correctly
+    QList<QWidget*> childs = view->findChildren<QWidget*>();
+    foreach(QWidget *child, childs)
+    {
+        child->setAttribute(Qt::WA_DeleteOnClose, true);
+        child->close();
+    }
 
     view->close();
 }
@@ -146,7 +156,7 @@ void QViewCmdExecutor::SwitchTo(Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -160,7 +170,7 @@ void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -184,7 +194,7 @@ void QViewCmdExecutor::SetAlertPromptText(const std::string& alert_prompt_text, 
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
@@ -211,7 +221,7 @@ void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);
 
-    if (error) {
+    if (err) {
         *error = err;
         return;
     }
