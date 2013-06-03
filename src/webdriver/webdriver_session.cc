@@ -234,6 +234,34 @@ bool Session::AddNewView(const ViewHandle handle, ViewId* viewId) {
     return true;   
 }
 
+ViewHandle Session::ReplaceViewHandle(const ViewId& viewId, const ViewHandle handle) {
+    ViewsMap::iterator it;
+
+    it = views_.find(viewId.id());
+    if (it == views_.end())
+        return INVALID_HANDLE;
+
+    ViewHandle ret = it->second;
+    
+    it->second = handle;
+
+    return ret;
+}
+
+ViewId Session::GetViewForHandle(const ViewHandle handle) const {
+    ViewId view_to_return;
+    ViewsMap::const_iterator it;
+
+    for (it = views_.begin(); it != views_.end(); ++it) {
+        if (handle == it->second) {
+            view_to_return = ViewId(it->first);
+            break;
+        }
+    }
+
+    return view_to_return;
+};
+
 void Session::RemoveView(const ViewId& viewId) {
     elements_.erase(viewId.id());
     views_.erase(viewId.id());

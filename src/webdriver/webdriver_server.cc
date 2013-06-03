@@ -148,11 +148,11 @@ void* Server::ProcessHttpRequestCb(int event_raised,
 
 bool Server::ProcessHttpRequest(struct mg_connection* connection,
                         const struct mg_request_info* request_info) {
-    std::string method;
     std::vector<std::string> path_segments;
     base::DictionaryValue* parameters = NULL;
     Response response;
     std::string uri(request_info->uri);
+    std::string method(request_info->request_method);
 
     // Overwrite mongoose's default handler for /favicon.ico to always return a
     // 204 response so we don't spam the logs with 404s.
@@ -161,7 +161,8 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
         return true;
     }
 
-    GlobalLogger::Log(kFineLogLevel, ">>>>> ProcessHttpRequest - got new request: " + uri);
+    GlobalLogger::Log(kFineLogLevel, ">>>>> ProcessHttpRequest - got new request: "+
+                        method + "  " + uri);
 
     // remove url_base from uri
     uri = uri.substr(url_base_.length());

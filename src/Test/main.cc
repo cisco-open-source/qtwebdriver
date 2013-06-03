@@ -27,6 +27,7 @@
 #include "webdriver_server.h"
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
+#include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/q_view_runner.h"
 
 
@@ -71,7 +72,8 @@ int main(int argc, char *argv[])
     webCreator->RegisterViewClass<QWebView>("QWebView");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
 
-//    webdriver::ViewCmdExecutorCreator* webExCreator = new webdriver::QWebViewCmdExecutorCreator();
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
+
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
 
     webdriver::Server wd_server;

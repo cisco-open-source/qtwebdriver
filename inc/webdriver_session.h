@@ -126,6 +126,17 @@ public:
     /// @return true if ok
     bool AddNewView(const ViewHandle handle, ViewId* viewId);
 
+    /// Change mapping of viewId to handle
+    /// @param viewId viewId to change
+    /// @param handle new handle to map
+    /// @return old handle, INVALID_HANDLE if viewId not found
+    ViewHandle ReplaceViewHandle(const ViewId& viewId, const ViewHandle handle);
+
+    /// Check if some view maps handle
+    /// @param handle to check
+    /// @return valid viewId if found
+    ViewId GetViewForHandle(const ViewHandle handle) const;
+
     /// Invalidate viewIdRemove it from map
     /// @param viewId requested view
     void RemoveView(const ViewId& viewId);
