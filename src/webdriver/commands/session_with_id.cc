@@ -92,7 +92,7 @@ void SessionWithID::CloseView(const ViewId& viewId) {
     }
 
     session_->RunSessionTask(base::Bind(
-                &ViewCmdExecutor::SwitchTo,
+                &ViewCmdExecutor::Close,
                 base::Unretained(executor.get()),
                 &error));
 
