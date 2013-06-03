@@ -81,10 +81,12 @@ int Server::Init(int argc, char *argv[]) {
     return 0;
 }
 
-void Server::SetRouteTable(RouteTable* routeTable) {
+int Server::SetRouteTable(RouteTable* routeTable) {
     if (state_ == STATE_IDLE) {
         routeTable_.reset(new RouteTable(*routeTable));
+        return 0;
     }
+    return 1;
 }
 
 int Server::Start() {

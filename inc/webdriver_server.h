@@ -43,7 +43,8 @@ public:
 
     /// Set route table for this server. Server should be stopped.
     /// @param routeTable routeTable to set. Server keeps own copy of RouteTable.
-    void SetRouteTable(RouteTable* routeTable);
+    /// @return 0 - if success, error code otherwise.
+    int SetRouteTable(RouteTable* routeTable);
 
     /// Start server 
     /// @return 0 - if success, error code otherwise.
