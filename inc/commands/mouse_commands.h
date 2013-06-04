@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "commands/webelement_commands.h"
+#include "commands/element_commands.h"
 #include "webdriver_element_id.h"
 
 namespace base {
@@ -21,7 +21,7 @@ class Response;
 
 /// Click an element. See:
 /// http://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/WebElement.html#click()
-class MoveAndClickCommand : public WebElementCommand {
+class MoveAndClickCommand : public ElementCommand {
 public:
     MoveAndClickCommand(const std::vector<std::string>& path_segments,
                       const base::DictionaryValue* const parameters);
@@ -36,7 +36,7 @@ private:
 
 /// Move the mouse over an element. See:
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/hover
-class HoverCommand : public WebElementCommand {
+class HoverCommand : public ElementCommand {
 public:
     HoverCommand(const std::vector<std::string>& path_segments,
                const base::DictionaryValue* const parameters);

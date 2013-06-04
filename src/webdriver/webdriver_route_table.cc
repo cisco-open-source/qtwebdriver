@@ -22,7 +22,7 @@
 #include "commands/screenshot_command.h"
 #include "commands/keys_command.h"
 #include "commands/mouse_commands.h"
-#include "commands/webelement_commands.h"
+#include "commands/element_commands.h"
 #include "commands/find_element_commands.h"
 #include "commands/target_locator_commands.h"
 #include "commands/source_command.h"

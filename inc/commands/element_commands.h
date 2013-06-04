@@ -26,11 +26,11 @@ class Response;
 
 /// Handles commands that interact with a web element in the WebDriver REST
 /// service.
-class WebElementCommand : public ViewCommand {
+class ElementCommand : public ViewCommand {
 public:
-    WebElementCommand(const std::vector<std::string>& path_segments,
+    ElementCommand(const std::vector<std::string>& path_segments,
                     const base::DictionaryValue* const parameters);
-    virtual ~WebElementCommand();
+    virtual ~ElementCommand();
 
     virtual bool Init(Response* const response) OVERRIDE;
 
@@ -39,12 +39,12 @@ protected:
     ElementId element;
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(WebElementCommand);
+    DISALLOW_COPY_AND_ASSIGN(ElementCommand);
 };
 
 /// Retrieves element attributes.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/attribute/:name
-class ElementAttributeCommand : public WebElementCommand {
+class ElementAttributeCommand : public ElementCommand {
 public:
     ElementAttributeCommand(const std::vector<std::string>& path_segments,
                           const base::DictionaryValue* parameters);
@@ -59,7 +59,7 @@ private:
 
 /// Clears test input elements.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/clear
-class ElementClearCommand : public WebElementCommand {
+class ElementClearCommand : public ElementCommand {
 public:
     ElementClearCommand(const std::vector<std::string>& path_segments,
                       const base::DictionaryValue* parameters);
@@ -74,7 +74,7 @@ private:
 
 /// Retrieves element style properties.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/css/:propertyName
-class ElementCssCommand : public WebElementCommand {
+class ElementCssCommand : public ElementCommand {
 public:
     ElementCssCommand(const std::vector<std::string>& path_segments,
                     const base::DictionaryValue* parameters);
@@ -89,7 +89,7 @@ private:
 
 /// Queries whether an element is currently displayed ot the user.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/displayed
-class ElementDisplayedCommand : public WebElementCommand {
+class ElementDisplayedCommand : public ElementCommand {
 public:
     ElementDisplayedCommand(const std::vector<std::string>& path_segments,
                           const base::DictionaryValue* parameters);
@@ -104,7 +104,7 @@ private:
 
 /// Queries whether an element is currently enabled.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/enabled
-class ElementEnabledCommand : public WebElementCommand {
+class ElementEnabledCommand : public ElementCommand {
 public:
     ElementEnabledCommand(const std::vector<std::string>& path_segments,
                         const base::DictionaryValue* parameters);
@@ -119,7 +119,7 @@ private:
 
 /// Queries whether two elements are equal.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/equals/:other
-class ElementEqualsCommand : public WebElementCommand {
+class ElementEqualsCommand : public ElementCommand {
 public:
     ElementEqualsCommand(const std::vector<std::string>& path_segments,
                        const base::DictionaryValue* parameters);
@@ -134,7 +134,7 @@ private:
 
 /// Retrieves the element's location on the page.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/location
-class ElementLocationCommand : public WebElementCommand {
+class ElementLocationCommand : public ElementCommand {
 public:
     ElementLocationCommand(const std::vector<std::string>& path_segments,
                          const base::DictionaryValue* parameters);
@@ -150,7 +150,7 @@ private:
 /// Retrieves the element's location on the page after ensuring it is visible in
 /// the current viewport.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/location_in_view
-class ElementLocationInViewCommand : public WebElementCommand {
+class ElementLocationInViewCommand : public ElementCommand {
 public:
     ElementLocationInViewCommand(const std::vector<std::string>& path_segments,
                                const base::DictionaryValue* parameters);
@@ -165,7 +165,7 @@ private:
 
 /// Queries for an element's tag name.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/name
-class ElementNameCommand : public WebElementCommand {
+class ElementNameCommand : public ElementCommand {
 public:
     ElementNameCommand(const std::vector<std::string>& path_segments,
                      const base::DictionaryValue* parameters);
@@ -181,7 +181,7 @@ private:
 /// Handles selecting elements and querying whether they are currently selected.
 /// Queries whether an element is currently enabled.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/selected
-class ElementSelectedCommand : public WebElementCommand {
+class ElementSelectedCommand : public ElementCommand {
 public:
     ElementSelectedCommand(const std::vector<std::string>& path_segments,
                          const base::DictionaryValue* parameters);
@@ -198,7 +198,7 @@ private:
 
 /// Queries for an element's size.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/size
-class ElementSizeCommand : public WebElementCommand {
+class ElementSizeCommand : public ElementCommand {
 public:
     ElementSizeCommand(const std::vector<std::string>& path_segments,
                      const base::DictionaryValue* parameters);
@@ -213,7 +213,7 @@ private:
 
 /// Submit's the form containing the target element.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/submit
-class ElementSubmitCommand : public WebElementCommand {
+class ElementSubmitCommand : public ElementCommand {
 public:
     ElementSubmitCommand(const std::vector<std::string>& path_segments,
                        const base::DictionaryValue* parameters);
@@ -229,7 +229,7 @@ private:
 /// Sends keys to the specified web element. Also gets the value property of an
 /// element.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/value
-class ElementValueCommand : public WebElementCommand {
+class ElementValueCommand : public ElementCommand {
 public:
     ElementValueCommand(const std::vector<std::string>& path_segments,
                       const base::DictionaryValue* parameters);
@@ -244,7 +244,7 @@ private:
 
 /// Gets the visible text of the specified web element.
 /// http://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/text
-class ElementTextCommand : public WebElementCommand {
+class ElementTextCommand : public ElementCommand {
 public:
     ElementTextCommand(const std::vector<std::string>& path_segments,
                      const base::DictionaryValue* parameters);

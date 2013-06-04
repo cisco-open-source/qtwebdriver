@@ -6,7 +6,7 @@
 
 #include "base/values.h"
 #include "base/bind.h"
-//#include "chrome/test/automation/value_conversion_util.h"
+//#include "value_conversion_util.h"
 #include "commands/response.h"
 #include "webdriver_basic_types.h"
 #include "webdriver_element_id.h"
@@ -20,7 +20,7 @@ namespace webdriver {
 MoveAndClickCommand::MoveAndClickCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 MoveAndClickCommand::~MoveAndClickCommand() {}
 
@@ -46,7 +46,7 @@ void MoveAndClickCommand::ExecutePost(Response* response) {
 
 HoverCommand::HoverCommand(const std::vector<std::string>& path_segments,
                            const DictionaryValue* const parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 HoverCommand::~HoverCommand() {}
 

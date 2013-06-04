@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "commands/webelement_commands.h"
+#include "commands/element_commands.h"
 
 #include "base/file_util.h"
 #include "base/format_macros.h"
@@ -22,17 +22,17 @@
 
 namespace webdriver {
 
-///////////////////// WebElementCommand ////////////////////
+///////////////////// ElementCommand ////////////////////
 
-WebElementCommand::WebElementCommand(
+ElementCommand::ElementCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* const parameters)
     : ViewCommand(path_segments, parameters),
       path_segments_(path_segments) {}
 
-WebElementCommand::~WebElementCommand() {}
+ElementCommand::~ElementCommand() {}
 
-bool WebElementCommand::Init(Response* const response) {
+bool ElementCommand::Init(Response* const response) {
     if (!ViewCommand::Init(response))
         return false;
 
@@ -54,7 +54,7 @@ bool WebElementCommand::Init(Response* const response) {
 ElementAttributeCommand::ElementAttributeCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementAttributeCommand::~ElementAttributeCommand() {}
 
@@ -96,7 +96,7 @@ void ElementAttributeCommand::ExecuteGet(Response* const response) {
 ElementClearCommand::ElementClearCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementClearCommand::~ElementClearCommand() {}
 
@@ -124,7 +124,7 @@ void ElementClearCommand::ExecutePost(Response* const response) {
 ElementCssCommand::ElementCssCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementCssCommand::~ElementCssCommand() {}
 
@@ -168,7 +168,7 @@ void ElementCssCommand::ExecuteGet(Response* const response) {
 ElementDisplayedCommand::ElementDisplayedCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementDisplayedCommand::~ElementDisplayedCommand() {}
 
@@ -201,7 +201,7 @@ void ElementDisplayedCommand::ExecuteGet(Response* const response) {
 ElementEnabledCommand::ElementEnabledCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementEnabledCommand::~ElementEnabledCommand() {}
 
@@ -233,7 +233,7 @@ void ElementEnabledCommand::ExecuteGet(Response* const response) {
 ElementEqualsCommand::ElementEqualsCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementEqualsCommand::~ElementEqualsCommand() {}
 
@@ -275,7 +275,7 @@ void ElementEqualsCommand::ExecuteGet(Response* const response) {
 ElementLocationCommand::ElementLocationCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementLocationCommand::~ElementLocationCommand() {}
 
@@ -310,7 +310,7 @@ void ElementLocationCommand::ExecuteGet(Response* const response) {
 ElementLocationInViewCommand::ElementLocationInViewCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementLocationInViewCommand::~ElementLocationInViewCommand() {}
 
@@ -345,7 +345,7 @@ void ElementLocationInViewCommand::ExecuteGet(Response* const response) {
 ElementNameCommand::ElementNameCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementNameCommand::~ElementNameCommand() {}
 
@@ -377,7 +377,7 @@ void ElementNameCommand::ExecuteGet(Response* const response) {
 ElementSelectedCommand::ElementSelectedCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementSelectedCommand::~ElementSelectedCommand() {}
 
@@ -429,7 +429,7 @@ void ElementSelectedCommand::ExecutePost(Response* const response) {
 ElementSizeCommand::ElementSizeCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementSizeCommand::~ElementSizeCommand() {}
 
@@ -464,7 +464,7 @@ void ElementSizeCommand::ExecuteGet(Response* const response) {
 ElementSubmitCommand::ElementSubmitCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementSubmitCommand::~ElementSubmitCommand() {}
 
@@ -492,7 +492,7 @@ void ElementSubmitCommand::ExecutePost(Response* const response) {
 ElementValueCommand::ElementValueCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementValueCommand::~ElementValueCommand() {}
 
@@ -536,7 +536,7 @@ void ElementValueCommand::ExecutePost(Response* const response) {
 ElementTextCommand::ElementTextCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebElementCommand(path_segments, parameters) {}
+    : ElementCommand(path_segments, parameters) {}
 
 ElementTextCommand::~ElementTextCommand() {}
 
