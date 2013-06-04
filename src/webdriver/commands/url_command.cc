@@ -54,10 +54,12 @@ void URLCommand::ExecutePost(Response* const response) {
         return;
     }
 
+    // TODO: get capabilities and choose sync/async method
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::NavigateToURL,
             base::Unretained(executor_.get()),
             url,
+            true,
             &error));
 
     if (error) {

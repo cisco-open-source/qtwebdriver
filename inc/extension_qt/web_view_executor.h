@@ -3,12 +3,34 @@
 
 #include "extension_qt/q_view_executor.h"
 
+//#include <QtCore/QObject>
 #include <QtWebKit/QtWebKit>
 
 namespace webdriver {
 
 class FramePath;	
 class ValueParser;
+
+class QPageLoader : public QObject {
+    Q_OBJECT
+public:
+    explicit QPageLoader(QWebView* view) :
+                QObject(NULL) {webView = view; is_loading = false;};
+
+    void loadPage(QUrl url);
+    bool isLoading() {return is_loading;};
+    
+signals:
+    void loaded();
+    
+public slots:
+    void pageLoadStarted();
+    void pageLoadFinished();
+private:
+    bool is_loading;
+    QWebView* webView;
+    
+};
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
@@ -69,7 +91,7 @@ public:
     virtual void SwitchToFrameWithIndex(int index, Error** error);
     virtual void SwitchToFrameWithElement(const ElementId& element, Error** error);
     virtual void SwitchToTopFrame(Error** error);
-    virtual void NavigateToURL(const std::string& url, Error** error);
+    virtual void NavigateToURL(const std::string& url, bool sync, Error** error);
     virtual void GetURL(std::string* url, Error** error);
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);

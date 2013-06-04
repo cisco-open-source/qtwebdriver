@@ -13,18 +13,18 @@
 
 namespace webdriver {
 
-class QTaskRunner : public QObject
-    {
-        Q_OBJECT
-    public:
-        explicit QTaskRunner(QObject *parent = 0) :
-            QObject(parent) {};
+class QTaskRunner : public QObject {
+    Q_OBJECT
+public:
+    explicit QTaskRunner(QObject *parent = 0) :
+                QObject(parent) {};
     
-    signals:
+signals:
     
-    public slots:
-        void runTask(const base::Closure& task) { task.Run(); };
-    };    
+public slots:
+    void runTask(const base::Closure& task) { task.Run(); };
+};
+
 
 class QViewRunner : public ViewRunner {
 public:

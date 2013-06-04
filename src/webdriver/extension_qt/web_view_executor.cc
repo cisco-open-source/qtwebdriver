@@ -15,6 +15,21 @@
 
 namespace webdriver {
 
+void QPageLoader::loadPage(QUrl url) {
+    connect(webView, SIGNAL(loadStarted()),this, SLOT(pageLoadStarted()));
+    webView->load(url);
+}
+
+void QPageLoader::pageLoadStarted() {
+    is_loading = true;
+    connect(webView, SIGNAL(loadFinished(bool)),this, SLOT(pageLoadFinished()), Qt::QueuedConnection);
+}
+
+void QPageLoader::pageLoadFinished() {
+    is_loading = false;
+    emit loaded();
+}
+
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
@@ -800,7 +815,7 @@ void QWebViewCmdExecutor::SwitchToTopFrame(Error** error) {
     session_->set_current_frame(FramePath());
 }
 
-void QWebViewCmdExecutor::NavigateToURL(const std::string& url, Error** error) {
+void QWebViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
 
@@ -809,10 +824,20 @@ void QWebViewCmdExecutor::NavigateToURL(const std::string& url, Error** error) {
         return;
     }
 
-    // this is async
-    // TODO: implement sync load
     QUrl address(QString(url.c_str()));
-    view->load(address);
+
+    if (sync) {
+        QPageLoader pageLoader(view);
+        QEventLoop loop;
+        view->stop();
+        QObject::connect(&pageLoader, SIGNAL(loaded()),&loop,SLOT(quit()));
+        pageLoader.loadPage(address);
+        if (pageLoader.isLoading()) {
+            loop.exec();
+        }
+    } else {
+        view->load(address);
+    }
 }
 
 void QWebViewCmdExecutor::GetURL(std::string* url, Error** error) {
