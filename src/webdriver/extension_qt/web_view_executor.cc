@@ -309,8 +309,21 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "MouseMove not implemented, TBD.");
+    Point location;
+    GetElementLocationInView(element, &location, &err);
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    location.Offset(x_offset, y_offset);
+
+    QPoint point = ConvertPointToQPoint(location);
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, moveEvent);
+
+    session_->set_mouse_position(location);
 }
 
 void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
@@ -664,11 +677,9 @@ void QWebViewCmdExecutor::GetElementCssProperty(const ElementId& element, const 
   	args.Append(element.ToValue());
   	args.Append(Value::CreateStringValue(property));
 
-  	Value* result = NULL;
   	*error = ExecuteScript(
   				GetFrame(view, session_->current_frame()),
-  				script, &args, &result);
-	scoped_ptr<Value> scoped_value(result);
+  				script, &args, value);
 }
 
 void QWebViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
