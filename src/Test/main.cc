@@ -29,6 +29,7 @@
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/q_view_runner.h"
+#include "extension_qt/qwebviewext.h"
 
 
 int main(int argc, char *argv[])
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
 
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
-    webCreator->RegisterViewClass<QWebView>("QWebView");
+    webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
