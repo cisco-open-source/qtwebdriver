@@ -30,6 +30,28 @@ void QPageLoader::pageLoadFinished() {
     emit loaded();
 }
 
+JSNotifier::JSNotifier():
+    isCompleted(false)
+{
+}
+
+QVariant JSNotifier::getResult()
+{
+    return res;
+}
+
+bool JSNotifier::IsCompleted()
+{
+    return isCompleted;
+}
+
+void JSNotifier::setResult(QVariant result)
+{
+    res = result;
+    isCompleted = true;
+    emit completed();
+}
+
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
@@ -1056,16 +1078,15 @@ Error* QWebViewCmdExecutor::ExecuteScriptImpl(QWebFrame* frame,
 	std::string res;
     if (isAsync)
     {
-    	// TODO: implement
-/*        JSNotifier* jsNotify = new JSNotifier();
+        QEventLoop loop;
+        JSNotifier* jsNotify = new JSNotifier();
         frame->addToJavaScriptWindowObject("jsnotify", jsNotify );
-        connect(jsNotify, SIGNAL(completed()), &loop, SLOT(quit()));
+        QObject::connect(jsNotify, SIGNAL(completed()), &loop, SLOT(quit()));
         frame->evaluateJavaScript(script.c_str());
         if (!jsNotify->IsCompleted())
             loop.exec();
         res = jsNotify->getResult().toString().toStdString();
         jsNotify->deleteLater();
-*/
     }
     else
     {

@@ -32,6 +32,28 @@ private:
     
 };
 
+//Notify automation module about end of execution of async script
+class JSNotifier : public QObject
+{
+    Q_OBJECT
+
+public:
+    JSNotifier();
+    QVariant getResult();
+    bool IsCompleted();
+
+
+public slots:
+    void setResult(QVariant result);
+
+signals:
+    void completed();
+
+private:
+    QVariant res;
+    bool isCompleted;
+};
+
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     QWebViewCmdExecutorCreator();
