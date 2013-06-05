@@ -106,7 +106,7 @@ bool ViewCommand::Init(Response* const response) {
     // get executor for current view
     executor_.reset(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_));
     if (NULL == executor_.get()) {
-        response->SetError(new Error(kBadRequest, "cant get view executor."));
+        response->SetError(new Error(kNoSuchWindow, "cant get view executor."));
         return false;
     }
 
