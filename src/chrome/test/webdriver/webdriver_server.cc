@@ -35,7 +35,6 @@
 #include "chrome/test/webdriver/commands/alert_commands.h"
 #include "chrome/test/webdriver/commands/appcache_status_command.h"
 #include "chrome/test/webdriver/commands/browser_connection_commands.h"
-#include "chrome/test/webdriver/commands/chrome_commands.h"
 #include "chrome/test/webdriver/commands/cookie_commands.h"
 #include "chrome/test/webdriver/commands/create_session.h"
 #include "chrome/test/webdriver/commands/execute_async_script_command.h"
@@ -264,15 +263,6 @@ void InitCallbacks(Dispatcher* dispatcher,
 
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
   dispatcher->Add<AppCacheStatusCommand>("/session/*/application_cache/status");
-
-  // Chrome-specific commands.
-  dispatcher->Add<ExtensionsCommand>("/session/*/chrome/extensions");
-  dispatcher->Add<ExtensionCommand>("/session/*/chrome/extension/*");
-  dispatcher->Add<ViewsCommand>("/session/*/chrome/views");
-#if !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
-  dispatcher->Add<HeapProfilerDumpCommand>(
-      "/session/*/chrome/heapprofilerdump");
-#endif  // !defined(NO_TCMALLOC) && (defined(OS_LINUX) || defined(OS_CHROMEOS))
 
   // HTML5 functions.
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");

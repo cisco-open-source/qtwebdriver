@@ -28,16 +28,7 @@ else
 fi
 
 #generate wdversion.cc
-last_changes=`git describe --abbrev=10 --dirty --always`
-version_file=src/wdversion.cc
-
-printf 'namespace webdriver {
-extern const char kProductName[] = "WebDriver-cisco-cmt";
-extern const char kVersionNumber[] = "0.2.0";
-extern const char kBuildTime[] = __TIME__;
-extern const char kBuildDate[] = __DATE__;
-extern const char kLastChanges[] = "%s";
-}' $last_changes > $version_file
+python generate_wdversion.py
 
 for platform in $platforms
 do
