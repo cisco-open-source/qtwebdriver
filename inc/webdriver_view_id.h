@@ -31,6 +31,12 @@ public:
     /// Returns string form of id
     const std::string& id() const { return id_; }
 
+    bool operator==(const ViewId &other) const;
+
+    bool operator!=(const ViewId &other) const;
+
+    bool operator<(const ViewId &other) const;
+
 private:
     std::string id_;
     bool is_valid_;

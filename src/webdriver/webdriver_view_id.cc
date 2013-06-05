@@ -16,4 +16,17 @@ bool ViewId::is_valid() const {
     return is_valid_;
 }    
 
+bool ViewId::operator==(const ViewId &other) const {
+	return (id_ == other.id());
+}
+
+bool ViewId::operator!=(const ViewId &other) const {
+    return !(*this == other);
+}
+
+bool ViewId::operator<(const ViewId &other) const {
+	return (id_ < other.id());
+}
+
+
 }  // namespace webdriver
