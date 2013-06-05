@@ -65,7 +65,7 @@ void WindowHandlesCommand::ExecuteGet(Response* const response) {
 WindowCommand::WindowCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : ViewCommand(path_segments, parameters) {}
+    : WebDriverCommand(path_segments, parameters) {}
 
 WindowCommand::~WindowCommand() {}
 
@@ -105,8 +105,6 @@ void WindowCommand::ExecutePost(Response* const response) {
             error = GetViewTitle(views[i], &window_name);
             if (error)
                 break;
-
-            printf("!!!!! find view %s.\n", window_name.c_str());
 
             if (name == window_name) {
                 new_view = views[i];
@@ -170,14 +168,24 @@ bool WindowCommand::DoesViewExist(const ViewId& viewId) {
 
 void WindowCommand::ExecuteDelete(Response* const response) {
     Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_, session_->current_view()));
+
+    if (NULL == executor.get()) {
+        response->SetError(new Error(kBadRequest, "cant get view executor."));
+        return;
+    }
 
     session_->RunSessionTask(base::Bind(
-            &ViewCmdExecutor::Close,
-            base::Unretained(executor_.get()),
-            &error));
+                &ViewCmdExecutor::Close,
+                base::Unretained(executor.get()),
+                &error));
 
-    if (error)
+    if (error) {
         response->SetError(error);
+        return;
+    }
+
+    // TODO: terminate session if no views found
 }
 
 bool WindowCommand::ShouldRunPreAndPostCommandHandlers() {

@@ -53,7 +53,7 @@ private:
 /// Switches to the given window as the default window to execute commands on
 /// or closes it.
 /// REST URL: /session/:sessionId/window
-class WindowCommand : public ViewCommand {
+class WindowCommand : public WebDriverCommand {
 public:
     WindowCommand(const std::vector<std::string>& path_segments,
                 const base::DictionaryValue* parameters);
