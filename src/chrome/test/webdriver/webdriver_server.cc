@@ -186,6 +186,8 @@ void InitCallbacks(Dispatcher* dispatcher,
 
   dispatcher->Add<Sessions>("/sessions");
 
+  dispatcher->SetNotImplemented("/session/*/touch/click");
+  dispatcher->SetNotImplemented("/session/*/touch/doubleclick");
   // WebElement commands
   dispatcher->Add<FindOneElementCommand>(  "/session/*/element");
   dispatcher->Add<FindManyElementsCommand>("/session/*/elements");
