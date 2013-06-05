@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include "webdriver_view_enumerator.h"
 
@@ -12,7 +13,7 @@ namespace webdriver {
 /// class for QWebView enumerator
 class WebViewEnumeratorImpl : public AbstractViewEnumeratorImpl {
 public:
-    virtual void EnumerateViews(Session* session) const;
+	virtual void EnumerateViews(Session* session, std::set<ViewId>* views) const;
 };
 
 }  // namespace webdriver

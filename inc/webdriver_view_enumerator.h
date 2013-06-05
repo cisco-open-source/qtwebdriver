@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 
 #include "base/basictypes.h"
 #include "webdriver_view_id.h"
@@ -17,7 +18,8 @@ class AbstractViewEnumeratorImpl {
 public:
     /// Get list of views in session
     /// @param session session to enumerate views
-    virtual void EnumerateViews(Session* session) const = 0;
+    /// @param views returned list of ViewIds
+    virtual void EnumerateViews(Session* session, std::set<ViewId>* views) const = 0;
 };
 
 typedef AbstractViewEnumeratorImpl* ViewEnumeratorImplPtr;
@@ -28,7 +30,7 @@ public:
     /// Updates session views list
     /// @param session session to update
     /// @param views returned list of ViewIds
-    static void EnumerateViews(Session* session, std::vector<ViewId>* views = NULL);
+    static void EnumerateViews(Session* session, std::vector<ViewId>* views);
 
     /// Add enumerator for custom view
     /// @param enumeratorImpl pointer to custom enumerator. No need to delete object, class will handle.

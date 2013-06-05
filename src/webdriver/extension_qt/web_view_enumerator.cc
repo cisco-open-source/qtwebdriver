@@ -9,7 +9,7 @@
 
 namespace webdriver {
 
-void WebViewEnumeratorImpl::EnumerateViews(Session* session) const {
+void WebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>* views) const {
 	session->logger().Log(kInfoLogLevel, ">>>>> WebView enumerate");
 
     foreach(QWidget* pWidget, qApp->allWidgets())
@@ -25,6 +25,9 @@ void WebViewEnumeratorImpl::EnumerateViews(Session* session) const {
            			session->logger().Log(kInfoLogLevel,
                 		"WebViewEnumerator found new view("+viewId.id()+")");
                 }
+            }
+            if (viewId.is_valid()) {
+                views->insert(viewId);
             }
         }
     }

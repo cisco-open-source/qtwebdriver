@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "base/callback_forward.h"
 #include "base/file_path.h"
@@ -111,10 +112,6 @@ public:
 
     const Capabilities& capabilities() const;
 
-    /// Gets list of enumerated viewIds
-    /// @param[out] views vector of viewIds to return
-    void GetViews(std::vector<ViewId>* views) const;
-
     /// Get ViewHandle for given ViewId
     /// @param viewId requested viewId
     /// @return viewHandle for given viewId
@@ -140,6 +137,10 @@ public:
     /// Invalidate viewIdRemove it from map
     /// @param viewId requested view
     void RemoveView(const ViewId& viewId);
+
+    /// Invalidate all views except passed
+    /// @param views set of valid views
+    void UpdateViews(const std::set<ViewId>& views);
 
     /// Get elementHandle for given elementId in specific view
     /// @param viewId requested view
@@ -190,14 +191,6 @@ private:
 
     // Last mouse position. Advanced APIs need this value.
     Point mouse_position_;
-
-  // Chrome does not have an individual method for setting the prompt text
-  // of an alert. Instead, when the WebDriver client wants to set the text,
-  // we store it here and pass the text when the alert is accepted or
-  // dismissed. This text should only be used if |has_alert_prompt_text_|
-  // is true, so that the default prompt text is not overridden.
-  std::string alert_prompt_text_;
-  //bool has_alert_prompt_text_;
 
     // Temporary directory containing session data.
     ScopedTempDir temp_dir_;

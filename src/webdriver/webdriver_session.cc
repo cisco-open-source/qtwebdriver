@@ -205,16 +205,6 @@ void Session::RunSessionTask(const base::Closure& task) {
     done_event.Wait();
 }
 
-void Session::GetViews(std::vector<ViewId>* views) const {
-    if (NULL == views) return;
-
-    ViewsMap::const_iterator view;
-    
-    for (view = views_.begin(); view != views_.end(); ++view) {
-        views->push_back(ViewId(view->first));
-    }
-}
-
 ViewHandle Session::GetViewHandle(const ViewId& viewId) const {
     ViewsMap::const_iterator it;
 
@@ -265,6 +255,17 @@ ViewId Session::GetViewForHandle(const ViewHandle handle) const {
 void Session::RemoveView(const ViewId& viewId) {
     elements_.erase(viewId.id());
     views_.erase(viewId.id());
+}
+
+void Session::UpdateViews(const std::set<ViewId>& views) {
+    ViewsMap::iterator it;
+
+    for (it = views_.begin(); it != views_.end(); ++it) {
+        if (0 == views.count(ViewId(it->first))) {
+            // invalidate handle
+            RemoveView(ViewId(it->first));
+        }
+    }
 }
 
 ElementHandle Session::GetElementHandle(const ViewId& viewId, const ElementId& elementId) const {

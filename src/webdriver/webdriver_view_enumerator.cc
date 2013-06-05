@@ -9,14 +9,16 @@ std::vector<ViewEnumeratorImplPtr> ViewEnumerator::enumerators_;
 
 void ViewEnumerator::EnumerateViews(Session* session, std::vector<ViewId>* views) {
 	std::vector<ViewEnumeratorImplPtr>::const_iterator impl;
+	std::set<ViewId> views_set;
 
 	for (impl = enumerators_.begin(); impl < enumerators_.end(); ++impl) {
-		(*impl)->EnumerateViews(session);
+		(*impl)->EnumerateViews(session, &views_set);
 	}
 
-	if (NULL != views) {
-		session->GetViews(views);
-	}
+	std::copy(views_set.begin(), views_set.end(), std::back_inserter(*views));
+
+	// update session to remove dangling sessionIds
+	session->UpdateViews(views_set);
 }
 
 void ViewEnumerator::AddViewEnumeratorImpl(AbstractViewEnumeratorImpl* enumeratorImpl) {
