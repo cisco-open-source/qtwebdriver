@@ -38,6 +38,7 @@ public:
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error) = 0;
     virtual void GetTitle(std::string* title, Error **error) = 0;
+    virtual void GetWindowName(std::string* name, Error ** error) = 0;
     virtual void GetBounds(Rect *bounds, Error **error) = 0;
     virtual void SetBounds(const Rect& bounds, Error** error) = 0;
     virtual void Maximize(Error** error) = 0;

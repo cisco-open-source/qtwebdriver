@@ -74,6 +74,7 @@ public:
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error);
     virtual void GetTitle(std::string* title, Error **error);
+    virtual void GetWindowName(std::string* name, Error ** error);
     virtual void GetBounds(Rect *bounds, Error **error);
     virtual void GoForward(Error** error);
     virtual void GoBack(Error** error);

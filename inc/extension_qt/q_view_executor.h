@@ -24,6 +24,7 @@ public:
     ~QViewCmdExecutor();
 
     virtual void GetTitle(std::string* title, Error **error);
+    virtual void GetWindowName(std::string* name, Error ** error);
     virtual void GetBounds(Rect *bounds, Error **error);
     virtual void SetBounds(const Rect& bounds, Error** error);
     virtual void Maximize(Error** error);

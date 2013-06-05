@@ -56,12 +56,25 @@ QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
 ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-	return new QWebViewCmdExecutor(session, viewId);
+    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
+
+    QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+    if (NULL != pWebView) {
+        return new QWebViewCmdExecutor(session, viewId);
+    }
+
+	return NULL;
 }
 
 bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-	// TODO: implement
-	return true;
+    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
+
+    QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+    if (NULL != pWebView) {
+        return true;
+    }
+
+    return false;
 }
 
 QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
@@ -110,6 +123,25 @@ void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
                             "getTitle",
                             new ListValue(),
                             CreateDirectValueParser(title));
+}
+
+void QWebViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                "function() { return window.name; }",
+                "getWindowName",
+                new ListValue(),
+                CreateDirectValueParser(name));
+
+    session_->logger().Log(kFineLogLevel, "GetWindowName - "+*name);
 }
 
 void QWebViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {

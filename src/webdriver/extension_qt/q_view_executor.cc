@@ -48,6 +48,20 @@ void QViewCmdExecutor::GetTitle(std::string* title, Error **error) {
     session_->logger().Log(kFineLogLevel, "GetTitle - "+*title);
 }
 
+void QViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    *name = view->windowTitle().toStdString();
+
+    session_->logger().Log(kFineLogLevel, "GetWindowName - "+*name);
+}
+
 void QViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
     QWidget* view = NULL;
     Error* err = checkView(view_id_, &view);

@@ -106,6 +106,8 @@ void WindowCommand::ExecutePost(Response* const response) {
             if (error)
                 break;
 
+            printf("!!!!! find view %s.\n", window_name.c_str());
+
             if (name == window_name) {
                 new_view = views[i];
                 break;
@@ -132,7 +134,7 @@ Error* WindowCommand::GetViewTitle(const ViewId& viewId, std::string* title) {
     }
 
     session_->RunSessionTask(base::Bind(
-                &ViewCmdExecutor::GetTitle,
+                &ViewCmdExecutor::GetWindowName,
                 base::Unretained(executor.get()),
                 title,
                 &error));
