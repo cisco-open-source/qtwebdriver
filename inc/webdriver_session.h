@@ -106,6 +106,10 @@ public:
 
     void set_mouse_position(const Point& point);
 
+    int get_sticky_modifiers() const { return sticky_modifiers_; }
+
+    void set_sticky_modifiers(int mods) { sticky_modifiers_ = mods; }
+
     const Logger& logger() const;
 
     const FilePath& temp_dir() const;
@@ -197,6 +201,9 @@ private:
     Capabilities capabilities_;
 
     scoped_ptr<ViewRunner> view_runner_;
+
+    // Current state of all modifier keys.
+    int sticky_modifiers_;
 
     DISALLOW_COPY_AND_ASSIGN(Session);
 };

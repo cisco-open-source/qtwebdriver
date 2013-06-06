@@ -49,7 +49,8 @@ Session::Session()
       thread_(id_.c_str()),
       async_script_timeout_(0),
       implicit_wait_(0),
-      view_runner_(ViewRunner::CreateRunner())
+      view_runner_(ViewRunner::CreateRunner()),
+      sticky_modifiers_(0)
 {
     SessionManager::GetInstance()->Add(this);
     logger_.AddHandler(session_log_.get());
