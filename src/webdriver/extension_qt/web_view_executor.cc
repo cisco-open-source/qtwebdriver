@@ -10,6 +10,7 @@
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
 #include "webdriver_util.h"
+#include "extension_qt/q_key_converter.h"
 
 #include <QtGui/QApplication>
 
@@ -241,8 +242,91 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
         return;
     }
 
-    // TODO: implement
-    *error = new Error(kUnknownError, "sendkeys not implemented, TBD.");
+    bool is_displayed = false;
+    IsElementDisplayed(element, true, &is_displayed, &err);
+    if (err) {
+        *error = err;
+        return;
+    }
+    if (!is_displayed) {
+        *error = new Error(kElementNotVisible);
+        return;
+    }
+
+    bool is_enabled = false;
+    IsElementEnabled(element, &is_enabled, &err);
+    if (err) {
+        *error = err;
+        return;
+    }
+    if (!is_enabled) {
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    // Focus the target element in order to send keys to it.
+    // First, the currently active element is blurred, if it is different from
+    // the target element. We do not want to blur an element unnecessarily,
+    // because this may cause us to lose the current cursor position in the
+    // element.
+    // Secondly, we focus the target element.
+    // Thirdly, if the target element is newly focused and is a text input, we
+    // set the cursor position at the end.
+    // Fourthly, we check if the new active element is the target element. If not,
+    // we throw an error.
+    // Additional notes:
+    //   - |document.activeElement| is the currently focused element, or body if
+    //     no element is focused
+    //   - Even if |document.hasFocus()| returns true and the active element is
+    //     the body, sometimes we still need to focus the body element for send
+    //     keys to work. Not sure why
+    //   - You cannot focus a descendant of a content editable node
+    // TODO(jleyba): Update this to use the correct atom.
+    const char* kFocusScript =
+        "function(elem) {"
+        "  var doc = elem.ownerDocument || elem;"
+        "  var prevActiveElem = doc.activeElement;"
+        "  if (elem != prevActiveElem && prevActiveElem)"
+        "    prevActiveElem.blur();"
+        "  elem.focus();"
+        "  if (elem != prevActiveElem && elem.value && elem.value.length &&"
+        "      elem.setSelectionRange) {"
+        "    elem.setSelectionRange(elem.value.length, elem.value.length);"
+        "  }"
+        "  if (elem != doc.activeElement)"
+        "    throw new Error('Failed to send keys because cannot focus element');"
+        "}";
+    err = ExecuteScriptAndParse(GetFrame(view, session_->current_frame()),
+                                kFocusScript,
+                                "focusElement",
+                                CreateListValueFrom(element),
+                                CreateDirectValueParser(kSkipParsing));
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string err_msg;
+    std::vector<QKeyEvent> key_events;
+    // TODO: get modifiers from session
+    int modifiers = 0;
+
+    if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
+                               session_->logger(),
+                               false,
+                               &modifiers,
+                               &key_events,
+                               &err_msg)) {
+        session_->logger().Log(kSevereLogLevel, "ElementSendKeys - cant convert keys:"+err_msg);
+        *error = new Error(kUnknownError, "ElementSendKeys - cant convert keys:"+err_msg);
+        return;
+    }
+
+    std::vector<QKeyEvent>::iterator it = key_events.begin();
+    while (it != key_events.end()) {
+        qApp->sendEvent(view, &(*it));
+        ++it;
+    }
 }
 
 void QWebViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -1397,8 +1481,6 @@ QWebFrame* QWebViewCmdExecutor::GetFrame(QWebView* view, const FramePath& frame_
 	QWebFrame* frame = FindFrameByPath(view->page()->mainFrame(), frame_path);
     if (frame == NULL)
         frame = view->page()->mainFrame();
-
-    printf("!!!! GetFrame: %s\n", frame_path.value().c_str());
 
     return frame;
 }

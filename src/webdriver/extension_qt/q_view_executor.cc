@@ -2,6 +2,7 @@
 
 #include "webdriver_logging.h"
 #include "webdriver_session.h"
+#include "extension_qt/q_key_converter.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -132,9 +133,35 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
 }
 
 void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
-    // TODO: implement
-    session_->logger().Log(kSevereLogLevel, "SendKeys - not implemented, TBD");
-    *error = new Error(kUnknownError, "SendKeys - not implemented, TBD");
+    QWidget* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string err_msg;
+    std::vector<QKeyEvent> key_events;
+    // TODO: get modifiers from session
+    int modifiers = 0;
+
+    if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
+                               session_->logger(),
+                               false,
+                               &modifiers,
+                               &key_events,
+                               &err_msg)) {
+        session_->logger().Log(kSevereLogLevel, "SendKeys - cant convert keys:"+err_msg);
+        *error = new Error(kUnknownError, "SendKeys - cant convert keys:"+err_msg);
+        return;
+    }
+
+    std::vector<QKeyEvent>::iterator it = key_events.begin();
+    while (it != key_events.end()) {
+        qApp->sendEvent(view, &(*it));
+        ++it;
+    }
 }
 
 void QViewCmdExecutor::Close(Error** error) {
