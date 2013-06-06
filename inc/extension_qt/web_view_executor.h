@@ -117,6 +117,9 @@ public:
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void GetAppCacheStatus(int* status, Error** error);
+    virtual void GetCookies(const std::string& url, base::ListValue** cookies, Error** error);
+    virtual void SetCookie(const std::string& url, base::DictionaryValue* cookie_dict, Error** error);
+    virtual void DeleteCookie(const std::string& url, const std::string& cookie_name, Error** error);
 
 protected:
 	Error* checkView(const ViewId& viewId, QWebView** webView);

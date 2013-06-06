@@ -31,6 +31,7 @@
 #include "commands/execute_async_script_command.h"
 #include "commands/appcache_status_command.h"
 #include "commands/alert_commands.h"
+#include "commands/cookie_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -225,15 +226,14 @@ DefaultRouteTable::DefaultRouteTable()
     Add<AlertTextCommand>               (CommandRoutes::kAlertText);
     Add<AcceptAlertCommand>             (CommandRoutes::kAcceptAlert);
     Add<DismissAlertCommand>            (CommandRoutes::kDismissAlert);
-
+    Add<CookieCommand>                  (CommandRoutes::kCookie);
+    Add<NamedCookieCommand>             (CommandRoutes::kNamedCookie);
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
   // Cookie functions.
-  dispatcher->Add<CookieCommand>(     "/session/*/cookie");
-  dispatcher->Add<NamedCookieCommand>("/session/*/cookie/*");
-
+  
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
   
 

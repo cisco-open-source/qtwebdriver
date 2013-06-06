@@ -74,27 +74,18 @@ public:
     static const char kAlertText[];
     static const char kAcceptAlert[];
     static const char kDismissAlert[];
-    
+    static const char kCookie[];
+    static const char kNamedCookie[];
+
 
 // TODO:
 /*    
     static const char kGet[];
-    static const char kAddCookie[];
-    static const char kGetCookie[];
-    static const char kGetCookies[];
-    static const char kDeleteCookie[];
-    static const char kDeleteAllCookies[];
-    
-    static const char kFindChildElement[];
-    static const char kFindChildElements[];
     
     static const char kSendKeysToActiveElement[];
     
     
     
-   
-    static const char kExecuteScript[];
-    static const char kExecuteAsyncScript[];
     static const char kSetBrowserVisible[];
     static const char kIsBrowserVisible[];
 

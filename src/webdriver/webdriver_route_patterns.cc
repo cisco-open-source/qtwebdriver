@@ -61,6 +61,8 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kAlertText);
 		standardCommandRoutes.insert(kAcceptAlert);
 		standardCommandRoutes.insert(kDismissAlert);
+		standardCommandRoutes.insert(kCookie);
+		standardCommandRoutes.insert(kNamedCookie);
 
 	}
 
@@ -126,15 +128,12 @@ const char CommandRoutes::kGetAppCache[] 				= "/session/*/application_cache/sta
 const char CommandRoutes::kAlertText[] 					= "/session/*/alert_text";
 const char CommandRoutes::kAcceptAlert[] 				= "/session/*/accept_alert";
 const char CommandRoutes::kDismissAlert[] 				= "/session/*/dismiss_alert";
+const char CommandRoutes::kCookie[] 					= "/session/*/cookie";
+const char CommandRoutes::kNamedCookie[] 				= "/session/*/cookie/*";
 
 /*
 
 const char CommandRoutes::kGet[] = "get";
-const char CommandRoutes::kAddCookie[] = "addCookie";
-const char CommandRoutes::kGetCookie[] = "getCookie";
-const char CommandRoutes::kGetCookies[] = "getCookies";
-const char CommandRoutes::kDeleteCookie[] = "deleteCookie";
-const char CommandRoutes::kDeleteAllCookies[] = "deleteAllCookies";
 
 const char CommandRoutes::kSendKeysToActiveElement[] = "sendKeysToActiveElement";
 

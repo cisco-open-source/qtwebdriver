@@ -13,6 +13,8 @@
 
 #include <QtGui/QApplication>
 
+class QNetworkCookie;
+
 namespace webdriver {
 
 void QPageLoader::loadPage(QUrl url) {
@@ -1024,6 +1026,199 @@ void QWebViewCmdExecutor::GetAppCacheStatus(int* status, Error** error) {
       			"getAppcacheStatus",
       			new ListValue(),
       			CreateDirectValueParser(status));
+}
+
+void QWebViewCmdExecutor::GetCookies(const std::string& url, ListValue** cookies, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QString qUrl = url.c_str();
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
+
+    if (NULL == jar) {
+        *error = new Error(kUnknownError, "No active NetworkCookieJar");
+        return;
+    }
+
+    QList<QNetworkCookie> cookies_list = jar->cookiesForUrl(QUrl(qUrl));
+
+    ListValue* list = new ListValue();
+    for (int i = 0; i < cookies_list.size(); ++i) {
+        const QNetworkCookie& cookie = cookies_list[i];
+
+        DictionaryValue* cookie_dict = new DictionaryValue();
+        cookie_dict->SetString("name", cookie.name().data());
+        cookie_dict->SetString("value", cookie.value().data());
+        cookie_dict->SetString("path", cookie.path().toStdString());
+        cookie_dict->SetString("domain", cookie.domain().toStdString());
+        cookie_dict->SetBoolean("secure", cookie.isSecure());
+        cookie_dict->SetBoolean("http_only", cookie.isHttpOnly());
+        if (!cookie.isSessionCookie())
+            cookie_dict->SetDouble("expiry", (double)cookie.expirationDate().toTime_t());
+
+        list->Append(cookie_dict);
+    }
+
+    scoped_ptr<Value> cookies_value(list);
+    if (!cookies_value->IsType(Value::TYPE_LIST)) {
+        *error = new Error(kUnknownError);
+        return;
+    }
+
+    *cookies = static_cast<ListValue*>(cookies_value.release());
+}
+
+void QWebViewCmdExecutor::SetCookie(const std::string& url, DictionaryValue* cookie_dict, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QList<QNetworkCookie> cookie_list;
+    std::string name, value;
+    std::string domain;
+    std::string path = "/";
+    bool secure = false;
+    double expiry = 0;
+    bool http_only = false;
+
+    if (!cookie_dict->GetString("name", &name)) {
+        *error = new Error(kUnknownError, "'name' missing or invalid");
+        return;
+    }
+
+    if (!cookie_dict->GetString("value", &value)) {
+        *error = new Error(kUnknownError, "'value' missing or invalid");
+        return;
+    }
+
+    QNetworkCookie cookie(QByteArray(name.c_str()), QByteArray(value.c_str()));
+
+    if (cookie_dict->HasKey("domain")) {
+        if (!cookie_dict->GetString("domain", &domain)) {
+            *error = new Error(kUnknownError, "optional 'domain' invalid");
+            return;
+        }
+
+        session_->logger().Log(kFineLogLevel, "SetCookie - domain:" + domain);
+
+        // TODO: check why it fails here
+        //cookie.setDomain(QString(domain.c_str()));
+    }
+
+    if (cookie_dict->HasKey("path")) {
+        if (!cookie_dict->GetString("path", &path)) {
+            *error = new Error(kUnknownError, "optional 'path' invalid");
+            return;
+        }
+
+        cookie.setPath(QString(path.data()));
+    }
+
+    if (cookie_dict->HasKey("secure")) {
+        if (!cookie_dict->GetBoolean("secure", &secure)) {
+            *error = new Error(kUnknownError, "optional 'secure' invalid");
+            return;
+        }
+
+        cookie.setSecure(secure);
+    }
+
+    if (cookie_dict->HasKey("expiry")) {
+        if (!cookie_dict->GetDouble("expiry", &expiry)) {
+            *error = new Error(kUnknownError, "optional 'expiry' invalid");
+            return;
+        }
+
+        time_t time = (base::Time::FromDoubleT(expiry)).ToTimeT();
+        //qDebug()<<"[WD]:" << "time=[" << time <<"]";
+
+        QDateTime qtime;
+        qtime.setTime_t(time);
+
+        if (qtime > QDateTime::currentDateTime()) {
+            session_->logger().Log(kFineLogLevel, "SetCookie - adding cookie");
+            cookie.setExpirationDate(qtime);
+        } else {
+            session_->logger().Log(kWarningLogLevel, "SetCookie - cookie expired");
+            *error = new Error(kUnknownError, "Could not set expired cookie");
+            return;
+        }
+    }
+
+    if (cookie_dict->HasKey("http_only")) {
+        if (!cookie_dict->GetBoolean("http_only", &http_only)) {
+            *error = new Error(kUnknownError, "optional 'http_only' invalid");
+            return;
+        }
+
+        cookie.setHttpOnly(http_only);
+    }
+
+    cookie_list.append(cookie);
+
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
+
+    if (!jar) {
+        jar = new QNetworkCookieJar();
+        view->page()->networkAccessManager()->setCookieJar(jar);
+    }
+
+    if (!jar->setCookiesFromUrl(cookie_list, QUrl(url.c_str()))) {
+        *error = new Error(kUnknownError, "Could not set the cookie");
+    }
+}
+
+void QWebViewCmdExecutor::DeleteCookie(const std::string& url, const std::string& cookie_name, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    QString qUrl = url.c_str();
+    QNetworkCookieJar* jar = view->page()->networkAccessManager()->cookieJar();
+
+    if (NULL == jar) {
+        *error = new Error(kUnknownError, "No active NetworkCookieJar");
+        return;
+    }
+
+    QList<QNetworkCookie> cookies = jar->cookiesForUrl(QUrl(qUrl));
+
+    if (cookies.isEmpty())
+        return;
+
+    QList<QNetworkCookie>::Iterator it = cookies.begin();
+    QList<QNetworkCookie>::Iterator end = cookies.end();
+
+    while (it != end) {
+        std::string str_name(it->name().data());
+
+        if (str_name == cookie_name) {
+            it = cookies.erase(it);
+
+            // NOTE: use QNetworkCookieJar::deleteCookie in case QT 5.0
+            QNetworkCookieJar * newCookieJar = new QNetworkCookieJar();
+            newCookieJar->setCookiesFromUrl(cookies, QUrl(qUrl));
+            view->page()->networkAccessManager()->setCookieJar(newCookieJar);
+            return;
+        } else {
+            it++;
+        }
+    }
+
+    *error = new Error(kUnknownError, "No such cookie");
 }
 
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {

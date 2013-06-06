@@ -99,6 +99,10 @@ public:
     virtual void GetAlertMessage(std::string* text, Error** error) = 0;
     virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error) = 0;
     virtual void AcceptOrDismissAlert(bool accept, Error** error) = 0;
+    virtual void GetCookies(const std::string& url, base::ListValue** cookies, Error** error) = 0;
+    virtual void SetCookie(const std::string& url, base::DictionaryValue* cookie_dict, Error** error) = 0;
+    virtual void DeleteCookie(const std::string& url, const std::string& cookie_name, Error** error) = 0;
+
 
 
 protected:
