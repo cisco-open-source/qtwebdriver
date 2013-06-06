@@ -90,6 +90,7 @@ public:
     virtual void SwitchToFrameWithElement(const ElementId& element, Error** error) = 0;
     /// Switches the target frame to the topmost frame.
     virtual void SwitchToTopFrame(Error** error) = 0;
+    virtual void SwitchToTopFrameIfCurrentFrameInvalid(Error** error) = 0;
     virtual void NavigateToURL(const std::string& url, bool sync, Error** error) = 0;
     virtual void GetURL(std::string* url, Error** error) = 0;
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) = 0;

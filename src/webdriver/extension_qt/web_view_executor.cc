@@ -218,7 +218,9 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
     }
 
     const char* kSource =
-    	"return new XMLSerializer().serializeToString(document);";
+        "function() {"
+        "  return new XMLSerializer().serializeToString(document);"
+        "}";        
 
     *error = ExecuteScriptAndParse(
 		      	GetFrame(view, session_->current_frame()),
@@ -368,11 +370,23 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     }
 
     Point location;
-    err = GetClickableLocation(view, element, &location);
+
+    // element is specified, calculate the coordinate.
+    GetElementLocationInView(element, &location, &err);
     if (err) {
-    	*error = err;
-    	return;
+        *error = err;
+        return;
     }
+    
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, &err);
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    location.Offset(size.width() / 2, size.height() / 2);
 
     QPoint point = ConvertPointToQPoint(location);
 
@@ -880,6 +894,47 @@ void QWebViewCmdExecutor::SwitchToTopFrame(Error** error) {
     session_->set_current_frame(FramePath());
 }
 
+void QWebViewCmdExecutor::SwitchToTopFrameIfCurrentFrameInvalid(Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::vector<std::string> components;
+    session_->current_frame().GetComponents(&components);
+    if (session_->frame_elements_.size() != components.size()) {
+        *error = new Error(kUnknownError,
+                     "Frame element vector out of sync with frame path");
+        return;
+    }
+
+    FramePath frame_path;
+    // Start from the root path and check that each frame element that makes
+    // up the current frame target is valid by executing an empty script.
+    // This code should not execute script in any frame before making sure the
+    // frame element is valid, otherwise the automation hangs until a timeout.
+    for (size_t i = 0; i < session_->frame_elements_.size(); ++i) {
+        scoped_ptr<Error> scoped_error(ExecuteScriptAndParse(
+            GetFrame(view, frame_path),
+            "function(){ }",
+            "emptyScript",
+            CreateListValueFrom(session_->frame_elements_[i]),
+            CreateDirectValueParser(kSkipParsing)));
+        if (scoped_error.get() && scoped_error->code() == kStaleElementReference) {
+            Error* terr = NULL;
+            SwitchToTopFrame(&terr);
+            scoped_ptr<Error> tmp(terr);
+        } else if (scoped_error.get()) {
+            *error = scoped_error.release();
+            return;
+        }
+        frame_path = frame_path.Append(components[i]);
+    }
+}
+
 void QWebViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
 	QWebView* view = NULL;
     Error* err = checkView(view_id_, &view);
@@ -1148,6 +1203,8 @@ QWebFrame* QWebViewCmdExecutor::GetFrame(QWebView* view, const FramePath& frame_
     if (frame == NULL)
         frame = view->page()->mainFrame();
 
+    printf("!!!! GetFrame: %s\n", frame_path.value().c_str());
+
     return frame;
 }
 
@@ -1282,11 +1339,12 @@ Error* QWebViewCmdExecutor::GetElementRegionInView(
   	for (FramePath frame_path = session_->current_frame();
        	frame_path.IsSubframe();
        	frame_path = frame_path.Parent()) {
+
     	// Find the frame element for the current frame path.
     	ElementId frame_element;
     	std::string frameBasePath = base::StringPrintf("//*[@wd_frame_id_ = '%s']", frame_path.BaseName().value().c_str());
 
-    	QWebFrame* cur_frame = GetFrame(view, frame_path);
+    	QWebFrame* cur_frame = GetFrame(view, frame_path.Parent());
     	std::vector<ElementId> elements;
     	error = FindElementsHelper(
         	cur_frame,

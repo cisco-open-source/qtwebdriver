@@ -70,8 +70,6 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
         return new Error(kUnknownError, "Cannot start session thread");
     }
 
-//  qtask.moveToThread(QApplication::instance()->thread());
-
     if (!temp_dir_.CreateUniqueTempDir()) {
         delete this;
         return new Error(

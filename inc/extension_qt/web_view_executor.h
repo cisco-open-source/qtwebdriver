@@ -85,11 +85,8 @@ public:
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);
     virtual void MouseClick(MouseButton button, Error** error);
-    /// move mouse to position: cur_point + offset
     virtual void MouseMove(const int x_offset, const int y_offset, Error** error);
-    /// Move the mouse by an offset of the specificed element
     virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error);
-    /// the mouse will be moved to the center of the element
     virtual void MouseMove(const ElementId& element, Error** error);
     virtual void ClickElement(const ElementId& element, Error** error);
     virtual void GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error);
@@ -114,6 +111,7 @@ public:
     virtual void SwitchToFrameWithIndex(int index, Error** error);
     virtual void SwitchToFrameWithElement(const ElementId& element, Error** error);
     virtual void SwitchToTopFrame(Error** error);
+    virtual void SwitchToTopFrameIfCurrentFrameInvalid(Error** error);
     virtual void NavigateToURL(const std::string& url, bool sync, Error** error);
     virtual void GetURL(std::string* url, Error** error);
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);

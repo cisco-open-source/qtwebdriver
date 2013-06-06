@@ -11,6 +11,7 @@
 #include "base/string_util.h"
 #include "base/stringprintf.h"
 #include "base/values.h"
+#include "base/bind.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_logging.h"
@@ -68,6 +69,7 @@ void WebDriverCommand::Finish(Response* const response) {
         return;
 
     if (ShouldRunPreAndPostCommandHandlers()) {
+        // TODO: review
         scoped_ptr<Error> error(session_->AfterExecuteCommand());
         if (error.get()) {
             session_->logger().Log(kWarningLogLevel,
@@ -109,6 +111,40 @@ bool ViewCommand::Init(Response* const response) {
         response->SetError(new Error(kNoSuchWindow, "cant get view executor."));
         return false;
     }
+
+#if 1
+    // TODO: review
+    //if (ShouldRunPreAndPostCommandHandlers())
+    {
+
+        Error* error = NULL;
+        scoped_ptr<Error> switch_error;
+        session_->RunSessionTask(base::Bind(
+                        &ViewCmdExecutor::SwitchToTopFrameIfCurrentFrameInvalid,
+                        base::Unretained(executor_.get()),
+                        &error));
+        switch_error.reset(error);
+        if (switch_error.get()) {
+            std::string text;
+            Error* terr = NULL;
+            scoped_ptr<Error> alert_error;
+            session_->RunSessionTask(base::Bind(
+                        &ViewCmdExecutor::GetAlertMessage,
+                        base::Unretained(executor_.get()),
+                        &text,
+                        &error));
+            alert_error.reset(terr);
+            if (alert_error.get()) {
+                // Only return a frame checking error if a modal dialog is not present.
+                // TODO(kkania): This is ugly. Fix.
+                response->SetError(switch_error.release());
+                return false;
+            }
+        }
+    }
+        
+#endif
+
 
     return true;
 }
