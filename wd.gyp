@@ -327,12 +327,14 @@
 
         # TODO: files below belong to custom implementation
         'src/webdriver/extension_qt/web_view_creator.cc',
+        'src/webdriver/extension_qt/widget_view_creator.cc',
         'src/webdriver/extension_qt/q_view_executor.cc',
         'src/webdriver/extension_qt/web_view_executor.cc',
         'src/webdriver/extension_qt/web_view_enumerator.cc',
         'src/webdriver/extension_qt/q_view_runner.cc',
         'src/webdriver/extension_qt/qwebviewext.cc',
         'src/webdriver/extension_qt/q_key_converter.cc',
+        'src/webdriver/extension_qt/widget_view_util.cc',
         'inc/extension_qt/q_view_runner.h',
         'inc/extension_qt/web_view_executor.h',
         'inc/extension_qt/qwebviewext.h',
