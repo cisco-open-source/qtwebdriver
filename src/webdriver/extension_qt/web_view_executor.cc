@@ -10,7 +10,7 @@
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
 #include "webdriver_util.h"
-#include "extension_qt/q_key_converter.h"
+#include "q_key_converter.h"
 
 #include "web_view_util.h"
 

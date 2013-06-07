@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "extension_qt/q_key_converter.h"
+#include "q_key_converter.h"
 
 #include "base/format_macros.h"
 #include "base/logging.h"

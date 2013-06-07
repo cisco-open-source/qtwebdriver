@@ -2,7 +2,7 @@
 
 #include "webdriver_logging.h"
 #include "webdriver_session.h"
-#include "extension_qt/q_key_converter.h"
+#include "q_key_converter.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
