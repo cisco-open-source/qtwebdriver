@@ -331,6 +331,7 @@
         'src/webdriver/extension_qt/q_view_executor.cc',
         'src/webdriver/extension_qt/web_view_executor.cc',
         'src/webdriver/extension_qt/web_view_enumerator.cc',
+        'src/webdriver/extension_qt/widget_view_enumerator.cc',
         'src/webdriver/extension_qt/q_view_runner.cc',
         'src/webdriver/extension_qt/qwebviewext.cc',
         'src/webdriver/extension_qt/q_key_converter.cc',
