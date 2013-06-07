@@ -12,6 +12,8 @@
 #include "webdriver_util.h"
 #include "extension_qt/q_key_converter.h"
 
+#include "web_view_util.h"
+
 #include <QtGui/QApplication>
 
 class QNetworkCookie;
@@ -99,9 +101,7 @@ Error* QWebViewCmdExecutor::checkView(const ViewId& viewId, QWebView** webView) 
 }	
 
 void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
-	// TODO: implement
-	// check if url starts with http:// file:// https://
-	*can = true;
+	*can = QWebViewUtil::isUrlSupported(url);
 }
 
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {

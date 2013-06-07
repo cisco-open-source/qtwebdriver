@@ -3,6 +3,8 @@
 #include "webdriver_session.h"
 #include "webdriver_logging.h"
 
+#include "web_view_util.h"
+
 #include <QtWebKit/QtWebKit>
 
 namespace webdriver {
@@ -49,8 +51,33 @@ bool QWebViewCreator::CreateViewByClassName(Session* session, const std::string&
 }
 
 bool QWebViewCreator::CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const {
-	// TODO:
-	session->logger().Log(kSevereLogLevel, "CreateViewForUrl not implemented, TBD.");
+    if (factory.empty())
+        return false;
+
+    if (!QWebViewUtil::isUrlSupported(url))
+        return false;
+
+    ViewHandle handle = INVALID_HANDLE;
+    // get first found QWebView
+    CreateViewMethod createMethod = factory.begin()->second;
+    handle = createMethod();
+
+    ViewId newView;
+
+    if (INVALID_HANDLE != handle) {
+        if (session->AddNewView(handle, &newView))  {
+            *viewId = newView;
+            session->logger().Log(kInfoLogLevel,
+                "QWebViewCreator created view(" + newView.id() +
+                ") by url - "+url);
+
+            // show
+            QWidget* widget = static_cast<QWidget*>(handle);
+            widget->show();
+            return true;
+        }
+    }
+	
 	return false;
 };
 
