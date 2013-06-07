@@ -1306,6 +1306,126 @@ void QWebViewCmdExecutor::DeleteCookie(const std::string& url, const std::string
     *error = new Error(kUnknownError, "No such cookie");
 }
 
+void QWebViewCmdExecutor::GetStorageKeys(StorageType type, base::ListValue** keys, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_KEYS
+                                    : atoms::GET_SESSION_STORAGE_KEYS);
+    *error = ExecuteScriptAndParse(
+                    GetFrame(view, session_->current_frame()),
+                    js,
+                    "getStorageKeys",
+                    new ListValue(),
+                    CreateDirectValueParser(keys));
+}
+
+void QWebViewCmdExecutor::SetStorageItem(StorageType type, const std::string& key, const std::string& value, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::SET_LOCAL_STORAGE_ITEM
+                                : atoms::SET_SESSION_STORAGE_ITEM);
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                js,
+                "setStorageItem",
+                CreateListValueFrom(key, value),
+                CreateDirectValueParser(kSkipParsing));
+}
+
+void QWebViewCmdExecutor::ClearStorage(StorageType type, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::CLEAR_LOCAL_STORAGE
+                                : atoms::CLEAR_SESSION_STORAGE);
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                js,
+                "clearStorage",
+                new ListValue(),
+                CreateDirectValueParser(kSkipParsing));
+}
+
+void QWebViewCmdExecutor::GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_ITEM
+                                : atoms::GET_SESSION_STORAGE_ITEM);
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                js,
+                "getStorageItem",
+                CreateListValueFrom(key),
+                CreateDirectValueParser(value));
+}
+
+void QWebViewCmdExecutor::RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::REMOVE_LOCAL_STORAGE_ITEM
+                                : atoms::REMOVE_SESSION_STORAGE_ITEM);
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                js,
+                "removeStorageItem",
+                CreateListValueFrom(key),
+                CreateDirectValueParser(value));
+}
+
+void QWebViewCmdExecutor::GetStorageSize(StorageType type, int* size, Error** error) {
+    QWebView* view = NULL;
+    Error* err = checkView(view_id_, &view);
+
+    if (err) {
+        *error = err;
+        return;
+    }
+
+    std::string js = atoms::asString(
+        type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_SIZE
+                                : atoms::GET_SESSION_STORAGE_SIZE);
+    *error = ExecuteScriptAndParse(
+                GetFrame(view, session_->current_frame()),
+                js,
+                "getStorageSize",
+                new ListValue(),
+                CreateDirectValueParser(size));
+}
+
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
     if (frame_path.value().empty())
         return NULL;

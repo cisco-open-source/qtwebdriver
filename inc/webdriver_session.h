@@ -43,11 +43,6 @@ typedef std::map<std::string, ElementHandle> ElementsMap;
 typedef std::map<std::string, ElementsMap> ViewsElementsMap;
 typedef std::map<std::string, ViewHandle> ViewsMap;
 
-enum StorageType {
-    kLocalStorageType = 0,
-    kSessionStorageType
-};
-
 /// Every connection made by WebDriver maps to a session object.
 /// This object creates the browser instance and keeps track of the
 /// state necessary to control the browser created.

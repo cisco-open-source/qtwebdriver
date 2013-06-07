@@ -76,15 +76,17 @@ public:
     static const char kDismissAlert[];
     static const char kCookie[];
     static const char kNamedCookie[];
+    static const char kLocalStorage[];
+    static const char kLocalStorageKey[];
+    static const char kLocalStorageSize[];
+    static const char kSessionStorage[];
+    static const char kSessionStorageKey[];
+    static const char kSessionStorageSize[];
 
 
 // TODO:
 /*    
-    static const char kGet[];
-    
-    static const char kSendKeysToActiveElement[];
-    
-    
+   
     
     static const char kSetBrowserVisible[];
     static const char kIsBrowserVisible[];
@@ -97,18 +99,6 @@ public:
     static const char kClearAppCache[];
     static const char kIsBrowserOnline[];
     static const char kSetBrowserOnline[];
-    static const char kGetLocalStorageItem[];
-    static const char kGetLocalStorageKeys[];
-    static const char kSetLocalStorageItem[];
-    static const char kRemoveLocalStorageItem[];
-    static const char kClearLocalStorage[];
-    static const char kGetLocalStorageSize[];
-    static const char kGetSessionStorageItem[];
-    static const char kGetSessionStorageKey[];
-    static const char kSetSessionStorageItem[];
-    static const char kRemoveSessionStorageItem[];
-    static const char kClearSessionStorage[];
-    static const char kGetSessionStorageSize[];
     static const char kSetScreenOrientation[];
     static const char kGetScreenOrientation[];
     

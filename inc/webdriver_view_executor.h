@@ -29,6 +29,11 @@ enum MouseButton {
     kRightButton = 2
 };
 
+/// @enum StorageType storage types
+enum StorageType {
+    kLocalStorageType = 0,
+    kSessionStorageType
+};
 
 /// base class for custom view's executors
 class ViewCmdExecutor {
@@ -102,6 +107,15 @@ public:
     virtual void GetCookies(const std::string& url, base::ListValue** cookies, Error** error) = 0;
     virtual void SetCookie(const std::string& url, base::DictionaryValue* cookie_dict, Error** error) = 0;
     virtual void DeleteCookie(const std::string& url, const std::string& cookie_name, Error** error) = 0;
+    virtual void GetStorageKeys(StorageType type, base::ListValue** keys, Error** error) = 0;
+    virtual void SetStorageItem(StorageType type, const std::string& key, const std::string& value, Error** error) = 0;
+    virtual void ClearStorage(StorageType type, Error** error) = 0;
+    virtual void GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) = 0;
+    virtual void RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) = 0;
+    virtual void GetStorageSize(StorageType type, int* size, Error** error) = 0;
+
+
+
 
 
 

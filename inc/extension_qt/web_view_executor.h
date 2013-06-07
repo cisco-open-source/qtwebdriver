@@ -120,6 +120,13 @@ public:
     virtual void GetCookies(const std::string& url, base::ListValue** cookies, Error** error);
     virtual void SetCookie(const std::string& url, base::DictionaryValue* cookie_dict, Error** error);
     virtual void DeleteCookie(const std::string& url, const std::string& cookie_name, Error** error);
+    virtual void GetStorageKeys(StorageType type, base::ListValue** keys, Error** error);
+    virtual void SetStorageItem(StorageType type, const std::string& key, const std::string& value, Error** error);
+    virtual void ClearStorage(StorageType type, Error** error);
+    virtual void GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error);
+    virtual void RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error);
+    virtual void GetStorageSize(StorageType type, int* size, Error** error);
+
 
 protected:
 	Error* checkView(const ViewId& viewId, QWebView** webView);

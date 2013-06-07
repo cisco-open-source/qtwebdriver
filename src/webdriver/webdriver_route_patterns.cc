@@ -63,6 +63,12 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kDismissAlert);
 		standardCommandRoutes.insert(kCookie);
 		standardCommandRoutes.insert(kNamedCookie);
+		standardCommandRoutes.insert(kLocalStorage);
+		standardCommandRoutes.insert(kLocalStorageKey);
+		standardCommandRoutes.insert(kLocalStorageSize);
+		standardCommandRoutes.insert(kSessionStorage);
+		standardCommandRoutes.insert(kSessionStorageKey);
+		standardCommandRoutes.insert(kSessionStorageSize);
 
 	}
 
@@ -130,16 +136,18 @@ const char CommandRoutes::kAcceptAlert[] 				= "/session/*/accept_alert";
 const char CommandRoutes::kDismissAlert[] 				= "/session/*/dismiss_alert";
 const char CommandRoutes::kCookie[] 					= "/session/*/cookie";
 const char CommandRoutes::kNamedCookie[] 				= "/session/*/cookie/*";
+const char CommandRoutes::kLocalStorage[] 				= "/session/*/local_storage";
+const char CommandRoutes::kLocalStorageKey[] 			= "/session/*/local_storage/key/*";
+const char CommandRoutes::kLocalStorageSize[] 			= "/session/*/local_storage/size";
+const char CommandRoutes::kSessionStorage[] 			= "/session/*/session_storage";
+const char CommandRoutes::kSessionStorageKey[] 			= "/session/*/session_storage/key/*";
+const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/size";
 
 /*
 
-const char CommandRoutes::kGet[] = "get";
-
-const char CommandRoutes::kSendKeysToActiveElement[] = "sendKeysToActiveElement";
 
 const char CommandRoutes::kSetBrowserVisible[] = "setBrowserVisible";
 const char CommandRoutes::kIsBrowserVisible[] = "isBrowserVisible";
-const char CommandRoutes::kSetScriptTimeout[] = "setScriptTimeout";
 const char CommandRoutes::kExecuteSQL[] = "executeSQL";
 const char CommandRoutes::kGetLocation[] = "getLocation";
 const char CommandRoutes::kSetLocation[] = "setLocation";
@@ -148,19 +156,6 @@ const char CommandRoutes::kGetStatus[] = "getStatus";
 const char CommandRoutes::kClearAppCache[] = "clearAppCache";
 const char CommandRoutes::kIsBrowserOnline[] = "isBrowserOnline";
 const char CommandRoutes::kSetBrowserOnline[] = "setBrowserOnline";
-const char CommandRoutes::kGetLocalStorageItem[] = "getLocalStorageItem";
-const char CommandRoutes::kGetLocalStorageKeys[] = "getLocalStorageKeys";
-const char CommandRoutes::kSetLocalStorageItem[] = "setLocalStorageItem";
-const char CommandRoutes::kRemoveLocalStorageItem[] = "removeLocalStorageItem";
-const char CommandRoutes::kClearLocalStorage[] = "clearLocalStorage";
-const char CommandRoutes::kGetLocalStorageSize[] = "getLocalStorageSize";
-const char CommandRoutes::kGetSessionStorageItem[] = "getSessionStorageItem";
-const char CommandRoutes::kGetSessionStorageKey[] = "getSessionStorageKey";
-const char CommandRoutes::kSetSessionStorageItem[] = "setSessionStorageItem";
-const char CommandRoutes::kRemoveSessionStorageItem[] =
-    "removeSessionStorageItem";
-const char CommandRoutes::kClearSessionStorage[] = "clearSessionStorage";
-const char CommandRoutes::kGetSessionStorageSize[] = "getSessionStorageSize";
 const char CommandRoutes::kSetScreenOrientation[] = "setScreenOrientation";
 const char CommandRoutes::kGetScreenOrientation[] = "getScreenOrientation";
 const char CommandRoutes::kImeGetAvailableEngines[] = "imeGetAvailableEngines";

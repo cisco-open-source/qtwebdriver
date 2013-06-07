@@ -32,6 +32,7 @@
 #include "commands/appcache_status_command.h"
 #include "commands/alert_commands.h"
 #include "commands/cookie_commands.h"
+#include "commands/html5_storage_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -228,6 +229,14 @@ DefaultRouteTable::DefaultRouteTable()
     Add<DismissAlertCommand>            (CommandRoutes::kDismissAlert);
     Add<CookieCommand>                  (CommandRoutes::kCookie);
     Add<NamedCookieCommand>             (CommandRoutes::kNamedCookie);
+    Add<LocalStorageCommand>            (CommandRoutes::kLocalStorage);
+    Add<LocalStorageKeyCommand>         (CommandRoutes::kLocalStorageKey);
+    Add<LocalStorageSizeCommand>        (CommandRoutes::kLocalStorageSize);
+    Add<SessionStorageCommand>          (CommandRoutes::kSessionStorage);
+    Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
+    Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
+
+
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
@@ -239,12 +248,7 @@ dispatcher->AddShutdown("/shutdown", shutdown_event);
 
   // HTML5 functions.
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");
-  dispatcher->Add<LocalStorageCommand>("/session/*/local_storage");
-  dispatcher->Add<LocalStorageSizeCommand>("/session/*/local_storage/size");
-  dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key*");
-  dispatcher->Add<SessionStorageCommand>("/session/*/session_storage");
-  dispatcher->Add<SessionStorageSizeCommand>("/session/*/session_storage/size");
-  dispatcher->Add<SessionStorageKeyCommand>("/session/*/session_storage/key*");
+  
 #endif  
   
 }
