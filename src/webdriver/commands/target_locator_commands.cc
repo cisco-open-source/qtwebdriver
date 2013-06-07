@@ -185,7 +185,18 @@ void WindowCommand::ExecuteDelete(Response* const response) {
         return;
     }
 
-    // TODO: terminate session if no views found
+    // terminate session if no views found
+    std::vector<ViewId> views;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewEnumerator::EnumerateViews,
+            session_,
+            &views));
+
+    if (views.empty()) {
+        // Session manages its own lifetime, so do not call delete.
+        session_->Terminate();
+    }
 }
 
 bool WindowCommand::ShouldRunPreAndPostCommandHandlers() {
