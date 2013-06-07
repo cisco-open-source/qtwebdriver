@@ -14,9 +14,11 @@
 
 namespace webdriver {
 
+typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;    
+
 URLCommand::URLCommand(const std::vector<std::string>& path_segments,
                        const DictionaryValue* const parameters)
-    : ViewCommand(path_segments, parameters) {}
+    : WebDriverCommand(path_segments, parameters) {}
 
 URLCommand::~URLCommand() {}
 
@@ -32,9 +34,15 @@ void URLCommand::ExecuteGet(Response* const response) {
     std::string url;
     Error* error = NULL;
 
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_));
+    if (NULL == executor.get()) {
+        response->SetError(new Error(kBadRequest, "cant get view executor."));
+        return;
+    }
+
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::GetURL,
-            base::Unretained(executor_.get()),
+            base::Unretained(executor.get()),
             &url,
             &error));
 
@@ -49,6 +57,12 @@ void URLCommand::ExecutePost(Response* const response) {
     std::string url;
     Error* error = NULL;
 
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_));
+    if (NULL == executor.get()) {
+        response->SetError(new Error(kBadRequest, "cant get view executor."));
+        return;
+    }
+
     if (!GetStringASCIIParameter("url", &url)) {
         response->SetError(new Error(kBadRequest, "Missing 'url' parameter"));
         return;
@@ -57,7 +71,7 @@ void URLCommand::ExecutePost(Response* const response) {
     // TODO: get capabilities and choose sync/async method
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::NavigateToURL,
-            base::Unretained(executor_.get()),
+            base::Unretained(executor.get()),
             url,
             true,
             &error));
