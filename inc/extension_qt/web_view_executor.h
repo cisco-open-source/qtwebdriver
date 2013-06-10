@@ -129,7 +129,7 @@ public:
 
 
 protected:
-	Error* checkView(const ViewId& viewId, QWebView** webView);
+	QWebView* getView(const ViewId& viewId, Error** error);
 	QWebFrame* FindFrameByPath(QWebFrame* parent, const FramePath &frame_path);
 	QWebFrame* GetFrame(QWebView* view, const FramePath& frame_path);
 	Error* ExecuteScriptAndParse(QWebFrame* frame,

@@ -20,29 +20,24 @@ QViewCmdExecutor::~QViewCmdExecutor() {
 
 };
 
-Error* QViewCmdExecutor::checkView(const ViewId& viewId, QWidget** widget) {
+QWidget* QViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
     ViewHandle handle = session_->GetViewHandle(viewId);
 
     QWidget* pWidget = static_cast<QWidget*>(handle);
 
     if (NULL == pWidget) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such view("+viewId.id()+")");
-        return new Error(kNoSuchWindow);
+        *error = new Error(kNoSuchWindow);
+        return NULL;
     }
 
-    *widget = pWidget;
-
-    return NULL;
+    return pWidget;
 }
 
 void QViewCmdExecutor::GetTitle(std::string* title, Error **error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     *title = view->windowTitle().toStdString();
 
@@ -50,13 +45,9 @@ void QViewCmdExecutor::GetTitle(std::string* title, Error **error) {
 }
 
 void QViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     *name = view->windowTitle().toStdString();
 
@@ -64,37 +55,25 @@ void QViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
 }
 
 void QViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     *bounds = ConvertQRectToRect(view->geometry());
 }
     
 void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     view->setGeometry(ConvertRectToQRect(bounds));
 }
 
 void QViewCmdExecutor::Maximize(Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     if (!view->isTopLevel()) {
         *error = new Error(kUnknownError, "Cant maximize non top level view.");
@@ -105,13 +84,9 @@ void QViewCmdExecutor::Maximize(Error** error) {
 }
 
 void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
     
     FilePath path = session_->temp_dir();
     path.Append("/screen.png");
@@ -133,13 +108,9 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
 }
 
 void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
@@ -166,13 +137,9 @@ void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
 }
 
 void QViewCmdExecutor::Close(Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     if (!view->isTopLevel()) {
         *error = new Error(kUnknownError, "Cant close non top level view.");
@@ -195,13 +162,9 @@ void QViewCmdExecutor::Close(Error** error) {
 }
 
 void QViewCmdExecutor::SwitchTo(Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     session_->set_current_view(view_id_);
 
@@ -209,13 +172,9 @@ void QViewCmdExecutor::SwitchTo(Error** error) {
 }
 
 void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     // QMessageBox::information(pWeb, "Alert", message->c_str(), QMessageBox::Ok);
     QMessageBox *msgBox = view->findChild<QMessageBox*>();
@@ -233,20 +192,14 @@ void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
 }
 
 void QViewCmdExecutor::SetAlertPromptText(const std::string& alert_prompt_text, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     std::string message_text;
-    GetAlertMessage(&message_text, &err);
-    if (err) {
-        *error = err;
+    GetAlertMessage(&message_text, error);
+    if (*error)
         return;
-    }
 
     QInputDialog *alert = view->findChild<QInputDialog*>();
 
@@ -260,13 +213,9 @@ void QViewCmdExecutor::SetAlertPromptText(const std::string& alert_prompt_text, 
 }
 
 void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
-    QWidget* view = NULL;
-    Error* err = checkView(view_id_, &view);
-
-    if (err) {
-        *error = err;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
         return;
-    }
 
     QMessageBox *msgBox = view->findChild<QMessageBox*>();
 

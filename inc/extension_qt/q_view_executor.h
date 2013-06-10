@@ -13,7 +13,7 @@
 
 namespace webdriver {
 
-//#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
+#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
 //#define NOT_IMPLEMENTED_IMPL    {*error = new Error(kUnknownError, "Command not implemented.");}
 //#define RET_IF_ERROR(e)         {if(e) {*error = e; return;}}
 
@@ -45,7 +45,7 @@ public:
     virtual void AcceptOrDismissAlert(bool accept, Error** error);
 
 protected:
-    Error* checkView(const ViewId& viewId, QWidget** widget);
+    QWidget* getView(const ViewId& viewId, Error** error);
     Rect ConvertQRectToRect(const QRect &rect);
     QRect ConvertRectToQRect(const Rect &rect);
     QPoint ConvertPointToQPoint(const Point &p);
