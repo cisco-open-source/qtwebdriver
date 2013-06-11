@@ -20,7 +20,7 @@ namespace webdriver {
 /// This class represents a Webdriver Element handle. Custom implementation should inherit and implement.
 class ElementHandle : public base::RefCounted<ElementHandle>{
 public:
-    ElementHandle();
+    ElementHandle() {};
 
     virtual bool is_valid() const = 0;
     virtual bool equals(const ElementHandle* other) const = 0;
