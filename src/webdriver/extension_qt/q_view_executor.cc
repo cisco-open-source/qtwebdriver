@@ -88,10 +88,12 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     if (NULL == view)
         return;
     
-    FilePath path = session_->temp_dir();
-    path.Append("/screen.png");
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
 
     QPixmap pixmap = QPixmap::grabWidget(view);
+
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - "+path.value());
 
 #if defined(OS_POSIX)
     if (!pixmap.save(path.value().c_str())) 
