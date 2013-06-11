@@ -7,35 +7,17 @@
 
 #include "base/basictypes.h"
 #include "webdriver_view_id.h"
-
+#include "webdriver_logging.h"
 
 namespace webdriver {
 
-class Session;
-/*
-namespace internal {
-class AbstractViewCreator
-{
-public:
-    virtual ViewHandle create() const = 0;
-};
+typedef void* (*CreateViewMethod)(void);
 
 template <class C>
-class ViewCreator: public AbstractViewCreator
-{
-public:
-    virtual ViewHandle create() const { return static_cast<ViewHandle>(new C()); }
-};
-*/
-
-typedef ViewHandle (*CreateViewMethod)(void);
-
-template <class C>
-ViewHandle createView(void) { return static_cast<ViewHandle>(new C());}
+void* createView(void) { return static_cast<void*>(new C());}
 
 /// base class for custom view's creators
-class ViewCreator
-{
+class ViewCreator {
 public:
     ViewCreator();
     virtual ~ViewCreator(){}
@@ -52,18 +34,18 @@ public:
     }
 
     /// creates new view of specified class
-    /// @param[in] session pointer to session
+    /// @param[in] logger
     /// @param[in] className requested class name
-    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
+    /// @param[out] view created view.
     /// @return true if handled
-    virtual bool CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const = 0;
+    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const = 0;
 
     /// creates new view that can handle specified url
-    /// @param[in] session pointer to session
+    /// @param[in] logger
     /// @param[in] url url to handle
-    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
+    /// @param[out] view created view. 
     /// @return true if handled
-    virtual bool CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const = 0;    
+    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const = 0;    
 
 protected:
     typedef std::map<std::string, CreateViewMethod> FactoryMap;
@@ -80,16 +62,16 @@ public:
     static ViewFactory* GetInstance();
 
     /// creates new view of specified class
-    /// @param[in] session pointer to session
+    /// @param[in] logger
     /// @param[in] className requested class name
-    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
-    void CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const;
+    /// @param[out] view created view.
+    void CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const;
 
     /// creates new view that can handle specified url
-    /// @param[in] session pointer to session
+    /// @param[in] logger
     /// @param[in] url url to handle
-    /// @param[out] viewId created view. Use ViewId::is_valid() to check if created.
-    void CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const;    
+    /// @param[out] view created view.
+    void CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const;
 
 
     /// add new view's creator

@@ -3,6 +3,8 @@
 #include "webdriver_session.h"
 #include "webdriver_logging.h"
 
+#include "extension_qt/widget_view_handle.h"
+
 #include <QtGui/QApplication>
 #include <QtGui/QWidget>
 
@@ -17,7 +19,7 @@ void WidgetViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
 
         if (!pWidget->isTopLevel()) continue;
 
-        ViewHandle handle = static_cast<ViewHandle>(pWidget);
+        ViewHandle* handle = new QViewHandle(pWidget);
         ViewId viewId = session->GetViewForHandle(handle);
         if (!viewId.is_valid()) {
             if (session->AddNewView(handle, &viewId))  {

@@ -7,11 +7,31 @@
 
 #include <string>
 
+#include "base/memory/ref_counted.h"    
+
 namespace webdriver {
 
-typedef void* ViewHandle;
+//typedef void* ViewHandle;
 typedef unsigned long int ViewType;
-#define INVALID_HANDLE  (0)
+//#define INVALID_HANDLE  (0)
+
+/// This class represents a Webdriver View handle.
+/// It keeps implementation's dependent view pointer or object.
+/// Customizer should inherit this class and implement.
+class ViewHandle : public base::RefCounted<ViewHandle>{
+public:
+    ViewHandle() {};
+
+    /// @return true if handle references valid view
+    virtual bool is_valid() const = 0;
+    /// compares two handle
+    /// @param other handle to compare
+    /// @return true if two handles reference same view
+    virtual bool equals(const ViewHandle* other) const = 0;
+protected:
+    friend class base::RefCounted<ViewHandle>;
+    virtual ~ViewHandle() {};
+};
 
 /// This class represents a Webdriver View ID. These IDs are mapped to objects in a page.
 class ViewId {

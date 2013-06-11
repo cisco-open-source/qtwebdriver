@@ -4,6 +4,7 @@
 #include "webdriver_logging.h"
 
 #include "widget_view_util.h"
+#include "extension_qt/widget_view_handle.h"
 
 #include <QtGui/QWidget>
 
@@ -11,8 +12,8 @@ namespace webdriver {
 
 QWidgetViewCreator::QWidgetViewCreator() {}
 
-bool QWidgetViewCreator::CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const {
-	ViewHandle handle = INVALID_HANDLE;	
+bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+	ViewHandle* handle = NULL;	
 
     if (factory.empty())
         return false;
@@ -20,29 +21,31 @@ bool QWidgetViewCreator::CreateViewByClassName(Session* session, const std::stri
 	if (className.empty()) {
 		// get first registered
         CreateViewMethod createMethod = factory.begin()->second;
-        handle = createMethod();
+        handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
 	} else {
     	FactoryMap::const_iterator it = factory.find(className);
         if (it != factory.end())
         {
         	CreateViewMethod createMethod = it->second;
-            handle = createMethod();
+            handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
         }
     }
 
-    ViewId newView;
+    if (NULL != handle) {
+        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
+        std::string objClassName(widget->metaObject()->className());
 
-    if (INVALID_HANDLE != handle) {
-        if (session->AddNewView(handle, &newView))  {
-            *viewId = newView;
-            session->logger().Log(kInfoLogLevel,
-                "QWidgetViewCreator created view(" + newView.id() +
-                ") by class name - "+className);
-
-            // show
-            QWidget* widget = static_cast<QWidget*>(handle);
+        if (NULL != widget) {
             widget->show();
+
+            logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by class name - "+className);
+
+            *view = handle;
+            
             return true;
+        } else {
+            logger.Log(kSevereLogLevel, "QWidgetViewCreator, smth wrong.");
+            handle->Release();
         }
     }
 
@@ -50,31 +53,33 @@ bool QWidgetViewCreator::CreateViewByClassName(Session* session, const std::stri
     return false;
 }
 
-bool QWidgetViewCreator::CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const {
+bool QWidgetViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
     if (factory.empty())
         return false;
 
 	if (!QWidgetViewUtil::isUrlSupported(url))
         return false;
     
-    ViewHandle handle = INVALID_HANDLE;
+    ViewHandle* handle = NULL;
     // get first registered
     CreateViewMethod createMethod = factory.begin()->second;
-    handle = createMethod();
+    handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
 
-    ViewId newView;
+    if (NULL != handle) {
+        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
+        std::string objClassName(widget->metaObject()->className());
 
-    if (INVALID_HANDLE != handle) {
-        if (session->AddNewView(handle, &newView))  {
-            *viewId = newView;
-            session->logger().Log(kInfoLogLevel,
-                "QWidgetViewCreator created view(" + newView.id() +
-                ") by url - "+url);
-
-            // show
-            QWidget* widget = static_cast<QWidget*>(handle);
+        if (NULL != widget) {
             widget->show();
+        
+            logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by url - "+url);
+
+            *view = handle;
+
             return true;
+        } else {
+            logger.Log(kSevereLogLevel, "QWidgetViewCreator, smth wrong.");
+            handle->Release();
         }
     }
 

@@ -75,13 +75,23 @@ void CreateSession::ExecutePost(Response* const response) {
 
     if (!startView.is_valid()) {
         session->logger().Log(kFineLogLevel, "Trying to create window - "+window_class);
+
+        ViewHandle* viewHandle = NULL;
         // create view
         session->RunSessionTask(base::Bind(
             &ViewFactory::CreateViewByClassName,
             base::Unretained(ViewFactory::GetInstance()),
-            session,
+            session->logger(),
             window_class,
-            &startView));
+            &viewHandle));
+
+        if (NULL != viewHandle) {
+            session->AddNewView(viewHandle, &startView);
+            if (!startView.is_valid()) {
+                viewHandle->Release();
+                session->logger().Log(kSevereLogLevel, "Cant add view handle to session.");
+            }
+        }
     }
 
     if (!startView.is_valid()) {

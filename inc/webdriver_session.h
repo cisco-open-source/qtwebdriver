@@ -21,7 +21,6 @@
 #include "webdriver_view_id.h"
 #include "webdriver_element_id.h"
 #include "webdriver_capabilities_parser.h"
-#include "webdriver_element_id.h"
 #include "webdriver_logging.h"
 
 class FilePath;
@@ -38,10 +37,6 @@ namespace webdriver {
 class Error;
 class ValueParser;
 class ViewRunner;
-
-typedef std::map<std::string, ElementHandle> ElementsMap;
-typedef std::map<std::string, ElementsMap> ViewsElementsMap;
-typedef std::map<std::string, ViewHandle> ViewsMap;
 
 /// Every connection made by WebDriver maps to a session object.
 /// This object creates the browser instance and keeps track of the
@@ -114,24 +109,24 @@ public:
     /// Get ViewHandle for given ViewId
     /// @param viewId requested viewId
     /// @return viewHandle for given viewId
-    ViewHandle GetViewHandle(const ViewId& viewId) const;
+    ViewHandle* GetViewHandle(const ViewId& viewId) const;
 
     /// Put ViewHandle in map and return new ViewId for this handle
-    /// @param handle handle to put
+    /// @param handle handle to put, no need to delete.
     /// @param[out] viewId returned viewId
-    /// @return true if ok
-    bool AddNewView(const ViewHandle handle, ViewId* viewId);
+    /// @return true if added, false if viewId already exist
+    bool AddNewView(ViewHandle* handle, ViewId* viewId);
 
     /// Change mapping of viewId to handle
     /// @param viewId viewId to change
     /// @param handle new handle to map
-    /// @return old handle, INVALID_HANDLE if viewId not found
-    ViewHandle ReplaceViewHandle(const ViewId& viewId, const ViewHandle handle);
+    /// @return true if replaced, false if viewId not found
+    bool ReplaceViewHandle(const ViewId& viewId, ViewHandle* handle);
 
     /// Check if some view maps handle
     /// @param handle to check
     /// @return valid viewId if found
-    ViewId GetViewForHandle(const ViewHandle handle) const;
+    ViewId GetViewForHandle(ViewHandle* handle) const;
 
     /// Invalidate viewIdRemove it from map
     /// @param viewId requested view
@@ -145,7 +140,14 @@ public:
     /// @param viewId requested view
     /// @param elementId requested element
     /// @return elementHandle
-    ElementHandle GetElementHandle(const ViewId& viewId, const ElementId& elementId) const;
+    ElementHandle* GetElementHandle(const ViewId& viewId, const ElementId& elementId) const;
+
+    /// Add element mapping
+    /// @param viewId target view
+    /// @param handle pointer to element handle, no need to delete
+    /// @param elementId returned elementId
+    /// @return true if ok
+    bool AddElement(const ViewId& viewId, ElementHandle* handle, ElementId* elementId);
 
     /// Invalidate elementId in specific view. Remove it from map
     /// @param viewId requested view
@@ -159,9 +161,11 @@ public:
     std::vector<ElementId> frame_elements_;
 
 private:
-    typedef std::map<std::string, ElementHandle> ElementsMap;
+    typedef scoped_refptr<ElementHandle> ElementHandlePtr;
+    typedef scoped_refptr<ViewHandle> ViewHandlePtr;
+    typedef std::map<std::string, ElementHandlePtr> ElementsMap;
     typedef std::map<std::string, ElementsMap> ViewsElementsMap;
-    typedef std::map<std::string, ViewHandle> ViewsMap;
+    typedef std::map<std::string, ViewHandlePtr> ViewsMap;
 
     void RunClosureOnSessionThread(
         const base::Closure& task,

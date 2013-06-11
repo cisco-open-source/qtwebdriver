@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "base/memory/ref_counted.h"
+
 #include "value_conversion_traits.h"
 
 namespace base {
@@ -15,7 +17,15 @@ class Value;
 
 namespace webdriver {
 
-typedef void* ElementHandle;        
+/// This class represents a Webdriver Element handle. Custom implementation should inherit and implement.
+class ElementHandle : public base::RefCounted<ElementHandle>{
+public:
+    ElementHandle();
+    virtual ~ElementHandle() {};
+
+    virtual bool is_valid() const = 0;
+    virtual bool equals(const ElementHandle* other) const = 0;
+};
 
 /// This class represents a WebDriver Element ID. These IDs are mapped to
 /// objects in a page.

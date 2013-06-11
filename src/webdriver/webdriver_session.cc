@@ -204,45 +204,45 @@ void Session::RunSessionTask(const base::Closure& task) {
     done_event.Wait();
 }
 
-ViewHandle Session::GetViewHandle(const ViewId& viewId) const {
+ViewHandle* Session::GetViewHandle(const ViewId& viewId) const {
     ViewsMap::const_iterator it;
 
     it = views_.find(viewId.id());
     if (it == views_.end())
-        return INVALID_HANDLE;
-    return it->second;
+        return NULL;
+    return it->second.get();
 }
 
-bool Session::AddNewView(const ViewHandle handle, ViewId* viewId) {
+bool Session::AddNewView(ViewHandle* handle, ViewId* viewId) {
     ViewId newView(GenerateRandomID());
 
-    views_[newView.id()] = handle;
+    // TODO: check if view id already exist and return false
+
+    views_[newView.id()] = ViewHandlePtr(handle);
 
     *viewId = newView;
 
     return true;   
 }
 
-ViewHandle Session::ReplaceViewHandle(const ViewId& viewId, const ViewHandle handle) {
+bool Session::ReplaceViewHandle(const ViewId& viewId, ViewHandle* handle) {
     ViewsMap::iterator it;
 
     it = views_.find(viewId.id());
     if (it == views_.end())
-        return INVALID_HANDLE;
+        return false;
 
-    ViewHandle ret = it->second;
-    
-    it->second = handle;
+    it->second = ViewHandlePtr(handle);
 
-    return ret;
+    return true;
 }
 
-ViewId Session::GetViewForHandle(const ViewHandle handle) const {
+ViewId Session::GetViewForHandle(ViewHandle* handle) const {
     ViewId view_to_return;
     ViewsMap::const_iterator it;
 
     for (it = views_.begin(); it != views_.end(); ++it) {
-        if (handle == it->second) {
+        if (handle->equals((it->second).get())) {
             view_to_return = ViewId(it->first);
             break;
         }
@@ -267,19 +267,38 @@ void Session::UpdateViews(const std::set<ViewId>& views) {
     }
 }
 
-ElementHandle Session::GetElementHandle(const ViewId& viewId, const ElementId& elementId) const {
+ElementHandle* Session::GetElementHandle(const ViewId& viewId, const ElementId& elementId) const {
     ViewsElementsMap::const_iterator it_view;
 
     it_view = elements_.find(viewId.id());
     if (it_view == elements_.end())
-        return INVALID_HANDLE;
+        return NULL;
 
     ElementsMap::const_iterator it_el;
     it_el = it_view->second.find(elementId.id());
     if (it_el == it_view->second.end())
-        return INVALID_HANDLE;
+        return NULL;
 
-    return it_el->second;
+    return (it_el->second).get();
+}
+
+bool Session::AddElement(const ViewId& viewId, ElementHandle* handle, ElementId* elementId) {
+    ElementId targetElement(GenerateRandomID());    
+
+    ViewsElementsMap::iterator it_view;
+
+    it_view = elements_.find(viewId.id());
+    if (it_view == elements_.end()) {
+        elements_[viewId.id()] = ElementsMap();
+    }
+
+    it_view = elements_.find(viewId.id());
+
+    it_view->second[targetElement.id()] = ElementHandlePtr(handle);  
+    
+    *elementId = targetElement;
+
+    return true;
 }
 
 void Session::RemoveElement(const ViewId& viewId, const ElementId& elementId) {

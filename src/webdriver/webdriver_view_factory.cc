@@ -22,42 +22,34 @@ ViewFactory* ViewFactory::GetInstance() {
 	return instance;
 }
 
-void ViewFactory::CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const {
+void ViewFactory::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
 	CreatorsList::const_iterator creator;
 
-	session->logger().Log(kInfoLogLevel, "ViewFactory::CreateViewByClassName - " + className);
+	logger.Log(kInfoLogLevel, "ViewFactory::CreateViewByClassName - " + className);
 
 	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewByClassName(session, className, viewId)) {
+		if ((*creator)->CreateViewByClassName(logger, className, view)) {
 			// succed, return
 			return;
 		}
 	}
 
-	session->logger().Log(kSevereLogLevel, "ViewFactory::CreateViewByClassName - cant create view.");
-
-	*viewId = ViewId();
-
-	return;
+	logger.Log(kSevereLogLevel, "ViewFactory::CreateViewByClassName - cant create view.");
 }
 
-void ViewFactory::CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const {
+void ViewFactory::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
 	CreatorsList::const_iterator creator;
 
-	session->logger().Log(kInfoLogLevel, "ViewFactory::CreateViewForUrl - " + url);
+	logger.Log(kInfoLogLevel, "ViewFactory::CreateViewForUrl - " + url);
 
 	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewForUrl(session, url, viewId)) {
+		if ((*creator)->CreateViewForUrl(logger, url, view)) {
 			// succed, return
 			return;
 		}
 	}
 
-	session->logger().Log(kSevereLogLevel, "ViewFactory::CreateViewForUrl - cant create view.");
-
-	*viewId = ViewId();
-
-	return;
+	logger.Log(kSevereLogLevel, "ViewFactory::CreateViewForUrl - cant create view.");
 }
 
 void ViewFactory::AddViewCreator(ViewCreator* creator) {

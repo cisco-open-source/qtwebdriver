@@ -4,10 +4,9 @@
 #include <string>
 
 #include "webdriver_view_factory.h"
+#include "webdriver_logging.h"
 
 namespace webdriver {
-
-class Session;
 
 /// base class for custom view's creators
 class QWidgetViewCreator : public ViewCreator {
@@ -15,9 +14,9 @@ public:
     QWidgetViewCreator();
     virtual ~QWidgetViewCreator(){}
 
-    virtual bool CreateViewByClassName(Session* session, const std::string& className, ViewId* viewId) const;
+    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const;
 
-    virtual bool CreateViewForUrl(Session* session, const std::string& url, ViewId* viewId) const;    
+    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const;    
 
 private:
 

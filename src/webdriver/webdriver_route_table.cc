@@ -241,8 +241,7 @@ DefaultRouteTable::DefaultRouteTable()
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
-  // Cookie functions.
-  
+   
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
   
 

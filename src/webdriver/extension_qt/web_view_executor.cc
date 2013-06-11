@@ -13,6 +13,7 @@
 #include "q_key_converter.h"
 
 #include "web_view_util.h"
+#include "extension_qt/widget_view_handle.h"
 
 #include <QtGui/QApplication>
 
@@ -61,9 +62,7 @@ QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
 ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
-
-    QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
+    QWebView* pWebView = QWebViewUtil::getWebView(session, viewId);
     if (NULL != pWebView) {
         return new QWebViewCmdExecutor(session, viewId);
     }
@@ -72,9 +71,8 @@ ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, Vi
 }
 
 bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
+    QWebView* pWebView = QWebViewUtil::getWebView(session, viewId);
 
-    QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
     if (NULL != pWebView) {
         return true;
     }
@@ -87,9 +85,8 @@ QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
 }
 
 QWebView* QWebViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    QWidget* pWidget = static_cast<QWidget*>(session_->GetViewHandle(viewId));
+    QWebView* pWebView = QWebViewUtil::getWebView(session_, viewId);
 
-	QWebView* pWebView = qobject_cast<QWebView*>(pWidget);
 	if (NULL == pWebView) {
 		session_->logger().Log(kWarningLogLevel, "checkView - no such web view("+viewId.id()+")");
         *error = new Error(kNoSuchWindow);

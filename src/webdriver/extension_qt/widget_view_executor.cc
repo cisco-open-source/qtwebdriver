@@ -8,6 +8,7 @@
 #include "webdriver_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element.h"
+#include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
 
 #include <QtGui/QApplication>
@@ -30,7 +31,7 @@ QWidgetViewCmdExecutorCreator::QWidgetViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
 ViewCmdExecutor* QWidgetViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
+    QWidget* pWidget = (dynamic_cast<QViewHandle*>(session->GetViewHandle(viewId)))->get();
 
     if (NULL != pWidget) {
         return new QWidgetViewCmdExecutor(session, viewId);
@@ -40,7 +41,7 @@ ViewCmdExecutor* QWidgetViewCmdExecutorCreator::CreateExecutor(Session* session,
 }
 
 bool QWidgetViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-    QWidget* pWidget = static_cast<QWidget*>(session->GetViewHandle(viewId));
+    QWidget* pWidget = (dynamic_cast<QViewHandle*>(session->GetViewHandle(viewId)))->get();
 
     if (NULL != pWidget) {
         return true;

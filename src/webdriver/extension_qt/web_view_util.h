@@ -3,11 +3,18 @@
 
 #include <string>
 
+#include <QtWebKit/QtWebKit>
+
 namespace webdriver {
+
+class Session;
+class ViewId;
+
 
 class QWebViewUtil {
 public:
     static bool isUrlSupported(const std::string& url);
+    static QWebView* getWebView(Session* session, const ViewId& viewId);
 
 private:
 	QWebViewUtil() {};

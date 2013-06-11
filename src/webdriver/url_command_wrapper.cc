@@ -65,6 +65,9 @@ UrlCommandWrapper::~UrlCommandWrapper() {}
 typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;    
 
 void UrlCommandWrapper::ExecutePost(Response* const response) {
+
+// TODO:
+#if 0    
 	std::string url;
 	bool can_handle;
     Error* error = NULL;
@@ -130,7 +133,7 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
         response->SetError(error);
         return;
     }
-
+#endif
     delegate_->ExecutePost(response);
 }
 

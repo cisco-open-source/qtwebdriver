@@ -115,10 +115,6 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error) = 0;
 
 
-
-
-
-
 protected:
     Session* session_;
     ViewId view_id_;
@@ -162,6 +158,11 @@ public:
     /// @param viewId view to operate on
     /// @return new executor, NULL - if cant create.
     ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
+
+    template <class C>
+    C* CreateExecutor(Session* session, ViewId viewId) const {
+        return dynamic_cast<C>(CreateExecutor(session, viewId));
+    }
 
     /// creates executor for current view in session
     /// @param session pointer to session

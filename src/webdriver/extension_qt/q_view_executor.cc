@@ -3,6 +3,7 @@
 #include "webdriver_logging.h"
 #include "webdriver_session.h"
 #include "q_key_converter.h"
+#include "extension_qt/widget_view_handle.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -21,9 +22,9 @@ QViewCmdExecutor::~QViewCmdExecutor() {
 };
 
 QWidget* QViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    ViewHandle handle = session_->GetViewHandle(viewId);
+    ViewHandle* handle = session_->GetViewHandle(viewId);
 
-    QWidget* pWidget = static_cast<QWidget*>(handle);
+    QWidget* pWidget = (dynamic_cast<QViewHandle*>(handle))->get();
 
     if (NULL == pWidget) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such view("+viewId.id()+")");
