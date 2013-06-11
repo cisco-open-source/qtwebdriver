@@ -5,6 +5,7 @@
 
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
+#include "webdriver_view_factory.h"
 #include "webdriver_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element_handle.h"
@@ -23,15 +24,13 @@
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
 
-
-
 namespace webdriver {
 
 QWidgetViewCmdExecutorCreator::QWidgetViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
 ViewCmdExecutor* QWidgetViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-    QWidget* pWidget = (dynamic_cast<QViewHandle*>(session->GetViewHandle(viewId)))->get();
+    QWidget* pWidget = QWidgetViewUtil::getView(session, viewId);
 
     if (NULL != pWidget) {
         return new QWidgetViewCmdExecutor(session, viewId);
@@ -41,7 +40,7 @@ ViewCmdExecutor* QWidgetViewCmdExecutorCreator::CreateExecutor(Session* session,
 }
 
 bool QWidgetViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-    QWidget* pWidget = (dynamic_cast<QViewHandle*>(session->GetViewHandle(viewId)))->get();
+    QWidget* pWidget = QWidgetViewUtil::getView(session, viewId);
 
     if (NULL != pWidget) {
         return true;
@@ -699,8 +698,27 @@ void QWidgetViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Er
     if (NULL == view)
         return;
 
-    // TODO:
+    ViewHandle* viewHandle = NULL;
 
+    // create view
+    ViewFactory::GetInstance()->CreateViewForUrl(session_->logger(), url, &viewHandle);
+    if (NULL == viewHandle) {
+        *error = new Error(kUnknownError, "cant load widget - " + url);
+        return;
+    }
+
+    // close old widget, destroy children correctly
+    QList<QWidget*> childs = view->findChildren<QWidget*>();
+    foreach(QWidget *child, childs)
+    {
+        child->setAttribute(Qt::WA_DeleteOnClose, true);
+        child->close();
+    }
+
+    view->close();
+
+    // map viewId to new widget
+    session_->ReplaceViewHandle(view_id_, viewHandle);
 }
 
 void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
@@ -709,6 +727,7 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
         return;
 
     // TODO:
+    *error = new Error(kUnknownError, "widgte getURL - TBD.");
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {

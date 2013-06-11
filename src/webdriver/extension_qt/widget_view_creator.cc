@@ -54,36 +54,12 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
 }
 
 bool QWidgetViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-    if (factory.empty())
-        return false;
-
 	if (!QWidgetViewUtil::isUrlSupported(url))
         return false;
-    
-    ViewHandle* handle = NULL;
-    // get first registered
-    CreateViewMethod createMethod = factory.begin()->second;
-    handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
 
-    if (NULL != handle) {
-        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
-        std::string objClassName(widget->metaObject()->className());
+    std::string className = QWidgetViewUtil::extractClassName(url);
 
-        if (NULL != widget) {
-            widget->show();
-        
-            logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by url - "+url);
-
-            *view = handle;
-
-            return true;
-        } else {
-            logger.Log(kSevereLogLevel, "QWidgetViewCreator, smth wrong.");
-            handle->Release();
-        }
-    }
-
-	return false;
+    return CreateViewByClassName(logger, className, view);
 };
 
 

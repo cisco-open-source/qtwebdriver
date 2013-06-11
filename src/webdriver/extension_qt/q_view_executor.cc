@@ -4,6 +4,7 @@
 #include "webdriver_session.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_view_handle.h"
+#include "widget_view_util.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -22,9 +23,7 @@ QViewCmdExecutor::~QViewCmdExecutor() {
 };
 
 QWidget* QViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    ViewHandle* handle = session_->GetViewHandle(viewId);
-
-    QWidget* pWidget = (dynamic_cast<QViewHandle*>(handle))->get();
+    QWidget* pWidget = QWidgetViewUtil::getView(session_, viewId);
 
     if (NULL == pWidget) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such view("+viewId.id()+")");
