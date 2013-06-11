@@ -339,6 +339,7 @@
         'src/webdriver/extension_qt/widget_view_util.cc',
         'src/webdriver/extension_qt/web_view_util.cc',
         'src/webdriver/extension_qt/widget_view_handle.cc',
+        'src/webdriver/extension_qt/widget_element_handle.cc',
         'inc/extension_qt/q_view_runner.h',
         'inc/extension_qt/web_view_executor.h',
         'inc/extension_qt/qwebviewext.h',

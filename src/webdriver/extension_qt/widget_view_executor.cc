@@ -7,7 +7,7 @@
 #include "webdriver_session.h"
 #include "webdriver_util.h"
 #include "q_key_converter.h"
-#include "extension_qt/widget_element.h"
+#include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
 
