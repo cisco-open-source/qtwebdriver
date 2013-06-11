@@ -19,14 +19,14 @@ class QElementHandle : public ElementHandle {
 public:
     QElementHandle();
     QElementHandle(QObject* element);
-    virtual ~QElementHandle() {};
-
+    
     virtual bool is_valid() const { return !element_.isNull(); }
-    virtual bool equals(const ElementHandle* other) const { return false; /*element_ == other.element_;*/ }
+    virtual bool equals(const ElementHandle* other) const;
     QObject* get() { return element_.data(); }
     
 protected:
     QPointer<QObject> element_;
+    virtual ~QElementHandle() {};
 };
 
 }  // namespace webdriver

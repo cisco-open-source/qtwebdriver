@@ -21,10 +21,12 @@ namespace webdriver {
 class ElementHandle : public base::RefCounted<ElementHandle>{
 public:
     ElementHandle();
-    virtual ~ElementHandle() {};
 
     virtual bool is_valid() const = 0;
     virtual bool equals(const ElementHandle* other) const = 0;
+protected:
+    friend class base::RefCounted<ElementHandle>;
+    virtual ~ElementHandle() {};    
 };
 
 /// This class represents a WebDriver Element ID. These IDs are mapped to
