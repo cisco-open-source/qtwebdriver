@@ -34,6 +34,7 @@ public:
 
 private:
 	Error* SwitchToView(Session* session, const ViewId& viewId);
+	Error* GetViewTitle(Session* session, const ViewId& viewId, std::string* title);
 	
   	DISALLOW_COPY_AND_ASSIGN(CreateSession);
 };

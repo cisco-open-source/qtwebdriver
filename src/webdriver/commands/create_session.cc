@@ -20,6 +20,8 @@
 
 namespace webdriver {
 
+typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;  
+
 CreateSession::CreateSession(const std::vector<std::string>& path_segments,
                              const DictionaryValue* const parameters)
     : Command(path_segments, parameters) {}
@@ -63,14 +65,30 @@ void CreateSession::ExecutePost(Response* const response) {
         session->logger().Log(kFineLogLevel, "Trying to attach to window - "+browser_start_window);
 
         std::vector<ViewId> views;
+        std::string window_name;
 
         session->RunSessionTask(base::Bind(
             &ViewEnumerator::EnumerateViews,
             session,
             &views));
 
-        // TODO: implement attach functionality
         // find view to attach
+        std::vector<ViewId>::const_iterator it = views.begin();
+        Error* tmp_err = NULL;
+        scoped_ptr<Error> ignore_error(NULL);
+
+        while (it != views.end()) {
+            tmp_err = GetViewTitle(session, *it, &window_name);
+            ignore_error.reset(tmp_err);
+            if (tmp_err) break;
+
+            if (window_name == browser_start_window) {
+                startView = *it;
+                break;
+            }
+            
+            ++it;
+        }
     }
 
     if (!startView.is_valid()) {
@@ -121,8 +139,6 @@ void CreateSession::ExecutePost(Response* const response) {
 }
 
 Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
-    typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;        
-
     Error* error = NULL;
     ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
 
@@ -135,6 +151,23 @@ Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
     session->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::SwitchTo,
                 base::Unretained(executor.get()),
+                &error));
+
+    return error;
+}
+
+Error* CreateSession::GetViewTitle(Session* session, const ViewId& viewId, std::string* title) {
+    Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
+
+    if (NULL == executor.get()) {
+        return new Error(kBadRequest, "cant get view executor.");
+    }
+
+    session->RunSessionTask(base::Bind(
+                &ViewCmdExecutor::GetWindowName,
+                base::Unretained(executor.get()),
+                title,
                 &error));
 
     return error;
