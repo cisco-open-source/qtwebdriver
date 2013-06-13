@@ -36,8 +36,6 @@
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
-#include <QtCore/QDebug>
-
 namespace webdriver {
 
 
@@ -141,7 +139,7 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
         if (route->uri_regex_ == uri_pattern) {
             // replace command for pattern
             *route = webdriver::internal::RouteDetails(uri_pattern, creator);
-            return false;
+            return true;
         }
 
         if (CompareBestMatch(uri_pattern, route->uri_regex_)) {
