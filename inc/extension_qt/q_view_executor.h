@@ -30,14 +30,6 @@ public:
     virtual void Maximize(Error** error);
     virtual void GetScreenShot(std::string* png, Error** error);
     virtual void SendKeys(const string16& keys, Error** error);
-    virtual void MouseDoubleClick(Error** error) = 0;
-    virtual void MouseButtonUp(Error** error) = 0;
-    virtual void MouseButtonDown(Error** error) = 0;
-    virtual void MouseClick(MouseButton button, Error** error) = 0;
-    virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
-    virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) = 0;
-    virtual void MouseMove(const ElementId& element, Error** error) = 0;
-    virtual void ClickElement(const ElementId& element, Error** error) = 0;
     virtual void Close(Error** error);
     virtual void SwitchTo(Error** error);
     virtual void GetAlertMessage(std::string* text, Error** error);

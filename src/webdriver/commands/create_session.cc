@@ -131,6 +131,7 @@ void CreateSession::ExecutePost(Response* const response) {
         return;
     }
 
+    // TODO: get url_base elsewhere, not from session manager
     // Redirect to a relative URI. Although prohibited by the HTTP standard,
     // this is what the IEDriver does. Finding the actual IP address is
     // difficult, and returning the hostname causes perf problems with the python

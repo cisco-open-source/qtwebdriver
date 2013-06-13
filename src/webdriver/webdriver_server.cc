@@ -17,12 +17,15 @@
 #include "base/stringprintf.h"
 #include "base/sys_info.h"
 #include "base/string_number_conversions.h"
-#include "chrome/common/chrome_version_info.h"
 #include "http_response.h"
 #include "webdriver_logging.h"
 #include "webdriver_switches.h"
 #include "webdriver_util.h"
 #include "webdriver_session_manager.h"
+
+#include "webdriver_route_patterns.h"
+#include "url_command_wrapper.h"
+
 
 
 namespace webdriver {
@@ -155,6 +158,7 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     Response response;
     std::string uri(request_info->uri);
     std::string method(request_info->request_method);
+    std::string matched_route;
 
     // Overwrite mongoose's default handler for /favicon.ico to always return a
     // 204 response so we don't spam the logs with 404s.
@@ -169,7 +173,7 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
     // remove url_base from uri
     uri = uri.substr(url_base_.length());
 
-    AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri);
+    AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri, &matched_route);
     if (NULL == cmdCreator)
     {
         GlobalLogger::Log(kWarningLogLevel, "<<<<< ProcessHttpRequest - no route for url: " + uri);
@@ -182,10 +186,19 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
                             &path_segments,
                             &parameters,
                             &response)) {
-        DispatchHelper(
+        if (matched_route == CommandRoutes::kUrlCmd) {
+            DispatchHelper(
+                    new UrlCommandWrapper(path_segments,
+                            parameters,
+                            cmdCreator->create(path_segments, parameters)),
+                    method,
+                    &response);
+        } else {
+            DispatchHelper(
                     cmdCreator->create(path_segments, parameters),
                     method,
                     &response);
+        }
     }
     SendResponse(connection,
                 request_info->request_method,

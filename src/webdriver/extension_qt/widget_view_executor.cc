@@ -808,7 +808,7 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
             QString elementId;
             xmlquery.evaluateTo(&elementId);
             if (!elementId.isEmpty()) {
-                // TODO: what this? why we need to remove EOL?
+                // TODO: what this? why do we need to remove EOL?
                 elementId.remove('\n');
 
                 if (elementsMap.contains(elementId)) {

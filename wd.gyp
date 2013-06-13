@@ -8,7 +8,7 @@
     'WD_CONFIG_QWIDGET_VIEW%': '0',
     'WD_CONFIG_QML_VIEW%': '0',
     'WD_BUILD_MONGOOSE%': '0',
-    'WD_CONFIG_XPATH%': '0',
+    'WD_CONFIG_XPATH%': '1',
     'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
   },
 
@@ -352,10 +352,6 @@
 #        'src/net/base/io_buffer.cc',
 #        'src/net/base/net_errors.cc',
 #        'src/net/base/net_log.cc',
-#        'src/qtaskrunner.h',
-#        'src/qtaskrunner.cc',
-#        'src/qwebviewext.h',
-#        'src/qwebviewext.cc',
         'src/third_party/webdriver/atoms.cc',
       ],
 

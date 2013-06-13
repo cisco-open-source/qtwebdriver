@@ -131,7 +131,7 @@ Error* Session::AfterExecuteCommand() {
 void Session::Terminate() {
     logger_.Log(kInfoLogLevel, "Session("+id_+") terminate.");
 
-    // TODO: cleanup ressources
+    // TODO: cleanup resources
     delete this;
 }
 
