@@ -36,6 +36,7 @@
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
+#include <QtCore/QDebug>
 
 namespace webdriver {
 
@@ -112,9 +113,24 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
     // custom command check
     if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
-        // TODO: validate custom command syntax
-    }
+        std::vector<std::string> url_segments;
+        base::SplitString(uri_pattern, '/', &url_segments);
 
+        if (url_segments.size() < 4
+                || url_segments[0] != "" || url_segments[1] != "session" || url_segments[2] != "*") {
+            GlobalLogger::Log(kWarningLogLevel, "Custom commands must begin with \"/session/*/\"");
+            return false;
+        }
+
+        // custom prefix is "-cisco-"
+        const std::string CUSTOM_PREFIX = "-cisco-";
+        unsigned int custom_prefix_length = CUSTOM_PREFIX.length();
+        if (url_segments[3].compare(0, custom_prefix_length, CUSTOM_PREFIX)
+                || custom_prefix_length == url_segments[3].length()) {
+            GlobalLogger::Log(kWarningLogLevel, "Custom prefix must be \"-cisco-\"");
+            return false;
+        }
+    }
     std::vector<webdriver::internal::RouteDetails>::iterator route;
     for (route = routes_.begin();
          route < routes_.end();
