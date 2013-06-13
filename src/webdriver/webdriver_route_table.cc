@@ -162,8 +162,29 @@ bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern
     return true;
 }
 
-bool RouteTable::CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2) { 
-    // TODO: implement
+bool RouteTable::CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2) {
+
+    std::vector<std::string> segments1;
+    std::vector<std::string> segments2;
+    base::SplitString(uri_pattern1, '/', &segments1);
+    base::SplitString(uri_pattern2, '/', &segments2);
+
+    unsigned int segments_num = segments1.size();
+
+    if (segments_num != segments2.size()) {
+        // different segments num
+        return false;
+    }
+
+    for (unsigned int i = 0; i < segments_num; i++) {
+        if (segments1.at(i) == segments2.at(i))
+            continue;
+        if (segments1.at(i) == "*")
+            return false;
+        if (segments2.at(i) == "*")
+            return true;
+        return false;
+    }
     return false;
 }
 
@@ -235,8 +256,6 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageCommand>          (CommandRoutes::kSessionStorage);
     Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
-
-
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
