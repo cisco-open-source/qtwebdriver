@@ -7,6 +7,7 @@
 #include "base/basictypes.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/command_line.h"
+#include "base/values.h"
 
 struct mg_context;
 struct mg_connection;
@@ -69,8 +70,11 @@ private:
 
     // Converts a |Response| into a |HttpResponse| to be returned to the client.
     // This function is exposed for testing.
-    void PrepareHttpResponse(const Response& command_response,
+    void PrepareHttpResponse(const std::string& request_method,
+                             const Response& command_response,
                              HttpResponse* const http_response);
+
+    ListValue* ListCommandSupportedMethods(/*TODO: const*/ Command& command) const;
 
     void DispatchCommand(Command* const command,
                          const std::string& method,

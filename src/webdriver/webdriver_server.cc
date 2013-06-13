@@ -224,7 +224,7 @@ void Server::SendResponse(struct mg_connection* const connection,
                   const std::string& request_method,
                   const Response& response) {
     HttpResponse http_response;
-    PrepareHttpResponse(response, &http_response);
+    PrepareHttpResponse(request_method, response, &http_response);
     WriteHttpResponse(connection, http_response);
 }
 
@@ -237,72 +237,78 @@ void Server::WriteHttpResponse(struct mg_connection* connection,
     mg_write(connection, data.data(), data.length());
 }
 
-void Server::PrepareHttpResponse(const Response& command_response,
+void Server::PrepareHttpResponse(const std::string& request_method,
+                                 const Response& command_response,
                                  HttpResponse* const http_response) {
     ErrorCode status = command_response.GetStatus();
+
+    // TODO(jleyba): kSeeOther, kBadRequest, kSessionNotFound,
+    // and kMethodNotAllowed should be detected before creating
+    // a command_response, and should thus not need conversion.
+    if (status == kSeeOther) {
+      const Value* const value = command_response.GetValue();
+      std::string location;
+      if (!value->GetAsString(&location)) {
+          // This should never happen.
+          http_response->set_status(HttpResponse::kInternalServerError);
+          http_response->set_body("Unable to set 'Location' header: response "
+                                  "value is not a string: " +
+                                  command_response.ToJSON());
+          return;
+      }
+      http_response->AddHeader("Location", location);
+    }
+    if ((request_method == "OPTIONS" && status == kSuccess) ||
+        status == kMethodNotAllowed) {
+      const Value* const value = command_response.GetValue();
+      if (!value->IsType(Value::TYPE_LIST)) {
+          // This should never happen.
+          http_response->set_status(HttpResponse::kInternalServerError);
+          http_response->set_body(
+                      "Unable to set 'Allow' header: response value was "
+                      "not a list of strings: " + command_response.ToJSON());
+          return;
+      }
+
+      const ListValue* const list_value =
+              static_cast<const ListValue* const>(value);
+      std::vector<std::string> allowed_methods;
+      for (size_t i = 0; i < list_value->GetSize(); ++i) {
+          std::string method;
+          if (list_value->GetString(i, &method)) {
+              allowed_methods.push_back(method);
+          } else {
+              // This should never happen.
+              http_response->set_status(HttpResponse::kInternalServerError);
+              http_response->set_body(
+                          "Unable to set 'Allow' header: response value was "
+                          "not a list of strings: " + command_response.ToJSON());
+              return;
+          }
+      }
+      http_response->AddHeader("Allow", JoinString(allowed_methods, ','));
+    }
+
     switch (status) {
     case kSuccess:
         http_response->set_status(HttpResponse::kOk);
         break;
 
-        // TODO(jleyba): kSeeOther, kBadRequest, kSessionNotFound,
-        // and kMethodNotAllowed should be detected before creating
-        // a command_response, and should thus not need conversion.
-    case kSeeOther: {
-        const Value* const value = command_response.GetValue();
-        std::string location;
-        if (!value->GetAsString(&location)) {
-            // This should never happen.
-            http_response->set_status(HttpResponse::kInternalServerError);
-            http_response->set_body("Unable to set 'Location' header: response "
-                                    "value is not a string: " +
-                                    command_response.ToJSON());
-            return;
-        }
-        http_response->AddHeader("Location", location);
+    case kSeeOther:
         http_response->set_status(HttpResponse::kSeeOther);
         break;
-    }
 
     case kBadRequest:
     case kSessionNotFound:
         http_response->set_status(status);
         break;
 
-    case kMethodNotAllowed: {
-        const Value* const value = command_response.GetValue();
-        if (!value->IsType(Value::TYPE_LIST)) {
-            // This should never happen.
-            http_response->set_status(HttpResponse::kInternalServerError);
-            http_response->set_body(
-                        "Unable to set 'Allow' header: response value was "
-                        "not a list of strings: " + command_response.ToJSON());
-            return;
-        }
-
-        const ListValue* const list_value =
-                static_cast<const ListValue* const>(value);
-        std::vector<std::string> allowed_methods;
-        for (size_t i = 0; i < list_value->GetSize(); ++i) {
-            std::string method;
-            if (list_value->GetString(i, &method)) {
-                allowed_methods.push_back(method);
-            } else {
-                // This should never happen.
-                http_response->set_status(HttpResponse::kInternalServerError);
-                http_response->set_body(
-                            "Unable to set 'Allow' header: response value was "
-                            "not a list of strings: " + command_response.ToJSON());
-                return;
-            }
-        }
-        http_response->AddHeader("Allow", JoinString(allowed_methods, ','));
+    case kMethodNotAllowed:
         http_response->set_status(HttpResponse::kMethodNotAllowed);
         break;
-    }
 
-        // All other errors should be treated as generic 500s. The client
-        // will be responsible for inspecting the message body for details.
+    // All other errors should be treated as generic 500s. The client
+    // will be responsible for inspecting the message body for details.
     case kInternalServerError:
     default:
         http_response->set_status(HttpResponse::kInternalServerError);
@@ -388,26 +394,39 @@ void Server::ReadRequestBody(const struct mg_request_info* const request_info,
     }
 }
 
+ListValue* Server::ListCommandSupportedMethods(/*TODO: const*/ Command& command) const {
+  ListValue* methods = new ListValue;
+  if (command.DoesPost())
+    methods->Append(Value::CreateStringValue("POST"));
+  if (command.DoesGet()) {
+    methods->Append(Value::CreateStringValue("GET"));
+    methods->Append(Value::CreateStringValue("HEAD"));
+  }
+  if (command.DoesDelete())
+    methods->Append(Value::CreateStringValue("DELETE"));
+  return methods;
+}
+
 void Server::DispatchHelper(Command* command_ptr,
                             const std::string& method,
                             Response* response) {
-    CHECK(method == "GET" || method == "POST" || method == "DELETE");
+    CHECK(method == "GET" ||
+          method == "POST" ||
+          method == "DELETE" ||
+          method == "OPTIONS");
     scoped_ptr<Command> command(command_ptr);
 
     if ((method == "GET" && !command->DoesGet()) ||
-            (method == "POST" && !command->DoesPost()) ||
-            (method == "DELETE" && !command->DoesDelete())) {
-        ListValue* methods = new ListValue;
-        if (command->DoesPost())
-            methods->Append(Value::CreateStringValue("POST"));
-        if (command->DoesGet()) {
-            methods->Append(Value::CreateStringValue("GET"));
-            methods->Append(Value::CreateStringValue("HEAD"));
-        }
-        if (command->DoesDelete())
-            methods->Append(Value::CreateStringValue("DELETE"));
+        (method == "POST" && !command->DoesPost()) ||
+        (method == "DELETE" && !command->DoesDelete())) {
         response->SetStatus(kMethodNotAllowed);
-        response->SetValue(methods);
+        response->SetValue(ListCommandSupportedMethods(*command));
+        return;
+    }
+
+    if (method == "OPTIONS") {
+        response->SetStatus(kSuccess);
+        response->SetValue(ListCommandSupportedMethods(*command));
         return;
     }
 
