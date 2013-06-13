@@ -96,12 +96,15 @@ std::vector<std::string> RouteTable::GetRoutes() {
     return routes_to_ret;
 }
 
-CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url) {
+CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string* pattern) {
     std::vector<webdriver::internal::RouteDetails>::const_iterator route;
     for (route = routes_.begin();
          route < routes_.end();
          ++route) {
         if (MatchPattern(url, route->uri_regex_)) {
+            if (NULL != pattern) {
+                *pattern = route->uri_regex_;
+            }
             return route->creator_;
         }
     }

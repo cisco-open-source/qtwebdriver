@@ -90,8 +90,9 @@ public:
 
     /// Find matched route for given url and retrieve CommandCreator for this route.
     /// @param url url to handle
+    /// @param[out] pattern optional output - matched pattern for url
     /// @return pointer to CommandCreator, NULL if route not found
-    CommandCreatorPtr GetRouteForURL(const std::string& url);
+    CommandCreatorPtr GetRouteForURL(const std::string& url, std::string* pattern = NULL);
 
     /// Returns list of registered routes
     /// @return vector of registered patterns

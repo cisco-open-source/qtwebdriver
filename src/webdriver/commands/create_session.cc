@@ -20,6 +20,8 @@
 
 namespace webdriver {
 
+typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;  
+
 CreateSession::CreateSession(const std::vector<std::string>& path_segments,
                              const DictionaryValue* const parameters)
     : Command(path_segments, parameters) {}
@@ -29,12 +31,16 @@ CreateSession::~CreateSession() {}
 bool CreateSession::DoesPost() { return true; }
 
 void CreateSession::ExecutePost(Response* const response) {
-    const DictionaryValue* dict;
-    if (!GetDictionaryParameter("desiredCapabilities", &dict)) {
+    const DictionaryValue* desired_caps_dict;
+    const DictionaryValue* required_caps_dict;
+    if (!GetDictionaryParameter("desiredCapabilities", &desired_caps_dict)) {
         response->SetError(new Error(
             kBadRequest, "Missing or invalid 'desiredCapabilities'"));
         return;
     }
+
+    // get optional required capabilities
+    (void)GetDictionaryParameter("requiredCapabilities", &required_caps_dict);
 
     if (SessionManager::GetInstance()->GetSessions().size()  > 0) {
         response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
@@ -43,7 +49,7 @@ void CreateSession::ExecutePost(Response* const response) {
 
     // Session manages its own liftime, so do not call delete.
     Session* session = new Session();
-    Error* error = session->Init(dict);
+    Error* error = session->Init(desired_caps_dict, required_caps_dict);
     if (error) {
         response->SetError(error);
         return;
@@ -63,14 +69,30 @@ void CreateSession::ExecutePost(Response* const response) {
         session->logger().Log(kFineLogLevel, "Trying to attach to window - "+browser_start_window);
 
         std::vector<ViewId> views;
+        std::string window_name;
 
         session->RunSessionTask(base::Bind(
             &ViewEnumerator::EnumerateViews,
             session,
             &views));
 
-        // TODO: implement attach functionality
         // find view to attach
+        std::vector<ViewId>::const_iterator it = views.begin();
+        Error* tmp_err = NULL;
+        scoped_ptr<Error> ignore_error(NULL);
+
+        while (it != views.end()) {
+            tmp_err = GetViewTitle(session, *it, &window_name);
+            ignore_error.reset(tmp_err);
+            if (tmp_err) break;
+
+            if (window_name == browser_start_window) {
+                startView = *it;
+                break;
+            }
+            
+            ++it;
+        }
     }
 
     if (!startView.is_valid()) {
@@ -121,8 +143,6 @@ void CreateSession::ExecutePost(Response* const response) {
 }
 
 Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
-    typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;        
-
     Error* error = NULL;
     ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
 
@@ -135,6 +155,23 @@ Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
     session->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::SwitchTo,
                 base::Unretained(executor.get()),
+                &error));
+
+    return error;
+}
+
+Error* CreateSession::GetViewTitle(Session* session, const ViewId& viewId, std::string* title) {
+    Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
+
+    if (NULL == executor.get()) {
+        return new Error(kBadRequest, "cant get view executor.");
+    }
+
+    session->RunSessionTask(base::Bind(
+                &ViewCmdExecutor::GetWindowName,
+                base::Unretained(executor.get()),
+                title,
                 &error));
 
     return error;

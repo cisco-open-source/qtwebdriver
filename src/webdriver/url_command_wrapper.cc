@@ -65,9 +65,6 @@ UrlCommandWrapper::~UrlCommandWrapper() {}
 typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;    
 
 void UrlCommandWrapper::ExecutePost(Response* const response) {
-
-// TODO:
-#if 0    
 	std::string url;
 	bool can_handle;
     Error* error = NULL;
@@ -101,20 +98,31 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
     	//Step 2: Y->handleOldViews() can be customized
 		//Y.get/createInstance()->handleOldViews(oldViews);
 
+        ViewHandle* viewHandle = NULL;
     	ViewId viewId;
 
 		session_->RunSessionTask(base::Bind(
             &ViewFactory::CreateViewForUrl,
             base::Unretained(ViewFactory::GetInstance()),
-            session_,
+            session_->logger(),
             url,
-            &viewId));
+            &viewHandle));
 
-		if (!viewId.is_valid()) {
+        if (NULL == viewHandle) {
 			session_->logger().Log(kSevereLogLevel, "cant create view able to handle url.");
 			response->SetError(new Error(kBadRequest, "cant create view able to handle url."));
 			return;
 		}
+
+        session_->AddNewView(viewHandle, &viewId);
+        if (!viewId.is_valid()) {
+            viewHandle->Release();
+            session_->logger().Log(kSevereLogLevel, "Cant add view handle to session.");
+            response->SetError(new Error(kBadRequest, "Cant add view handle to session."));
+            return;
+        }
+
+        session_->logger().Log(kInfoLogLevel, "New view("+viewId.id()+") created for url - "+url);
 
 		executor.reset(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session_, viewId));
    		if (NULL == executor.get()) {
@@ -133,7 +141,7 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
         response->SetError(error);
         return;
     }
-#endif
+
     delegate_->ExecutePost(response);
 }
 

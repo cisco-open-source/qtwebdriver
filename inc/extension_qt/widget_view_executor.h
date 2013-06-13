@@ -3,7 +3,7 @@
 
 #include "extension_qt/q_view_executor.h"
 
-//#include <QtCore/QObject>
+#include <QtXml/QXmlStreamWriter>
 
 namespace webdriver {
 
@@ -78,9 +78,13 @@ public:
 
 
 protected:
+    typedef QHash<QString, QWidget*> XMLElementMap;    
+
     QWidget* getElement(const ElementId &element, Error** error);
     bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
+    void createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource);
+    void addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);

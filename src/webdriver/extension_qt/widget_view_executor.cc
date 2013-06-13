@@ -23,6 +23,12 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
+#include <QtCore/QBuffer>
+
+#ifdef WD_CONFIG_XPATH
+#include <QtXmlPatterns/QXmlQuery>
+#include <QtXmlPatterns/QXmlResultItems>
+#endif
 
 namespace webdriver {
 
@@ -33,6 +39,7 @@ ViewCmdExecutor* QWidgetViewCmdExecutorCreator::CreateExecutor(Session* session,
     QWidget* pWidget = QWidgetViewUtil::getView(session, viewId);
 
     if (NULL != pWidget) {
+        session->logger().Log(kFineLogLevel, "Widget executor for view("+viewId.id()+")");
         return new QWidgetViewCmdExecutor(session, viewId);
     }
 
@@ -85,9 +92,16 @@ void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
     if (NULL == view)
         return;
 
-    // TODO: get implementation from automation
+    XMLElementMap elementsMap;
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+    buff.open(QIODevice::ReadWrite);
+    createUIXML(view, &buff, elementsMap, error, true);
 
+    if (*error)
+        return;
 
+    *source = byteArray.data();
 }
 
 void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -700,6 +714,8 @@ void QWidgetViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Er
 
     ViewHandle* viewHandle = NULL;
 
+    session_->logger().Log(kFineLogLevel, "Navigate to widget - "+url);
+
     // create view
     ViewFactory::GetInstance()->CreateViewForUrl(session_->logger(), url, &viewHandle);
     if (NULL == viewHandle) {
@@ -726,8 +742,8 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     if (NULL == view)
         return;
 
-    // TODO:
-    *error = new Error(kUnknownError, "widgte getURL - TBD.");
+    // TODO: check if we can implement this command
+    *error = new Error(kUnknownError, "widget getURL - TBD.");
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
@@ -752,8 +768,114 @@ bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std
 }
 
 void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
-    // TODO: get implementation from automation
+#ifndef WD_CONFIG_XPATH
+    *error = new Error(kXPathLookupError, "Finding elements by xpath is not supported");
+    return;
+#else
+    QXmlResultItems result;
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+
+    buff.open(QIODevice::ReadWrite);
+    XMLElementMap elementsMap;
+    createUIXML(parent, &buff, elementsMap, error);
+    if (*error)
+        return;
+
+    buff.seek(0);
+    QXmlQuery xmlquery;
+    xmlquery.bindVariable("buff", &buff);
+    xmlquery.setQuery("doc($buff) "+QString(query.c_str()));
+
+    if (!xmlquery.isValid()) {
+        *error = new Error(kXPathLookupError);
+        return;
+    }
+    xmlquery.evaluateTo(&result);
+
+    buff.close();
+
+    QXmlItem item(result.next());
+    while (!item.isNull()) {
+        if (item.isNode()) {
+            xmlquery.setFocus(item);
+            xmlquery.setQuery("./@elementId/string()");
+            if (!xmlquery.isValid()) {
+                *error = new Error(kXPathLookupError);
+                return;
+            }
+
+            QString elementId;
+            xmlquery.evaluateTo(&elementId);
+            if (!elementId.isEmpty()) {
+                // TODO: what this? why we need to remove EOL?
+                elementId.remove('\n');
+
+                if (elementsMap.contains(elementId)) {
+                    ElementId elm;
+                    session_->AddElement(view_id_, new QElementHandle(elementsMap[elementId]), &elm);
+                    (*elements).push_back(elm);
+                    session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+                } else {
+                    session_->logger().Log(kSevereLogLevel, "cant get element from map, skipped");
+                }
+            }
+        }
+        item = result.next();
+    }
+    if (elements->empty())
+    {
+        *error = new Error(kNoSuchElement);
+        return;
+    }
+#endif
 }
+
+void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource) {
+    QXmlStreamWriter* writer = new QXmlStreamWriter();
+
+    writer->setDevice(buff);
+    writer->setAutoFormatting(true);
+    writer->writeStartDocument();
+
+    addWidgetToXML(parent, elementsMap, writer, needAddWebSource);
+
+    writer->writeEndDocument();
+
+    delete writer;
+}
+
+void QWidgetViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource) {
+    writer->writeStartElement(parent->metaObject()->className());
+
+    if (!parent->objectName().isEmpty())
+        writer->writeAttribute("id", parent->objectName());
+
+    if (!parent->windowTitle().isEmpty())
+        writer->writeAttribute("name", parent->windowTitle());
+
+    QString elementKey = GenerateRandomID().c_str();
+    elementsMap.insert(elementKey, QPointer<QWidget>(parent));
+    writer->writeAttribute("elementId", elementKey);
+
+// TODO: this executor doesnt know anything about qwebview
+//    QWebView* webview = qobject_cast<QWebView*>(parent);
+//    if (webview && needAddWebSource)
+//    {
+//        writer->writeCharacters(webview->page()->mainFrame()->toHtml());
+//    }
+//    else
+    {
+        QList<QObject*> childs = parent->children();
+        foreach(QObject *child, childs) {
+            QWidget* childWgt = qobject_cast<QWidget*>(child);
+            if (childWgt)
+                addWidgetToXML(childWgt, elementsMap, writer, needAddWebSource);
+        }
+    }
+    writer->writeEndElement();
+}
+
 
 
 } //namespace webdriver 
