@@ -173,11 +173,6 @@
           'WD_CONFIG_QWIDGET_VIEW',
         ],
       } ],
-      [ '<(WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY) == 1', {
-        'defines': [
-          'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY',
-        ],
-      } ],
       [ '<(WD_CONFIG_QML_VIEW) == 1', {
         'defines': [
           'WD_CONFIG_QML_VIEW',
