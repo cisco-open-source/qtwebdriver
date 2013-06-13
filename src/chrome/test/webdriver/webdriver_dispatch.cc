@@ -273,6 +273,12 @@ void PrepareHttpResponse(const Response& command_response,
   }
 
   http_response->SetMimeType("application/json; charset=utf-8");
+
+  // Sets access control headers to allow cross-origin resource sharing from any origin.
+  http_response->AddHeader("Access-Control-Allow-Origin", "*");
+  http_response->AddHeader("Access-Control-Allow-Methods", "DELETE,GET,HEAD,POST");
+  http_response->AddHeader("Access-Control-Allow-Headers", "Accept,Content-Type");
+
   http_response->set_body(command_response.ToJSON());
 }
 
