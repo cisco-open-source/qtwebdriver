@@ -108,8 +108,7 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url) {
     return NULL;
 }
 
-
-void RouteTable::AddRoute(const std::string& uri_pattern,
+bool RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
     // custom command check
     if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
@@ -123,19 +122,20 @@ void RouteTable::AddRoute(const std::string& uri_pattern,
         if (route->uri_regex_ == uri_pattern) {
             // replace command for pattern
             *route = webdriver::internal::RouteDetails(uri_pattern, creator);
-            return;
+            return false;
         }
 
         if (CompareBestMatch(uri_pattern, route->uri_regex_)) {
             // put best match pattern before other
             routes_.insert(route, webdriver::internal::RouteDetails(uri_pattern, creator));
-            return;
+            return true;
         }
     }
 
     routes_.push_back(webdriver::internal::RouteDetails(
                          uri_pattern,
                          creator));
+    return true;
 }
 
 bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern) {

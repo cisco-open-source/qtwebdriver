@@ -73,8 +73,9 @@ public:
     /// Registers a command for a WebDriver command using the given URL pattern.
     /// @tparam <CommandType> class of command to handle this route. Must be subtype of webdriver::Command
     /// @param pattern url pattern of route to add
+    /// @return true, if added successfully, false - otherwise.
     template<typename CommandType>
-    void Add(const std::string& pattern);
+    bool Add(const std::string& pattern);
 
     /// Removes a command for pattern registered previously.
     /// @param pattern url pattern of route to remove 
@@ -97,7 +98,8 @@ public:
     std::vector<std::string> GetRoutes();
 
 private:
-    void AddRoute(const std::string& uri_pattern,
+    // return true if added successfully, false - otherwise.
+    bool AddRoute(const std::string& uri_pattern,
                   const CommandCreatorPtr& creator);
 
     // return true if pattern1 is bestmatch then pattern2
@@ -109,8 +111,8 @@ private:
 };
 
 template <typename CommandType>
-void RouteTable::Add(const std::string& pattern) {
-    AddRoute(pattern, make_scoped_refptr(new CommandCreator<CommandType>));
+bool RouteTable::Add(const std::string& pattern) {
+    return AddRoute(pattern, make_scoped_refptr(new CommandCreator<CommandType>));
 }
 
 /// Subclass of RouteTable with default WD commands set.
