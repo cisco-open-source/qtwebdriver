@@ -1,24 +1,14 @@
 #ifndef ELEMENTATTRIBUTETEST_H
 #define ELEMENTATTRIBUTETEST_H
 
-#include <QtGui/QWidget>
-#include <QtGui/QPushButton>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPlainTextEdit>
-#include <QtGui/QCheckBox>
-#include <QtGui/QRadioButton>
-
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-
+#include "CommonQtTestHeaders.h"
 
 class ElementAttributeTestWidget : public QWidget
 {
     Q_OBJECT
 public:
     explicit ElementAttributeTestWidget();
-    ~ElementAttributeTestWidget();
+    virtual ~ElementAttributeTestWidget();
 
 private:
     QLabel *plblDis;
