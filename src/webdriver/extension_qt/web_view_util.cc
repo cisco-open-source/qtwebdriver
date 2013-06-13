@@ -8,9 +8,9 @@ namespace webdriver {
 
 bool QWebViewUtil::isUrlSupported(const std::string& url) {
 	// TODO: implement content detection
-	const std::string web_prefix("http://");
+	const std::string non_web_prefix("qtwidget://");
 
-	if (url.compare(0, web_prefix.length(), web_prefix) == 0) {
+	if (url.compare(0, non_web_prefix.length(), non_web_prefix) != 0) {
 		return true;
 	}
 

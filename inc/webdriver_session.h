@@ -52,7 +52,8 @@ public:
     ~Session();
 
     /// Initializes the session with the given capabilities.
-    Error* Init(const base::DictionaryValue* capabilities_dict);
+    Error* Init(const base::DictionaryValue* desired_capabilities_dict,
+                const base::DictionaryValue* required_capabilities_dict);
 
     /// Should be called before executing a command.
     Error* BeforeExecuteCommand();

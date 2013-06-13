@@ -124,7 +124,8 @@ protected:
     bool GetListParameter(const std::string& key, const ListValue** out) const;
 
     const std::vector<std::string> path_segments_;
-    const scoped_ptr<const DictionaryValue> parameters_;
+    //const scoped_ptr<const DictionaryValue> parameters_;
+    scoped_ptr<const DictionaryValue> parameters_;
 
 private:
 #if defined(OS_MACOSX)

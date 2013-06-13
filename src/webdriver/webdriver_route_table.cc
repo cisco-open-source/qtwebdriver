@@ -36,7 +36,6 @@
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
-
 namespace webdriver {
 
 
@@ -111,14 +110,28 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string
     return NULL;
 }
 
-
-void RouteTable::AddRoute(const std::string& uri_pattern,
+bool RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
     // custom command check
     if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
-        // TODO: validate custom command syntax
-    }
+        std::vector<std::string> url_segments;
+        base::SplitString(uri_pattern, '/', &url_segments);
 
+        if (url_segments.size() < 4
+                || url_segments[0] != "" || url_segments[1] != "session" || url_segments[2] != "*") {
+            GlobalLogger::Log(kWarningLogLevel, "Custom commands must begin with \"/session/*/\"");
+            return false;
+        }
+
+        // custom prefix is "-cisco-"
+        const std::string CUSTOM_PREFIX = "-cisco-";
+        unsigned int custom_prefix_length = CUSTOM_PREFIX.length();
+        if (url_segments[3].compare(0, custom_prefix_length, CUSTOM_PREFIX)
+                || custom_prefix_length == url_segments[3].length()) {
+            GlobalLogger::Log(kWarningLogLevel, "Custom prefix must be \"-cisco-\"");
+            return false;
+        }
+    }
     std::vector<webdriver::internal::RouteDetails>::iterator route;
     for (route = routes_.begin();
          route < routes_.end();
@@ -126,19 +139,20 @@ void RouteTable::AddRoute(const std::string& uri_pattern,
         if (route->uri_regex_ == uri_pattern) {
             // replace command for pattern
             *route = webdriver::internal::RouteDetails(uri_pattern, creator);
-            return;
+            return true;
         }
 
         if (CompareBestMatch(uri_pattern, route->uri_regex_)) {
             // put best match pattern before other
             routes_.insert(route, webdriver::internal::RouteDetails(uri_pattern, creator));
-            return;
+            return true;
         }
     }
 
     routes_.push_back(webdriver::internal::RouteDetails(
                          uri_pattern,
                          creator));
+    return true;
 }
 
 bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern) {
@@ -165,8 +179,29 @@ bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern
     return true;
 }
 
-bool RouteTable::CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2) { 
-    // TODO: implement
+bool RouteTable::CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2) {
+
+    std::vector<std::string> segments1;
+    std::vector<std::string> segments2;
+    base::SplitString(uri_pattern1, '/', &segments1);
+    base::SplitString(uri_pattern2, '/', &segments2);
+
+    unsigned int segments_num = segments1.size();
+
+    if (segments_num != segments2.size()) {
+        // different segments num
+        return false;
+    }
+
+    for (unsigned int i = 0; i < segments_num; i++) {
+        if (segments1.at(i) == segments2.at(i))
+            continue;
+        if (segments1.at(i) == "*")
+            return false;
+        if (segments2.at(i) == "*")
+            return true;
+        return false;
+    }
     return false;
 }
 
@@ -238,8 +273,6 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageCommand>          (CommandRoutes::kSessionStorage);
     Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
-
-
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);

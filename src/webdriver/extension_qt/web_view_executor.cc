@@ -64,6 +64,7 @@ QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
 ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
     QWebView* pWebView = QWebViewUtil::getWebView(session, viewId);
     if (NULL != pWebView) {
+        session->logger().Log(kFineLogLevel, "Web executor for view("+viewId.id()+")");
         return new QWebViewCmdExecutor(session, viewId);
     }
 
@@ -859,8 +860,12 @@ void QWebViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
         if (pageLoader.isLoading()) {
             loop.exec();
         }
+
+        session_->logger().Log(kFineLogLevel, "Web sync load - " + url);
     } else {
         view->load(address);
+
+        session_->logger().Log(kFineLogLevel, "Web async load - " + url);
     }
 }
 

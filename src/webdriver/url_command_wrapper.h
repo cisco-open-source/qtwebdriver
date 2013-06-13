@@ -8,18 +8,18 @@
 #include <string>
 #include <vector>
 
-#include "commands/webdriver_command.h"
+#include "commands/command.h"
 
 namespace webdriver {
 
 class Response;
 
-class WebDriverCommandWrapper : public WebDriverCommand {
+class CommandWrapper : public Command {
 public:
-  	WebDriverCommandWrapper(const std::vector<std::string>& path_segments,
+  	CommandWrapper(const std::vector<std::string>& path_segments,
              const DictionaryValue* const parameters,
-             WebDriverCommand* delegate);
-  	virtual ~WebDriverCommandWrapper();
+             Command* delegate);
+  	virtual ~CommandWrapper();
 
   	virtual bool DoesDelete() OVERRIDE;
     virtual bool DoesGet() OVERRIDE;
@@ -30,17 +30,17 @@ public:
     virtual void ExecuteGet(Response* const response) OVERRIDE;
     virtual void ExecutePost(Response* const response)  OVERRIDE;
 protected:
-	scoped_ptr<WebDriverCommand> delegate_;    
+	scoped_ptr<Command> delegate_;    
 
 private:
-  	DISALLOW_COPY_AND_ASSIGN(WebDriverCommandWrapper);
+  	DISALLOW_COPY_AND_ASSIGN(CommandWrapper);
 };
 
-class UrlCommandWrapper : public WebDriverCommandWrapper {
+class UrlCommandWrapper : public CommandWrapper {
 public:
   	UrlCommandWrapper(const std::vector<std::string>& path_segments,
              const DictionaryValue* const parameters,
-             WebDriverCommand* delegate);
+             Command* delegate);
   	virtual ~UrlCommandWrapper();
 
     virtual void ExecutePost(Response* const response)  OVERRIDE;

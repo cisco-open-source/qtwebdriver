@@ -25,6 +25,8 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kGoForward);
 		standardCommandRoutes.insert(kGoBack);
 		standardCommandRoutes.insert(kRefresh);
+		standardCommandRoutes.insert(kScreenshot);
+		standardCommandRoutes.insert(kSendKeys);
 		standardCommandRoutes.insert(kClickElement);
 		standardCommandRoutes.insert(kHoverOverElement);
 		standardCommandRoutes.insert(kMouseClick);
@@ -32,6 +34,8 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kMouseButtonDown);
 		standardCommandRoutes.insert(kMouseButtonUp);
 		standardCommandRoutes.insert(kMouseMoveTo);
+		standardCommandRoutes.insert(kFindElement);
+		standardCommandRoutes.insert(kFindElements);
 		standardCommandRoutes.insert(kClearElement);
 		standardCommandRoutes.insert(kSendKeysToElement);
 		standardCommandRoutes.insert(kSubmitElement);
@@ -46,8 +50,8 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kGetElementAttribute);
 		standardCommandRoutes.insert(kGetElementCssProp);
 		standardCommandRoutes.insert(kElementEquals);
-		standardCommandRoutes.insert(kFindElement);
-		standardCommandRoutes.insert(kFindElements);
+		standardCommandRoutes.insert(kFindChildElement);
+		standardCommandRoutes.insert(kFindChildElements);
 		standardCommandRoutes.insert(kSwitchToFrame);
 		standardCommandRoutes.insert(kGetActiveElement);
 		standardCommandRoutes.insert(kGetCurrentWindowHandle);
