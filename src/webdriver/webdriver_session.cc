@@ -64,7 +64,8 @@ Session::~Session() {
     SessionManager::GetInstance()->Remove(id_);
 }
 
-Error* Session::Init(const DictionaryValue* capabilities_dict) {
+Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
+                    const base::DictionaryValue* required_capabilities_dict) {
 
     if (!thread_.Start()) {
         delete this;
@@ -76,11 +77,14 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
         return new Error(
             kUnknownError, "Unable to create temp directory");
     }
+
     logger_.Log(kFineLogLevel,
                     "Initializing session with capabilities " +
-                    JsonStringifyForDisplay(capabilities_dict));
+                    JsonStringifyForDisplay(desired_capabilities_dict));
 
-    CapabilitiesParser parser(capabilities_dict, logger_, &capabilities_);
+    // TODO: take into account required capabilities
+
+    CapabilitiesParser parser(desired_capabilities_dict, logger_, &capabilities_);
     Error* error = parser.Parse();
     if (error) {
         delete this;

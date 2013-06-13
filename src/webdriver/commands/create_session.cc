@@ -31,12 +31,16 @@ CreateSession::~CreateSession() {}
 bool CreateSession::DoesPost() { return true; }
 
 void CreateSession::ExecutePost(Response* const response) {
-    const DictionaryValue* dict;
-    if (!GetDictionaryParameter("desiredCapabilities", &dict)) {
+    const DictionaryValue* desired_caps_dict;
+    const DictionaryValue* required_caps_dict;
+    if (!GetDictionaryParameter("desiredCapabilities", &desired_caps_dict)) {
         response->SetError(new Error(
             kBadRequest, "Missing or invalid 'desiredCapabilities'"));
         return;
     }
+
+    // get optional required capabilities
+    (void)GetDictionaryParameter("requiredCapabilities", &required_caps_dict);
 
     if (SessionManager::GetInstance()->GetSessions().size()  > 0) {
         response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
@@ -45,7 +49,7 @@ void CreateSession::ExecutePost(Response* const response) {
 
     // Session manages its own liftime, so do not call delete.
     Session* session = new Session();
-    Error* error = session->Init(dict);
+    Error* error = session->Init(desired_caps_dict, required_caps_dict);
     if (error) {
         response->SetError(error);
         return;
