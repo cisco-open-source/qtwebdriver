@@ -265,7 +265,8 @@ void InitCallbacks(Dispatcher* dispatcher,
   dispatcher->Add<AppCacheStatusCommand>("/session/*/application_cache/status");
 
   // HTML5 functions.
-  dispatcher->Add<HTML5LocationCommand>("/session/*/location");
+  // dispatcher->Add<HTML5LocationCommand>("/session/*/location");
+  dispatcher->SetNotImplemented("/session/*/location");
   dispatcher->Add<LocalStorageCommand>("/session/*/local_storage");
   dispatcher->Add<LocalStorageSizeCommand>("/session/*/local_storage/size");
   dispatcher->Add<LocalStorageKeyCommand>("/session/*/local_storage/key/*");
