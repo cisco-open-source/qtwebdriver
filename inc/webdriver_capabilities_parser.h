@@ -26,6 +26,28 @@ class Error;
 /// Contains all the capabilities that a user may request when starting a
 /// new session.
 struct Capabilities {
+
+    static const char kBrowserName[];
+    static const char kVersion[];
+    static const char kPlatform[];
+    static const char kJavascriptEnabled[];
+    static const char kTakesScreenshot[];
+    static const char kHandlesAlerts[];
+    static const char kDatabaseEnabled[];
+    static const char kLocationContextEnabled[];
+    static const char kApplicationCacheEnabled[];
+    static const char kBrowserConnectionEnabled[];
+    static const char kCssSelectorsEnabled[];
+    static const char kWebStorageEnabled[];
+    static const char kRotatable[];
+    static const char kAcceptSslCerts[];
+    static const char kNativeEvents[];
+    static const char kProxy[];
+    static const char kLoggingPrefs[];
+    static const char kLoadAsync[];
+    static const char kBrowserStartWindow[];
+    static const char kBrowserClass[];
+
     Capabilities();
     ~Capabilities();
 
@@ -51,9 +73,8 @@ struct Capabilities {
     /// Name of the browser
     std::string browser_name;
 
-    /// save proxy capabilities to return in "sessions" command
-    DictionaryValue *proxy;
-
+    /// capabilities dictionary
+    scoped_ptr<DictionaryValue> caps;
 };
 
 /// Parses the given capabilities dictionary to produce a Capabilities

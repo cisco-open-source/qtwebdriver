@@ -19,6 +19,27 @@ using base::Value;
 
 namespace webdriver {
 
+const char Capabilities::kBrowserName[]                 = "browserName";
+const char Capabilities::kVersion[]                     = "version";
+const char Capabilities::kPlatform[]                    = "platform";
+const char Capabilities::kJavascriptEnabled[]           = "javascriptEnabled";
+const char Capabilities::kTakesScreenshot[]             = "takesScreenshot";
+const char Capabilities::kHandlesAlerts[]               = "handlesAlerts";
+const char Capabilities::kDatabaseEnabled[]             = "databaseEnabled";
+const char Capabilities::kLocationContextEnabled[]      = "locationContextEnabled";
+const char Capabilities::kApplicationCacheEnabled[]     = "applicationCacheEnabled";
+const char Capabilities::kBrowserConnectionEnabled[]    = "browserConnectionEnabled";
+const char Capabilities::kCssSelectorsEnabled[]         = "cssSelectorsEnabled";
+const char Capabilities::kWebStorageEnabled[]           = "webStorageEnabled";
+const char Capabilities::kRotatable[]                   = "rotatable";
+const char Capabilities::kAcceptSslCerts[]              = "acceptSslCerts";
+const char Capabilities::kNativeEvents[]                = "nativeEvents";
+const char Capabilities::kProxy[]                       = "proxy";
+const char Capabilities::kLoggingPrefs[]                = "loggingPrefs";
+const char Capabilities::kLoadAsync[]                   = "loadAsync";
+const char Capabilities::kBrowserStartWindow[]          = "browserStartWindow";
+const char Capabilities::kBrowserClass[]                = "browserClass";
+
 namespace {
 
 Error* CreateBadInputError(const std::string& name,
@@ -37,7 +58,7 @@ Capabilities::Capabilities()
     : options(CommandLine::NO_PROGRAM),
       load_async(false),
       native_events(false),
-      proxy(0) {
+      caps(NULL) {
     log_levels[LogType::kDriver] = kAllLogLevel;
 }
 
@@ -64,8 +85,8 @@ Error* CapabilitiesParser::Parse() {
     };
 
     NameAndParser name_and_parser[] = {
-        { "proxy", &CapabilitiesParser::ParseProxy },
-        { "loggingPrefs", &CapabilitiesParser::ParseLoggingPrefs },
+        { Capabilities::kProxy, &CapabilitiesParser::ParseProxy },
+        { Capabilities::kLoggingPrefs, &CapabilitiesParser::ParseLoggingPrefs },
     };
 
     for (size_t i = 0; i < ARRAYSIZE_UNSAFE(name_and_parser); ++i) {
@@ -79,11 +100,11 @@ Error* CapabilitiesParser::Parse() {
 
     std::map<std::string, Parser> parser_map;
   
-    parser_map["loadAsync"] = &CapabilitiesParser::ParseLoadAsync;
-    parser_map["nativeEvents"] = &CapabilitiesParser::ParseNativeEvents;
-    parser_map["browserStartWindow"] = &CapabilitiesParser::ParseBrowserStartWindow;
-    parser_map["browserClass"] = &CapabilitiesParser::ParseBrowserClass;
-    parser_map["browserName"] = &CapabilitiesParser::ParseBrowserName;
+    parser_map[Capabilities::kLoadAsync] = &CapabilitiesParser::ParseLoadAsync;
+    parser_map[Capabilities::kNativeEvents] = &CapabilitiesParser::ParseNativeEvents;
+    parser_map[Capabilities::kBrowserStartWindow] = &CapabilitiesParser::ParseBrowserStartWindow;
+    parser_map[Capabilities::kBrowserClass] = &CapabilitiesParser::ParseBrowserClass;
+    parser_map[Capabilities::kBrowserName] = &CapabilitiesParser::ParseBrowserName;
 
     DictionaryValue::key_iterator key_iter = dict_->begin_keys();
     for (; key_iter != dict_->end_keys(); ++key_iter) {
@@ -102,6 +123,9 @@ Error* CapabilitiesParser::Parse() {
             return error;
         }
     }
+
+    caps_->caps.reset(dict_->DeepCopy());
+
     return NULL;
 }
 
@@ -200,7 +224,7 @@ Error* CapabilitiesParser::ParseProxy(const base::Value* option) {
             return error;
         }
     }
-    caps_->proxy = options->DeepCopy();
+    
     return NULL;
 }
 
@@ -291,19 +315,19 @@ Error* CapabilitiesParser::ParseNoProxy(const base::Value* option){
 
 Error* CapabilitiesParser::ParseBrowserStartWindow(const Value* option) {
     if (!option->GetAsString(&caps_->browser_start_window))
-        return CreateBadInputError("browserStartWindow", Value::TYPE_STRING, option);
+        return CreateBadInputError(Capabilities::kBrowserStartWindow, Value::TYPE_STRING, option);
     return NULL;
 }
 
 Error* CapabilitiesParser::ParseBrowserClass(const Value* option) {
     if (!option->GetAsString(&caps_->browser_class))
-        return CreateBadInputError("browserClass", Value::TYPE_STRING, option);
+        return CreateBadInputError(Capabilities::kBrowserClass, Value::TYPE_STRING, option);
     return NULL;
 }
 
 Error* CapabilitiesParser::ParseBrowserName(const Value* option) {
     if (!option->GetAsString(&caps_->browser_name))
-        return CreateBadInputError("browserName", Value::TYPE_STRING, option);
+        return CreateBadInputError(Capabilities::kBrowserName, Value::TYPE_STRING, option);
     return NULL;
 }
 

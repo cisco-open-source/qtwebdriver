@@ -82,6 +82,42 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
                     "Initializing session with capabilities " +
                     JsonStringifyForDisplay(desired_capabilities_dict));
 
+    // TODO: compose actual capabilities 
+/*
+      // Standard capabilities defined at
+      // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
+      //capabilities_value->SetString("browserName", "QtWebkit");
+      //capabilities_value->SetString("version", session->GetBrowserVersion());
+
+      capabilities_value->SetString("platform", base::SysInfo::OperatingSystemName());
+
+      capabilities_value->SetBoolean("javascriptEnabled", true);
+      capabilities_value->SetBoolean("takesScreenshot", true);
+      capabilities_value->SetBoolean("handlesAlerts", true);
+      capabilities_value->SetBoolean("databaseEnabled", true);
+      capabilities_value->SetBoolean("locationContextEnabled", true);
+      capabilities_value->SetBoolean("applicationCacheEnabled", true);
+      capabilities_value->SetBoolean("browserConnectionEnabled", false);
+      capabilities_value->SetBoolean("cssSelectorsEnabled", true);
+      capabilities_value->SetBoolean("webStorageEnabled", true);
+      capabilities_value->SetBoolean("rotatable", false);
+      capabilities_value->SetBoolean("acceptSslCerts", false);
+      // Even when ChromeDriver does not OS-events, the input simulation produces
+      // the same effect for most purposes (except IME).
+      capabilities_value->SetBoolean("nativeEvents", true);
+
+      // Custom non-standard session info.
+      capabilities_value->SetWithoutPathExpansion(
+          "chrome.chromedriverVersion",
+          Value::CreateStringValue("QtWebKit"));
+      capabilities_value->SetWithoutPathExpansion(
+          "chrome.nativeEvents",
+          Value::CreateBooleanValue(session->capabilities().native_events));
+
+      if (session->capabilities().proxy != NULL)
+          capabilities_value->Set("proxy", session->capabilities().proxy->DeepCopy());
+          */
+
     // TODO: take into account required capabilities
 
     CapabilitiesParser parser(desired_capabilities_dict, logger_, &capabilities_);
