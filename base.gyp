@@ -144,7 +144,6 @@
             'src/base/threading/thread_local_posix.cc',
             'src/base/threading/thread_local_storage_posix.cc',
             'src/base/threading/worker_pool_posix.cc',
-            'src/chrome/common/chrome_version_info_posix.cc',
             'src/net/base/file_stream_metrics_posix.cc',
             'src/net/base/file_stream_posix.cc',
             'src/net/base/net_errors_posix.cc',
