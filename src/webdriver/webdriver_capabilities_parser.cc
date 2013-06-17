@@ -58,7 +58,7 @@ Capabilities::Capabilities()
     : options(CommandLine::NO_PROGRAM),
       load_async(false),
       native_events(false),
-      caps(NULL) {
+      caps(new DictionaryValue()) {
     log_levels[LogType::kDriver] = kAllLogLevel;
 }
 

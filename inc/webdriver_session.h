@@ -168,6 +168,12 @@ private:
     typedef std::map<std::string, ElementsMap> ViewsElementsMap;
     typedef std::map<std::string, ViewHandlePtr> ViewsMap;
 
+    bool InitActualCapabilities();
+    bool CheckRequiredCapabilities(const base::DictionaryValue* capabilities_dict);
+    bool CheckRequiredBrowser(const base::DictionaryValue* capabilities_dict);
+    bool CheckRequiredPlatform(const base::DictionaryValue* capabilities_dict);
+    bool CheckRequiredCapabilityBoolean(const base::DictionaryValue* capabilities_dict, const std::string& cap_name);
+
     void RunClosureOnSessionThread(
         const base::Closure& task,
         base::WaitableEvent* done_event);

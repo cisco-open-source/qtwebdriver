@@ -9,6 +9,7 @@
 
 #include "base/bind.h"
 #include "base/callback.h"
+#include "base/sys_info.h"
 //#include "base/command_line.h"
 #include "base/file_path.h"
 #include "base/file_util.h"
@@ -64,6 +65,131 @@ Session::~Session() {
     SessionManager::GetInstance()->Remove(id_);
 }
 
+bool Session::InitActualCapabilities() {
+    // Standard capabilities defined at
+    // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
+    capabilities_.caps->SetString(Capabilities::kBrowserName, "QtWebkit");
+    // TODO: get version of QT webkit?
+    //capabilities_value->SetString("version", session->GetBrowserVersion());
+
+    capabilities_.caps->SetString(Capabilities::kPlatform, base::SysInfo::OperatingSystemName());
+    capabilities_.caps->SetBoolean(Capabilities::kJavascriptEnabled, true);
+    capabilities_.caps->SetBoolean(Capabilities::kTakesScreenshot, true);
+    capabilities_.caps->SetBoolean(Capabilities::kHandlesAlerts, true);
+    capabilities_.caps->SetBoolean(Capabilities::kDatabaseEnabled, false);
+    capabilities_.caps->SetBoolean(Capabilities::kLocationContextEnabled, false);
+    capabilities_.caps->SetBoolean(Capabilities::kApplicationCacheEnabled, true);
+    capabilities_.caps->SetBoolean(Capabilities::kBrowserConnectionEnabled, false);
+    capabilities_.caps->SetBoolean(Capabilities::kCssSelectorsEnabled, true);
+    capabilities_.caps->SetBoolean(Capabilities::kWebStorageEnabled, true);
+    capabilities_.caps->SetBoolean(Capabilities::kRotatable, false);
+    capabilities_.caps->SetBoolean(Capabilities::kAcceptSslCerts, false);
+    capabilities_.caps->SetBoolean(Capabilities::kNativeEvents, true);
+
+    return true;
+}
+
+bool Session::CheckRequiredCapabilities(const base::DictionaryValue* capabilities_dict) {
+    if (!CheckRequiredPlatform(capabilities_dict))
+        return false;
+
+    if (!CheckRequiredBrowser(capabilities_dict))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kJavascriptEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kTakesScreenshot))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kHandlesAlerts))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kDatabaseEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kLocationContextEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kApplicationCacheEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kBrowserConnectionEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kCssSelectorsEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kWebStorageEnabled))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kRotatable))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kNativeEvents))
+        return false;
+
+    return true;
+}
+
+bool Session::CheckRequiredBrowser(const base::DictionaryValue* capabilities_dict) {
+    std::string required_browser;
+    std::string actual_browser;
+
+    if (capabilities_dict->GetString(Capabilities::kBrowserName, &required_browser)) {
+        capabilities_.caps->GetString(Capabilities::kBrowserName, &actual_browser);
+
+        if (actual_browser != required_browser) {
+            logger_.Log(kWarningLogLevel,
+                "check failed - required browser("+required_browser+"), actual browser("+actual_browser+").");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Session::CheckRequiredPlatform(const base::DictionaryValue* capabilities_dict) {
+    std::string required_platform;
+    std::string actual_platform;
+
+    if (capabilities_dict->GetString(Capabilities::kPlatform, &required_platform)) {
+        capabilities_.caps->GetString(Capabilities::kPlatform, &actual_platform);
+
+        if (required_platform == "ANY")
+            return true;
+
+        if (actual_platform != required_platform) {
+            logger_.Log(kWarningLogLevel,
+                "check failed - required platform("+required_platform+"), actual platform("+actual_platform+").");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Session::CheckRequiredCapabilityBoolean(const base::DictionaryValue* capabilities_dict, const std::string& cap_name) {
+    bool actual_value; 
+    bool required_value;
+    if (capabilities_dict->GetBoolean(cap_name, &required_value)) {
+        if (required_value) {
+            if (capabilities_.caps->GetBoolean(cap_name, &actual_value)) {
+                if (actual_value) 
+                    return true;
+
+                logger_.Log(kWarningLogLevel, "actual capability("+cap_name+") is \"false\" but required \"true\".");
+                return false;
+            }
+
+            logger_.Log(kWarningLogLevel, "required capability("+cap_name+") is not present in actual caps.");
+            return false;
+        }
+    }    
+
+    return true;
+}
+
 Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
                     const base::DictionaryValue* required_capabilities_dict) {
 
@@ -82,43 +208,16 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
                     "Initializing session with capabilities " +
                     JsonStringifyForDisplay(desired_capabilities_dict));
 
-    // TODO: compose actual capabilities 
-/*
-      // Standard capabilities defined at
-      // http://code.google.com/p/selenium/wiki/JsonWireProtocol#Capabilities_JSON_Object
-      //capabilities_value->SetString("browserName", "QtWebkit");
-      //capabilities_value->SetString("version", session->GetBrowserVersion());
-
-      capabilities_value->SetString("platform", base::SysInfo::OperatingSystemName());
-
-      capabilities_value->SetBoolean("javascriptEnabled", true);
-      capabilities_value->SetBoolean("takesScreenshot", true);
-      capabilities_value->SetBoolean("handlesAlerts", true);
-      capabilities_value->SetBoolean("databaseEnabled", true);
-      capabilities_value->SetBoolean("locationContextEnabled", true);
-      capabilities_value->SetBoolean("applicationCacheEnabled", true);
-      capabilities_value->SetBoolean("browserConnectionEnabled", false);
-      capabilities_value->SetBoolean("cssSelectorsEnabled", true);
-      capabilities_value->SetBoolean("webStorageEnabled", true);
-      capabilities_value->SetBoolean("rotatable", false);
-      capabilities_value->SetBoolean("acceptSslCerts", false);
-      // Even when ChromeDriver does not OS-events, the input simulation produces
-      // the same effect for most purposes (except IME).
-      capabilities_value->SetBoolean("nativeEvents", true);
-
-      // Custom non-standard session info.
-      capabilities_value->SetWithoutPathExpansion(
-          "chrome.chromedriverVersion",
-          Value::CreateStringValue("QtWebKit"));
-      capabilities_value->SetWithoutPathExpansion(
-          "chrome.nativeEvents",
-          Value::CreateBooleanValue(session->capabilities().native_events));
-
-      if (session->capabilities().proxy != NULL)
-          capabilities_value->Set("proxy", session->capabilities().proxy->DeepCopy());
-          */
+    (void) InitActualCapabilities();
 
     // TODO: take into account required capabilities
+    if (required_capabilities_dict) {
+        if (!CheckRequiredCapabilities(required_capabilities_dict)) {
+            logger_.Log(kWarningLogLevel, "Required caps check failed.");
+            Terminate();
+            return new Error(kUnknownError, "Required caps check failed.");
+        }
+    }
 
     CapabilitiesParser parser(desired_capabilities_dict, logger_, &capabilities_);
     Error* error = parser.Parse();

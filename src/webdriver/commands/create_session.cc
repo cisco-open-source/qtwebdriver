@@ -32,7 +32,7 @@ bool CreateSession::DoesPost() { return true; }
 
 void CreateSession::ExecutePost(Response* const response) {
     const DictionaryValue* desired_caps_dict;
-    const DictionaryValue* required_caps_dict;
+    const DictionaryValue* required_caps_dict = NULL;
     if (!GetDictionaryParameter("desiredCapabilities", &desired_caps_dict)) {
         response->SetError(new Error(
             kBadRequest, "Missing or invalid 'desiredCapabilities'"));
