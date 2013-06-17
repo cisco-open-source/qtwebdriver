@@ -26,6 +26,9 @@ else
   modes=$mode
 fi
 
+#generate wdversion.cc
+python generate_wdversion.py
+
 for platform in $platforms
 do
   for mode in $modes

@@ -25,8 +25,7 @@
 
 #include "webdriver_route_patterns.h"
 #include "url_command_wrapper.h"
-
-
+#include "versioninfo.h"
 
 namespace webdriver {
 
@@ -40,6 +39,7 @@ Server::Server()
 Server::~Server() {};
 
 int Server::Init(int argc, char *argv[]) {
+    base::AtExitManager exit;
     int ret_val = 0;
 
     if (state_ != STATE_UNCONFIGURED) {
@@ -108,8 +108,9 @@ int Server::Init(int argc, char *argv[]) {
 
     SessionManager::GetInstance()->set_url_base(url_base_);
 
-    std::string chromedriver_info = base::StringPrintf("ChromeDriver %s", "QtWebKit");
-    GlobalLogger::Log(kInfoLogLevel, chromedriver_info);
+    std::string driver_info = "*** Webdriver ****\nVersion:    "+ version_info.Name() + "-" + version_info.Version() +
+                            "\nBuild Time: "+ version_info.BuildDateTime() ;
+    GlobalLogger::Log(kInfoLogLevel, driver_info);
 
     // set default route table
     routeTable_.reset(new DefaultRouteTable());
