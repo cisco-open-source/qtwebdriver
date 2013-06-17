@@ -317,6 +317,7 @@
         'src/webdriver/webdriver_switches.cc',
         'src/webdriver/webdriver_util.cc',
         'src/webdriver/webdriver_view_runner.cc',
+        'src/webdriver/webdriver_view_transitions.cc',
         'src/webdriver/url_command_wrapper.cc',
 
 

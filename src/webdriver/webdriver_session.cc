@@ -214,11 +214,12 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
     if (required_capabilities_dict) {
         if (!CheckRequiredCapabilities(required_capabilities_dict)) {
             logger_.Log(kWarningLogLevel, "Required caps check failed.");
-            Terminate();
+            delete this;
             return new Error(kUnknownError, "Required caps check failed.");
         }
     }
 
+    // TODO: apply desired capabilities
     CapabilitiesParser parser(desired_capabilities_dict, logger_, &capabilities_);
     Error* error = parser.Parse();
     if (error) {
