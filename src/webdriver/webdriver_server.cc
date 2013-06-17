@@ -25,8 +25,7 @@
 
 #include "webdriver_route_patterns.h"
 #include "url_command_wrapper.h"
-
-
+#include "versioninfo.h"
 
 namespace webdriver {
 
@@ -40,6 +39,7 @@ Server::Server()
 Server::~Server() {};
 
 int Server::Init(int argc, char *argv[]) {
+    base::AtExitManager exit;
     int ret_val = 0;
 
     if (state_ != STATE_UNCONFIGURED) {
@@ -71,10 +71,46 @@ int Server::Init(int argc, char *argv[]) {
     if (options_.HasSwitch("url-base"))
         url_base_ = options_.GetSwitchValueASCII("url-base");
 
+    // check if --help CL argument is present
+    if (options_.HasSwitch("help")) {
+      std::cout << "Usage: WebDriver [--OPTION=VALUE]..."                                             << std::endl
+                << "Starts QtWebDriver server"                                                        << std::endl
+                << ""                                                                                 << std::endl
+                << "OPTION         DEFAULT VALUE      DESCRIPTION"                                    << std::endl
+                << "http-threads   4                  The number of threads to use for handling"      << std::endl
+                << "                                  HTTP requests"                                  << std::endl
+                << "log-path       ./webdriver.log    The path to use for the QtWebDriver server"     << std::endl
+                << "                                  log"                                            << std::endl
+                << "root           ./web              The path of location to serve files from"       << std::endl
+                << "port           9517               The port that QtWebDriver listens on"           << std::endl
+                << "silence        false              If true, QtWebDriver will not log anything"     << std::endl
+                << "                                  to stdout/stderr"                               << std::endl
+                << "verbose        false              If true, QtWebDriver will log lots of stuff"    << std::endl
+                << "                                  to stdout/stderr"                               << std::endl
+                << "url-base                          The URL path prefix to use for all incoming"    << std::endl
+                << "                                  WebDriver REST requests. A prefix and postfix"  << std::endl
+                << "                                  '/' will automatically be appended if not"      << std::endl
+                << "                                  present"                                        << std::endl
+                << "config                            The path to config file (e.g. config.json) in"  << std::endl
+                << "                                  JSON format with specified WD parameters as"    << std::endl
+                << "                                  described above (port, root, etc.)"             << std::endl;
+
+      return 1;
+    }
+
+    VersionInfo version_info;
+    if (options_.HasSwitch("version"))
+    {
+      std::cout <<version_info.CreateVersionString()<< std::endl;
+      return 1;
+    }
+
+
     SessionManager::GetInstance()->set_url_base(url_base_);
 
-    std::string chromedriver_info = base::StringPrintf("ChromeDriver %s", "QtWebKit");
-    GlobalLogger::Log(kInfoLogLevel, chromedriver_info);
+    std::string driver_info = "*** Webdriver ****\nVersion:    "+ version_info.Name() + "-" + version_info.Version() +
+                            "\nBuild Time: "+ version_info.BuildDateTime() ;
+    GlobalLogger::Log(kInfoLogLevel, driver_info);
 
     // set default route table
     routeTable_.reset(new DefaultRouteTable());

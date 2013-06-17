@@ -12,6 +12,7 @@
 #include "base/stringprintf.h"
 #include "base/sys_info.h"
 //#include "chrome/common/chrome_version_info.h"
+#include"versioninfo.h"
 
 namespace webdriver {
 
@@ -27,14 +28,13 @@ bool StatusCommand::DoesGet() {
 }
 
 void StatusCommand::ExecuteGet(Response* const response) {
-    //TODO: need to check what info we shoud send
-    //chrome::VersionInfo version_info;
+    VersionInfo version_info;
 
     DictionaryValue* build_info = new DictionaryValue;
     build_info->SetString("time",
-                        base::StringPrintf("%s %s PST", __DATE__, __TIME__));
-    //build_info->SetString("version", version_info.Version());
-    //build_info->SetString("revision", version_info.LastChange());
+                          base::StringPrintf("%s PST", version_info.BuildDateTime().c_str()));
+    build_info->SetString("version", version_info.Version());
+    build_info->SetString("revision", version_info.LastChange());
 
     DictionaryValue* os_info = new DictionaryValue;
     os_info->SetString("name", base::SysInfo::OperatingSystemName());
