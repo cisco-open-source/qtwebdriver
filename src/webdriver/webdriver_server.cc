@@ -97,7 +97,15 @@ int Server::Init(int argc, char *argv[]) {
 
       return 1;
     }
-	
+
+    VersionInfo version_info;
+    if (options_.HasSwitch("version"))
+    {
+      std::cout <<version_info.CreateVersionString()<< std::endl;
+      return 1;
+    }
+
+
     SessionManager::GetInstance()->set_url_base(url_base_);
 
     std::string chromedriver_info = base::StringPrintf("ChromeDriver %s", "QtWebKit");
