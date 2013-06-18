@@ -26,6 +26,7 @@
 #include "ClickScrollingTest.h"
 
 #include "webdriver_server.h"
+#include "webdriver_view_transitions.h"
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
@@ -63,6 +64,8 @@ int main(int argc, char *argv[])
     //watcher.setFuture(future);
 
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
+
+    webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");

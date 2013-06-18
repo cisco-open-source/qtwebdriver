@@ -51,7 +51,7 @@
             'src/Test/WindowTest.cc',
             'src/Test/FindingTest.cc',
             'src/Test/CoordinatesTest.cc',
-	          'src/Test/ElementAttributeTest.cc',
+            'src/Test/ElementAttributeTest.cc',
             'src/Test/ElementAttributeTest.h',
             '<(INTERMEDIATE_DIR)/moc_ElementAttributeTest.cc',
           ],
@@ -317,7 +317,10 @@
         'src/webdriver/webdriver_switches.cc',
         'src/webdriver/webdriver_util.cc',
         'src/webdriver/webdriver_view_runner.cc',
+        'src/webdriver/webdriver_view_transitions.cc',
         'src/webdriver/url_command_wrapper.cc',
+        'src/webdriver/versioninfo.cc',
+        'src/webdriver/webdriver_version.cc',
 
 
         # TODO: files below belong to custom implementation

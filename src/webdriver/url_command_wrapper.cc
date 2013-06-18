@@ -10,6 +10,7 @@
 #include "webdriver_view_executor.h"
 #include "webdriver_view_factory.h"
 #include "webdriver_session_manager.h"
+#include "webdriver_view_transitions.h"
 
 
 namespace webdriver {
@@ -108,9 +109,8 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
 
         if (!can_handle) {
             session->logger().Log(kInfoLogLevel, "Current view cant handle url, try to create another - "+url);
-            // TODO:
-    	    //Step 2: Y->handleOldViews() can be customized
-		    //Y.get/createInstance()->handleOldViews(oldViews);
+            
+            ViewTransitionManager::HandleOldView(session, current_view);
 
             ViewHandle* viewHandle = NULL;
     	    ViewId viewId;
