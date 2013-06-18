@@ -6,8 +6,6 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
-#include <QtWebKit/QtWebKit>
-
 namespace webdriver {
 
 QWebViewCreator::QWebViewCreator() {}
