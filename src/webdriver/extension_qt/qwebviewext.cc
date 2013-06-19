@@ -24,11 +24,6 @@ QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
     QWebViewExt* newView = new QWebViewExt;
     newView->show();
     newView->setAttribute(Qt::WA_DeleteOnClose, true);
-    QVariant sessionId = property("sessionId");
-    if (sessionId.isValid())
-        newView->setProperty("sessionId", sessionId.toInt());
-    if (!page()->networkAccessManager()->proxy().hostName().isEmpty())
-        newView->page()->networkAccessManager()->setProxy(page()->networkAccessManager()->proxy());
     return newView;
 }
 
