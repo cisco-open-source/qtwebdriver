@@ -33,6 +33,8 @@ protected:
     virtual ~ViewHandle() {};
 };
 
+typedef scoped_refptr<ViewHandle> ViewHandlePtr;
+
 /// This class represents a Webdriver View ID. These IDs are mapped to objects in a page.
 class ViewId {
 public:

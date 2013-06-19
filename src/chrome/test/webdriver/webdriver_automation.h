@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <QtWebKit/QtWebKit>
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
 #include <QtCore/QObject>
@@ -18,6 +17,14 @@
 #include <QtGui/QKeyEvent>
 #include <QtCore/QBuffer>
 #include <QtXml/QXmlStreamWriter>
+
+#include <QtCore/QGlobalStatic>
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#else
+#include <QtWebKit/QtWebKit>
+#endif
 
 #include "base/command_line.h"
 #include "base/file_path.h"

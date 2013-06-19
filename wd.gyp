@@ -81,6 +81,9 @@
                     '-lpthread',
                     '-lrt',
                     '-ldl',
+                    '-l:libicuuc.so.49', #version of the lib could be changed in case of Qt upgrade
+                    '-l:libicudata.so.49',
+                    '-l:libicui18n.so.49',
                   ],
                 } ],
                 [ 'OS=="win"', {
@@ -102,6 +105,7 @@
                     '-lQtWebKit',
                     '-lQtNetwork',
                     '-lQtXml',
+                    '-lQtXmlPatterns',
                     '-lQtGui',
                     '-lQtCore',
                     '-lpthread',
@@ -317,6 +321,7 @@
         'src/webdriver/webdriver_switches.cc',
         'src/webdriver/webdriver_util.cc',
         'src/webdriver/webdriver_view_runner.cc',
+        'src/webdriver/webdriver_view_transitions.cc',
         'src/webdriver/url_command_wrapper.cc',
         'src/webdriver/versioninfo.cc',
         'src/webdriver/webdriver_version.cc',

@@ -163,7 +163,6 @@ public:
 
 private:
     typedef scoped_refptr<ElementHandle> ElementHandlePtr;
-    typedef scoped_refptr<ViewHandle> ViewHandlePtr;
     typedef std::map<std::string, ElementHandlePtr> ElementsMap;
     typedef std::map<std::string, ElementsMap> ViewsElementsMap;
     typedef std::map<std::string, ViewHandlePtr> ViewsMap;

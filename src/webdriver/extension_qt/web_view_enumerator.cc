@@ -5,14 +5,22 @@
 
 #include "extension_qt/widget_view_handle.h"
 
-#include <QtGui/QApplication>
+#include <QtCore/QGlobalStatic>
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+#else
 #include <QtWebKit/QtWebKit>
 #include <QtGui/QWidget>
+#include <QtGui/QApplication>
+#endif
 
 namespace webdriver {
 
 void WebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>* views) const {
-	session->logger().Log(kInfoLogLevel, ">>>>> WebView enumerate");
+    session->logger().Log(kInfoLogLevel, ">>>>> WebView enumerate");
 
     foreach(QWidget* pWidget, qApp->allWidgets())
     {
@@ -20,12 +28,12 @@ void WebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>* v
 
         QWebView* pView = qobject_cast<QWebView*>(pWidget);
         if (pView != NULL) {
-          	ViewHandle* handle = new QViewHandle(pView);
-           	ViewId viewId = session->GetViewForHandle(handle);
+            ViewHandlePtr handle(new QViewHandle(pView));
+            ViewId viewId = session->GetViewForHandle(handle);
             if (!viewId.is_valid()) {
-              	if (session->AddNewView(handle, &viewId))  {
-           			session->logger().Log(kInfoLogLevel,
-                		"WebViewEnumerator found new view("+viewId.id()+")");
+                if (session->AddNewView(handle, &viewId))  {
+                    session->logger().Log(kInfoLogLevel,
+                        "WebViewEnumerator found new view("+viewId.id()+")");
                 }
             }
             if (viewId.is_valid()) {

@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QTextCodec>
 
+#include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtConcurrent/QtConcurrentRun>
 #include <QtWebKitWidgets/QWebView>
@@ -25,6 +26,7 @@
 #include "ClickScrollingTest.h"
 
 #include "webdriver_server.h"
+#include "webdriver_view_transitions.h"
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
@@ -45,11 +47,13 @@ int main(int argc, char *argv[])
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanCloseWindows, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
     QWebSettings::globalSettings()->enablePersistentStorage("./web/html5");
     QWebSettings::globalSettings()->setLocalStoragePath("./web/html5");
@@ -62,6 +66,8 @@ int main(int argc, char *argv[])
     //watcher.setFuture(future);
 
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
+
+    webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");

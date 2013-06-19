@@ -19,7 +19,7 @@ void WidgetViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
 
         if (!pWidget->isTopLevel()) continue;
 
-        ViewHandle* handle = new QViewHandle(pWidget);
+        ViewHandlePtr handle(new QViewHandle(pWidget));
         ViewId viewId = session->GetViewForHandle(handle);
         if (!viewId.is_valid()) {
             if (session->AddNewView(handle, &viewId))  {
