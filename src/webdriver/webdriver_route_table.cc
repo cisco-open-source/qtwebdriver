@@ -35,7 +35,6 @@
 #include "commands/html5_storage_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
-
 namespace webdriver {
 
 
@@ -118,19 +117,21 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
         base::SplitString(uri_pattern, '/', &url_segments);
 
         if (url_segments.size() < 4
-                || url_segments[0] != "" || url_segments[1] != "session" || url_segments[2] != "*") {
+                || !url_segments[0].empty() || url_segments[1] != "session" || url_segments[2] != "*") {
             GlobalLogger::Log(kWarningLogLevel, "Custom commands must begin with \"/session/*/\"");
             return false;
         }
 
-        // custom prefix is "-cisco-"
-        const std::string CUSTOM_PREFIX = "-cisco-";
-        unsigned int custom_prefix_length = CUSTOM_PREFIX.length();
-        if (url_segments[3].compare(0, custom_prefix_length, CUSTOM_PREFIX)
-                || custom_prefix_length == url_segments[3].length()) {
-            GlobalLogger::Log(kWarningLogLevel, "Custom prefix must be \"-cisco-\"");
+        // check custom prefix, should be of the form:
+        // '-' + vendor prefix + '-' + command name
+        std::vector<std::string> prefix_segments;
+        base::SplitString(url_segments[3], '-', &prefix_segments);
+        if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
+                || prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
+            GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
             return false;
         }
+
     }
     std::vector<webdriver::internal::RouteDetails>::iterator route;
     for (route = routes_.begin();
@@ -277,14 +278,12 @@ DefaultRouteTable::DefaultRouteTable()
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
-   
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
-  
 
   // HTML5 functions.
   dispatcher->Add<HTML5LocationCommand>("/session/*/location");
-  
-#endif  
+
+#endif
   
 }
 

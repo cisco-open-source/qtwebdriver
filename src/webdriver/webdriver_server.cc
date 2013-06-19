@@ -518,7 +518,7 @@ int Server::InitLogging() {
     FileLog::SetGlobalLog(fileLog);
 
     // Init global stdout log.
-    StdOutLog* stdLog = new StdOutLog(kAllLogLevel);
+    StdOutLog* stdLog = new StdOutLog(kWarningLogLevel);
     if (NULL == stdLog) {
         std::cerr << "ERROR: InitLogging failed.";
         return 1;
@@ -527,12 +527,12 @@ int Server::InitLogging() {
     StdOutLog::SetGlobalLog(stdLog);
 
     if (options_.HasSwitch("verbose")) {
-        // TODO: handle
+        stdLog->set_min_log_level(kAllLogLevel);
     }
 
     // check if silence mode
     if (options_.HasSwitch("silence")) {
-        // TODO: handle
+        stdLog->set_min_log_level(kOffLogLevel);
     }
 
     return 0;
