@@ -102,6 +102,7 @@
                     '-lQtWebKit',
                     '-lQtNetwork',
                     '-lQtXml',
+                    '-lQtXmlPatterns',
                     '-lQtGui',
                     '-lQtCore',
                     '-lpthread',
