@@ -5,9 +5,17 @@
 
 #include "extension_qt/widget_view_handle.h"
 
-#include <QtGui/QApplication>
+#include <QtCore/QGlobalStatic>
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+#else
 #include <QtWebKit/QtWebKit>
 #include <QtGui/QWidget>
+#include <QtGui/QApplication>
+#endif
 
 namespace webdriver {
 

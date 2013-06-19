@@ -12,6 +12,21 @@
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
 
+#include <QtCore/QBuffer>
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QLabel>
+#else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
@@ -23,7 +38,7 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
-#include <QtCore/QBuffer>
+#endif
 
 #ifdef WD_CONFIG_XPATH
 #include <QtXmlPatterns/QXmlQuery>
@@ -778,7 +793,7 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
 
     buff.open(QIODevice::ReadWrite);
     XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error);
+    createUIXML(parent, &buff, elementsMap, error, false);
     if (*error)
         return;
 

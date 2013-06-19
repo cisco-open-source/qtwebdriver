@@ -3,12 +3,18 @@
 
 #include "extension_qt/q_view_executor.h"
 
-//#include <QtCore/QObject>
+#include <QtCore/QtGlobal>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebView>
+#include <QtWebKit/QWebHistory>
+#else
 #include <QtWebKit/QtWebKit>
+#endif
 
 namespace webdriver {
 
-class FramePath;	
+class FramePath;
 class ValueParser;
 
 class QPageLoader : public QObject {

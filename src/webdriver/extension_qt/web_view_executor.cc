@@ -15,8 +15,16 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
-#include <QtGui/QApplication>
 
+#include <QtCore/QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
+#include <QtNetwork/QNetworkCookieJar>
+#include <QtNetwork/QNetworkCookie>
+#include <QtWebKitWidgets/QWebFrame>
+#else
+#include <QtGui/QApplication>
+#endif
 class QNetworkCookie;
 
 namespace webdriver {

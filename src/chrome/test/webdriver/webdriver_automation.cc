@@ -6,7 +6,6 @@
 #include <QtCore/QThread>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPixmap>
-#include <QtWebKit/QtWebKit>
 #include <QtCore/QDebug>
 #include <QtNetwork/QtNetwork>
 
@@ -15,6 +14,7 @@
 #include <QtXmlPatterns/QXmlResultItems>
 #endif
 
+#include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtWidgets/QApplication>
@@ -30,6 +30,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QLabel>
+#include <QtWebKitWidgets/QWebView>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -44,6 +45,7 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
+#include <QtWebKit/QtWebKit>
 #endif
 
 #include "webdriver_automation.h"
