@@ -81,6 +81,9 @@
                     '-lpthread',
                     '-lrt',
                     '-ldl',
+                    '-l:libicuuc.so.49', #version of the lib could be changed in case of Qt upgrade
+                    '-l:libicudata.so.49',
+                    '-l:libicui18n.so.49',
                   ],
                 } ],
                 [ 'OS=="win"', {
