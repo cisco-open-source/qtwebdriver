@@ -1,6 +1,11 @@
 #include "extension_qt/q_view_runner.h"
 
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
+#else
 #include <QtGui/QApplication>
+#endif
 
 #include "base/synchronization/waitable_event.h"
 
