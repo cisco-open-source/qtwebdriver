@@ -26,7 +26,7 @@ static const QString CHILD_TEXT_NAME="childtext";
 static const QString UNVISIBLE_ITEM_NAME="unvisible";
 static const QString LIST_VIEW_NAME="listview";
 
-TextHandlingWidget::TextHandlingWidget()
+TextHandlingTestWidget::TextHandlingTestWidget()
 {
     QGridLayout *controlLayout = new QGridLayout(this);
     this->setLayout(controlLayout);
@@ -97,5 +97,5 @@ TextHandlingWidget::TextHandlingWidget()
     controlLayout->addWidget(listView, 0, 3);
 }
 
-TextHandlingWidget::~TextHandlingWidget()
+TextHandlingTestWidget::~TextHandlingTestWidget()
 {}

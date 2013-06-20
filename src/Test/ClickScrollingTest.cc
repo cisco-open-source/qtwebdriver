@@ -2,9 +2,9 @@
 #include "ui_ClickScrollingTest.h"
 #include <QtGui/QRegion>
 
-ClickScrollingTest::ClickScrollingTest(QWidget *parent) :
+ClickScrollingTestWidget::ClickScrollingTestWidget(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ClickScrollingTest)
+    ui(new Ui::ClickScrollingTestWidget)
 {
     ui->setupUi(this);
 
@@ -13,22 +13,22 @@ ClickScrollingTest::ClickScrollingTest(QWidget *parent) :
     connect(this->ui->partiallyVisibleRadioButton, SIGNAL(clicked()), this, SLOT(ClickOnPartiallyVisibleRadioButton()));
 }
 
-ClickScrollingTest::~ClickScrollingTest()
+ClickScrollingTestWidget::~ClickScrollingTestWidget()
 {
     delete ui;
 }
 
-void ClickScrollingTest::ClickOnVisibleButton()
+void ClickScrollingTestWidget::ClickOnVisibleButton()
 {
 
 }
 
-void ClickScrollingTest::ClickOnButtonHiddenByOverflow()
+void ClickScrollingTestWidget::ClickOnButtonHiddenByOverflow()
 {
     this->ui->buttonHiddenByOverflow->setText("clicked");
 }
 
-void ClickScrollingTest::ClickOnPartiallyVisibleRadioButton()
+void ClickScrollingTestWidget::ClickOnPartiallyVisibleRadioButton()
 {
     this->ui->partiallyVisibleRadioButton->setText("clicked");
 }
