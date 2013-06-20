@@ -37,6 +37,7 @@ namespace webdriver {
 class Error;
 class ValueParser;
 class ViewRunner;
+class SessionLifeCycleActions;
 
 /// Every connection made by WebDriver maps to a session object.
 /// This object creates the browser instance and keeps track of the
@@ -206,12 +207,53 @@ private:
     Capabilities capabilities_;
 
     scoped_ptr<ViewRunner> view_runner_;
+    scoped_ptr<SessionLifeCycleActions> life_cycle_actions_;
 
     // Current state of all modifier keys.
     int sticky_modifiers_;
 
     DISALLOW_COPY_AND_ASSIGN(Session);
 };
+
+/// base class for session lifecycle actions.
+/// Contains default imlementation.
+class SessionLifeCycleActions {
+protected:
+    typedef SessionLifeCycleActions* (*CreateLifeCycleActionsMethod)(Session*);
+public:
+    SessionLifeCycleActions(Session* session);
+    virtual ~SessionLifeCycleActions() {};
+
+    /// action after usual session Init().
+    virtual Error* PostInit(const base::DictionaryValue* desired_capabilities_dict,
+                const base::DictionaryValue* required_capabilities_dict);
+
+    /// action before session terminated.
+    virtual void BeforeTerminate(void);
+
+    /// Create SessionLifeCycleActions
+    /// @return new SessionLifeCycleActions object.
+    static SessionLifeCycleActions* CreateLifeCycleActions(Session* session);
+
+    /// Register custom SessionLifeCycleActions.
+    /// @tparam C subclass of SessionLifeCycleActions with custom implementation
+    template <class C>
+    static void RegisterCustomLifeCycleActions(void) {
+        create = &createLifeCycleActions<C>;
+    }
+
+protected:
+    Session* session_;
+    template <class C>
+    static SessionLifeCycleActions* createLifeCycleActions(Session* session) { return static_cast<SessionLifeCycleActions*>(new C(session));}
+
+    static CreateLifeCycleActionsMethod create;
+private:
+
+    DISALLOW_COPY_AND_ASSIGN(SessionLifeCycleActions);
+};
+
+
 
 }  // namespace webdriver
 
