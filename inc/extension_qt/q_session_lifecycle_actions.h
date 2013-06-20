@@ -20,6 +20,7 @@ public:
 
 protected:
 private:
+    Error* ParseAndApplyProxySettings(const base::DictionaryValue* proxy_dict);
 
     DISALLOW_COPY_AND_ASSIGN(QSessionLifeCycleActions);
 };
