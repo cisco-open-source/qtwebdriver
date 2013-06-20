@@ -25,11 +25,11 @@
 #include <QtGui/QListView>
 #endif
 
-class TextHandlingWidget : public QWidget
+class TextHandlingTestWidget : public QWidget
 {
 public:
-    TextHandlingWidget();
-    ~TextHandlingWidget();
+    TextHandlingTestWidget();
+    ~TextHandlingTestWidget();
 
 private:
     QTextEdit *simpleTextEdit;

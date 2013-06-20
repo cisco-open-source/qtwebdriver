@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ClickScrollingTest</class>
- <widget class="QMainWindow" name="ClickScrollingTest">
+ <class>ClickScrollingTestWidget</class>
+ <widget class="QMainWindow" name="ClickScrollingTestWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -175,7 +175,7 @@
      <x>0</x>
      <y>0</y>
      <width>398</width>
-     <height>23</height>
+     <height>29</height>
     </rect>
    </property>
   </widget>

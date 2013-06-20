@@ -3,10 +3,10 @@
 
 #include "CommonQtTestHeaders.h"
 
-class BasicMouseInterfaceTest : public QWidget
+class BasicMouseInterfaceTestWidget : public QWidget
 {
 public:
-    explicit BasicMouseInterfaceTest(QWidget *parent = 0);
+    explicit BasicMouseInterfaceTestWidget(QWidget *parent = 0);
     
 signals:
     

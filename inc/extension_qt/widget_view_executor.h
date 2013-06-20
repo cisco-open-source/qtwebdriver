@@ -3,7 +3,12 @@
 
 #include "extension_qt/q_view_executor.h"
 
+#include <QtCore/QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtCore/QXmlStreamWriter>
+#else
 #include <QtXml/QXmlStreamWriter>
+#endif
 
 namespace webdriver {
 

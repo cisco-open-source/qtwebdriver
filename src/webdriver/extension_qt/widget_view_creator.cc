@@ -6,7 +6,12 @@
 #include "widget_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
+#include <QtCore/QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QWidget>
+#else
 #include <QtGui/QWidget>
+#endif
 
 namespace webdriver {
 

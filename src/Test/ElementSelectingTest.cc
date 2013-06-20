@@ -1,14 +1,14 @@
 #include "ElementSelectingTest.h"
 #include "ui_ElementSelectingTest.h"
 
-ElementSelectingTest::ElementSelectingTest(QWidget *parent) :
+ElementSelectingTestWidget::ElementSelectingTestWidget(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::ElementSelectingTest)
+    ui(new Ui::ElementSelectingTestWidget)
 {
     ui->setupUi(this);
 }
 
-ElementSelectingTest::~ElementSelectingTest()
+ElementSelectingTestWidget::~ElementSelectingTestWidget()
 {
     delete ui;
 }

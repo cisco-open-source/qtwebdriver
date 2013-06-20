@@ -4,19 +4,19 @@
 #include "CommonQtTestHeaders.h"
 
 namespace Ui {
-class ElementSelectingTest;
+class ElementSelectingTestWidget;
 }
 
-class ElementSelectingTest : public QMainWindow
+class ElementSelectingTestWidget : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit ElementSelectingTest(QWidget *parent = 0);
-    ~ElementSelectingTest();
+    explicit ElementSelectingTestWidget(QWidget *parent = 0);
+    ~ElementSelectingTestWidget();
     
 private:
-    Ui::ElementSelectingTest *ui;
+    Ui::ElementSelectingTestWidget *ui;
 };
 
 #endif // ELEMENTSELECTINGTEST_H
