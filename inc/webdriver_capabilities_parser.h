@@ -106,7 +106,6 @@ private:
     Error* ParseProxyServers(const base::DictionaryValue* options);
     Error* ParseBrowserStartWindow(const base::Value* option);
     Error* ParseBrowserClass(const base::Value* option);
-    Error* ParseBrowserName(const base::Value* option);
 
     // The capabilities dictionary to parse.
     const base::DictionaryValue* dict_;

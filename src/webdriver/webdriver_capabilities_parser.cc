@@ -104,7 +104,6 @@ Error* CapabilitiesParser::Parse() {
     parser_map[Capabilities::kNativeEvents] = &CapabilitiesParser::ParseNativeEvents;
     parser_map[Capabilities::kBrowserStartWindow] = &CapabilitiesParser::ParseBrowserStartWindow;
     parser_map[Capabilities::kBrowserClass] = &CapabilitiesParser::ParseBrowserClass;
-    parser_map[Capabilities::kBrowserName] = &CapabilitiesParser::ParseBrowserName;
 
     DictionaryValue::key_iterator key_iter = dict_->begin_keys();
     for (; key_iter != dict_->end_keys(); ++key_iter) {
@@ -322,12 +321,6 @@ Error* CapabilitiesParser::ParseBrowserStartWindow(const Value* option) {
 Error* CapabilitiesParser::ParseBrowserClass(const Value* option) {
     if (!option->GetAsString(&caps_->browser_class))
         return CreateBadInputError(Capabilities::kBrowserClass, Value::TYPE_STRING, option);
-    return NULL;
-}
-
-Error* CapabilitiesParser::ParseBrowserName(const Value* option) {
-    if (!option->GetAsString(&caps_->browser_name))
-        return CreateBadInputError(Capabilities::kBrowserName, Value::TYPE_STRING, option);
     return NULL;
 }
 
