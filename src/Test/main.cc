@@ -40,6 +40,7 @@
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/q_view_runner.h"
+#include "extension_qt/q_session_lifecycle_actions.h"
 #include "extension_qt/qwebviewext.h"
 #include "extension_qt/widget_view_creator.h"
 #include "extension_qt/widget_view_enumerator.h"
@@ -75,6 +76,8 @@ int main(int argc, char *argv[])
     //watcher.setFuture(future);
 
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
+
+    webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
