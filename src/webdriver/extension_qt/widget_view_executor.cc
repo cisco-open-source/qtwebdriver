@@ -667,6 +667,8 @@ void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const st
     FindElements(root_element, locator, query, &elements, error);
     if (*error == NULL && elements.size() != 0)
         *element = elements[0];
+    else if(*error == NULL)
+        *error = new Error(kNoSuchElement);
 }
 
 void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
@@ -676,7 +678,6 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
 
     session_->logger().Log(kFineLogLevel, "FindNativeElements, loc:"+locator+" query:"+query);
 
-    bool isAtLeastOneElementFound = false;
     Error* tmp_error = NULL;
     QWidget *parentWidget = getElement(root_element, &tmp_error);
     scoped_ptr<Error> scoped_err(tmp_error);
@@ -698,12 +699,8 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
                 (*elements).push_back(elm);
 
                 session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-                isAtLeastOneElementFound = true;
             }
         }
-    }
-    if(*error == NULL && isAtLeastOneElementFound == false){
-        *error = new Error(kNoSuchElement);
     }
 }
 
