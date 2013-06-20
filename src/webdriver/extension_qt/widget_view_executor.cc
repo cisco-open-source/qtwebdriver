@@ -676,6 +676,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
 
     session_->logger().Log(kFineLogLevel, "FindNativeElements, loc:"+locator+" query:"+query);
 
+    bool isAtLeastOneElementFound = false;
     Error* tmp_error = NULL;
     QWidget *parentWidget = getElement(root_element, &tmp_error);
     scoped_ptr<Error> scoped_err(tmp_error);
@@ -697,8 +698,12 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
                 (*elements).push_back(elm);
 
                 session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+                isAtLeastOneElementFound = true;
             }
         }
+    }
+    if(*error == NULL && isAtLeastOneElementFound == false){
+        *error = new Error(kNoSuchElement);
     }
 }
 
