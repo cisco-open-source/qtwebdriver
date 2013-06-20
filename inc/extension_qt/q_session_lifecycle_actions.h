@@ -6,6 +6,8 @@
 
 #include "webdriver_session.h"
 
+#include <QtNetwork/QNetworkProxy>
+
 namespace webdriver {
 
 class QSessionLifeCycleActions : public SessionLifeCycleActions {
@@ -20,6 +22,9 @@ public:
 
 protected:
 private:
+    bool restore_proxy_;
+    QNetworkProxy saved_proxy_;
+
     Error* ParseAndApplyProxySettings(const base::DictionaryValue* proxy_dict);
 
     DISALLOW_COPY_AND_ASSIGN(QSessionLifeCycleActions);

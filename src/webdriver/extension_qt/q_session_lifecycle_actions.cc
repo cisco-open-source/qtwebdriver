@@ -5,7 +5,8 @@
 namespace webdriver {
 
 QSessionLifeCycleActions::QSessionLifeCycleActions(Session* session)
-	: SessionLifeCycleActions(session) {}
+	: SessionLifeCycleActions(session),
+	  restore_proxy_(false) {}
 
 Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_capabilities_dict,
                 const base::DictionaryValue* required_capabilities_dict) {
@@ -33,6 +34,11 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 
 void QSessionLifeCycleActions::BeforeTerminate(void) {
 	session_->logger().Log(kInfoLogLevel, "Custom QT BeforeTerminate action.");
+
+	if (restore_proxy_) {
+		QNetworkProxy::setApplicationProxy(saved_proxy_);
+		restore_proxy_ = false;
+	}
 }
 
 Error* QSessionLifeCycleActions::ParseAndApplyProxySettings(const base::DictionaryValue* proxy_dict) {
@@ -45,6 +51,8 @@ Error* QSessionLifeCycleActions::ParseAndApplyProxySettings(const base::Dictiona
         return error;
     }
 
+    saved_proxy_ = QNetworkProxy::applicationProxy();
+    restore_proxy_ = true;
     QNetworkProxy::setApplicationProxy(proxy);
 
     return NULL;
