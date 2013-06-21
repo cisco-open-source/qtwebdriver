@@ -15,12 +15,12 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
-#include <QtNetwork/QNetworkCookieJar>
-#include <QtNetwork/QNetworkCookie>
 
 #include <QtCore/QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
+#include <QtNetwork/QNetworkCookieJar>
+#include <QtNetwork/QNetworkCookie>
 #include <QtWebKitWidgets/QWebFrame>
 #else
 #include <QtGui/QApplication>
@@ -1411,7 +1411,19 @@ Error* QWebViewCmdExecutor::FindElementsHelper(QWebFrame* frame,
                 return new Error(kNoSuchElement);
             break;
         }
-        base::PlatformThread::Sleep(base::TimeDelta::FromMilliseconds(50));
+
+        // non-blocking sleep for 50 ms
+        {
+            QEventLoop loop;
+            QTimer timer;
+     
+            timer.setSingleShot(true);
+            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+     
+            timer.start(50); //your predefined timeout
+            loop.exec();
+        }
+        //base::PlatformThread::Sleep(base::TimeDelta::FromMilliseconds(50));
     }
     return NULL;
 }
