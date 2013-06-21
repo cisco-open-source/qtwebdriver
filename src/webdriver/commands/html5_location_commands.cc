@@ -26,19 +26,19 @@ bool HTML5LocationCommand::DoesPost() {
 }
 
 void HTML5LocationCommand::ExecuteGet(Response* const response) {
-    base::DictionaryValue** geolocation;
+    base::DictionaryValue* geolocation;
     Error* error = NULL;
     session_->RunSessionTask(base::Bind(
                                  &ViewCmdExecutor::GetGeoLocation,
                                  base::Unretained(executor_.get()),
-                                 geolocation,
+                                 &geolocation,
                                  &error));
     if (error) {
         response->SetError(error);
         return;
     }
 
-    response->SetValue(*geolocation);
+    response->SetValue(geolocation);
 }
 
 void HTML5LocationCommand::ExecutePost(Response* const response) {
