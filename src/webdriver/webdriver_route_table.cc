@@ -33,8 +33,10 @@
 #include "commands/alert_commands.h"
 #include "commands/cookie_commands.h"
 #include "commands/html5_storage_commands.h"
+#include "commands/html5_location_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
+
 namespace webdriver {
 
 
@@ -274,17 +276,15 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageCommand>          (CommandRoutes::kSessionStorage);
     Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
+    Add<HTML5LocationCommand>           (CommandRoutes::kGetLocation);
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);
 
   dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
 
-  // HTML5 functions.
-  dispatcher->Add<HTML5LocationCommand>("/session/*/location");
-
 #endif
-  
+
 }
 
 DefaultRouteTable::~DefaultRouteTable() {}
