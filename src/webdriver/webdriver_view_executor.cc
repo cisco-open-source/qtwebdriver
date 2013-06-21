@@ -6,13 +6,15 @@ namespace webdriver {
 
 ViewCmdExecutor::ViewCmdExecutor(Session* session, ViewId viewId)
 	: session_(session),
-	  view_id_(viewId) {};	
+      view_id_(viewId) {}
 
-ViewCmdExecutorCreator::ViewCmdExecutorCreator() {};
+ViewCmdExecutor::~ViewCmdExecutor() {}
+
+ViewCmdExecutorCreator::ViewCmdExecutorCreator() {}
 
 ViewCmdExecutorFactory* ViewCmdExecutorFactory::instance = NULL;
 
-ViewCmdExecutorFactory::ViewCmdExecutorFactory() {};
+ViewCmdExecutorFactory::ViewCmdExecutorFactory() {}
 
 ViewCmdExecutorFactory* ViewCmdExecutorFactory::GetInstance() {
 	if (NULL == instance) {

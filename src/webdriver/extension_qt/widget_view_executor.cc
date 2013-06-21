@@ -75,6 +75,8 @@ QWidgetViewCmdExecutor::QWidgetViewCmdExecutor(Session* session, ViewId viewId)
 	: QViewCmdExecutor(session, viewId) {
 }
 
+QWidgetViewCmdExecutor::~QWidgetViewCmdExecutor() {}
+
 QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** error) {
     QElementHandle* element_handle = dynamic_cast<QElementHandle*>(session_->GetElementHandle(view_id_, element));
 
