@@ -73,6 +73,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSessionStorage);
 		standardCommandRoutes.insert(kSessionStorageKey);
 		standardCommandRoutes.insert(kSessionStorageSize);
+		standardCommandRoutes.insert(kGetLocation);
 
 	}
 
@@ -146,6 +147,7 @@ const char CommandRoutes::kLocalStorageSize[] 			= "/session/*/local_storage/siz
 const char CommandRoutes::kSessionStorage[] 			= "/session/*/session_storage";
 const char CommandRoutes::kSessionStorageKey[] 			= "/session/*/session_storage/key/*";
 const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/size";
+const char CommandRoutes::kGetLocation[]				= "/session/*/location";
 
 /*
 
@@ -153,7 +155,7 @@ const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/
 const char CommandRoutes::kSetBrowserVisible[] = "setBrowserVisible";
 const char CommandRoutes::kIsBrowserVisible[] = "isBrowserVisible";
 const char CommandRoutes::kExecuteSQL[] = "executeSQL";
-const char CommandRoutes::kGetLocation[] = "getLocation";
+
 const char CommandRoutes::kSetLocation[] = "setLocation";
 
 const char CommandRoutes::kGetStatus[] = "getStatus";

@@ -15,7 +15,6 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
-
 #include <QtCore/QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
@@ -70,6 +69,8 @@ void JSNotifier::setResult(QVariant result)
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
     : ViewCmdExecutorCreator() { }
 
+QWebViewCmdExecutorCreator::~QWebViewCmdExecutorCreator() {}
+
 ViewCmdExecutor* QWebViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
     QWebView* pWebView = QWebViewUtil::getWebView(session, viewId);
     if (NULL != pWebView) {
@@ -93,6 +94,7 @@ bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, 
 QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
     : QViewCmdExecutor(session, viewId) {
 }
+QWebViewCmdExecutor::~QWebViewCmdExecutor() {}
 
 QWebView* QWebViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
     QWebView* pWebView = QWebViewUtil::getWebView(session_, viewId);
@@ -1849,8 +1851,5 @@ Error* QWebViewCmdExecutor::ToggleOptionElement(const ElementId& element) {
 
     return error;
 }
-
-
-
 
 } //namespace webdriver 

@@ -27,7 +27,7 @@ namespace webdriver {
 class QViewCmdExecutor : public ViewCmdExecutor {
 public:
     explicit QViewCmdExecutor(Session* session, ViewId viewId);
-    ~QViewCmdExecutor();
+    virtual ~QViewCmdExecutor();
 
     virtual void GetTitle(std::string* title, Error **error);
     virtual void GetWindowName(std::string* name, Error ** error);
