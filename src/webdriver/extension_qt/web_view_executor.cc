@@ -21,6 +21,7 @@
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
 #include <QtWebKitWidgets/QWebFrame>
+#include <QtCore/QTimer>
 #else
 #include <QtGui/QApplication>
 #endif
