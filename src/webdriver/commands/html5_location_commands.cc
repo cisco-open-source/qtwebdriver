@@ -31,16 +31,13 @@ void HTML5LocationCommand::ExecuteGet(Response* const response) {
     session_->RunSessionTask(base::Bind(
                                  &ViewCmdExecutor::GetGeoLocation,
                                  base::Unretained(executor_.get()),
-                            //     kLocalStorageType,
-                                 geolocation, //&keys,
+                                 geolocation,
                                  &error));
-//          GetGeolocation(&geolocation);
     if (error) {
         response->SetError(error);
         return;
     }
 
-//    response->SetValue(geolocation->release());
     response->SetValue(*geolocation);
 }
 
@@ -55,11 +52,8 @@ void HTML5LocationCommand::ExecutePost(Response* const response) {
     session_->RunSessionTask(base::Bind(
                                  &ViewCmdExecutor::SetGeoLocation,
                                  base::Unretained(executor_.get()),
-                            //     kLocalStorageType,
                                  geolocation,
-//                                              key,
-//                                              value,
-                                 &error));//OverrideGeolocation(geolocation);
+                                 &error));
     if (error)
         response->SetError(error);
 }

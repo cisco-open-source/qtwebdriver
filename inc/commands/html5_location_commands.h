@@ -14,7 +14,7 @@ namespace webdriver {
 
 class Response;
 
-class HTML5LocationCommand : public ViewCommand { ///??? : public WebDriverCommand {
+class HTML5LocationCommand : public ViewCommand {
  public:
   HTML5LocationCommand(const std::vector<std::string>& path_segments,
                        const base::DictionaryValue* const parameters);
