@@ -40,7 +40,7 @@
         'src/webdriver/commands/execute_async_script_command.cc',
         'src/webdriver/commands/execute_command.cc',
         'src/webdriver/commands/find_element_commands.cc',
-#        'src/webdriver/commands/html5_location_commands.cc',
+        'src/webdriver/commands/html5_location_commands.cc',
         'src/webdriver/commands/html5_storage_commands.cc',
         'src/webdriver/commands/keys_command.cc',
         'src/webdriver/commands/log_command.cc',
