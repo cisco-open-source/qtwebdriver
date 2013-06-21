@@ -33,11 +33,14 @@ class SessionManager {
   Session* GetSession(const std::string& id) const;
 
   void set_port(const std::string& port);
+  void set_wi_port(unsigned int port);
 
   void set_url_base(const std::string& url_base);
   std::string url_base() const;
 
   std::map<std::string, Session*> GetSessions();
+
+  unsigned int get_wi_port() const;
 
  private:
   SessionManager();
@@ -48,6 +51,7 @@ class SessionManager {
   mutable base::Lock map_lock_;
   std::string port_;
   std::string url_base_;
+  unsigned int wi_port_;
 
   DISALLOW_COPY_AND_ASSIGN(SessionManager);
 };

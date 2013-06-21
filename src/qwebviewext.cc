@@ -22,6 +22,8 @@ QWebViewExt::~QWebViewExt()
 QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
 {
     QWebViewExt* newView = new QWebViewExt;
+    newView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    newView->setProperty("_q_webInspectorServerPort", 9222);
     newView->show();
     newView->setAttribute(Qt::WA_DeleteOnClose, true);
     QVariant sessionId = property("sessionId");

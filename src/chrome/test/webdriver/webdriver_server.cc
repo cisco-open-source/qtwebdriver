@@ -344,7 +344,8 @@ int RunChromeDriver() {
               << "                                  present"                                        << std::endl
               << "config                            The path to config file (e.g. config.json) in"  << std::endl
               << "                                  JSON format with specified WD parameters as"    << std::endl
-              << "                                  described above (port, root, etc.)"             << std::endl;
+              << "                                  described above (port, root, etc.)"             << std::endl
+              << "wi-port        9222               Web inspector listening port"                   << std::endl;
 
      return (EXIT_SUCCESS);
   }
@@ -409,7 +410,9 @@ int RunChromeDriver() {
   FilePath log_path;
   std::string root = "./web";
   std::string url_base;
+  int wi_port = 9222;
   int http_threads = 4;
+
   bool enable_keep_alive = false;
   if (cmd_line->HasSwitch("port"))
     port = cmd_line->GetSwitchValueASCII("port");
@@ -429,6 +432,9 @@ int RunChromeDriver() {
       return 1;
     }
   }
+  if (cmd_line->HasSwitch("wi-port"))
+      wi_port = QString(cmd_line->GetSwitchValueASCII("wi=port").c_str()).toInt();
+
 //  if (cmd_line->HasSwitch(kEnableKeepAlive))
 //    enable_keep_alive = true;
 
@@ -446,6 +452,7 @@ int RunChromeDriver() {
   SessionManager* manager = SessionManager::GetInstance();
   manager->set_port(port);
   manager->set_url_base(url_base);
+  manager->set_wi_port(wi_port);
 
   Dispatcher dispatcher(url_base);
   InitCallbacks(&dispatcher,  &shutdown_event, root.empty());
@@ -481,6 +488,7 @@ int RunChromeDriver() {
             << "root=" << root << std::endl
             << "url-base=" << url_base << std::endl
             << "http-threads=" << http_threads << std::endl
+            << "wi-port=" << wi_port << std::endl
             /*<< "version=" << chrome::kChromeVersion << std::endl*/;
   if (logging_success)
       std::cout << "log=" << FileLog::Get()->path().value() << std::endl;
@@ -529,6 +537,7 @@ bool parse_config_to_cmd_line()
             std::string url_base;
             int http_threads;
             std::string log_path;
+            int wi_port;
             if (result_dict->GetInteger("port", &port))
                 cmd_line->AppendSwitchASCII("port", base::IntToString(port));
             if (result_dict->GetString("root", &root))
@@ -539,6 +548,8 @@ bool parse_config_to_cmd_line()
                 cmd_line->AppendSwitchASCII("http-threads", base::IntToString(http_threads));
             if (result_dict->GetString("log-path", &log_path))
                 cmd_line->AppendSwitchASCII("log-path", log_path);
+            if (result_dict->GetInteger("wi-port", &wi_port))
+                cmd_line->AppendSwitchASCII("wi-port", base::IntToString(wi_port));
 
         }
         else

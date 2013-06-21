@@ -41,6 +41,11 @@ void SessionManager::set_port(const std::string& port) {
   port_ = port;
 }
 
+void SessionManager::set_wi_port(unsigned int port)
+{
+    wi_port_ = port;
+}
+
 void SessionManager::set_url_base(const std::string& url_base) {
   url_base_ = url_base;
 }
@@ -55,13 +60,22 @@ std::map<std::string, Session*> SessionManager::GetSessions()
     return map_;
 }
 
-SessionManager::SessionManager() : port_(""), url_base_("") {}
+SessionManager::SessionManager()
+    : port_(""),
+      url_base_(""),
+      wi_port_(9222)
+{}
 
 SessionManager::~SessionManager() {}
 
 // static
 SessionManager* SessionManager::GetInstance() {
   return Singleton<SessionManager>::get();
+}
+
+unsigned int SessionManager::get_wi_port() const
+{
+    return wi_port_;
 }
 
 }  // namespace webdriver
