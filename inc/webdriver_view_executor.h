@@ -39,7 +39,7 @@ enum StorageType {
 class ViewCmdExecutor {
 public:
     explicit ViewCmdExecutor(Session* session, ViewId viewId);
-    virtual ~ViewCmdExecutor();
+    ~ViewCmdExecutor() {};
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error) = 0;
     virtual void GetTitle(std::string* title, Error **error) = 0;
@@ -113,10 +113,7 @@ public:
     virtual void GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) = 0;
     virtual void RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) = 0;
     virtual void GetStorageSize(StorageType type, int* size, Error** error) = 0;
-    /// Gets the current geolocation.
-    virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) = 0;
-    /// Overrides the current geolocation.
-    virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) = 0;
+
 
 protected:
     Session* session_;
