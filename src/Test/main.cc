@@ -36,6 +36,7 @@
 #include "extension_qt/widget_view_enumerator.h"
 #include "extension_qt/widget_view_executor.h"
 
+void setQtSettings();
 
 int main(int argc, char *argv[])
 {
@@ -44,22 +45,6 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 #endif
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanCloseWindows, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->enablePersistentStorage("./web/html5");
-    QWebSettings::globalSettings()->setLocalStoragePath("./web/html5");
-    QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
-    QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
-
     //QFutureWatcher<int> watcher;
     //QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
     //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
@@ -95,7 +80,26 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    setQtSettings();
     wd_server.Start();
 
     return app.exec();
+}
+
+void setQtSettings() {
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanCloseWindows, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalStorageEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineStorageDatabaseEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::OfflineWebApplicationCacheEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    QWebSettings::globalSettings()->enablePersistentStorage("./web/html5");
+    QWebSettings::globalSettings()->setLocalStoragePath("./web/html5");
+    QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
+    QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 }
