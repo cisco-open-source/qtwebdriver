@@ -16,10 +16,11 @@
 #include "extension_qt/widget_view_handle.h"
 
 #include <QtCore/QtGlobal>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QApplication>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
 #include <QtWebKitWidgets/QWebFrame>
 #include <QtCore/QTimer>
 #else
