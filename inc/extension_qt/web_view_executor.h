@@ -21,10 +21,10 @@ class QPageLoader : public QObject {
     Q_OBJECT
 public:
     explicit QPageLoader(QWebView* view) :
-                QObject(NULL) {webView = view; is_loading = false;};
+                QObject(NULL) {webView = view; is_loading = false;}
 
     void loadPage(QUrl url);
-    bool isLoading() {return is_loading;};
+    bool isLoading() {return is_loading;}
     
 signals:
     void loaded();
@@ -63,7 +63,7 @@ private:
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     QWebViewCmdExecutorCreator();
-    virtual ~QWebViewCmdExecutorCreator(){}
+    virtual ~QWebViewCmdExecutorCreator();
 
     virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const;
@@ -76,7 +76,7 @@ private:
 class QWebViewCmdExecutor : public QViewCmdExecutor {
 public:
     explicit QWebViewCmdExecutor(Session* session, ViewId viewId);
-    ~QWebViewCmdExecutor();
+    virtual ~QWebViewCmdExecutor();
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error);
     virtual void GetTitle(std::string* title, Error **error);
@@ -132,6 +132,8 @@ public:
     virtual void GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error);
     virtual void RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error);
     virtual void GetStorageSize(StorageType type, int* size, Error** error);
+    virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
 
 
 protected:
