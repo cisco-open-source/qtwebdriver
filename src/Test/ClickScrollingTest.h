@@ -4,19 +4,19 @@
 #include "CommonQtTestHeaders.h"
 
 namespace Ui {
-class ClickScrollingTest;
+class ClickScrollingTestWidget;
 }
 
-class ClickScrollingTest : public QMainWindow
+class ClickScrollingTestWidget : public QMainWindow
 {
     Q_OBJECT
     
 public:
-    explicit ClickScrollingTest(QWidget *parent = 0);
-    ~ClickScrollingTest();
+    explicit ClickScrollingTestWidget(QWidget *parent = 0);
+    ~ClickScrollingTestWidget();
     
 private:
-    Ui::ClickScrollingTest *ui;
+    Ui::ClickScrollingTestWidget *ui;
 private slots:
     void ClickOnVisibleButton();
     void ClickOnButtonHiddenByOverflow();

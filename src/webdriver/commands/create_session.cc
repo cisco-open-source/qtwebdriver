@@ -42,7 +42,7 @@ void CreateSession::ExecutePost(Response* const response) {
     // get optional required capabilities
     (void)GetDictionaryParameter("requiredCapabilities", &required_caps_dict);
 
-    if (SessionManager::GetInstance()->GetSessions().size()  > 0) {
+    if (SessionManager::GetInstance()->GetSessions().size() > 0) {
         response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
         return;
     }

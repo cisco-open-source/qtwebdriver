@@ -1413,7 +1413,19 @@ Error* QWebViewCmdExecutor::FindElementsHelper(QWebFrame* frame,
                 return new Error(kNoSuchElement);
             break;
         }
-        base::PlatformThread::Sleep(base::TimeDelta::FromMilliseconds(50));
+
+        // non-blocking sleep for 50 ms
+        {
+            QEventLoop loop;
+            QTimer timer;
+     
+            timer.setSingleShot(true);
+            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+     
+            timer.start(50); //your predefined timeout
+            loop.exec();
+        }
+        //base::PlatformThread::Sleep(base::TimeDelta::FromMilliseconds(50));
     }
     return NULL;
 }

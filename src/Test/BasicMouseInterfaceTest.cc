@@ -3,7 +3,7 @@
 #include "RestyledLabel.h"
 #include "CommonQtTestHeaders.h"
 
-BasicMouseInterfaceTest::BasicMouseInterfaceTest(QWidget *parent) :
+BasicMouseInterfaceTestWidget::BasicMouseInterfaceTestWidget(QWidget *parent) :
     QWidget(parent)
 {
     DragableWidget *firstWidget = new DragableWidget(this);

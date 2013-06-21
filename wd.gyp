@@ -35,7 +35,9 @@
           ],
 
           'dependencies': [
-            'WebDriver',
+            'base.gyp:chromium_base',
+            'wd_core.gyp:WebDriver_core',
+            'WebDriver_extension_qt',
           ],
 
 
@@ -54,6 +56,33 @@
             'src/Test/ElementAttributeTest.cc',
             'src/Test/ElementAttributeTest.h',
             '<(INTERMEDIATE_DIR)/moc_ElementAttributeTest.cc',
+            'src/Test/ElementSelectingTest.cc',
+            'src/Test/ElementSelectingTest.h',
+            'src/Test/ElementSelectingTest.ui',
+            '<(INTERMEDIATE_DIR)/moc_ElementSelectingTest.cc',
+            'src/Test/TypingTest.cc',
+            'src/Test/TypingTest.h',
+            '<(INTERMEDIATE_DIR)/moc_TypingTest.cc',
+            'src/Test/BasicKeyboardInterfaceTest.cc',
+            'src/Test/BasicKeyboardInterfaceTest.h',
+            '<(INTERMEDIATE_DIR)/moc_BasicKeyboardInterfaceTest.cc',
+            'src/Test/TextHandlingTest.cc',
+            'src/Test/FormHandlingTest.cc',
+            'src/Test/FormHandlingTest.h',
+            '<(INTERMEDIATE_DIR)/moc_FormHandlingTest.cc',
+            'src/Test/img.xpm',
+            'src/Test/XPathElementFindingTest.cc',
+            'src/Test/XPathElementFindingTest.h',
+            '<(INTERMEDIATE_DIR)/moc_XPathElementFindingTest.cc',
+            'src/Test/StaleElementReferenceTest.cc',
+            'src/Test/StaleElementReferenceTest.h',
+            '<(INTERMEDIATE_DIR)/moc_StaleElementReferenceTest.cc',
+            'src/Test/VisibilityTest.cc',
+            'src/Test/VisibilityTest.h',
+            '<(INTERMEDIATE_DIR)/moc_VisibilityTest.cc',
+            'src/Test/RestyledLabel.cc',
+            'src/Test/DragableWidget.cc',
+            'src/Test/BasicMouseInterfaceTest.cc'
           ],
 
           'conditions': [
@@ -81,9 +110,9 @@
                     '-lpthread',
                     '-lrt',
                     '-ldl',
-                    '-l:libicuuc.so.49', #version of the lib could be changed in case of Qt upgrade
-                    '-l:libicudata.so.49',
-                    '-l:libicui18n.so.49',
+                    '-licuuc',
+                    '-licudata',
+                    '-licui18n',
                   ],
                 } ],
                 [ 'OS=="win"', {
@@ -253,23 +282,18 @@
 
   'targets': [
     {
-      'target_name': 'WebDriver',
+      'target_name': 'WebDriver_extension_qt',
       'type': 'static_library',
       'standalone_static_library': 1,
       'msvs_configuration_attributes': {
         'CharacterSet': '1'
       },
 
-      'dependencies': [
-        'base.gyp:chromium_base',
-      ],
-
       'include_dirs': [
         'inc/',
         'src/',
         '<(QT_INC_PATH)',
         '<(INTERMEDIATE_DIR)',
-        '<(MONGOOSE_INC_PATH)',
       ],
 
       'sources': [
@@ -336,6 +360,8 @@
         'src/webdriver/extension_qt/web_view_enumerator.cc',
         'src/webdriver/extension_qt/widget_view_enumerator.cc',
         'src/webdriver/extension_qt/q_view_runner.cc',
+        'src/webdriver/extension_qt/q_proxy_parser.cc',
+        'src/webdriver/extension_qt/q_session_lifecycle_actions.cc',
         'src/webdriver/extension_qt/qwebviewext.cc',
         'src/webdriver/extension_qt/q_key_converter.cc',
         'src/webdriver/extension_qt/widget_view_util.cc',
@@ -357,22 +383,15 @@
         'src/third_party/webdriver/atoms.cc',
       ],
 
-      'conditions': [
-        [ '<(WD_BUILD_MONGOOSE) == 1', {
-          'sources': [
-            'src/third_party/mongoose/mongoose.c',
-          ],
-        } ],
-
-      ],
     }, {
+      # TODO: rewrite this target
       'target_name': 'WebDriverShared',
       'type': 'shared_library',
 
       'product_name': 'WebDriver',
 
       'dependencies': [
-        'WebDriver',
+        'WebDriver_extension_qt',
       ],
     },
   ],

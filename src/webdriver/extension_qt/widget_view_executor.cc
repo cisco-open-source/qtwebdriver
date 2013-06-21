@@ -669,6 +669,8 @@ void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const st
     FindElements(root_element, locator, query, &elements, error);
     if (*error == NULL && elements.size() != 0)
         *element = elements[0];
+    else if(*error == NULL)
+        *error = new Error(kNoSuchElement);
 }
 
 void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {

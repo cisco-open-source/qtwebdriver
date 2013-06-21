@@ -24,6 +24,15 @@
 #include "FindingTest.h"
 #include "CoordinatesTest.h"
 #include "ClickScrollingTest.h"
+#include "ElementSelectingTest.h"
+#include "TypingTest.h"
+#include "BasicKeyboardInterfaceTest.h"
+#include "TextHandlingTest.h"
+#include "FormHandlingTest.h"
+#include "XPathElementFindingTest.h"
+#include "StaleElementReferenceTest.h"
+#include "VisibilityTest.h"
+#include "BasicMouseInterfaceTest.h"
 
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
@@ -31,6 +40,7 @@
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/q_view_runner.h"
+#include "extension_qt/q_session_lifecycle_actions.h"
 #include "extension_qt/qwebviewext.h"
 #include "extension_qt/widget_view_creator.h"
 #include "extension_qt/widget_view_enumerator.h"
@@ -52,6 +62,8 @@ int main(int argc, char *argv[])
 
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
 
+    webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
+
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
@@ -64,7 +76,16 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<ElementAttributeTestWidget>("ElementAttributeTestWidget");
     widgetCreator->RegisterViewClass<FindingTestWidget>("FindingTestWidget");
     widgetCreator->RegisterViewClass<CoordinatesTestWidget>("CoordinatesTestWidget");
-    widgetCreator->RegisterViewClass<ClickScrollingTest>("ClickScrollingTest");
+    widgetCreator->RegisterViewClass<ClickScrollingTestWidget>("ClickScrollingTestWidget");
+    widgetCreator->RegisterViewClass<ElementSelectingTestWidget>("ElementSelectingTestWidget");
+    widgetCreator->RegisterViewClass<TypingTestWidget>("TypingTestWidget");
+    widgetCreator->RegisterViewClass<BasicKeyboardInterfaceTestWidget>("BasicKeyboardInterfaceTestWidget");
+    widgetCreator->RegisterViewClass<TextHandlingTestWidget>("TextHandlingTestWidget");
+    widgetCreator->RegisterViewClass<FormHandlingTestWidget>("FormHandlingTestWidget");
+    widgetCreator->RegisterViewClass<XPathElementFindingTestWidget>("XPathElementFindingTestWidget");
+    widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
+    widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
+    widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
 
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);

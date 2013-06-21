@@ -51,6 +51,7 @@ Session::Session()
       async_script_timeout_(0),
       implicit_wait_(0),
       view_runner_(ViewRunner::CreateRunner()),
+      life_cycle_actions_(SessionLifeCycleActions::CreateLifeCycleActions(this)),
       sticky_modifiers_(0)
 {
     SessionManager::GetInstance()->Add(this);
@@ -205,13 +206,17 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
     }
 
     logger_.Log(kFineLogLevel,
-                    "Initializing session with capabilities " +
+                    "Initializing session with desired capabilities " +
                     JsonStringifyForDisplay(desired_capabilities_dict));
 
     (void) InitActualCapabilities();
 
     // TODO: take into account required capabilities
     if (required_capabilities_dict) {
+        logger_.Log(kFineLogLevel,
+                    "Initializing session with required capabilities " +
+                    JsonStringifyForDisplay(required_capabilities_dict));
+
         if (!CheckRequiredCapabilities(required_capabilities_dict)) {
             logger_.Log(kWarningLogLevel, "Required caps check failed.");
             delete this;
@@ -227,6 +232,8 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
         return error;
     }
     logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
+
+    error = life_cycle_actions_->PostInit(desired_capabilities_dict, required_capabilities_dict);
 
     if (error)
         Terminate();
@@ -266,6 +273,8 @@ Error* Session::AfterExecuteCommand() {
 
 void Session::Terminate() {
     logger_.Log(kInfoLogLevel, "Session("+id_+") terminate.");
+
+    life_cycle_actions_->BeforeTerminate();
 
     // TODO: cleanup resources
     delete this;
@@ -456,6 +465,26 @@ void Session::RunClosureOnSessionThread(const base::Closure& task,
     view_runner_->RunClosure(task, done_event);
 //    QMetaObject::invokeMethod(&qtask, "runTask", Qt::BlockingQueuedConnection, Q_ARG(const base::Closure&, task));
 //    done_event->Signal();
+}
+
+
+SessionLifeCycleActions::CreateLifeCycleActionsMethod SessionLifeCycleActions::create = &(SessionLifeCycleActions::createLifeCycleActions<SessionLifeCycleActions>);
+
+SessionLifeCycleActions::SessionLifeCycleActions(Session* session)
+    : session_(session) {}
+
+Error* SessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_capabilities_dict,
+                const base::DictionaryValue* required_capabilities_dict) {
+    session_->logger().Log(kFineLogLevel, "Default PostInit action: do nothing.");
+    return NULL;
+}
+
+void SessionLifeCycleActions::BeforeTerminate(void) {
+    session_->logger().Log(kFineLogLevel, "Default BeforeTerminate action: do nothing.");
+}
+
+SessionLifeCycleActions* SessionLifeCycleActions::CreateLifeCycleActions(Session* session) {
+    return create(session);
 }
 
 }  // namespace webdriver
