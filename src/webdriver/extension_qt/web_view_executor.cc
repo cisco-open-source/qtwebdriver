@@ -18,11 +18,12 @@
 #include <QtCore/QtGlobal>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
+#include <QtCore/QTimer>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
 #include <QtWebKitWidgets/QWebFrame>
-#include <QtCore/QTimer>
+
 #else
 #include <QtGui/QApplication>
 #endif
