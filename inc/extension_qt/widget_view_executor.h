@@ -23,7 +23,7 @@ private:
 class QWidgetViewCmdExecutor : public QViewCmdExecutor {
 public:
     explicit QWidgetViewCmdExecutor(Session* session, ViewId viewId);
-    ~QWidgetViewCmdExecutor();
+    virtual ~QWidgetViewCmdExecutor();
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error);
     virtual void GoForward(Error** error) NOT_SUPPORTED_IMPL;
@@ -75,7 +75,8 @@ public:
     virtual void GetStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) NOT_SUPPORTED_IMPL;
     virtual void RemoveStorageItem(StorageType type, const std::string& key, std::string* value, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetStorageSize(StorageType type, int* size, Error** error) NOT_SUPPORTED_IMPL;
-
+    virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

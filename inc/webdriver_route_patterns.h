@@ -82,17 +82,16 @@ public:
     static const char kSessionStorage[];
     static const char kSessionStorageKey[];
     static const char kSessionStorageSize[];
-
+    static const char kGetLocation[];
 
 // TODO:
-/*    
-   
+/*      
     
     static const char kSetBrowserVisible[];
     static const char kIsBrowserVisible[];
 
     static const char kExecuteSQL[];
-    static const char kGetLocation[];
+
     static const char kSetLocation[];
     
     static const char kGetStatus[];
