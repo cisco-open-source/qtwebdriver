@@ -206,13 +206,17 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
     }
 
     logger_.Log(kFineLogLevel,
-                    "Initializing session with capabilities " +
+                    "Initializing session with desired capabilities " +
                     JsonStringifyForDisplay(desired_capabilities_dict));
 
     (void) InitActualCapabilities();
 
     // TODO: take into account required capabilities
     if (required_capabilities_dict) {
+        logger_.Log(kFineLogLevel,
+                    "Initializing session with required capabilities " +
+                    JsonStringifyForDisplay(required_capabilities_dict));
+
         if (!CheckRequiredCapabilities(required_capabilities_dict)) {
             logger_.Log(kWarningLogLevel, "Required caps check failed.");
             delete this;

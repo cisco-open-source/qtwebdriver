@@ -86,6 +86,7 @@ Error* QProxyCapabilitiesParser::Parse() {
         return new Error(kBadRequest, "Unrecognized 'proxyType': " + proxy_type);
 
     if (proxy_type == "direct") {
+        logger_.Log(kInfoLogLevel, "found noProxy configuration.");
         *proxy_ = QNetworkProxy(QNetworkProxy::NoProxy);
     } else if (proxy_type == "system") {
         *proxy_ = QNetworkProxy(QNetworkProxy::DefaultProxy);
@@ -171,6 +172,7 @@ Error* QProxyCapabilitiesParser::ParseProxyServers(const DictionaryValue* option
                 if (proxyUrl.isValid() && !proxyUrl.host().isEmpty()) {
                     int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
 
+                    logger_.Log(kInfoLogLevel, "found httpProxy configuration - " + proxyUrl.toString().toStdString());
                     *proxy_ = QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort);
                 }
             }
@@ -188,6 +190,8 @@ Error* QProxyCapabilitiesParser::ParseNoProxy(const base::Value* option){
     std::string proxy_bypass_list;
     if (!option->GetAsString(&proxy_bypass_list))
         return CreateBadInputError("noProxy", Value::TYPE_STRING, option);
+
+    logger_.Log(kInfoLogLevel, "found noProxy configuration.");
 
     *proxy_ = QNetworkProxy(QNetworkProxy::NoProxy);
     
