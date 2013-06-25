@@ -19,6 +19,7 @@ class Command;
 class AbstractCommandCreator : public base::RefCounted<AbstractCommandCreator>
 {
 public:
+    virtual ~AbstractCommandCreator() {}
     virtual Command* create(const std::vector<std::string>& path_segments,
                             const base::DictionaryValue* const parameters) const = 0;
 };
@@ -92,7 +93,7 @@ public:
     /// @param url url to handle
     /// @param[out] pattern optional output - matched pattern for url
     /// @return pointer to CommandCreator, NULL if route not found
-    CommandCreatorPtr GetRouteForURL(const std::string& url, std::string* pattern = NULL);
+    CommandCreatorPtr GetRouteForURL(const std::string& url, std::string* pattern = NULL) const;
 
     /// Returns list of registered routes
     /// @return vector of registered patterns
@@ -106,7 +107,7 @@ private:
     // return true if pattern1 is bestmatch then pattern2
     bool CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2);
 
-    bool MatchPattern(const std::string& url, const std::string& pattern);
+    bool MatchPattern(const std::string& url, const std::string& pattern) const;
 
     std::vector<webdriver::internal::RouteDetails> routes_;
 };

@@ -56,6 +56,17 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Start();
 
+    const RouteTable& getRouteTable() const
+    {
+        return *routeTable_;
+    }
+
+    void DispatchCommand(Command* command_ptr,
+                         const std::string& method,
+                         Response* response);
+
+    static Server* GetInstance();
+
 private:
     CommandLine options_;
     scoped_ptr<RouteTable> routeTable_;
@@ -73,18 +84,6 @@ private:
     void PrepareHttpResponse(const std::string& request_method,
                              const Response& command_response,
                              HttpResponse* const http_response);
-
-    ListValue* ListCommandSupportedMethods(/*TODO: const*/ Command& command) const;
-
-    void DispatchCommand(Command* const command,
-                         const std::string& method,
-                         Response* response);
-
-    // Allows the bulk of the implementation of |Dispatch| to be moved out of this
-    // header file. Takes ownership of |command|.
-    void DispatchHelper(Command* command_ptr,
-                        const std::string& method,
-                        Response* response);
 
     bool ProcessHttpRequest(struct mg_connection* connection,
                         const struct mg_request_info* request_info);
@@ -110,6 +109,8 @@ private:
     void WriteHttpResponse(struct mg_connection* connection,
                        const HttpResponse& response);
 
+    static ListValue* ListCommandSupportedMethods(/*TODO: const*/ Command& command);
+
     int InitMongooseOptions();
 
     int InitLogging();
@@ -117,7 +118,6 @@ private:
 #if !defined(OS_WIN)
     int ParseConfigToOptions();
 #endif
-
 
     DISALLOW_COPY_AND_ASSIGN(Server);
 };

@@ -56,6 +56,7 @@
 #include "chrome/test/webdriver/commands/url_command.h"
 #include "chrome/test/webdriver/commands/webelement_commands.h"
 #include "chrome/test/webdriver/commands/window_commands.h"
+#include "chrome/test/webdriver/commands/xdrpc_command.h"
 #include "chrome/test/webdriver/webdriver_dispatch.h"
 #include "chrome/test/webdriver/webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_session_manager.h"
@@ -268,6 +269,8 @@ void InitCallbacks(Dispatcher* dispatcher,
   // Since the /session/* is a wild card that would match the above URIs, this
   // line MUST be after all other webdriver command callbacks.
   dispatcher->Add<SessionWithID>("/session/*");
+
+  dispatcher->Add<XDRPCCommand>("/xdrpc");
 
   if (forbid_other_requests)
     dispatcher->ForbidAllOtherRequests();

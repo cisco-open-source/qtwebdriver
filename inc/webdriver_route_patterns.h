@@ -83,6 +83,7 @@ public:
     static const char kSessionStorageKey[];
     static const char kSessionStorageSize[];
     static const char kGetLocation[];
+    static const char kXdrpc[];
 
 // TODO:
 /*    

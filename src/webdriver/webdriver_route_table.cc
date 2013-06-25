@@ -34,6 +34,7 @@
 #include "commands/cookie_commands.h"
 #include "commands/html5_storage_commands.h"
 #include "commands/html5_location_commands.h"
+#include "commands/xdrpc_command.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -95,7 +96,7 @@ std::vector<std::string> RouteTable::GetRoutes() {
     return routes_to_ret;
 }
 
-CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string* pattern) {
+CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string* pattern) const {
     std::vector<webdriver::internal::RouteDetails>::const_iterator route;
     for (route = routes_.begin();
          route < routes_.end();
@@ -158,7 +159,7 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
     return true;
 }
 
-bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern) {
+bool RouteTable::MatchPattern(const std::string& url, const std::string& pattern) const {
     std::vector<std::string> url_segments;
     std::vector<std::string> pattern_segments;
 
@@ -277,6 +278,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
     Add<HTML5LocationCommand>           (CommandRoutes::kGetLocation);
+    Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
 
 #if 0
 dispatcher->AddShutdown("/shutdown", shutdown_event);

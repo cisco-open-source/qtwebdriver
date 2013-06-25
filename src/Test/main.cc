@@ -114,13 +114,13 @@ int main(int argc, char *argv[])
       PrintVersion();
       return 0;
     }
-    webdriver::Server wd_server;
-    if (0 != wd_server.Init(options)) {
+    webdriver::Server* wd_server = webdriver::Server::GetInstance();
+    if (0 != wd_server->Init(argc, argv)) {
         return 1;
     }
 
     setQtSettings();
-    wd_server.Start();
+    wd_server->Start();
 
     return app.exec();
 }

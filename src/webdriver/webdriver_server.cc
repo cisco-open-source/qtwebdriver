@@ -139,6 +139,11 @@ int Server::Start() {
     return 0;
 }
 
+Server* Server::GetInstance()
+{
+    return Singleton<Server>::get();
+}
+
 // Maximum safe size of HTTP response message. Any larger than this,
 // the message may not be transferred at all.
 const size_t kMaxHttpMessageSize = 1024 * 1024 * 16;  // 16MB
@@ -193,14 +198,14 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
                             &parameters,
                             &response)) {
         if (matched_route == CommandRoutes::kUrlCmd) {
-            DispatchHelper(
+            DispatchCommand(
                     new UrlCommandWrapper(path_segments,
                             parameters,
                             cmdCreator->create(path_segments, parameters)),
                     method,
                     &response);
         } else {
-            DispatchHelper(
+            DispatchCommand(
                     cmdCreator->create(path_segments, parameters),
                     method,
                     &response);
@@ -394,22 +399,9 @@ void Server::ReadRequestBody(const struct mg_request_info* const request_info,
     }
 }
 
-ListValue* Server::ListCommandSupportedMethods(/*TODO: const*/ Command& command) const {
-  ListValue* methods = new ListValue;
-  if (command.DoesPost())
-    methods->Append(Value::CreateStringValue("POST"));
-  if (command.DoesGet()) {
-    methods->Append(Value::CreateStringValue("GET"));
-    methods->Append(Value::CreateStringValue("HEAD"));
-  }
-  if (command.DoesDelete())
-    methods->Append(Value::CreateStringValue("DELETE"));
-  return methods;
-}
-
-void Server::DispatchHelper(Command* command_ptr,
-                            const std::string& method,
-                            Response* response) {
+void Server::DispatchCommand(Command* command_ptr,
+                             const std::string& method,
+                             Response* response) {
     CHECK(method == "GET" ||
           method == "POST" ||
           method == "DELETE" ||
@@ -430,12 +422,6 @@ void Server::DispatchHelper(Command* command_ptr,
         return;
     }
 
-    DispatchCommand(command.get(), method, response);
-}
-
-void Server::DispatchCommand(Command* const command,
-                             const std::string& method,
-                             Response* response) {
     if (!command->Init(response))
         return;
 
@@ -449,6 +435,19 @@ void Server::DispatchCommand(Command* const command,
         NOTREACHED();
     }
     command->Finish(response);
+}
+
+ListValue* Server::ListCommandSupportedMethods(/*TODO: const*/ Command& command) {
+    ListValue* methods = new ListValue;
+    if (command.DoesPost())
+        methods->Append(Value::CreateStringValue("POST"));
+    if (command.DoesGet()) {
+        methods->Append(Value::CreateStringValue("GET"));
+        methods->Append(Value::CreateStringValue("HEAD"));
+    }
+    if (command.DoesDelete())
+        methods->Append(Value::CreateStringValue("DELETE"));
+    return methods;
 }
 
 int Server::InitMongooseOptions() {

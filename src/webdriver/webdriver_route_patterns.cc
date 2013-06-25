@@ -74,7 +74,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSessionStorageKey);
 		standardCommandRoutes.insert(kSessionStorageSize);
 		standardCommandRoutes.insert(kGetLocation);
-
+		standardCommandRoutes.insert(kXdrpc);
 	}
 
 	// check if paatern is presence in set
@@ -148,6 +148,7 @@ const char CommandRoutes::kSessionStorage[] 			= "/session/*/session_storage";
 const char CommandRoutes::kSessionStorageKey[] 			= "/session/*/session_storage/key/*";
 const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/size";
 const char CommandRoutes::kGetLocation[]				= "/session/*/location";
+const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 
 /*
 

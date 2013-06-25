@@ -22,3 +22,4 @@ report/*
 /WebDriver.target.mk
 /WebDriverTest.target.mk
 src/webdriver/wdversion.cc
+src/wdversion.cc
