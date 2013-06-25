@@ -24,7 +24,7 @@ public:
                     const base::DictionaryValue* const parameters);
     virtual ~SetTimeoutCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
     virtual void SetTimeout(int timeout_ms) = 0;
 

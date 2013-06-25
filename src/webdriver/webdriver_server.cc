@@ -445,7 +445,7 @@ const std::string& Server::url_base() const
     return url_base_;
 }
 
-ListValue* Server::ListCommandSupportedMethods(/*TODO: const*/ Command& command) {
+ListValue* Server::ListCommandSupportedMethods(const Command& command) {
     ListValue* methods = new ListValue;
     if (command.DoesPost())
         methods->Append(Value::CreateStringValue("POST"));

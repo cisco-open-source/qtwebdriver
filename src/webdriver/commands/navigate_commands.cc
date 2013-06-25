@@ -19,7 +19,7 @@ ForwardCommand::ForwardCommand(const std::vector<std::string>& path_segments,
 
 ForwardCommand::~ForwardCommand() {}
 
-bool ForwardCommand::DoesPost() {
+bool ForwardCommand::DoesPost() const {
     return true;
 }
 
@@ -41,7 +41,7 @@ BackCommand::BackCommand(const std::vector<std::string>& path_segments,
 
 BackCommand::~BackCommand() {}
 
-bool BackCommand::DoesPost() {
+bool BackCommand::DoesPost() const {
     return true;
 }
 
@@ -63,7 +63,7 @@ RefreshCommand::RefreshCommand(const std::vector<std::string>& path_segments,
 
 RefreshCommand::~RefreshCommand() {}
 
-bool RefreshCommand::DoesPost() {
+bool RefreshCommand::DoesPost() const {
     return true;
 }
 

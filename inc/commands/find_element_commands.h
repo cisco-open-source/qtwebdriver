@@ -23,7 +23,7 @@ public:
                       const bool find_one_element);
     virtual ~FindElementCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:

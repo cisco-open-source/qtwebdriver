@@ -29,9 +29,9 @@ public:
                     const base::DictionaryValue* const parameters);
     virtual ~CookieCommand();
 
-    virtual bool DoesDelete() OVERRIDE;
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
 
     virtual void ExecuteDelete(Response* const response) OVERRIDE;
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -52,7 +52,7 @@ public:
 
     virtual bool Init(Response* const response) OVERRIDE;
 
-    virtual bool DoesDelete() OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
 
     virtual void ExecuteDelete(Response* const response) OVERRIDE;
 

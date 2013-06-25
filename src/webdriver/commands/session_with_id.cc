@@ -22,11 +22,11 @@ SessionWithID::SessionWithID(const std::vector<std::string>& path_segments,
 
 SessionWithID::~SessionWithID() {}
 
-bool SessionWithID::DoesGet() {
+bool SessionWithID::DoesGet() const {
     return true;
 }
 
-bool SessionWithID::DoesDelete() {
+bool SessionWithID::DoesDelete() const {
     return true;
 }
 

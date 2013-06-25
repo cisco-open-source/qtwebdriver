@@ -24,8 +24,8 @@ class HTML5LocationCommand : public WebDriverCommand {
                        const base::DictionaryValue* const parameters);
   virtual ~HTML5LocationCommand();
 
-  virtual bool DoesGet() OVERRIDE;
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
 
   // Returns the current geolocation.
   virtual void ExecuteGet(Response* const response) OVERRIDE;

@@ -21,7 +21,7 @@ LogCommand::LogCommand(
 LogCommand::~LogCommand() {
 }
 
-bool LogCommand::DoesPost() {
+bool LogCommand::DoesPost() const {
     return true;
 }
 
@@ -55,7 +55,7 @@ LogTypesCommand::LogTypesCommand(
 LogTypesCommand::~LogTypesCommand() {
 }
 
-bool LogTypesCommand::DoesGet() {
+bool LogTypesCommand::DoesGet() const {
     return true;
 }
 

@@ -23,7 +23,7 @@ ScreenshotCommand::ScreenshotCommand(const std::vector<std::string>& ps,
 
 ScreenshotCommand::~ScreenshotCommand() {}
 
-bool ScreenshotCommand::DoesGet() {
+bool ScreenshotCommand::DoesGet() const {
     return true;
 }
 

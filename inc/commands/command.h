@@ -37,13 +37,13 @@ public:
     virtual ~Command();
 
     /// Indicates if this command URL responds to DELETE method.
-    virtual bool DoesDelete();
+    virtual bool DoesDelete() const;
 
     /// Indicates if this command URL responds to GET method.
-    virtual bool DoesGet();
+    virtual bool DoesGet() const;
 
     /// Indicates if this command URL responds to POST method.
-    virtual bool DoesPost();
+    virtual bool DoesPost() const;
 
     /// Initializes this command for execution. If initialization fails, will
     /// return false and populate the response with the necessary information

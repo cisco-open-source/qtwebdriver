@@ -29,8 +29,8 @@ public:
                 const DictionaryValue* const parameters);
   	virtual ~SessionWithID();
 
-  	virtual bool DoesGet() OVERRIDE;
-  	virtual bool DoesDelete() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
+  	virtual bool DoesDelete() const OVERRIDE;
 
   	virtual void ExecuteGet(Response* const response) OVERRIDE;
   	virtual void ExecuteDelete(Response* const response) OVERRIDE;

@@ -19,7 +19,7 @@ BrowserConnectionCommand::BrowserConnectionCommand(
 
 BrowserConnectionCommand::~BrowserConnectionCommand() {}
 
-bool BrowserConnectionCommand::DoesGet() {
+bool BrowserConnectionCommand::DoesGet() const {
   return true;
 }
 

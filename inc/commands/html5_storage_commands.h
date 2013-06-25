@@ -24,9 +24,9 @@ public:
                       const base::DictionaryValue* const parameters);
     virtual ~LocalStorageCommand();
 
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesPost() OVERRIDE;
-    virtual bool DoesDelete() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
 
     /// Returns the list of all keys in the HTML5 localStorage object.
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -47,8 +47,8 @@ public:
                          const base::DictionaryValue* const parameters);
     virtual ~LocalStorageKeyCommand();
 
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesDelete() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
 
     /// Returns the value of an item in the HTML5 localStorage.
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -66,7 +66,7 @@ public:
                           const base::DictionaryValue* const parameters);
     virtual ~LocalStorageSizeCommand();
 
-    virtual bool DoesGet() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
 
     /// Returns the size of the HTML5 localStorage object.
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -81,9 +81,9 @@ public:
                         const base::DictionaryValue* parameters);
     virtual ~SessionStorageCommand();
 
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesPost() OVERRIDE;
-    virtual bool DoesDelete() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
 
     /// Returns the key of all items in the HTML5 sessionStorage object.
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -104,8 +104,8 @@ public:
                            const base::DictionaryValue* const parameters);
     virtual ~SessionStorageKeyCommand();
 
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesDelete() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesDelete() const OVERRIDE;
 
     /// Returns the value of an item in the HTML5 sessionStorage.
     virtual void ExecuteGet(Response* const response) OVERRIDE;
@@ -123,7 +123,7 @@ public:
                             const base::DictionaryValue* const parameters);
     virtual ~SessionStorageSizeCommand();
 
-    virtual bool DoesGet() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
 
     /// Returns the size of the HTML5 sessionStorage object.
     virtual void ExecuteGet(Response* const response) OVERRIDE;

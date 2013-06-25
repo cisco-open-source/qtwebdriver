@@ -15,7 +15,7 @@ Sessions::Sessions(const std::vector<std::string>& path_segments,
 
 Sessions::~Sessions() {}
 
-bool Sessions::DoesGet() {
+bool Sessions::DoesGet() const {
     return true;
 }
 

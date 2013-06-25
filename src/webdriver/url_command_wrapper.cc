@@ -24,15 +24,15 @@ CommandWrapper::CommandWrapper(const std::vector<std::string>& path_segments,
 
 CommandWrapper::~CommandWrapper() { }
 
-bool CommandWrapper::DoesDelete() {
+bool CommandWrapper::DoesDelete() const {
 	return delegate_->DoesDelete();
 }
 
-bool CommandWrapper::DoesGet() {
+bool CommandWrapper::DoesGet() const {
 	return delegate_->DoesGet();
 }
 
-bool CommandWrapper::DoesPost() {
+bool CommandWrapper::DoesPost() const {
 	return delegate_->DoesPost();
 }
 

@@ -21,7 +21,7 @@ TitleCommand::TitleCommand(const std::vector<std::string>& path_segments,
 
 TitleCommand::~TitleCommand() {}
 
-bool TitleCommand::DoesGet() {
+bool TitleCommand::DoesGet() const {
     return true;
 }
 

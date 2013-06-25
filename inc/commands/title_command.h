@@ -22,7 +22,7 @@ public:
                const DictionaryValue* const parameters);
   	virtual ~TitleCommand();
 
-  	virtual bool DoesGet() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
   	virtual void ExecuteGet(Response* const response) OVERRIDE;
 
 private:

@@ -26,7 +26,7 @@ public:
                  const DictionaryValue* const parameters);
   	virtual ~ExecuteCommand();
 
-  	virtual bool DoesPost() OVERRIDE;
+  	virtual bool DoesPost() const OVERRIDE;
   	virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:

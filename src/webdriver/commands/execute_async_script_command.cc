@@ -20,7 +20,7 @@ ExecuteAsyncScriptCommand::ExecuteAsyncScriptCommand(
 
 ExecuteAsyncScriptCommand::~ExecuteAsyncScriptCommand() {}
 
-bool ExecuteAsyncScriptCommand::DoesPost() {
+bool ExecuteAsyncScriptCommand::DoesPost() const {
     return true;
 }
 

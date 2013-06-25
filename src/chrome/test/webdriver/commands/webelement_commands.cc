@@ -57,7 +57,7 @@ ElementAttributeCommand::ElementAttributeCommand(
 
 ElementAttributeCommand::~ElementAttributeCommand() {}
 
-bool ElementAttributeCommand::DoesGet() {
+bool ElementAttributeCommand::DoesGet() const {
   return true;
 }
 
@@ -89,7 +89,7 @@ ElementClearCommand::ElementClearCommand(
 
 ElementClearCommand::~ElementClearCommand() {}
 
-bool ElementClearCommand::DoesPost() {
+bool ElementClearCommand::DoesPost() const {
   return true;
 }
 
@@ -128,7 +128,7 @@ ElementCssCommand::ElementCssCommand(
 
 ElementCssCommand::~ElementCssCommand() {}
 
-bool ElementCssCommand::DoesGet() {
+bool ElementCssCommand::DoesGet() const {
   return true;
 }
 
@@ -166,7 +166,7 @@ ElementDisplayedCommand::ElementDisplayedCommand(
 
 ElementDisplayedCommand::~ElementDisplayedCommand() {}
 
-bool ElementDisplayedCommand::DoesGet() {
+bool ElementDisplayedCommand::DoesGet() const {
   return true;
 }
 
@@ -191,7 +191,7 @@ ElementEnabledCommand::ElementEnabledCommand(
 
 ElementEnabledCommand::~ElementEnabledCommand() {}
 
-bool ElementEnabledCommand::DoesGet() {
+bool ElementEnabledCommand::DoesGet() const {
   return true;
 }
 
@@ -233,7 +233,7 @@ ElementEqualsCommand::ElementEqualsCommand(
 
 ElementEqualsCommand::~ElementEqualsCommand() {}
 
-bool ElementEqualsCommand::DoesGet() {
+bool ElementEqualsCommand::DoesGet() const {
   return true;
 }
 
@@ -266,7 +266,7 @@ ElementLocationCommand::ElementLocationCommand(
 
 ElementLocationCommand::~ElementLocationCommand() {}
 
-bool ElementLocationCommand::DoesGet() {
+bool ElementLocationCommand::DoesGet() const {
   return true;
 }
 
@@ -292,7 +292,7 @@ ElementLocationInViewCommand::ElementLocationInViewCommand(
 
 ElementLocationInViewCommand::~ElementLocationInViewCommand() {}
 
-bool ElementLocationInViewCommand::DoesGet() {
+bool ElementLocationInViewCommand::DoesGet() const {
   return true;
 }
 
@@ -318,7 +318,7 @@ ElementNameCommand::ElementNameCommand(
 
 ElementNameCommand::~ElementNameCommand() {}
 
-bool ElementNameCommand::DoesGet() {
+bool ElementNameCommand::DoesGet() const {
   return true;
 }
 
@@ -342,11 +342,11 @@ ElementSelectedCommand::ElementSelectedCommand(
 
 ElementSelectedCommand::~ElementSelectedCommand() {}
 
-bool ElementSelectedCommand::DoesGet() {
+bool ElementSelectedCommand::DoesGet() const {
   return true;
 }
 
-bool ElementSelectedCommand::DoesPost() {
+bool ElementSelectedCommand::DoesPost() const {
   return true;
 }
 
@@ -379,7 +379,7 @@ ElementSizeCommand::ElementSizeCommand(
 
 ElementSizeCommand::~ElementSizeCommand() {}
 
-bool ElementSizeCommand::DoesGet() {
+bool ElementSizeCommand::DoesGet() const {
   return true;
 }
 
@@ -406,7 +406,7 @@ ElementSubmitCommand::ElementSubmitCommand(
 
 ElementSubmitCommand::~ElementSubmitCommand() {}
 
-bool ElementSubmitCommand::DoesPost() {
+bool ElementSubmitCommand::DoesPost() const {
   return true;
 }
 
@@ -435,7 +435,7 @@ ElementToggleCommand::ElementToggleCommand(
 
 ElementToggleCommand::~ElementToggleCommand() {}
 
-bool ElementToggleCommand::DoesPost() {
+bool ElementToggleCommand::DoesPost() const {
   return true;
 }
 
@@ -465,11 +465,11 @@ ElementValueCommand::ElementValueCommand(
 
 ElementValueCommand::~ElementValueCommand() {}
 
-bool ElementValueCommand::DoesGet() {
+bool ElementValueCommand::DoesGet() const {
   return true;
 }
 
-bool ElementValueCommand::DoesPost() {
+bool ElementValueCommand::DoesPost() const {
   return true;
 }
 
@@ -624,7 +624,7 @@ ElementTextCommand::ElementTextCommand(
 
 ElementTextCommand::~ElementTextCommand() {}
 
-bool ElementTextCommand::DoesGet() {
+bool ElementTextCommand::DoesGet() const {
   return true;
 }
 

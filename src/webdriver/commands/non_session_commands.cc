@@ -23,7 +23,7 @@ StatusCommand::StatusCommand(
 
 StatusCommand::~StatusCommand() {}
 
-bool StatusCommand::DoesGet() {
+bool StatusCommand::DoesGet() const {
     return true;
 }
 
@@ -54,7 +54,7 @@ GlobalLogCommand::GlobalLogCommand(
 
 GlobalLogCommand::~GlobalLogCommand() {}
 
-bool GlobalLogCommand::DoesGet() {
+bool GlobalLogCommand::DoesGet() const {
     return true;
 }
 

@@ -21,7 +21,7 @@ SetTimeoutCommand::SetTimeoutCommand(
 
 SetTimeoutCommand::~SetTimeoutCommand() {}
 
-bool SetTimeoutCommand::DoesPost() {
+bool SetTimeoutCommand::DoesPost() const {
     return true;
 }
 

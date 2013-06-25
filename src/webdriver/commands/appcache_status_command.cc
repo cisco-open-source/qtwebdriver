@@ -22,7 +22,7 @@ AppCacheStatusCommand::AppCacheStatusCommand(
 
 AppCacheStatusCommand::~AppCacheStatusCommand() {}
 
-bool AppCacheStatusCommand::DoesGet() {
+bool AppCacheStatusCommand::DoesGet() const {
     return true;
 }
 

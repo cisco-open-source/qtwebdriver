@@ -22,7 +22,7 @@ public:
                     const DictionaryValue* const parameters);
     virtual ~ForwardCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -37,7 +37,7 @@ public:
                 const DictionaryValue* const parameters);
     virtual ~BackCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -52,7 +52,7 @@ public:
                     const DictionaryValue* const parameters);
     virtual ~RefreshCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:

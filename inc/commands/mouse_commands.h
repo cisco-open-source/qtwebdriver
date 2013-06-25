@@ -27,7 +27,7 @@ public:
                       const base::DictionaryValue* const parameters);
     virtual ~MoveAndClickCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -42,7 +42,7 @@ public:
                const base::DictionaryValue* const parameters);
     virtual ~HoverCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -61,7 +61,7 @@ public:
                         const base::DictionaryValue* const parameters);
     virtual ~AdvancedMouseCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(AdvancedMouseCommand);

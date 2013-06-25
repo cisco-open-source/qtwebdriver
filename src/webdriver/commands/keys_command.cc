@@ -20,7 +20,7 @@ KeysCommand::KeysCommand(const std::vector<std::string>& path_segments,
 
 KeysCommand::~KeysCommand() {}
 
-bool KeysCommand::DoesPost() {
+bool KeysCommand::DoesPost() const {
     return true;
 }
 

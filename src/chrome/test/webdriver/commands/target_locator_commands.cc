@@ -23,7 +23,7 @@ WindowHandleCommand::WindowHandleCommand(
 
 WindowHandleCommand::~WindowHandleCommand() {}
 
-bool WindowHandleCommand::DoesGet() {
+bool WindowHandleCommand::DoesGet() const {
   return true;
 }
 
@@ -39,7 +39,7 @@ WindowHandlesCommand::WindowHandlesCommand(
 
 WindowHandlesCommand::~WindowHandlesCommand() {}
 
-bool WindowHandlesCommand::DoesGet() {
+bool WindowHandlesCommand::DoesGet() const {
   return true;
 }
 
@@ -68,11 +68,11 @@ WindowCommand::WindowCommand(
 
 WindowCommand::~WindowCommand() {}
 
-bool WindowCommand::DoesPost() {
+bool WindowCommand::DoesPost() const {
   return true;
 }
 
-bool WindowCommand::DoesDelete() {
+bool WindowCommand::DoesDelete() const {
   return true;
 }
 
@@ -106,7 +106,7 @@ SwitchFrameCommand::SwitchFrameCommand(
 
 SwitchFrameCommand::~SwitchFrameCommand() {}
 
-bool SwitchFrameCommand::DoesPost() {
+bool SwitchFrameCommand::DoesPost() const {
   return true;
 }
 
@@ -161,7 +161,7 @@ ActiveElementCommand::ActiveElementCommand(
 
 ActiveElementCommand::~ActiveElementCommand() {}
 
-bool ActiveElementCommand::DoesPost() {
+bool ActiveElementCommand::DoesPost() const {
   return true;
 }
 

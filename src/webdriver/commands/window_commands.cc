@@ -44,11 +44,11 @@ WindowSizeCommand::WindowSizeCommand(
 WindowSizeCommand::~WindowSizeCommand() {
 }
 
-bool WindowSizeCommand::DoesGet() {
+bool WindowSizeCommand::DoesGet() const {
     return true;
 }
 
-bool WindowSizeCommand::DoesPost() {
+bool WindowSizeCommand::DoesPost() const {
     return true;
 }
 
@@ -135,11 +135,11 @@ WindowPositionCommand::WindowPositionCommand(
 WindowPositionCommand::~WindowPositionCommand() {
 }
 
-bool WindowPositionCommand::DoesGet() {
+bool WindowPositionCommand::DoesGet() const {
     return true;
 }
 
-bool WindowPositionCommand::DoesPost() {
+bool WindowPositionCommand::DoesPost() const {
     return true;
 }
 
@@ -222,7 +222,7 @@ WindowMaximizeCommand::WindowMaximizeCommand(
 WindowMaximizeCommand::~WindowMaximizeCommand() {
 }
 
-bool WindowMaximizeCommand::DoesPost() {
+bool WindowMaximizeCommand::DoesPost() const {
     return true;
 }
 

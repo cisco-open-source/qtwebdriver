@@ -21,7 +21,7 @@ ExecuteCommand::ExecuteCommand(const std::vector<std::string>& path_segments,
 
 ExecuteCommand::~ExecuteCommand() {}
 
-bool ExecuteCommand::DoesPost() {
+bool ExecuteCommand::DoesPost() const {
     return true;
 }
 

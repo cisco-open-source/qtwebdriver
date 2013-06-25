@@ -26,7 +26,7 @@ public:
                     const base::DictionaryValue* const parameters);
   	virtual ~ScreenshotCommand();
 
-  	virtual bool DoesGet() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
   	virtual void ExecuteGet(Response* const response) OVERRIDE;
 
 private:

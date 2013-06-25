@@ -24,7 +24,7 @@ MoveAndClickCommand::MoveAndClickCommand(
 
 MoveAndClickCommand::~MoveAndClickCommand() {}
 
-bool MoveAndClickCommand::DoesPost() {
+bool MoveAndClickCommand::DoesPost() const {
   return true;
 }
 
@@ -50,7 +50,7 @@ HoverCommand::HoverCommand(const std::vector<std::string>& path_segments,
 
 HoverCommand::~HoverCommand() {}
 
-bool HoverCommand::DoesPost() {
+bool HoverCommand::DoesPost() const {
     return true;
 }
 
@@ -79,7 +79,7 @@ AdvancedMouseCommand::AdvancedMouseCommand(
 
 AdvancedMouseCommand::~AdvancedMouseCommand() {}
 
-bool AdvancedMouseCommand::DoesPost() {
+bool AdvancedMouseCommand::DoesPost() const {
     return true;
 }
 

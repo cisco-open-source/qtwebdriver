@@ -25,8 +25,8 @@ class AlertTextCommand : public ViewCommand {
                    const base::DictionaryValue* parameters);
     virtual ~AlertTextCommand();
 
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecuteGet(Response* const response) OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
@@ -40,7 +40,7 @@ public:
                      const base::DictionaryValue* parameters);
     virtual ~AcceptAlertCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -53,7 +53,7 @@ public:
                       const base::DictionaryValue* parameters);
     virtual ~DismissAlertCommand();
 
-    virtual bool DoesPost() OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:

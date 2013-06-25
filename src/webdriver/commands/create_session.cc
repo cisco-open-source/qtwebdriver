@@ -29,7 +29,7 @@ CreateSession::CreateSession(const std::vector<std::string>& path_segments,
 
 CreateSession::~CreateSession() {}
 
-bool CreateSession::DoesPost() { return true; }
+bool CreateSession::DoesPost() const { return true; }
 
 void CreateSession::ExecutePost(Response* const response) {
     const DictionaryValue* desired_caps_dict;

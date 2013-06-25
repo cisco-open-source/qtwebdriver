@@ -23,7 +23,7 @@ FindElementCommand::FindElementCommand(
 
 FindElementCommand::~FindElementCommand() {}
 
-bool FindElementCommand::DoesPost() {
+bool FindElementCommand::DoesPost() const {
     return true;
 }
 

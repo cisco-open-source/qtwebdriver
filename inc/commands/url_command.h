@@ -23,8 +23,8 @@ public:
              const DictionaryValue* const parameters);
   	virtual ~URLCommand();
 
-  	virtual bool DoesGet() OVERRIDE;
-  	virtual bool DoesPost() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
+  	virtual bool DoesPost() const OVERRIDE;
   	virtual void ExecuteGet(Response* const response) OVERRIDE;
   	virtual void ExecutePost(Response* const response) OVERRIDE;
 

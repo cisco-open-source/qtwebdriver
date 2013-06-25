@@ -15,7 +15,7 @@ XDRPCCommand::XDRPCCommand(const std::vector<std::string>& path_segments,
 
 XDRPCCommand::~XDRPCCommand() {}
 
-bool XDRPCCommand::DoesPost() {
+bool XDRPCCommand::DoesPost() const {
     return true;
 }
 

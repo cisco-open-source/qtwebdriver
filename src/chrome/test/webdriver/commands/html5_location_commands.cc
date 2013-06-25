@@ -18,11 +18,11 @@ HTML5LocationCommand::HTML5LocationCommand(
 
 HTML5LocationCommand::~HTML5LocationCommand() {}
 
-bool HTML5LocationCommand::DoesGet() {
+bool HTML5LocationCommand::DoesGet() const {
   return true;
 }
 
-bool HTML5LocationCommand::DoesPost() {
+bool HTML5LocationCommand::DoesPost() const {
   return true;
 }
 

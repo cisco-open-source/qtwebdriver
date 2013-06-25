@@ -24,7 +24,7 @@ public:
              const base::DictionaryValue* parameters);
   	virtual ~LogCommand();
 
-  	virtual bool DoesPost() OVERRIDE;
+  	virtual bool DoesPost() const OVERRIDE;
   	virtual void ExecutePost(Response* const response) OVERRIDE;
 
 private:
@@ -37,7 +37,7 @@ public:
              const base::DictionaryValue* parameters);
   	virtual ~LogTypesCommand();
 
-  	virtual bool DoesGet() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
   	virtual void ExecuteGet(Response* const response) OVERRIDE;
 
 private:

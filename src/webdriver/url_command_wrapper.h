@@ -21,9 +21,9 @@ public:
              Command* delegate);
   	virtual ~CommandWrapper();
 
-  	virtual bool DoesDelete() OVERRIDE;
-    virtual bool DoesGet() OVERRIDE;
-    virtual bool DoesPost() OVERRIDE;
+  	virtual bool DoesDelete() const OVERRIDE;
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
     virtual bool Init(Response* const response) OVERRIDE;
     virtual void Finish(Response* const response) OVERRIDE;
     virtual void ExecuteDelete(Response* const response) OVERRIDE;

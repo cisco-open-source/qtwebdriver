@@ -50,7 +50,7 @@ class ElementAttributeCommand : public WebElementCommand {
                           const base::DictionaryValue* parameters);
   virtual ~ElementAttributeCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -65,7 +65,7 @@ class ElementClearCommand : public WebElementCommand {
                       const base::DictionaryValue* parameters);
   virtual ~ElementClearCommand();
 
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
  private:
@@ -80,7 +80,7 @@ class ElementCssCommand : public WebElementCommand {
                     const base::DictionaryValue* parameters);
   virtual ~ElementCssCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -95,7 +95,7 @@ class ElementDisplayedCommand : public WebElementCommand {
                           const base::DictionaryValue* parameters);
   virtual ~ElementDisplayedCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -110,7 +110,7 @@ class ElementEnabledCommand : public WebElementCommand {
                         const base::DictionaryValue* parameters);
   virtual ~ElementEnabledCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -125,7 +125,7 @@ class ElementEqualsCommand : public WebElementCommand {
                        const base::DictionaryValue* parameters);
   virtual ~ElementEqualsCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -140,7 +140,7 @@ class ElementLocationCommand : public WebElementCommand {
                          const base::DictionaryValue* parameters);
   virtual ~ElementLocationCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -156,7 +156,7 @@ class ElementLocationInViewCommand : public WebElementCommand {
                                const base::DictionaryValue* parameters);
   virtual ~ElementLocationInViewCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -171,7 +171,7 @@ class ElementNameCommand : public WebElementCommand {
                      const base::DictionaryValue* parameters);
   virtual ~ElementNameCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -187,8 +187,8 @@ class ElementSelectedCommand : public WebElementCommand {
                          const base::DictionaryValue* parameters);
   virtual ~ElementSelectedCommand();
 
-  virtual bool DoesGet() OVERRIDE;
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
@@ -204,7 +204,7 @@ class ElementSizeCommand : public WebElementCommand {
                      const base::DictionaryValue* parameters);
   virtual ~ElementSizeCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -219,7 +219,7 @@ class ElementSubmitCommand : public WebElementCommand {
                        const base::DictionaryValue* parameters);
   virtual ~ElementSubmitCommand();
 
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
  private:
@@ -234,7 +234,7 @@ class ElementToggleCommand : public WebElementCommand {
                        const base::DictionaryValue* parameters);
   virtual ~ElementToggleCommand();
 
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
  private:
@@ -250,8 +250,8 @@ class ElementValueCommand : public WebElementCommand {
                       const base::DictionaryValue* parameters);
   virtual ~ElementValueCommand();
 
-  virtual bool DoesGet() OVERRIDE;
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
@@ -274,7 +274,7 @@ class ElementTextCommand : public WebElementCommand {
                      const base::DictionaryValue* parameters);
   virtual ~ElementTextCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:

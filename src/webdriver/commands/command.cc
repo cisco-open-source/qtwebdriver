@@ -13,15 +13,15 @@ Command::Command(const std::vector<std::string>& path_segments,
 
 Command::~Command() {}
 
-bool Command::DoesDelete() {
+bool Command::DoesDelete() const {
     return false;
 }
 
-bool Command::DoesGet() {
+bool Command::DoesGet() const {
     return false;
 }
 
-bool Command::DoesPost() {
+bool Command::DoesPost() const {
     return false;
 }
 

@@ -20,15 +20,15 @@ LocalStorageCommand::LocalStorageCommand(
 
 LocalStorageCommand::~LocalStorageCommand() {}
 
-bool LocalStorageCommand::DoesGet() {
+bool LocalStorageCommand::DoesGet() const {
     return true;
 }
 
-bool LocalStorageCommand::DoesPost() {
+bool LocalStorageCommand::DoesPost() const {
     return true;
 }
 
-bool LocalStorageCommand::DoesDelete() {
+bool LocalStorageCommand::DoesDelete() const {
     return true;
 }
 
@@ -94,11 +94,11 @@ LocalStorageKeyCommand::LocalStorageKeyCommand(
 
 LocalStorageKeyCommand::~LocalStorageKeyCommand() {}
 
-bool LocalStorageKeyCommand::DoesGet() {
+bool LocalStorageKeyCommand::DoesGet() const {
     return true;
 }
 
-bool LocalStorageKeyCommand::DoesDelete() {
+bool LocalStorageKeyCommand::DoesDelete() const {
     return true;
 }
 
@@ -150,7 +150,7 @@ LocalStorageSizeCommand::LocalStorageSizeCommand(
 
 LocalStorageSizeCommand::~LocalStorageSizeCommand() {}
 
-bool LocalStorageSizeCommand::DoesGet() {
+bool LocalStorageSizeCommand::DoesGet() const {
     return true;
 }
 
@@ -178,15 +178,15 @@ SessionStorageCommand::SessionStorageCommand(
 
 SessionStorageCommand::~SessionStorageCommand() {}
 
-bool SessionStorageCommand::DoesGet() {
+bool SessionStorageCommand::DoesGet() const {
     return true;
 }
 
-bool SessionStorageCommand::DoesPost() {
+bool SessionStorageCommand::DoesPost() const {
     return true;
 }
 
-bool SessionStorageCommand::DoesDelete() {
+bool SessionStorageCommand::DoesDelete() const {
     return true;
 }
 
@@ -251,11 +251,11 @@ SessionStorageKeyCommand::SessionStorageKeyCommand(
 
 SessionStorageKeyCommand::~SessionStorageKeyCommand() {}
 
-bool SessionStorageKeyCommand::DoesGet() {
+bool SessionStorageKeyCommand::DoesGet() const {
     return true;
 }
 
-bool SessionStorageKeyCommand::DoesDelete() {
+bool SessionStorageKeyCommand::DoesDelete() const {
     return true;
 }
 
@@ -307,7 +307,7 @@ SessionStorageSizeCommand::SessionStorageSizeCommand(
 
 SessionStorageSizeCommand::~SessionStorageSizeCommand() {}
 
-bool SessionStorageSizeCommand::DoesGet() {
+bool SessionStorageSizeCommand::DoesGet() const {
     return true;
 }
 

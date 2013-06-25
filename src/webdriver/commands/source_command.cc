@@ -21,7 +21,7 @@ SourceCommand::SourceCommand(const std::vector<std::string>& path_segments,
 
 SourceCommand::~SourceCommand() {}
 
-bool SourceCommand::DoesGet() {
+bool SourceCommand::DoesGet() const {
     return true;
 }
 

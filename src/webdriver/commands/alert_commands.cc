@@ -22,11 +22,11 @@ AlertTextCommand::AlertTextCommand(
 AlertTextCommand::~AlertTextCommand() {
 }
 
-bool AlertTextCommand::DoesGet() {
+bool AlertTextCommand::DoesGet() const {
     return true;
 }
 
-bool AlertTextCommand::DoesPost() {
+bool AlertTextCommand::DoesPost() const {
     return true;
 }
 
@@ -77,7 +77,7 @@ AcceptAlertCommand::AcceptAlertCommand(
 AcceptAlertCommand::~AcceptAlertCommand() {
 }
 
-bool AcceptAlertCommand::DoesPost() {
+bool AcceptAlertCommand::DoesPost() const {
     return true;
 }
 
@@ -103,7 +103,7 @@ DismissAlertCommand::DismissAlertCommand(
 DismissAlertCommand::~DismissAlertCommand() {
 }
 
-bool DismissAlertCommand::DoesPost() {
+bool DismissAlertCommand::DoesPost() const {
     return true;
 }
 

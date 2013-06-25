@@ -107,7 +107,7 @@ private:
     void WriteHttpResponse(struct mg_connection* connection,
                        const HttpResponse& response);
 
-    static ListValue* ListCommandSupportedMethods(/*TODO: const*/ Command& command);
+    static ListValue* ListCommandSupportedMethods(const Command& command);
 
     int InitMongooseOptions();
 

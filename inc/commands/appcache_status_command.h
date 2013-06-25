@@ -24,7 +24,7 @@ public:
                         const base::DictionaryValue* const parameters);
   	virtual ~AppCacheStatusCommand();
 
-  	virtual bool DoesGet() OVERRIDE;
+  	virtual bool DoesGet() const OVERRIDE;
 
   	// A call with HTTP GET will return the status of the appcahe.
   	virtual void ExecuteGet(Response* const response) OVERRIDE;

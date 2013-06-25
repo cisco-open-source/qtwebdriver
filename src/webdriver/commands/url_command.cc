@@ -22,11 +22,11 @@ URLCommand::URLCommand(const std::vector<std::string>& path_segments,
 
 URLCommand::~URLCommand() {}
 
-bool URLCommand::DoesGet() {
+bool URLCommand::DoesGet() const {
     return true;
 }
 
-bool URLCommand::DoesPost() {
+bool URLCommand::DoesPost() const {
     return true;
 }
 

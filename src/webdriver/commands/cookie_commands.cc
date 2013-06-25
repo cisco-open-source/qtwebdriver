@@ -24,15 +24,15 @@ CookieCommand::CookieCommand(const std::vector<std::string>& path_segments,
 
 CookieCommand::~CookieCommand() {}
 
-bool CookieCommand::DoesDelete() {
+bool CookieCommand::DoesDelete() const {
     return true;
 }
 
-bool CookieCommand::DoesGet() {
+bool CookieCommand::DoesGet() const {
     return true;
 }
 
-bool CookieCommand::DoesPost() {
+bool CookieCommand::DoesPost() const {
     return true;
 }
 
@@ -185,7 +185,7 @@ bool NamedCookieCommand::Init(Response* const response) {
     return true;
 }
 
-bool NamedCookieCommand::DoesDelete() {
+bool NamedCookieCommand::DoesDelete() const {
     return true;
 }
 

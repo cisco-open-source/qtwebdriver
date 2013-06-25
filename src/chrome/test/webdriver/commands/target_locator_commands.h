@@ -27,7 +27,7 @@ class WindowHandleCommand : public WebDriverCommand {
                       base::DictionaryValue* parameters);
   virtual ~WindowHandleCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -42,7 +42,7 @@ class WindowHandlesCommand : public WebDriverCommand {
                        base::DictionaryValue* parameters);
   virtual ~WindowHandlesCommand();
 
-  virtual bool DoesGet() OVERRIDE;
+  virtual bool DoesGet() const OVERRIDE;
   virtual void ExecuteGet(Response* const response) OVERRIDE;
 
  private:
@@ -58,8 +58,8 @@ class WindowCommand : public WebDriverCommand {
                 base::DictionaryValue* parameters);
   virtual ~WindowCommand();
 
-  virtual bool DoesPost() OVERRIDE;
-  virtual bool DoesDelete() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
+  virtual bool DoesDelete() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
   virtual void ExecuteDelete(Response* const response) OVERRIDE;
 
@@ -77,7 +77,7 @@ class SwitchFrameCommand : public WebDriverCommand {
                      base::DictionaryValue* parameters);
   virtual ~SwitchFrameCommand();
 
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
  private:
@@ -93,7 +93,7 @@ class ActiveElementCommand : public WebDriverCommand {
                        base::DictionaryValue* parameters);
   virtual ~ActiveElementCommand();
 
-  virtual bool DoesPost() OVERRIDE;
+  virtual bool DoesPost() const OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
  private:
