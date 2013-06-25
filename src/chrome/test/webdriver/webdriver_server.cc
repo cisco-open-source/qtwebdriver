@@ -345,6 +345,7 @@ int RunChromeDriver() {
               << "config                            The path to config file (e.g. config.json) in"  << std::endl
               << "                                  JSON format with specified WD parameters as"    << std::endl
               << "                                  described above (port, root, etc.)"             << std::endl
+              << "wi-server      false              If true, web inspector will be enabled"         << std::endl
               << "wi-port        9222               Web inspector listening port"                   << std::endl;
 
      return (EXIT_SUCCESS);
@@ -377,6 +378,11 @@ int RunChromeDriver() {
       std::cout.rdbuf(null_stream.rdbuf());
       qInstallMessageHandler(silentMessageOutput);
   }
+
+  // set WI enabled
+  if (cmd_line->HasSwitch("wi-server")) {
+      SessionManager::GetInstance()->set_wi_enabled(true);
+  }
 #else
   // set default output mode
   qInstallMsgHandler(normalMessageOutput);
@@ -392,6 +398,11 @@ int RunChromeDriver() {
       std::cerr.rdbuf(null_stream.rdbuf());
       std::cout.rdbuf(null_stream.rdbuf());
       qInstallMsgHandler(silentMessageOutput);
+  }
+
+  // set WI enabled
+  if (cmd_line->HasSwitch("wi-server")) {
+      SessionManager::GetInstance()->set_wi_enabled(true);
   }
 #endif
 

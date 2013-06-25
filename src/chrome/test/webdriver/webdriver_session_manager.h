@@ -34,6 +34,7 @@ class SessionManager {
 
   void set_port(const std::string& port);
   void set_wi_port(unsigned int port);
+  void set_wi_enabled(bool isSupported);
 
   void set_url_base(const std::string& url_base);
   std::string url_base() const;
@@ -41,6 +42,7 @@ class SessionManager {
   std::map<std::string, Session*> GetSessions();
 
   unsigned int get_wi_port() const;
+  bool is_wi_enabled() const;
 
  private:
   SessionManager();
@@ -52,6 +54,7 @@ class SessionManager {
   std::string port_;
   std::string url_base_;
   unsigned int wi_port_;
+  bool isWIEnabled_;
 
   DISALLOW_COPY_AND_ASSIGN(SessionManager);
 };

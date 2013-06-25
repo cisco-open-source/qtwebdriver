@@ -238,8 +238,11 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     qDebug() << "[WD]: geometry:" << pStartView->geometry();
     if (options.command.HasSwitch(switches::kStartMaximized))
         pStartView->showMaximized();
- 
-    pStartView->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        pStartView->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 
     pStartView->show();
 }
@@ -673,7 +676,10 @@ void Automation::NavigateToURL(const WebViewId &view_id, const std::string &url,
     if (isLoading)
         loop.exec();
 
-    view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 }
 
 
@@ -690,7 +696,10 @@ void Automation::NavigateToURLAsync(const WebViewId &view_id, const std::string 
     QUrl address(QString(url.c_str()));
     view->load(address);
 
-    view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 }
 
 void Automation::GoForward(const WebViewId &view_id, Error **error)
@@ -706,7 +715,10 @@ void Automation::GoForward(const WebViewId &view_id, Error **error)
     QWebHistory *history = view->history();
     history->forward();
 
-    view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 }
 
 void Automation::GoBack(const WebViewId &view_id, Error **error)
@@ -722,7 +734,10 @@ void Automation::GoBack(const WebViewId &view_id, Error **error)
     QWebHistory *history = view->history();
     history->back();
 
-    view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 }
 
 void Automation::Reload(const WebViewId &view_id, Error **error)
@@ -737,7 +752,10 @@ void Automation::Reload(const WebViewId &view_id, Error **error)
 
     view->reload();
 
-    view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        view->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
 }
 
 void Automation::GetCookies(const WebViewId &view_id, const std::string &url, base::ListValue **cookies, Error **error)

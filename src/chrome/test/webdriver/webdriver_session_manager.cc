@@ -46,6 +46,11 @@ void SessionManager::set_wi_port(unsigned int port)
     wi_port_ = port;
 }
 
+void SessionManager::set_wi_enabled(bool isEnabled)
+{
+    isWIEnabled_ = isEnabled;
+}
+
 void SessionManager::set_url_base(const std::string& url_base) {
   url_base_ = url_base;
 }
@@ -63,7 +68,8 @@ std::map<std::string, Session*> SessionManager::GetSessions()
 SessionManager::SessionManager()
     : port_(""),
       url_base_(""),
-      wi_port_(9222)
+      wi_port_(9222),
+      isWIEnabled_(false)
 {}
 
 SessionManager::~SessionManager() {}
@@ -76,6 +82,11 @@ SessionManager* SessionManager::GetInstance() {
 unsigned int SessionManager::get_wi_port() const
 {
     return wi_port_;
+}
+
+bool SessionManager::is_wi_enabled() const
+{
+    return isWIEnabled_;
 }
 
 }  // namespace webdriver

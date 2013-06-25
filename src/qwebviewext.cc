@@ -9,6 +9,10 @@
 #include <QtGui/QWidget>
 #endif
 
+#include "chrome/test/webdriver/webdriver_session_manager.h"
+
+using namespace webdriver;
+
 QWebViewExt::QWebViewExt(QWidget *parent) :
     QWebView(parent)
 {
@@ -23,7 +27,11 @@ QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
 {
     QWebViewExt* newView = new QWebViewExt;
     newView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    newView->setProperty("_q_webInspectorServerPort", 9222);
+    if (SessionManager::GetInstance()->is_wi_enabled())
+    {
+        newView->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
+    }
+
     newView->show();
     newView->setAttribute(Qt::WA_DeleteOnClose, true);
     QVariant sessionId = property("sessionId");
