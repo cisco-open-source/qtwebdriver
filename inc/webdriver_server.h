@@ -56,14 +56,12 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Start();
 
-    const RouteTable& getRouteTable() const
-    {
-        return *routeTable_;
-    }
-
     void DispatchCommand(Command* command_ptr,
                          const std::string& method,
                          Response* response);
+
+    const RouteTable& GetRouteTable() const;
+    const std::string& url_base() const;
 
     static Server* GetInstance();
 

@@ -76,8 +76,6 @@ int Server::Init(const CommandLine &options) {
     if (options_.HasSwitch("url-base"))
         url_base_ = options_.GetSwitchValueASCII("url-base");
 
-    SessionManager::GetInstance()->set_url_base(url_base_);
-
     std::string driver_info = "*** Webdriver ****\nVersion:    "+ VersionInfo::Name() + "-" + VersionInfo::Version() +
                             "\nBuild Time: "+ VersionInfo::BuildDateTime() ;
     GlobalLogger::Log(kInfoLogLevel, driver_info);
@@ -435,6 +433,16 @@ void Server::DispatchCommand(Command* command_ptr,
         NOTREACHED();
     }
     command->Finish(response);
+}
+
+const RouteTable& Server::GetRouteTable() const
+{
+    return *routeTable_;
+}
+
+const std::string& Server::url_base() const
+{
+    return url_base_;
 }
 
 ListValue* Server::ListCommandSupportedMethods(/*TODO: const*/ Command& command) {

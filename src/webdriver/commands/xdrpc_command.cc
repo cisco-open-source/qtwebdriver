@@ -4,7 +4,6 @@
 #include "commands/xdrpc_command.h"
 #include "webdriver_route_table.h"
 #include "webdriver_server.h"
-#include "webdriver_session_manager.h"
 
 #include <string>
 
@@ -27,8 +26,7 @@ void XDRPCCommand::ExecutePost(Response* const response) {
     std::string path;
     GetStringParameter("path", &path);
 
-    SessionManager* manager = SessionManager::GetInstance();
-    path = path.substr(manager->url_base().length());
+    path = path.substr(Server::GetInstance()->url_base().length());
 
     std::vector<std::string> path_segments;
     base::SplitString(path, '/', &path_segments);
@@ -39,7 +37,7 @@ void XDRPCCommand::ExecutePost(Response* const response) {
 
     std::string matched_route;
     AbstractCommandCreator* cmdCreator =
-        Server::GetInstance()->getRouteTable().GetRouteForURL(path, &matched_route);
+        Server::GetInstance()->GetRouteTable().GetRouteForURL(path, &matched_route);
 
     Server::GetInstance()->DispatchCommand(
         cmdCreator->create(path_segments, parameters),
