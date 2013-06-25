@@ -44,7 +44,6 @@ int Server::Init(int argc, char *argv[]) {
 }
 
 int Server::Init(const CommandLine &options) {
-    base::AtExitManager exit;
     int ret_val = 0;
 
     if (state_ != STATE_UNCONFIGURED) {

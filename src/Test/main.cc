@@ -36,6 +36,7 @@
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
 
+#include "base/at_exit.h"
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
@@ -55,6 +56,7 @@ void PrintHelp();
 
 int main(int argc, char *argv[])
 {
+    base::AtExitManager exit;
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
