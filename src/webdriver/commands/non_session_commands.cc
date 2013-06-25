@@ -28,13 +28,12 @@ bool StatusCommand::DoesGet() {
 }
 
 void StatusCommand::ExecuteGet(Response* const response) {
-    VersionInfo version_info;
 
     DictionaryValue* build_info = new DictionaryValue;
     build_info->SetString("time",
-                          base::StringPrintf("%s PST", version_info.BuildDateTime().c_str()));
-    build_info->SetString("version", version_info.Version());
-    build_info->SetString("revision", version_info.LastChange());
+                          base::StringPrintf("%s PST", VersionInfo ::BuildDateTime().c_str()));
+    build_info->SetString("version", VersionInfo::Version());
+    build_info->SetString("revision", VersionInfo ::LastChange());
 
     DictionaryValue* os_info = new DictionaryValue;
     os_info->SetString("name", base::SysInfo::OperatingSystemName());
