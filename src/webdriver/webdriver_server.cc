@@ -40,7 +40,7 @@ Server::~Server() {}
 
 int Server::Init(int argc, char *argv[]) {
     CommandLine options(argc,argv);
-    Init(options);
+    return Init(options);
 }
 
 int Server::Init(const CommandLine &options) {
