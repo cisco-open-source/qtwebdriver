@@ -24,6 +24,7 @@ public:
                 QObject(NULL) {webView = view; is_loading = false;}
 
     void loadPage(QUrl url);
+    void reloadPage();
     bool isLoading() {return is_loading;}
     
 signals:

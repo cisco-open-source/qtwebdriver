@@ -36,6 +36,11 @@ void QPageLoader::loadPage(QUrl url) {
     webView->load(url);
 }
 
+void QPageLoader::reloadPage() {
+    connect(webView, SIGNAL(loadStarted()),this, SLOT(pageLoadStarted()));
+    webView->reload();
+}
+
 void QPageLoader::pageLoadStarted() {
     is_loading = true;
     connect(webView, SIGNAL(loadFinished(bool)),this, SLOT(pageLoadFinished()), Qt::QueuedConnection);
@@ -194,7 +199,20 @@ void QWebViewCmdExecutor::Reload(Error** error) {
     if (NULL == view)
         return;
 
-    view->reload();
+    // TODO: take into account page load strategy
+    {
+        // sync reload
+        QPageLoader pageLoader(view);
+        QEventLoop loop;
+        view->stop();
+        QObject::connect(&pageLoader, SIGNAL(loaded()),&loop,SLOT(quit()));
+        pageLoader.reloadPage();
+        if (pageLoader.isLoading()) {
+            loop.exec();
+        }
+
+        session_->logger().Log(kFineLogLevel, "Web sync reload.");
+    }
 }
 
 void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
