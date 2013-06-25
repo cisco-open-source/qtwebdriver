@@ -137,11 +137,6 @@ int Server::Start() {
     return 0;
 }
 
-Server* Server::GetInstance()
-{
-    return Singleton<Server>::get();
-}
-
 // Maximum safe size of HTTP response message. Any larger than this,
 // the message may not be transferred at all.
 const size_t kMaxHttpMessageSize = 1024 * 1024 * 16;  // 16MB
@@ -397,6 +392,21 @@ void Server::ReadRequestBody(const struct mg_request_info* const request_info,
     }
 }
 
+const RouteTable& Server::GetRouteTable() const
+{
+    return *routeTable_;
+}
+
+const std::string& Server::url_base() const
+{
+    return url_base_;
+}
+
+Server* Server::GetInstance()
+{
+    return Singleton<Server>::get();
+}
+
 void Server::DispatchCommand(Command* command_ptr,
                              const std::string& method,
                              Response* response) {
@@ -433,16 +443,6 @@ void Server::DispatchCommand(Command* command_ptr,
         NOTREACHED();
     }
     command->Finish(response);
-}
-
-const RouteTable& Server::GetRouteTable() const
-{
-    return *routeTable_;
-}
-
-const std::string& Server::url_base() const
-{
-    return url_base_;
 }
 
 ListValue* Server::ListCommandSupportedMethods(const Command& command) {

@@ -56,22 +56,24 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Start();
 
-    void DispatchCommand(Command* command_ptr,
-                         const std::string& method,
-                         Response* response);
-
     const RouteTable& GetRouteTable() const;
     const std::string& url_base() const;
 
     static Server* GetInstance();
 
 private:
+    friend class XDRPCCommand;
+
     CommandLine options_;
     scoped_ptr<RouteTable> routeTable_;
     std::vector<std::string> mg_options_;
     std::string url_base_;
     struct mg_context* mg_ctx_;
     State state_;
+
+    void DispatchCommand(Command* command_ptr,
+                         const std::string& method,
+                         Response* response);
 
     static void* ProcessHttpRequestCb(int event_raised,
                               struct mg_connection* connection,
