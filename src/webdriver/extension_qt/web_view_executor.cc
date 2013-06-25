@@ -132,7 +132,7 @@ void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
         "    return document.URL;"
         "}";
     *error = ExecuteScriptAndParse(
-                            GetFrame(view, session_->current_frame()),
+                            GetFrame(view, FramePath()),
                             kGetTitleScript,
                             "getTitle",
                             new ListValue(),
