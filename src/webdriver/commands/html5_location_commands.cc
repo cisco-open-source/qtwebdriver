@@ -12,7 +12,6 @@ namespace webdriver {
 HTML5LocationCommand::HTML5LocationCommand(
     const std::vector<std::string>& path_segments,
     const base::DictionaryValue* const parameters)
-//    : WebDriverCommand(path_segments, parameters) {}
     : ViewCommand(path_segments, parameters) {}
 
 HTML5LocationCommand::~HTML5LocationCommand() {}

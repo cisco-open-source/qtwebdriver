@@ -35,6 +35,11 @@ public:
     Server();
     ~Server();
 
+    /// Init server from command line
+    /// @param options - obtained command line
+    /// @return 0 - if init was success, error code otherwise.
+    int Init(const CommandLine &options);
+
     /// Init server, parse arguments as options, creates DefaultRouteTable. 
     /// @param argc count of arguments
     /// @param argv array of arguments

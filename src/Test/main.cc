@@ -18,6 +18,8 @@
 
 #endif
 
+#include <iostream>
+
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -36,6 +38,7 @@
 
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
+#include "versioninfo.h"
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
@@ -47,6 +50,8 @@
 #include "extension_qt/widget_view_executor.h"
 
 void setQtSettings();
+void PrintVersion();
+void PrintHelp();
 
 int main(int argc, char *argv[])
 {
@@ -96,8 +101,21 @@ int main(int argc, char *argv[])
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
 
+    CommandLine options(argc, argv);
+    // check if --help CL argument is present
+    if (options.HasSwitch("help")) {
+        PrintHelp();
+        return 0;
+    }
+
+    // check if --version CL argument is present
+    if (options.HasSwitch("version"))
+    {
+      PrintVersion();
+      return 0;
+    }
     webdriver::Server wd_server;
-    if (0 != wd_server.Init(argc, argv)) {
+    if (0 != wd_server.Init(options)) {
         return 1;
     }
 
@@ -124,3 +142,35 @@ void setQtSettings() {
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 }
+
+void PrintVersion() {
+    std::cout <<webdriver::VersionInfo::CreateVersionString()<< std::endl;
+}
+
+void PrintHelp() {
+    std::cout << "Usage: WebDriver [--OPTION=VALUE]..."                                             << std::endl
+
+                << "Starts QtWebDriver server"                                                        << std::endl
+                << ""                                                                                 << std::endl
+                << "OPTION         DEFAULT VALUE      DESCRIPTION"                                    << std::endl
+                << "http-threads   4                  The number of threads to use for handling"      << std::endl
+                << "                                  HTTP requests"                                  << std::endl
+                << "log-path       ./webdriver.log    The path to use for the QtWebDriver server"     << std::endl
+                << "                                  log"                                            << std::endl
+                << "root           ./web              The path of location to serve files from"       << std::endl
+                << "port           9517               The port that QtWebDriver listens on"           << std::endl
+                << "silence        false              If true, QtWebDriver will not log anything"     << std::endl
+                << "                                  to stdout/stderr"                               << std::endl
+                << "verbose        false              If true, QtWebDriver will log lots of stuff"    << std::endl
+                << "                                  to stdout/stderr"                               << std::endl
+                << "url-base                          The URL path prefix to use for all incoming"    << std::endl
+                << "                                  WebDriver REST requests. A prefix and postfix"  << std::endl
+                << "                                  '/' will automatically be appended if not"      << std::endl
+                << "                                  present"                                        << std::endl
+                << "config                            The path to config file (e.g. config.json) in"  << std::endl
+                << "                                  JSON format with specified WD parameters as"    << std::endl
+                << "                                  described above (port, root, etc.)"             << std::endl;
+}
+
+
+
