@@ -16,12 +16,14 @@
 #include "extension_qt/widget_view_handle.h"
 
 #include <QtCore/QtGlobal>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QApplication>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
-#include <QtWebKitWidgets/QWebFrame>
 #include <QtCore/QTimer>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets/QApplication>
+#include <QtWebKitWidgets/QWebFrame>
+
 #else
 #include <QtGui/QApplication>
 #endif
@@ -32,6 +34,11 @@ namespace webdriver {
 void QPageLoader::loadPage(QUrl url) {
     connect(webView, SIGNAL(loadStarted()),this, SLOT(pageLoadStarted()));
     webView->load(url);
+}
+
+void QPageLoader::reloadPage() {
+    connect(webView, SIGNAL(loadStarted()),this, SLOT(pageLoadStarted()));
+    webView->reload();
 }
 
 void QPageLoader::pageLoadStarted() {
@@ -125,7 +132,7 @@ void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
         "    return document.URL;"
         "}";
     *error = ExecuteScriptAndParse(
-                            GetFrame(view, session_->current_frame()),
+                            GetFrame(view, FramePath()),
                             kGetTitleScript,
                             "getTitle",
                             new ListValue(),
@@ -192,7 +199,20 @@ void QWebViewCmdExecutor::Reload(Error** error) {
     if (NULL == view)
         return;
 
-    view->reload();
+    // TODO: take into account page load strategy
+    {
+        // sync reload
+        QPageLoader pageLoader(view);
+        QEventLoop loop;
+        view->stop();
+        QObject::connect(&pageLoader, SIGNAL(loaded()),&loop,SLOT(quit()));
+        pageLoader.reloadPage();
+        if (pageLoader.isLoading()) {
+            loop.exec();
+        }
+
+        session_->logger().Log(kFineLogLevel, "Web sync reload.");
+    }
 }
 
 void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
