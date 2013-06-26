@@ -94,7 +94,8 @@ Automation::Automation(const Logger& logger)
     : logger_(logger),
       build_no_(0),
       isLoading(false),
-      sessionId(0)
+      sessionId(0),
+      jslogger()
 {
 }
 
@@ -239,7 +240,13 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     if (options.command.HasSwitch(switches::kStartMaximized))
         pStartView->showMaximized();
 
-    if (SessionManager::GetInstance()->is_wi_enabled())
+    //JS Console log redefinition
+    connect(pStartView->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(loadJSLogObject()));
+    connect(pStartView, SIGNAL(loadFinished(bool)),this, SLOT(loadConsoleJS()), Qt::QueuedConnection);
+    loadJSLogObject(pStartView->page()->mainFrame());
+    loadConsoleJS(pStartView);
+	
+	if (SessionManager::GetInstance()->is_wi_enabled())
     {
         pStartView->page()->setProperty("_q_webInspectorServerPort", SessionManager::GetInstance()->get_wi_port());
     }
@@ -2210,6 +2217,37 @@ void Automation::SetAlertPromptText(const WebViewId& view_id, const std::string 
     }
 }
 
+void Automation::GetBrowserLog(base::ListValue **log)
+{
+    *log = jslogger.getLog();
+}
+
+void Automation::ResetBrowserCurrentView(const WebViewId& old_view_id, const WebViewId& new_view_id, Error **error)
+{
+    if(checkView(old_view_id))
+    {
+        QWebView *view = qobject_cast<QWebView*>(old_view_id.GetView());
+        disconnect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(loadJSLogObject()));
+    }
+
+    if(!checkView(new_view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWebView *view = qobject_cast<QWebView*>(new_view_id.GetView());
+
+    if (view)
+    {
+        //JS Console log redefinition
+        connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(loadJSLogObject()));
+        connect(view, SIGNAL(loadFinished(bool)),this, SLOT(loadConsoleJS()), Qt::QueuedConnection);
+        loadJSLogObject(view->page()->mainFrame());
+        loadConsoleJS(view);
+    }
+}
+
 QWebFrame* Automation::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path)
 {
     if (frame_path.value().empty())
@@ -2347,8 +2385,52 @@ void Automation::pageLoadStarted()
 }
 
 void Automation::pageLoadFinished()
-{
+{ 
     isLoading = false;
+}
+
+void Automation::loadJSLogObject()
+{
+    QWebFrame *mainFrame = qobject_cast<QWebFrame*>(sender());
+    if (mainFrame)
+        loadJSLogObject(mainFrame);
+}
+
+void Automation::loadJSLogObject(QWebFrame *frame)
+{
+    frame->addToJavaScriptWindowObject("wdconsole", &jslogger);
+}
+
+void Automation::loadConsoleJS()
+{
+    QWebView* view = qobject_cast<QWebView*>(sender());
+    if (view)
+        loadConsoleJS(view);
+}
+
+void Automation::loadConsoleJS(const QWebView *view)
+{
+    QString jscript ("if ( _log == null ){"
+                    "var _log = console.log,"
+                        "_warn = console.warn,"
+                        "_error = console.error;"
+                    "};"
+
+                    "console.log = function() {"
+                        "wdconsole.log(arguments[0]);"
+                        "return _log.apply(console, arguments);"
+                    "};"
+
+                     "console.warn = function() {"
+                        "wdconsole.warn(arguments[0]);"
+                        "return _warn.apply(console, arguments);"
+                     "};"
+
+                     "console.error = function() {"
+                        "wdconsole.error(arguments[0]);"
+                        "return _error.apply(console, arguments);"
+                     "};");
+    view->page()->mainFrame()->evaluateJavaScript(jscript);
 }
 
 JSNotifier::JSNotifier():
@@ -2371,6 +2453,33 @@ void JSNotifier::setResult(QVariant result)
     res = result;
     isCompleted = true;
     emit completed();
+}
+
+JSLogger::JSLogger()
+{
+    browserLogger.AddHandler(&browserLog);
+}
+
+base::ListValue* JSLogger::getLog()
+{
+    base::ListValue* retVal = browserLog.entries_list()->DeepCopy();
+    browserLog.clear_entries_list();
+    return retVal;
+}
+
+void JSLogger::log(QVariant message)
+{
+    browserLogger.Log(kInfoLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::warn(QVariant message)
+{
+    browserLogger.Log(kWarningLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::error(QVariant message)
+{
+    browserLogger.Log(kSevereLogLevel, message.toString().toStdString());
 }
 
 //bool Automation::eventFilter(QObject *obj, QEvent *event)

@@ -38,8 +38,8 @@ void LogCommand::ExecutePost(Response* const response) {
     return;
   }
 
-  if (log_type.type() == LogType::kDriver) {
-    response->SetValue(session_->GetLog());
+  if ((log_type.type() == LogType::kDriver) || (log_type.type() == LogType::kBrowser)) {
+    response->SetValue(session_->GetLog(log_type.type()));
   } else {
     response->SetError(new Error(kUnknownError, "Unrecognized type: " + type));
     return;
@@ -62,7 +62,7 @@ bool LogTypesCommand::DoesGet() {
 void LogTypesCommand::ExecuteGet(Response* const response) {
   base::ListValue* logTypes_list = new base::ListValue();
   logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kDriver).ToString()));
-
+  logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kBrowser).ToString()));
   response->SetValue(logTypes_list);
 }
 

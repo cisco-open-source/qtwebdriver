@@ -71,6 +71,25 @@ private:
     bool isCompleted;
 };
 
+
+class JSLogger : public QObject
+{
+    Q_OBJECT
+
+public:
+    JSLogger();
+    base::ListValue* getLog();
+
+public slots:
+    void log(QVariant message);
+    void warn(QVariant message);
+    void error(QVariant message);
+
+private:
+    InMemoryLog browserLog;
+    Logger browserLogger;
+
+};
 // Creates and controls the Chrome instance.
 // This class should be created and accessed on a single thread.
 // Note: All member functions are void because they are invoked
@@ -316,6 +335,13 @@ class Automation : public QObject {
   // set text into Prompt text field
   void SetAlertPromptText(const WebViewId& view_id, const std::string& text, Error **error);
 
+  // Gets browser (JavaScript console) logs
+  void GetBrowserLog(base::ListValue **log);
+
+  // current view has been changed, reconnect signals
+  void ResetBrowserCurrentView(const WebViewId& old_view_id, const WebViewId& new_view_id, Error **error);
+
+
 
   // get native element size
   void GetNativeElementSize(const WebViewId& view_id,
@@ -420,8 +446,11 @@ class Automation : public QObject {
   QKeyEvent ConvertToQtKeyEvent(const WebKeyEvent &key_event);
   void BuildKeyMap();
   bool checkView(const WebViewId &view_id);
+  void loadConsoleJS(const QWebView* view);
+  void loadJSLogObject(QWebFrame *frame);
 
   const Logger& logger_;
+  JSLogger jslogger;
   // scoped_ptr<ProxyLauncher> launcher_;
   int build_no_;
   scoped_ptr<base::DictionaryValue> geolocation_;
@@ -436,6 +465,8 @@ class Automation : public QObject {
 private slots:
   void pageLoadStarted();
   void pageLoadFinished();
+  void loadJSLogObject();
+  void loadConsoleJS();
 
 //protected:
 //     bool eventFilter(QObject *obj, QEvent *ev);

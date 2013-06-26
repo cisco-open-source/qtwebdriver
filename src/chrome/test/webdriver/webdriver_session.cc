@@ -794,6 +794,16 @@ Error* Session::SwitchToView(const std::string& id_or_name) {
   if (!does_exist)
     return new Error(kNoSuchWindow);
   frame_elements_.clear();
+
+  RunSessionTask(base::Bind(
+      &Automation::ResetBrowserCurrentView,
+      base::Unretained(automation_.get()),
+      current_target_.view_id,
+      new_view,
+      &error));
+  if (error)
+    return error;
+
   current_target_ = FrameId(new_view, FramePath());
   return NULL;
 }
@@ -1788,10 +1798,22 @@ Error* Session::SetPreference(
   return error;
 }
 
-base::ListValue* Session::GetLog() const {
-    base::ListValue* ret_val = session_log_->entries_list()->DeepCopy();
-    session_log_->clear_entries_list();
-    return ret_val;
+base::ListValue* Session::GetLog(LogType::Type type) {
+    base::ListValue* ret_val;
+    if (type == LogType::kDriver)
+    {
+        ret_val = session_log_->entries_list()->DeepCopy();
+        session_log_->clear_entries_list();
+        return ret_val;
+    }
+    else
+    {
+        RunSessionTask(base::Bind(
+            &Automation::GetBrowserLog,
+            base::Unretained(automation_.get()),
+            &ret_val));
+        return ret_val;
+    }
 }
 
 Error* Session::GetBrowserConnectionState(bool* online) {
@@ -2200,7 +2222,7 @@ Error* Session::SwitchToFrameWithJavaScriptLocatedFrame(
   std::string frame_id = GenerateRandomID();
   error = ExecuteScriptAndParse(
       current_target_,
-              "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);  console.log(meta); console.log(child);}",
+              "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);}",
       "setFrameId",
       CreateListValueFrom(new_frame_element, frame_id),
       CreateDirectValueParser(kSkipParsing));

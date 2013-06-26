@@ -67,7 +67,9 @@ std::string LogLevelToString(LogLevel level) {
 bool LogType::FromString(const std::string& name, LogType* log_type) {
   if (name == "driver") {
     *log_type = LogType(kDriver);
-  } else {
+  } else if (name == "browser") {
+    *log_type = LogType(kBrowser);
+  } else{
     return false;
   }
   return true;
@@ -83,6 +85,8 @@ std::string LogType::ToString() const {
   switch (type_) {
     case kDriver:
       return "driver";
+    case kBrowser:
+      return "browser";
     default:
       return "unknown";
   };

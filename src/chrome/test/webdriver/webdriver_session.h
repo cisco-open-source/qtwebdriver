@@ -367,7 +367,7 @@ class Session {
 
   // Returns a copy of the current log entries. Caller is responsible for
   // returned value.
-  base::ListValue* GetLog() const;
+  base::ListValue* GetLog(LogType::Type type);
 
   // Gets the browser connection state.
   Error* GetBrowserConnectionState(bool* online);

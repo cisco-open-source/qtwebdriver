@@ -40,6 +40,7 @@ class LogType {
   enum Type {
     kInvalid = -1,
     kDriver,
+    kBrowser,
     kNum  // must be correct
   };
 
