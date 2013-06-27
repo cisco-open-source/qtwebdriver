@@ -79,6 +79,7 @@ class JSLogger : public QObject
 public:
     JSLogger();
     base::ListValue* getLog();
+    void SetMinLogLevel(LogLevel level);
 
 public slots:
     void log(QVariant message);
@@ -128,6 +129,9 @@ class Automation : public QObject {
     // The name of WebView class that will be created on session init. If empty
     // or can't be resolved create default QWebViewExt
     std::string browser_class;
+
+    //Logging level for browser
+    LogLevel browserLogLevel;
   };
 
   explicit Automation(const Logger& logger);

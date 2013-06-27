@@ -111,6 +111,8 @@ void Automation::Init(const BrowserOptions& options, int* build_no, Error** erro
     qsrand(QTime::currentTime().msec()+10);
     sessionId = qrand();
 
+    jslogger.SetMinLogLevel(options.browserLogLevel);
+
     QWebView *pStartView = NULL;
 
     //Searching for a allready opened window
@@ -2465,6 +2467,11 @@ base::ListValue* JSLogger::getLog()
     base::ListValue* retVal = browserLog.entries_list()->DeepCopy();
     browserLog.clear_entries_list();
     return retVal;
+}
+
+void JSLogger::SetMinLogLevel(LogLevel level)
+{
+    browserLogger.set_min_log_level(level);
 }
 
 void JSLogger::log(QVariant message)

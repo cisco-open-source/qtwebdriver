@@ -127,6 +127,7 @@ Error* Session::Init(const DictionaryValue* capabilities_dict) {
   browser_options.user_data_dir = capabilities_.profile;
   browser_options.command = capabilities_.command;
   browser_options.browser_class = capabilities_.browser_class;
+  browser_options.browserLogLevel = capabilities_.log_levels[LogType::kBrowser];
   if (!capabilities_.no_website_testing_defaults) {
     browser_options.ignore_certificate_errors = true;
   }

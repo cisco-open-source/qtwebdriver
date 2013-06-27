@@ -43,7 +43,8 @@ Capabilities::Capabilities()
       no_website_testing_defaults(false),
       prefs(new DictionaryValue()),
       proxy(0) {
-  log_levels[LogType::kDriver] = kAllLogLevel;
+      log_levels[LogType::kDriver] = kAllLogLevel;
+      log_levels[LogType::kBrowser] = kAllLogLevel;
 }
 
 Capabilities::~Capabilities() { }
