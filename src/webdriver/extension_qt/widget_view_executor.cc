@@ -362,9 +362,9 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
         }
         opt.initFrom(pWidget);
         rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
-        point = pWidget->mapTo(view, QPoint(rect.width()/2, rect.height()/2));
+        point = QPoint(rect.width()/2, rect.height()/2);
     } else {
-        point = pWidget->mapTo(view, QPoint(pWidget->width()/2, pWidget->height()/2));
+        point = QPoint(pWidget->width()/2, pWidget->height()/2);
     }
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
