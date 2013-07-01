@@ -150,34 +150,4 @@ const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/
 const char CommandRoutes::kGetLocation[]				= "/session/*/location";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 
-/*
-
-
-const char CommandRoutes::kSetBrowserVisible[] = "setBrowserVisible";
-const char CommandRoutes::kIsBrowserVisible[] = "isBrowserVisible";
-const char CommandRoutes::kExecuteSQL[] = "executeSQL";
-
-const char CommandRoutes::kSetLocation[] = "setLocation";
-
-const char CommandRoutes::kGetStatus[] = "getStatus";
-const char CommandRoutes::kClearAppCache[] = "clearAppCache";
-const char CommandRoutes::kIsBrowserOnline[] = "isBrowserOnline";
-const char CommandRoutes::kSetBrowserOnline[] = "setBrowserOnline";
-const char CommandRoutes::kSetScreenOrientation[] = "setScreenOrientation";
-const char CommandRoutes::kGetScreenOrientation[] = "getScreenOrientation";
-const char CommandRoutes::kImeGetAvailableEngines[] = "imeGetAvailableEngines";
-const char CommandRoutes::kImeGetActiveEngine[] = "imeGetActiveEngine";
-const char CommandRoutes::kImeIsActivated[] = "imeIsActivated";
-const char CommandRoutes::kImeDeactivate[] = "imeDeactivate";
-const char CommandRoutes::kImeActivateEngine[] = "imeActivateEngine";
-const char CommandRoutes::kTouchSingleTap[] = "touchSingleTap";
-const char CommandRoutes::kTouchDown[] = "touchDown";
-const char CommandRoutes::kTouchUp[] = "touchUp";
-const char CommandRoutes::kTouchMove[] = "touchMove";
-const char CommandRoutes::kTouchScroll[] = "touchScroll";
-const char CommandRoutes::kTouchDoubleTap[] = "touchDoubleTap";
-const char CommandRoutes::kTouchLongPress[] = "touchLongPress";
-const char CommandRoutes::kTouchFlick[] = "touchFlick";
-*/
-
 } // namespace webdriver

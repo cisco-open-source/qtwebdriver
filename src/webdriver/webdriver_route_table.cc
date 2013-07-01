@@ -280,13 +280,6 @@ DefaultRouteTable::DefaultRouteTable()
     Add<HTML5LocationCommand>           (CommandRoutes::kGetLocation);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
 
-#if 0
-dispatcher->AddShutdown("/shutdown", shutdown_event);
-
-  dispatcher->Add<BrowserConnectionCommand>("/session/*/browser_connection");
-
-#endif
-
 }
 
 DefaultRouteTable::~DefaultRouteTable() {}

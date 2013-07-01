@@ -85,38 +85,6 @@ public:
     static const char kGetLocation[];
     static const char kXdrpc[];
 
-// TODO:
-/*    
-   
-    
-    static const char kSetBrowserVisible[];
-    static const char kIsBrowserVisible[];
-
-    static const char kExecuteSQL[];
-    static const char kGetLocation[];
-    static const char kSetLocation[];
-    
-    static const char kGetStatus[];
-    static const char kClearAppCache[];
-    static const char kIsBrowserOnline[];
-    static const char kSetBrowserOnline[];
-    static const char kSetScreenOrientation[];
-    static const char kGetScreenOrientation[];
-    
-    static const char kImeGetAvailableEngines[];
-    static const char kImeGetActiveEngine[];
-    static const char kImeIsActivated[];
-    static const char kImeDeactivate[];
-    static const char kImeActivateEngine[];
-    static const char kTouchSingleTap[];
-    static const char kTouchDown[];
-    static const char kTouchUp[];
-    static const char kTouchMove[];
-    static const char kTouchScroll[];
-    static const char kTouchDoubleTap[];
-    static const char kTouchLongPress[];
-    static const char kTouchFlick[];
-*/    
 private:
     static std::set<std::string> standardCommandRoutes;
 };
