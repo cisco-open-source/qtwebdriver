@@ -87,6 +87,11 @@ void CreateSession::ExecutePost(Response* const response) {
             ignore_error.reset(tmp_err);
             if (tmp_err) break;
 
+            if (browser_start_window == "*") {
+                startView = *it;
+                break;
+            }
+
             if (window_name == browser_start_window) {
                 startView = *it;
                 break;

@@ -99,11 +99,6 @@ private:
     Error* ParseLoadAsync(const base::Value* option);
     Error* ParseLoggingPrefs(const base::Value* option);
     Error* ParseNativeEvents(const base::Value* option);
-    Error* ParseNoProxy(const base::Value* option);
-    Error* ParseProxy(const base::Value* option);
-    Error* ParseProxyAutoDetect(const base::DictionaryValue* options);
-    Error* ParseProxyAutoconfigUrl(const base::DictionaryValue* options);
-    Error* ParseProxyServers(const base::DictionaryValue* options);
     Error* ParseBrowserStartWindow(const base::Value* option);
     Error* ParseBrowserClass(const base::Value* option);
 
