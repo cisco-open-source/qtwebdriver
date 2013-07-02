@@ -22,7 +22,11 @@ class ElementHandle : public base::RefCounted<ElementHandle>{
 public:
     ElementHandle() {};
 
+    /// @return true if handle references valid element (widget)
     virtual bool is_valid() const = 0;
+    /// compares two handle
+    /// @param other handle to compare
+    /// @return true if two handles reference same element(widget)
     virtual bool equals(const ElementHandle* other) const = 0;
 protected:
     friend class base::RefCounted<ElementHandle>;

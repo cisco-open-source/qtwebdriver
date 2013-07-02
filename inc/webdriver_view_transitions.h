@@ -14,10 +14,11 @@ namespace webdriver {
 
 class Session;   
 
-/// base class for view transition action
+/// Base class for view transition action that can be applied to old view,
+/// in case of URLCommand that creates new view for other content. 
 class URLTransitionAction {
 public:
-    /// handle old view 
+    /// Behavior of handling old view.
     /// @param session session to work within
     /// @param viewId viewId not able to handle requested URL
     virtual void HandleOldView(Session* session, const ViewId& viewId) const = 0;
@@ -31,6 +32,8 @@ public:
 
 typedef scoped_ptr<URLTransitionAction> URLTransitionActionPtr;
 
+/// Manager that stores custom view transition action.
+/// Registered custom action will be used in URLCommand processing.
 class ViewTransitionManager {
 public:
 

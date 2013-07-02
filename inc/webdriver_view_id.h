@@ -11,9 +11,7 @@
 
 namespace webdriver {
 
-//typedef void* ViewHandle;
 typedef unsigned long int ViewType;
-//#define INVALID_HANDLE  (0)
 
 /// This class represents a Webdriver View handle.
 /// It keeps implementation's dependent view pointer or object.

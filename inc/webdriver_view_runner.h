@@ -13,8 +13,9 @@ class WaitableEvent;
 
 namespace webdriver {
 
-/// base class for runner for view operations.
-/// Contains default imlementation.
+/// Base class for runner for view operations.
+/// It allows to run operations in other context(ie - UI thread).
+/// Has default imlementation which runs closure in same context.
 class ViewRunner {
 protected:
     typedef ViewRunner* (*CreateRunnerMethod)(void);
@@ -22,7 +23,8 @@ public:
     ViewRunner();
     virtual ~ViewRunner() {};
 
-    /// run view operation in runner context
+    /// run view operation in runner context.
+    /// Finish if operation should be signaled in done_event.
     /// @param task operation to run
     /// @param done_event event to signalize finis
     virtual void RunClosure(const base::Closure& task,
@@ -32,7 +34,7 @@ public:
     /// @return new ViewRunner object.
     static ViewRunner* CreateRunner(void);
 
-    /// Register custom runner.
+    /// Register custom runner. There is can be only one runner per driver instance.
     /// @tparam C subclass of ViewRunner with custom implementation
     template <class C>
     static void RegisterCustomRunner(void) {
