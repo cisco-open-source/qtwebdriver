@@ -63,6 +63,8 @@ private:
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
+    static const ViewType WEB_VIEW_TYPE; 
+
     QWebViewCmdExecutorCreator();
     virtual ~QWebViewCmdExecutorCreator();
 

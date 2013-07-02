@@ -73,6 +73,8 @@ void JSNotifier::setResult(QVariant result)
     emit completed();
 }
 
+const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
+
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
     : ViewCmdExecutorCreator() { }
 
@@ -92,6 +94,7 @@ bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, 
     QWebView* pWebView = QWebViewUtil::getWebView(session, viewId);
 
     if (NULL != pWebView) {
+        if (NULL != viewType) *viewType = WEB_VIEW_TYPE;
         return true;
     }
 

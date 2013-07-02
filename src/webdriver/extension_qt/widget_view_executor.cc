@@ -47,6 +47,8 @@
 
 namespace webdriver {
 
+const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
+
 QWidgetViewCmdExecutorCreator::QWidgetViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
@@ -65,6 +67,7 @@ bool QWidgetViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewI
     QWidget* pWidget = QWidgetViewUtil::getView(session, viewId);
 
     if (NULL != pWidget) {
+        if (NULL != viewType) *viewType = WIDGET_VIEW_TYPE;
         return true;
     }
 
