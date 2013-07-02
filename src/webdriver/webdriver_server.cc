@@ -234,6 +234,11 @@ void Server::WriteHttpResponse(struct mg_connection* connection,
     mg_write(connection, data.data(), data.length());
 }
 
+const CommandLine& Server::GetCommandLine() const
+{
+    return options_;
+}
+
 void Server::PrepareHttpResponse(const std::string& request_method,
                                  const Response& command_response,
                                  HttpResponse* const http_response) {
