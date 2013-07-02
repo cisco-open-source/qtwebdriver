@@ -86,7 +86,6 @@ QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** er
     }
 
     if (!element_handle->is_valid()) {
-        // TODO: invalidate element in session?
         *error = new Error(kStaleElementReference);
         return NULL;
     }

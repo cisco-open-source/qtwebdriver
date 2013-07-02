@@ -272,7 +272,6 @@ void Session::Terminate() {
 
     life_cycle_actions_->BeforeTerminate();
 
-    // TODO: cleanup resources
     delete this;
 }
 

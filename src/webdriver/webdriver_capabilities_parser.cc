@@ -57,7 +57,6 @@ Error* CreateBadInputError(const std::string& name,
 Capabilities::Capabilities()
     : options(CommandLine::NO_PROGRAM),
       load_async(false),
-      native_events(false),
       caps(new DictionaryValue()) {
     log_levels[LogType::kDriver] = kAllLogLevel;
 }
@@ -100,7 +99,6 @@ Error* CapabilitiesParser::Parse() {
     std::map<std::string, Parser> parser_map;
   
     parser_map[Capabilities::kLoadAsync] = &CapabilitiesParser::ParseLoadAsync;
-    parser_map[Capabilities::kNativeEvents] = &CapabilitiesParser::ParseNativeEvents;
     parser_map[Capabilities::kBrowserStartWindow] = &CapabilitiesParser::ParseBrowserStartWindow;
     parser_map[Capabilities::kBrowserClass] = &CapabilitiesParser::ParseBrowserClass;
 
@@ -122,7 +120,7 @@ Error* CapabilitiesParser::Parse() {
         }
     }
 
-    caps_->caps.reset(dict_->DeepCopy());
+    //caps_->caps.reset(dict_->DeepCopy());
 
     return NULL;
 }
@@ -155,12 +153,6 @@ Error* CapabilitiesParser::ParseLoggingPrefs(const base::Value* option) {
         }
         caps_->log_levels[log_type.type()] = LogLevelFromString(level_name);
     }
-    return NULL;
-}
-
-Error* CapabilitiesParser::ParseNativeEvents(const Value* option) {
-    if (!option->GetAsBoolean(&caps_->native_events))
-        return CreateBadInputError("nativeEvents", Value::TYPE_BOOLEAN, option);
     return NULL;
 }
 
