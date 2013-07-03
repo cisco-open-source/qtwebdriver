@@ -14,6 +14,8 @@ namespace webdriver {
 
 class QWidgetViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
+    static const ViewType WIDGET_VIEW_TYPE;
+    
     QWidgetViewCmdExecutorCreator();
     virtual ~QWidgetViewCmdExecutorCreator(){}
 

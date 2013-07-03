@@ -1,3 +1,16 @@
+/*! \page page_views Views management and actions
+
+<h1>View enumerator</h1>
+
+// TODO: 
+
+Example of usage:
+\code
+webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
+webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
+\endcode
+
+*/
 #ifndef WEBDRIVER_VIEW_ENUMERATOR_H_
 #define WEBDRIVER_VIEW_ENUMERATOR_H_
 

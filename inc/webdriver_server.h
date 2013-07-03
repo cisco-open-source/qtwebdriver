@@ -1,3 +1,46 @@
+/*! \mainpage Hybrid WebDriver Framework
+
+Hybrid WebDriver(HWD) is library based on Google ChromeDriver and intended
+for supporting not only web UI testing. By design it can be extended with 
+extension that allow testing native UI. 
+
+Topics:
+- \subpage page_intro
+- \subpage page_wd_server
+- \subpage page_commands_routing
+- \subpage page_sessions
+- \subpage page_views
+- \subpage page_hybrid_specific
+- \subpage page_samples
+*/
+
+//-----------------------------------------------------------
+
+/*! \page page_wd_server WD Server
+Entry point for HWD is webdriver::Server singleton class.
+It allows to configure, set predefined command routes and start
+webdriver service. 
+
+Server accepts options in form of command line arguments.
+Also by default it uses webdriver::DefaultRouteTable. Or custom route table
+can be passed after init.
+
+Example:
+\code
+webdriver::Server* wd_server = webdriver::Server::GetInstance();
+if (0 != wd_server->Init(argc, argv)) {
+    return 1;
+}
+
+wd_server->Start();
+\endcode
+
+\todo put here short description of supported options
+
+*/
+
+
+
 #ifndef WEBDRIVER_SERVER_H_
 #define WEBDRIVER_SERVER_H_
 
@@ -7,6 +50,7 @@
 #include "base/basictypes.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/command_line.h"
+#include "base/memory/singleton.h"
 #include "base/values.h"
 
 struct mg_context;
@@ -27,14 +71,10 @@ class Response;
 class Server {
 public:
     enum State {
-      STATE_UNCONFIGURED = 0,
-      STATE_IDLE = 1,
-      STATE_RUNNING = 2
+        STATE_UNCONFIGURED = 0,
+        STATE_IDLE = 1,
+        STATE_RUNNING = 2
     };
-
-    /// Creates a new Server.
-    Server();
-    ~Server();
 
     /// Init server from command line
     /// @param options - obtained command line
@@ -63,6 +103,10 @@ public:
     static Server* GetInstance();
 
 private:
+    Server();
+    ~Server();
+    friend struct DefaultSingletonTraits<Server>;
+
     friend class XDRPCCommand;
 
     CommandLine options_;

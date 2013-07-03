@@ -60,10 +60,6 @@ struct Capabilities {
     /// The minimum level to log for each log type.
     LogLevel log_levels[LogType::kNum];
 
-    /// Whether Chrome should simulate input events using OS APIs instead of
-    /// WebKit APIs.
-    bool native_events;
-
     /// Name of the window to use for connecting to an already running QWidget subclass.
     std::string browser_start_window;
 
@@ -98,7 +94,6 @@ public:
 private:
     Error* ParseLoadAsync(const base::Value* option);
     Error* ParseLoggingPrefs(const base::Value* option);
-    Error* ParseNativeEvents(const base::Value* option);
     Error* ParseBrowserStartWindow(const base::Value* option);
     Error* ParseBrowserClass(const base::Value* option);
 
