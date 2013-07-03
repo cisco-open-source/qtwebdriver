@@ -1,3 +1,34 @@
+/*! \page page_views Views management and actions
+
+<h1>View factory</h1>
+
+Each type of view should have own factory, class derived from webdriver::ViewCreator.
+Factory for single view type should be registered in singleton - webdriver::ViewFactory.
+View can be created by two methods:
+- by class name
+- by url (in this case it creates any view that can handle this url)
+
+\remark Please note that if two factories can create view by same classname(or url) - only one view will be created from first registered factory.
+
+CreateViewByClassName() and CreateViewForUrl() return ViewHandles. But these
+handles are not registered in session. User can register them manually or use
+view enumerator. After enumerating action all view created but not registered will be
+added to session's views map automatically.
+
+Example of configuration:
+\code
+webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
+webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
+
+webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
+widgetCreator->RegisterViewClass<QWidget>("QWidget");
+widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
+
+webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
+webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
+\endcode
+
+*/
 #ifndef WEBDRIVER_VIEW_FACTORY_H_
 #define WEBDRIVER_VIEW_FACTORY_H_
 
