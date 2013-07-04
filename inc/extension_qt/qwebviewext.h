@@ -19,6 +19,9 @@ public:
 
 protected:
     QWebView* createWindow(QWebPage::WebWindowType type);
+
+private:
+    void setWebInspectorProperty(QWebViewExt* view);
     
 };
 

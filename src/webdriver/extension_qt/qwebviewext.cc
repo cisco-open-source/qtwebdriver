@@ -13,6 +13,7 @@
 QWebViewExt::QWebViewExt(QWidget *parent) :
     QWebView(parent)
 {
+    setWebInspectorProperty(this);
     connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
 }
 
@@ -23,7 +24,16 @@ QWebViewExt::~QWebViewExt()
 QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
 {
     QWebViewExt* newView = new QWebViewExt;
-    newView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    setWebInspectorProperty(newView);
+
+    newView->show();
+    newView->setAttribute(Qt::WA_DeleteOnClose, true);
+    return newView;
+}
+
+void QWebViewExt::setWebInspectorProperty(QWebViewExt *view)
+{
+    view->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
 
     if (cmdLine.HasSwitch("wi-server"))
@@ -32,16 +42,12 @@ QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
         {
             std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
             int port = QString(wiPort.c_str()).toInt();
-            newView->page()->setProperty("_q_webInspectorServerPort", port);
+            view->page()->setProperty("_q_webInspectorServerPort", port);
         }
         else
         {
-            newView->page()->setProperty("_q_webInspectorServerPort", 9222);
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
         }
     }
-
-    newView->show();
-    newView->setAttribute(Qt::WA_DeleteOnClose, true);
-    return newView;
 }
 
