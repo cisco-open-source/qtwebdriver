@@ -2,9 +2,15 @@
 
 #include "webdriver_session.h"
 #include "webdriver_logging.h"
+#include "webdriver_error.h"
 
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
+#include "q_content_type_resolver.h"
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtCore/QString>
+
 
 namespace webdriver {
 
@@ -56,8 +62,25 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
     if (factory.empty())
         return false;
 
-    if (!QWebViewUtil::isUrlSupported(url))
+    QNetworkAccessManager *pmanager = new QNetworkAccessManager();
+
+    QContentTypeResolver *presolver = new QContentTypeResolver(pmanager);
+    std::string contentType;
+    scoped_ptr<Error> ignore_err(presolver->resolveContentType(url, contentType));
+    delete pmanager;
+    delete presolver;
+
+    if (ignore_err != NULL) {
+        ignore_err.release();
         return false;
+    }
+
+    QWebPage *pWebPage= new QWebPage();
+    if (!pWebPage->supportsContentType(QString::fromStdString(contentType))) {
+        delete pWebPage;
+        return false;
+    }
+    delete pWebPage;
 
     ViewHandle* handle = NULL;
     // get first found QWebView
@@ -84,7 +107,7 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
     }
 
 	return false;
-};
+}
 
 
 
