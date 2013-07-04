@@ -2,7 +2,11 @@
 
 <h1>View enumerator</h1>
 
-// TODO: 
+Session contains map of ViewId to ViewHandle. View enumerator can update 
+this map. It adds new views and removes closed.
+For each view type there should be separated view enumerator - class derived 
+from webdriver::AbstractViewEnumeratorImpl. Custom AbstractViewEnumeratorImpl
+has only one virtual method EnumerateViews() that returns all found view of specific types.
 
 Example of usage:
 \code
@@ -31,7 +35,7 @@ class AbstractViewEnumeratorImpl {
 public:
     /// Get list of views in session
     /// @param session session to enumerate views
-    /// @param views returned list of ViewIds
+    /// @param views set with views to update
     virtual void EnumerateViews(Session* session, std::set<ViewId>* views) const = 0;
 };
 

@@ -1,6 +1,29 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/*! \page page_views Views management and actions
+
+<h1>View handles</h1>
+
+Session contains map of ViewId to ViewHandle. webdriver::ViewHandle is abstraction
+intended to keep reference to real window implementation(ie pointer to QWidget).
+Customizer should implement this abstract class. 
+
+Example of custom implementation:
+\code
+class QViewHandle : public ViewHandle {
+public:
+    QViewHandle();
+    QViewHandle(QWidget* view);
+    
+    virtual bool is_valid() const { return !view_.isNull(); };
+    virtual bool equals(const ViewHandle* other) const;
+    QWidget* get() { return view_.data(); };
+    
+protected:
+    QPointer<QWidget> view_;
+    virtual ~QViewHandle() {};
+};
+\endcode
+
+*/
 
 #ifndef WEBDRIVER_WEBDRIVER_VIEW_ID_H_
 #define WEBDRIVER_WEBDRIVER_VIEW_ID_H_
