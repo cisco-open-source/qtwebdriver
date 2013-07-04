@@ -35,6 +35,8 @@ public:
 private:
 	Error* SwitchToView(Session* session, const ViewId& viewId);
 	Error* GetViewTitle(Session* session, const ViewId& viewId, std::string* title);
+	bool FindAndAttachView(Session* session, const std::string& name, ViewId* viewId);
+	bool CreateViewByClassName(Session* session, const std::string& name, ViewId* viewId);
 	
   	DISALLOW_COPY_AND_ASSIGN(CreateSession);
 };

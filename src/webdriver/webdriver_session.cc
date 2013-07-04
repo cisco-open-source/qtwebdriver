@@ -46,6 +46,8 @@ Session::Session()
       thread_(id_.c_str()),
       async_script_timeout_(0),
       implicit_wait_(0),
+      desired_caps_(NULL),
+      required_caps_(NULL),
       view_runner_(ViewRunner::CreateRunner()),
       life_cycle_actions_(SessionLifeCycleActions::CreateLifeCycleActions(this)),
       sticky_modifiers_(0)
@@ -201,14 +203,17 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
             kUnknownError, "Unable to create temp directory");
     }
 
+    desired_caps_.reset(desired_capabilities_dict->DeepCopy());
+
     logger_.Log(kFineLogLevel,
                     "Initializing session with desired capabilities " +
                     JsonStringifyForDisplay(desired_capabilities_dict));
 
     (void) InitActualCapabilities();
 
-    // TODO: take into account required capabilities
     if (required_capabilities_dict) {
+        required_caps_.reset(required_capabilities_dict->DeepCopy());
+
         logger_.Log(kFineLogLevel,
                     "Initializing session with required capabilities " +
                     JsonStringifyForDisplay(required_capabilities_dict));
@@ -220,7 +225,6 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
         }
     }
 
-    // TODO: apply desired capabilities
     CapabilitiesParser parser(desired_capabilities_dict, logger_, &capabilities_);
     Error* error = parser.Parse();
     if (error) {

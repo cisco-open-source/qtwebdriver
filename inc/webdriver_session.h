@@ -138,6 +138,9 @@ public:
 
     void set_sticky_modifiers(int mods) { sticky_modifiers_ = mods; }
 
+    const DictionaryValue* get_desired_caps() const { return desired_caps_.get(); }
+    const DictionaryValue* get_required_caps() const { return required_caps_.get(); }
+
     const Logger& logger() const;
 
     const FilePath& temp_dir() const;
@@ -241,6 +244,8 @@ private:
     // Temporary directory containing session data.
     ScopedTempDir temp_dir_;
     Capabilities capabilities_;
+    scoped_ptr<DictionaryValue> desired_caps_;
+    scoped_ptr<DictionaryValue> required_caps_;
 
     scoped_ptr<ViewRunner> view_runner_;
     scoped_ptr<SessionLifeCycleActions> life_cycle_actions_;

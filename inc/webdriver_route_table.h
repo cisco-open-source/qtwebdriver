@@ -30,7 +30,7 @@ route_table.Add<XDRPCCommand>              (CommandRoutes::kXdrpc);
 Another note is that webdriver::RouteTable::Add() method will refuse non-standard
 routes that dont comply vendor-specific syntax.
 
-/todo place here some description about commands 
+\todo place here some description about commands 
 */
 #ifndef WEBDRIVER_ROUTE_TABLE_H_
 #define WEBDRIVER_ROUTE_TABLE_H_

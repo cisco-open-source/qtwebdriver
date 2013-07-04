@@ -33,7 +33,6 @@
       'sources': [
         'src/webdriver/commands/alert_commands.cc',
         'src/webdriver/commands/appcache_status_command.cc',
-#        'src/webdriver/commands/browser_connection_commands.cc',
         'src/webdriver/commands/command.cc',
         'src/webdriver/commands/cookie_commands.cc',
         'src/webdriver/commands/create_session.cc',

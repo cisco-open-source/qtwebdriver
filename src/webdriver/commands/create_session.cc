@@ -56,68 +56,31 @@ void CreateSession::ExecutePost(Response* const response) {
         return;
     }
 
-    std::string browser_start_window = session->capabilities().browser_start_window;
-    std::string window_class = session->capabilities().browser_class;
+    std::string browser_start_window;
+    std::string window_class;
     ViewId startView;
+    bool wereRequiredCaps = false;
 
-    session->logger().Log(kInfoLogLevel,
-        "Session("+session->id()+
-        ") browser class("+window_class+
-        ") start window("+browser_start_window+").");
-
-    if (!browser_start_window.empty()) {
-        // enumerate all views
-        session->logger().Log(kFineLogLevel, "Trying to attach to window - "+browser_start_window);
-
-        std::vector<ViewId> views;
-        std::string window_name;
-
-        session->RunSessionTask(base::Bind(
-            &ViewEnumerator::EnumerateViews,
-            session,
-            &views));
-
-        // find view to attach
-        std::vector<ViewId>::const_iterator it = views.begin();
-        Error* tmp_err = NULL;
-        scoped_ptr<Error> ignore_error(NULL);
-
-        while (it != views.end()) {
-            tmp_err = GetViewTitle(session, *it, &window_name);
-            ignore_error.reset(tmp_err);
-            if (tmp_err) break;
-
-            if (browser_start_window == "*") {
-                startView = *it;
-                break;
-            }
-
-            if (window_name == browser_start_window) {
-                startView = *it;
-                break;
-            }
-            
-            ++it;
+    if (NULL != required_caps_dict) {
+        if (required_caps_dict->GetString(Capabilities::kBrowserStartWindow, &browser_start_window)) {
+            wereRequiredCaps = true;
+            FindAndAttachView(session, browser_start_window, &startView);
+        } else if (required_caps_dict->GetString(Capabilities::kBrowserClass, &window_class)) {
+            wereRequiredCaps = true;
+            CreateViewByClassName(session, window_class, &startView);
         }
     }
 
-    if (!startView.is_valid()) {
-        session->logger().Log(kFineLogLevel, "Trying to create window - "+window_class);
+    if (!wereRequiredCaps) {
+        if (desired_caps_dict->GetString(Capabilities::kBrowserStartWindow, &browser_start_window)) {
+            FindAndAttachView(session, browser_start_window, &startView);
+        }
 
-        ViewHandle* viewHandle = NULL;
-        // create view
-        session->RunSessionTask(base::Bind(
-            &ViewFactory::CreateViewByClassName,
-            base::Unretained(ViewFactory::GetInstance()),
-            session->logger(),
-            window_class,
-            &viewHandle));
-
-        if (NULL != viewHandle) {
-            session->AddNewView(viewHandle, &startView);
-            if (!startView.is_valid()) {
-                viewHandle->Release();
-                session->logger().Log(kSevereLogLevel, "Cant add view handle to session.");
+        if (!startView.is_valid()) {
+            if (desired_caps_dict->GetString(Capabilities::kBrowserClass, &window_class)) {
+                CreateViewByClassName(session, window_class, &startView);
+            } else {
+                CreateViewByClassName(session, "", &startView);
             }
         }
     }
@@ -129,6 +92,7 @@ void CreateSession::ExecutePost(Response* const response) {
         return;   
     }
 
+    session->logger().Log(kInfoLogLevel, "Session("+session->id()+") view: "+startView.id());
     // set current view
     error = SwitchToView(session, startView);
     if (error) {
@@ -146,6 +110,69 @@ void CreateSession::ExecutePost(Response* const response) {
             << session->id();
     response->SetStatus(kSeeOther);
     response->SetValue(Value::CreateStringValue(stream.str()));
+}
+
+bool CreateSession::FindAndAttachView(Session* session, const std::string& name, ViewId* viewId) {
+    // enumerate all views
+    session->logger().Log(kFineLogLevel, "Trying to attach to window - "+name);
+
+    std::vector<ViewId> views;
+    std::string window_name;
+
+    session->RunSessionTask(base::Bind(
+        &ViewEnumerator::EnumerateViews,
+        session,
+        &views));
+
+    // find view to attach
+    std::vector<ViewId>::const_iterator it = views.begin();
+    scoped_ptr<Error> ignore_error(NULL);
+
+    while (it != views.end()) {
+        ignore_error.reset(GetViewTitle(session, *it, &window_name));
+        if (NULL != ignore_error.get()) break;
+
+        if (name == "*") {
+            *viewId = *it;
+            return true;
+        }
+
+        if (window_name == name) {
+            *viewId = *it;
+            return true;
+        }
+            
+        ++it;
+    }
+
+    session->logger().Log(kWarningLogLevel, "Searching window - "+name+" - not found.");
+
+    return false;
+}
+
+bool CreateSession::CreateViewByClassName(Session* session, const std::string& name, ViewId* viewId) {
+    session->logger().Log(kFineLogLevel, "Trying to create window - "+name);
+
+    ViewHandle* viewHandle = NULL;
+    // create view
+    session->RunSessionTask(base::Bind(
+        &ViewFactory::CreateViewByClassName,
+        base::Unretained(ViewFactory::GetInstance()),
+        session->logger(),
+        name,
+        &viewHandle));
+
+    if (NULL != viewHandle) {
+        session->AddNewView(viewHandle, viewId);
+        if (!viewId->is_valid()) {
+            viewHandle->Release();
+            session->logger().Log(kSevereLogLevel, "Cant add view handle to session.");
+            return false;
+        }
+        return true;
+    }
+
+    return false;
 }
 
 Error* CreateSession::SwitchToView(Session* session, const ViewId& viewId) {
