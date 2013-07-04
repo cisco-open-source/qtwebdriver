@@ -95,6 +95,7 @@ public:
 
     const RouteTable& GetRouteTable() const;
     const std::string& url_base() const;
+    const CommandLine& GetCommandLine() const;
 
     static Server* GetInstance();
 

@@ -11,6 +11,7 @@
 #include "webdriver_session.h"
 #include "webdriver_util.h"
 #include "q_key_converter.h"
+#include "webdriver_server.h"
 
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
@@ -186,6 +187,22 @@ void QWebViewCmdExecutor::GoForward(Error** error) {
 
     QWebHistory *history = view->history();
     history->forward();
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch("wi-server"))
+    {
+        if (cmdLine.HasSwitch("wi-port"))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            int port = QString(wiPort.c_str()).toInt();
+            view->page()->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 void QWebViewCmdExecutor::GoBack(Error** error) {
@@ -195,6 +212,22 @@ void QWebViewCmdExecutor::GoBack(Error** error) {
 
     QWebHistory *history = view->history();
     history->back();
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch("wi-server"))
+    {
+        if (cmdLine.HasSwitch("wi-port"))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            int port = QString(wiPort.c_str()).toInt();
+            view->page()->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 void QWebViewCmdExecutor::Reload(Error** error) {
@@ -215,6 +248,22 @@ void QWebViewCmdExecutor::Reload(Error** error) {
         }
 
         session_->logger().Log(kFineLogLevel, "Web sync reload.");
+    }
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch("wi-server"))
+    {
+        if (cmdLine.HasSwitch("wi-port"))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            int port = QString(wiPort.c_str()).toInt();
+            view->page()->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
+        }
     }
 }
 
@@ -903,6 +952,22 @@ void QWebViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
 
         session_->logger().Log(kFineLogLevel, "Web async load - " + url);
     }
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch("wi-server"))
+    {
+        if (cmdLine.HasSwitch("wi-port"))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            int port = QString(wiPort.c_str()).toInt();
+            view->page()->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 void QWebViewCmdExecutor::GetURL(std::string* url, Error** error) {
@@ -916,6 +981,22 @@ void QWebViewCmdExecutor::GetURL(std::string* url, Error** error) {
                     "getUrl",
                     new ListValue(),
                     CreateDirectValueParser(url));
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch("wi-server"))
+    {
+        if (cmdLine.HasSwitch("wi-port"))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            int port = QString(wiPort.c_str()).toInt();
+            view->page()->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            view->page()->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 void QWebViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
