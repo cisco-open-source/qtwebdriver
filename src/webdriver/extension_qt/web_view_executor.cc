@@ -120,7 +120,14 @@ QWebView* QWebViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
 }   
 
 void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
-    *can = QWebViewUtil::isUrlSupported(url);
+    QWebView* pWebView = getView(view_id_, error);
+
+    if (NULL == pWebView) {
+
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+    *can = QWebViewUtil::isUrlSupported(pWebView, url, error);
 }
 
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
