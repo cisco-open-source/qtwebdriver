@@ -110,8 +110,6 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
         if (!can_handle) {
             session->logger().Log(kInfoLogLevel, "Current view cant handle url, try to create another - "+url);
             
-            ViewTransitionManager::HandleOldView(session, current_view);
-
             ViewHandle* viewHandle = NULL;
     	    ViewId viewId;
 
@@ -133,6 +131,8 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
                 session->logger().Log(kSevereLogLevel, "Cant add view handle to session.");
                 break;
             }
+
+            ViewTransitionManager::HandleOldView(session, current_view);
 
             session->logger().Log(kInfoLogLevel, "New view("+viewId.id()+") created for url - "+url);
 
