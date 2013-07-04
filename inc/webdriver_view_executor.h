@@ -1,3 +1,39 @@
+/*! \page page_views Views management and actions
+
+<h1>View executor</h1>
+
+For separating session and view commands executor concept is used.
+webdriver::ViewCmdExecutor is pure virtual class that represents all 
+actions that can be done on single view of specific type in one session.
+So for each view type there should be separated view executor implemented by customer.
+Exexcutor can be created only by webdriver::ViewCmdExecutorCreator which knows
+if it can create executor for passed view.
+All executor creators are registered in webdriver::ViewCmdExecutorFactory.
+This singleton is an entry point to get executor for view.
+\code
+Error* error = NULL;
+ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, viewId));
+
+if (NULL == executor.get()) {
+    // handle error
+}
+
+session->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetWindowName,
+            base::Unretained(executor.get()),
+            title,
+            &error));
+\endcode
+
+\remark ViewCmdExecutorFactory return only first found executor that can operate wit view, so if two executors can handle same view type - registration order is important.
+
+Example of registration:
+\code
+webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
+webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
+\endcode
+
+*/
 #ifndef WEBDRIVER_VIEW_EXECUTOR_H
 #define WEBDRIVER_VIEW_EXECUTOR_H
 

@@ -10,8 +10,7 @@ Topics:
 - \subpage page_commands_routing
 - \subpage page_sessions
 - \subpage page_views
-- \subpage page_hybrid_specific
-- \subpage page_samples
+- \subpage page_url_post
 */
 
 //-----------------------------------------------------------
@@ -38,8 +37,6 @@ wd_server->Start();
 \todo put here short description of supported options
 
 */
-
-
 
 #ifndef WEBDRIVER_SERVER_H_
 #define WEBDRIVER_SERVER_H_

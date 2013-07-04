@@ -1,7 +1,43 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/*! \page page_sessions Sessions
 
+Session class represents object that handles all information related to WD session.
+For each WD session new webdriver::Session object created and registered in webdriver::SessionManager.
+Valuable information stored in Session:
+- mapping ViewId into real window implementation.
+- mapping ElementId into real element implemenation.
+- session's wide options - timeouts, capabilities.
+- running context for all operations.
+
+<h2>Running context</h2>
+Most operations on views can be performed on separated thread(ie QT UI thread).
+For this purpose Session has RunSessionTask() method. And custom runnnig context 
+can be added with webdriver::ViewRunner class:
+\code
+webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
+\endcode
+
+\code
+session->RunSessionTask(base::Bind(
+            &ViewFactory::CreateViewByClassName,
+            base::Unretained(ViewFactory::GetInstance()),
+            session->logger(),
+            window_class,
+            &viewHandle));
+\endcode
+
+<h2>Custom capabilities handling</h2>
+Base capabilities are handled in webdriver::Session::Init() method.
+But there is way to extend this behavior with webdriver::SessionLifeCycleActions class.
+There are two methods - PostInit() and BeforeTerminate(). These methods 
+automatically included in session's init/terminate sequence. Customizer 
+can implement subclass of SessionLifeCycleActions and register it.
+\code
+webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
+\endcode
+Beside capabilities handling there can be any other actions to be run on 
+session's create or session's terminate.
+
+*/
 #ifndef WEBDRIVER_WEBDRIVER_SESSION_H_
 #define WEBDRIVER_WEBDRIVER_SESSION_H_
 
