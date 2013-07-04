@@ -14,15 +14,15 @@ namespace webdriver {
 
 class Session;
 class ViewId;
-
+class Error;
 
 class QWebViewUtil {
 public:
-    static bool isUrlSupported(const std::string& url);
+    static bool isUrlSupported(QWebView* pWebView, const std::string& url, Error **error);
     static QWebView* getWebView(Session* session, const ViewId& viewId);
 
 private:
-	QWebViewUtil() {};
+    QWebViewUtil() {}
     ~QWebViewUtil(){}
 };
 

@@ -1,20 +1,36 @@
 #include "web_view_util.h"
-
 #include "webdriver_session.h"
+#include "webdriver_error.h"
+#include "q_content_type_resolver.h"
 
 #include "extension_qt/widget_view_handle.h"
+#include <QtNetwork/QNetworkAccessManager>
+
 
 namespace webdriver {
 
-bool QWebViewUtil::isUrlSupported(const std::string& url) {
-	// TODO: implement content detection
-	const std::string non_web_prefix("qtwidget://");
+bool QWebViewUtil::isUrlSupported(QWebView* pWebView, const std::string& url, Error **error) {
+    QWebPage* pWebPage = pWebView->page();
+    if (NULL == pWebPage) {
+        *error = new Error(kBadRequest);
+        GlobalLogger::Log(kWarningLogLevel, " Invalid QWebPage* ");
+        return false;
+    }
 
-	if (url.compare(0, non_web_prefix.length(), non_web_prefix) != 0) {
-		return true;
-	}
+    QNetworkAccessManager *pmanager =  pWebPage->networkAccessManager();
+    if (NULL == pmanager) {
+        *error = new Error(kBadRequest);
+        GlobalLogger::Log(kWarningLogLevel, " Invalid QNetworkAccessManager* ");
+        return false;
+    }
+    QContentTypeResolver *presolver = new QContentTypeResolver(pmanager);
 
-	return false;
+    std::string mimeType ;
+    *error = presolver->resolveContentType(url, mimeType);
+    if (NULL != *error) {
+        return false;
+    }
+    return pWebPage->supportsContentType(QString::fromStdString(mimeType));
 }	
 
 QWebView* QWebViewUtil::getWebView(Session* session, const ViewId& viewId) {
