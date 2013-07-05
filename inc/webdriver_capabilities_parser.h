@@ -1,6 +1,13 @@
-// Copyright (c) 2012 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+/*! \page page_hybrid_capabilities Hybrid WD capabilities
+
+<h2>Start window capabilities</h2>
+There are two capabilities which define strategy what view will be current after session create:
+- "browserStartWindow" - HWD will search all existed views and attach to one with same title. Or if this capablities equals "*" then to first one.
+- "browserClass" - HWD will call ViewFactory and create window registered with specified classname.
+
+Both options can be passed in desired and required capabilities.
+
+*/
 
 #ifndef WEBDRIVER_WEBDRIVER_CAPABILITIES_PARSER_H_
 #define WEBDRIVER_WEBDRIVER_CAPABILITIES_PARSER_H_

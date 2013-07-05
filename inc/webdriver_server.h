@@ -11,6 +11,7 @@ Topics:
 - \subpage page_sessions
 - \subpage page_views
 - \subpage page_url_post
+- \subpage page_hybrid_capabilities
 */
 
 //-----------------------------------------------------------
