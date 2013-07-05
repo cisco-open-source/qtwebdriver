@@ -25,12 +25,15 @@ QWebView* ViewFactory::create(const std::string &id)
     }
     else
     {
-        // get first found QWebView; only for QWebView, for NativeWD need additional implementation
-        FactoryMap::iterator it = factory.begin();
-        for (it; it != factory.end(); ++it)
+        if (id == "QWebView")
         {
-            qDebug()<<"[WD]:"<<"ViewFactory create first found registered QWebView subclass:"<<QString(it->first.c_str());
-            return it->second->create();
+            // get first found QWebView
+            FactoryMap::iterator it = factory.begin();
+            for (it; it != factory.end(); ++it)
+            {
+                qDebug()<<"[WD]:"<<"ViewFactory create first found registered QWebView subclass:"<<QString(it->first.c_str());
+                return it->second->create();
+            }
         }
         qDebug()<<"[WD]:"<<"ViewFactory create default QWebViewExt";
         return new QWebViewExt;
