@@ -71,7 +71,6 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
     delete presolver;
 
     if (ignore_err != NULL) {
-        ignore_err.release();
         return false;
     }
 

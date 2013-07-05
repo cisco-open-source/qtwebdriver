@@ -29,7 +29,7 @@ Error* QContentTypeResolver::resolveContentType(const std::string& url, std::str
     QNetworkReply *reply = manager_->head(request);
     if (NULL == reply) {
         error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, " Invalid Request ");
+        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : invalid Request ");
         return error;
     }
 
@@ -40,14 +40,14 @@ Error* QContentTypeResolver::resolveContentType(const std::string& url, std::str
     QNetworkReply::NetworkError err = reply->error();
     if (err) {
         error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, "NetworkError : " + QString::number(err).toStdString());
+        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : NetworkError : " + QString::number(err).toStdString());
         return error;
     }
 
     QVariant contentMimeType  = reply->header(QNetworkRequest::ContentTypeHeader);
     if (!contentMimeType.isValid()) {
         error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, " ContentMimeType invalid ");
+        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType invalid ");
         return error;
     }
 
@@ -59,7 +59,7 @@ Error* QContentTypeResolver::resolveContentType(const std::string& url, std::str
 
     if (qmimetype.isEmpty()) {
         error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, " ContentMimeType is empty ");
+        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType is empty ");
         return error;
     }
 
