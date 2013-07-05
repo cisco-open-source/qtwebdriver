@@ -56,6 +56,7 @@
 #include "chrome/test/webdriver/commands/url_command.h"
 #include "chrome/test/webdriver/commands/webelement_commands.h"
 #include "chrome/test/webdriver/commands/window_commands.h"
+#include "chrome/test/webdriver/commands/touch_commands.h"
 #include "chrome/test/webdriver/webdriver_dispatch.h"
 #include "chrome/test/webdriver/webdriver_logging.h"
 #include "chrome/test/webdriver/webdriver_session_manager.h"
@@ -185,8 +186,16 @@ void InitCallbacks(Dispatcher* dispatcher,
 
   dispatcher->Add<Sessions>("/sessions");
 
-  dispatcher->SetNotImplemented("/session/*/touch/click");
-  dispatcher->SetNotImplemented("/session/*/touch/doubleclick");
+  // Touch commands
+  dispatcher->Add<TouchClickCommand>("/session/*/touch/click");
+  dispatcher->Add<TouchDoubleClickCommand>("/session/*/touch/doubleclick");
+  dispatcher->Add<TouchDownCommand>("/session/*/touch/down");
+  dispatcher->Add<TouchUpCommand>("/session/*/touch/up");
+  dispatcher->Add<TouchMoveCommand>("/session/*/touch/move");
+  dispatcher->Add<TouchScrollCommand>("/session/*/touch/scroll");
+  dispatcher->Add<TouchLongClickCommand>("/session/*/touch/longclick");
+  dispatcher->Add<TouchFlickCommand>("/session/*/touch/flick");
+
   // WebElement commands
   dispatcher->Add<FindOneElementCommand>(  "/session/*/element");
   dispatcher->Add<FindManyElementsCommand>("/session/*/elements");

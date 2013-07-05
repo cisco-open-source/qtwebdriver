@@ -372,6 +372,7 @@
         'src/chrome/test/webdriver/commands/webdriver_command.cc',
         'src/chrome/test/webdriver/commands/webelement_commands.cc',
         'src/chrome/test/webdriver/commands/window_commands.cc',
+        'src/chrome/test/webdriver/commands/touch_commands.cc',
         'src/chrome/test/webdriver/frame_path.cc',
         'src/chrome/test/webdriver/http_response.cc',
         'src/chrome/test/webdriver/webdriver_automation.h',
@@ -407,8 +408,8 @@
         'src/viewfactory.cc',
         'src/ServerThread.h',
         'src/ServerThread.cc',
-	'src/versioninfo.cc',
-        'src/wdversion.cc',
+        'src/versioninfo.cc',
+        'src/wdversion.cc'
       ],
 
       'conditions': [

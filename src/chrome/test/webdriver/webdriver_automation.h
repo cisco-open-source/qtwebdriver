@@ -329,6 +329,16 @@ class Automation : public QObject {
   void GetGeolocation(scoped_ptr<base::DictionaryValue>* geolocation,
                       Error** error);
 
+  void TouchClick(const WebViewId &view_id, const Point &p, Error **error);
+
+  void TouchDoubleClick(const WebViewId &view_id, const Point &p, Error **error);
+
+  void TouchDown(const WebViewId &view_id, const Point &p, Error **error);
+
+  void TouchUp(const WebViewId &view_id, const Point &p, Error **error);
+
+  void TouchLongClick(const WebViewId &view_id, const Point &p, Error **error);
+
   // Overrides the current geolocation.
   void OverrideGeolocation(const base::DictionaryValue* geolocation,
                            Error** error);

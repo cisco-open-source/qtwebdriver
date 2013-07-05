@@ -79,6 +79,7 @@
 #include "viewfactory.h"
 #include <iostream>
 
+
 class QNetworkCookie;
 
 namespace webdriver {
@@ -2025,11 +2026,202 @@ void Automation::GetGeolocation(scoped_ptr<base::DictionaryValue> *geolocation, 
   }
 }
 
+void Automation::TouchClick(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setScreenPos(view->mapToGlobal(point));
+    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+
+    points.clear();
+    touchPoint.setPos(point);
+    touchPoint.setScreenPos(view->mapToGlobal(point));
+    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+    touchPoint.setState(Qt::TouchPointReleased);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+
+    QApplication::postEvent(view, touchBeginEvent);
+//    QApplication::postEvent(view, touchEndEvent);
+
+    //additional we send mouse event for QWebView
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view, pressEvent);
+    QApplication::postEvent(view, releaseEvent);
+
+
+}
+
+void Automation::TouchDoubleClick(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+//    QList<QTouchEvent::TouchPoint> points;
+//    QTouchEvent::TouchPoint touchPoint(1);
+//    touchPoint.setPos(point);
+//    touchPoint.setState(Qt::TouchPointPressed);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+
+//    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+
+//    points.clear();
+//    touchPoint.setPos(point);
+//    touchPoint.setState(Qt::TouchPointReleased);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+//    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+
+////    QApplication::postEvent(view, touchBeginEvent);
+////    QApplication::postEvent(view, touchEndEvent);
+////    QApplication::postEvent(view, touchBeginEvent);
+////    QApplication::postEvent(view, touchEndEvent);
+
+    QWebView *webView = qobject_cast<QWebView*>(view);
+    webView->setZoomFactor(2/webView->zoomFactor());
+    webView->page()->mainFrame()->scroll(point.x(), point.y());
+
+
+}
+
+void Automation::TouchDown(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+    QTouchEvent *touchPressEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+
+    QApplication::postEvent(view, touchBeginEvent);
+    QApplication::postEvent(view, touchPressEvent);
+    QApplication::postEvent(view, touchEndEvent);
+
+    //additional we send mouse event for QWebView
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, pressEvent);
+
+}
+
+void Automation::TouchUp(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+    QTouchEvent *touchReleaseEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+
+    QApplication::postEvent(view, touchBeginEvent);
+    QApplication::postEvent(view, touchReleaseEvent);
+    QApplication::postEvent(view, touchEndEvent);
+
+    //additional we send mouse event for QWebView
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view, pressEvent);
+
+}
+
+void Automation::TouchLongClick(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+//    QList<QTouchEvent::TouchPoint> points;
+//    QTouchEvent::TouchPoint touchPoint(1);
+//    touchPoint.setPos(point);
+//    touchPoint.setScreenPos(view->mapToGlobal(point));
+//    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+//    touchPoint.setState(Qt::TouchPointPressed);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+//    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+
+//    points.clear();
+//    touchPoint.setPos(point);
+//    touchPoint.setScreenPos(view->mapToGlobal(point));
+//    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+//    touchPoint.setState(Qt::TouchPointReleased);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+//    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+
+//    QTimer::singleShot(1000, &loop, SLOT(quit()));
+//    QApplication::postEvent(view, touchBeginEvent);
+//    loop.exec(QEventLoop::ExcludeUserInputEvents);
+//    QApplication::postEvent(view, touchEndEvent);
+
+    QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Other, point, view->mapToGlobal(point));
+    qApp->postEvent(view, contextEvent);
+
+}
+
+
 void Automation::OverrideGeolocation(const DictionaryValue* geolocation,
                                      Error** error)
 {
-  *error = CheckGeolocationSupported();
-  if (*error)
+    *error = new Error(kUnknownError);
     return;
 
   // TODO: use QtLocation class in QT 5.0 in the future
@@ -2388,6 +2580,9 @@ void Automation::pageLoadStarted()
 
 void Automation::pageLoadFinished()
 { 
+    QWebView* view = qobject_cast<QWebView*>(sender());
+    if (view)
+        view->setZoomFactor(1);
     isLoading = false;
 }
 
@@ -2490,18 +2685,36 @@ void JSLogger::error(QVariant message)
 }
 
 //bool Automation::eventFilter(QObject *obj, QEvent *event)
-// {
-//     if (obj == pWeb) {
-//         if (event->type() == QEvent::Drop) {
-//             qDebug()<<"[WD]:"<<&event;
-//             return false;
-//         }
-//         else
-//             return false;
-//     } else {
+//{
+//    if (event->type() == QEvent::Gesture) {
+//        std::cout<<"Event recieve"<<event->type()<<std::endl;
+//        qDebug()<<"[WD]:"<<"Event recieve"<<event<<obj;
+//        return false;
+//    }
+//    else if (event->type() == QEvent::TouchBegin) {
+//        std::cout<<"Event recieve"<<event->type()<<std::endl;
+//        qDebug()<<"[WD]:"<<"Event recieve"<<event<<obj;
+//        return false;
+//    }
+//    else if (event->type() == QEvent::TouchUpdate) {
+//        std::cout<<"Event recieve"<<event->type()<<std::endl;
+//        qDebug()<<"[WD]:"<<"Event recieve"<<event<<obj;
+//        return false;
+//    }
+//    else if (event->type() == QEvent::TouchEnd) {
+//        std::cout<<"Event recieve"<<event->type()<<std::endl;
+//        qDebug()<<"[WD]:"<<"Event recieve"<<event<<obj;
+//        return false;
+//    }
 
-//         return false;
-//     }
-// }
+//    if (event->type() == QEvent::MouseButtonPress) {
+//        std::cout<<"Event recieve"<<event->type()<<std::endl;
+//        qDebug()<<"[WD]:"<<"Event recieve"<<event<<obj;
+//        return false;
+//    }
+//    else
+//        return false;
+
+//}
 
 }  // namespace webdriver

@@ -1915,12 +1915,12 @@ Error* Session::RemoveStorageItem(StorageType type,
 
 Error* Session::GetGeolocation(
     scoped_ptr<base::DictionaryValue>* geolocation) {
-  Error* error = NULL;
-  RunSessionTask(base::Bind(
-      &Automation::GetGeolocation,
-      base::Unretained(automation_.get()),
-      geolocation,
-      &error));
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+        &Automation::GetGeolocation,
+        base::Unretained(automation_.get()),
+        geolocation,
+        &error));
   return error;
 }
 
@@ -2585,6 +2585,62 @@ Error* Session::SetPrefs() {
       return error;
   }
   return NULL;
+}
+
+Error* Session::TouchClick(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchLongClick,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    if (!error)
+      mouse_position_ = location;
+    return error;
+}
+
+Error* Session::TouchDoubleClick(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchDoubleClick,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    if (!error)
+      mouse_position_ = location;
+    return error;
+}
+
+Error* Session::TouchDown(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchDown,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    if (!error)
+      mouse_position_ = location;
+    return error;
+}
+
+Error* Session::TouchUp(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchUp,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    if (!error)
+      mouse_position_ = location;
+    return error;
 }
 
 }  // namespace webdriver

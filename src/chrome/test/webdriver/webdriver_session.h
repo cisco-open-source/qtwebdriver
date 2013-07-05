@@ -406,6 +406,14 @@ class Session {
   // Overrides the current geolocation.
   Error* OverrideGeolocation(const base::DictionaryValue* geolocation);
 
+  Error* TouchClick(Point location);
+
+  Error* TouchDoubleClick(Point location);
+
+  Error* TouchDown(Point location);
+
+  Error* TouchUp(Point location);
+
   const std::string& id() const;
 
   const FrameId& current_target() const;
