@@ -3,6 +3,7 @@
     'wd.gypi',
   ],
 
+  # TODO: check if can remove
   'variables': {
     'WD_BUILD_MONGOOSE%': '0',
     'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
@@ -17,11 +18,8 @@
         'CharacterSet': '1'
       },
 
-      'cflags': [
-        '-fPIC',
-        '-Wall',
-        '-W',
-        '-Wno-unused-parameter',
+      'includes': [
+        'wd_build_options.gypi',
       ],
 
       'include_dirs': [
@@ -92,51 +90,7 @@
             'src/third_party/mongoose/mongoose.c',
           ],
         } ],
-
-        [ 'mode == "debug"', {
-          'cflags': [
-            '-O0',
-            '-g',
-          ],
-        } ],
-
-        [ 'mode == "release"', {
-          'cflags': [
-            '-O3',
-          ],
-
-          'defines': [
-            'NDEBUG',
-          ],
-        } ],
-
-        [ 'mode == "release_dbg"', {
-          'cflags': [
-            '-O3',
-            '-g',
-          ],
-        } ],
-       
-        ['OS=="linux"', {
-          'defines': [
-            '__STDC_FORMAT_MACROS',
-            'OS_POSIX',
-          ],
-        } ],
-
-        [ 'OS == "win"', {
-          'defines': [
-            '_WIN32',
-            'OS_WIN',
-            'NOMINMAX',
-            '_CRT_RAND_S',
-            'WIN32',
-            '_WINSOCKAPI_',
-          ],
-          'msvs_configuration_attributes': {
-            'CharacterSet': '1'
-          },
-        } ],
+        
       ],
     }
   ],
