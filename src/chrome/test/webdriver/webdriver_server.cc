@@ -359,8 +359,12 @@ int RunChromeDriver() {
   }
 
 #if defined(OS_WIN)
+#if (QT_VERSION == QT_VERSION_CHECK(5, 1, 0))
+  system("qtenv2.bat vsvars");
+#else //QT_VERSION
   system("qtvars.bat vsvars");
-#endif
+#endif //QT_VERSION
+#endif //OS_WIN
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
   // set default output mode

@@ -71,13 +71,21 @@
                   ],
                 } ],
                 [ 'OS=="win"', {
-                  #TODO: set here Qt5 libs
                   'libraries': [
-                    '-l<(QT_LIB_PATH)/QtWebKit4',
-                    '-l<(QT_LIB_PATH)/QtNetwork4',
-                    '-l<(QT_LIB_PATH)/QtXml4',
-                    '-l<(QT_LIB_PATH)/QtGui4',
-                    '-l<(QT_LIB_PATH)/QtCore4',
+                    '-l<(QT_LIB_PATH)/Qt5WebKitWidgets',
+                    '-l<(QT_LIB_PATH)/Qt5WebKit',
+                    '-l<(QT_LIB_PATH)/Qt5Network',
+                    '-l<(QT_LIB_PATH)/Qt5Xml',
+                    '-l<(QT_LIB_PATH)/Qt5Gui',
+                    '-l<(QT_LIB_PATH)/Qt5Core',
+                    '-l<(QT_LIB_PATH)/Qt5Widgets',
+                    '-luser32.lib',
+                    '-lws2_32.lib',
+                    '-lshell32.lib',
+                    '-ladvapi32.lib',
+                    '-lpsapi.lib',
+                    '-lkernel32.lib',
+                    '-luserenv.lib',
                   ],
                 } ],
               ],
@@ -133,7 +141,7 @@
 
     [ 'platform != "desktop"', {
       'variables': {
-		    'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
+        'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
         'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
         'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)',
         'MONGOOSE_INC_PATH':  '<(CISCO_MONGOOSE_INC_PATH)',
@@ -157,6 +165,7 @@
       'QT_GUI_LIB',
       'QT_CORE_LIB',
       'QT_SHARED',
+      'QT_NO_OPENGL',
     ],
 
     'conditions': [
