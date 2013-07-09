@@ -12,6 +12,8 @@
     'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
   },
 
+  # TODO: move generate_wdversion.py here from build.sh
+
   'targets': [
     {
       'target_name': 'All',

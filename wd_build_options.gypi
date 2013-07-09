@@ -7,6 +7,8 @@
       },
 
   'variables': {
+  	'QT5%': '0',
+  	
     'conditions': [
 
   		# WORKAROUND: this is for compatibility with CISCO-NDS build system
