@@ -1,6 +1,7 @@
 {
   'includes': [
     'wd.gypi',
+    'wd_common.gypi',
   ],
 
   'target_defaults': {
@@ -101,7 +102,7 @@
       'target_name': 'test_WD_hybrid',
       'type': 'executable',
 
-      'product_name': 'WebDriverTest',
+      'product_name': 'WebDriver',
 
       'dependencies': [
         'base.gyp:chromium_base',

@@ -1,22 +1,14 @@
 {
   'includes': [
     'wd.gypi',
+    'wd_common.gypi',
   ],
-
-  # TODO: check if can remove
-  'variables': {
-    'WD_BUILD_MONGOOSE%': '0',
-    'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
-  },
 
   'targets': [
     {
       'target_name': 'WebDriver_core',
       'type': 'static_library',
       'standalone_static_library': 1,
-      'msvs_configuration_attributes': {
-        'CharacterSet': '1'
-      },
 
       'includes': [
         'wd_build_options.gypi',

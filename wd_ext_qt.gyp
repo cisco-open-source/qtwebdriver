@@ -1,6 +1,7 @@
 {
   'includes': [
     'wd.gypi',
+    'wd_common.gypi',
   ],
 
   'target_defaults': {

@@ -1,3 +1,6 @@
+#
+# include this file for QT preprocessing - moc, ui, etc...
+#
 {
   'rules': [         
   {
