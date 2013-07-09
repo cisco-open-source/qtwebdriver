@@ -22,7 +22,7 @@
  *	char buf[32];
  */
 
-#include "dmg_fp.h"
+#include "base/third_party/dmg_fp/dmg_fp.h"
 
 namespace dmg_fp {
 
