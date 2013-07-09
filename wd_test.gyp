@@ -24,10 +24,10 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-              '-lQt5WebKitWidgets',
+#              '-lQt5WebKitWidgets',
               '-lQt5OpenGL',
               '-lQt5PrintSupport',
-              '-lQt5WebKit',
+#              '-lQt5WebKit',
               '-lQt5Script',
               '-lQt5Network',
               '-lQt5V8',
@@ -51,7 +51,7 @@
           [ 'OS=="win"', {
             #TODO: set here Qt5 libs
             'libraries': [
-            	'-l<(QT_LIB_PATH)/QtWebKit4',
+#            	'-l<(QT_LIB_PATH)/QtWebKit4',
             	'-l<(QT_LIB_PATH)/QtNetwork4',
             	'-l<(QT_LIB_PATH)/QtXml4',
             	'-l<(QT_LIB_PATH)/QtGui4',
@@ -64,7 +64,7 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-              '-lQtWebKit',
+#              '-lQtWebKit',
               '-lQtNetwork',
               '-lQtXml',
               '-lQtXmlPatterns',
@@ -77,7 +77,7 @@
           } ],
           [ 'OS=="win"', {
             'libraries': [
-              '-l<(QT_LIB_PATH)/QtWebKit4',
+#              '-l<(QT_LIB_PATH)/QtWebKit4',
               '-l<(QT_LIB_PATH)/QtNetwork4',
               '-l<(QT_LIB_PATH)/QtXml4',
               '-l<(QT_LIB_PATH)/QtGui4',
@@ -99,20 +99,11 @@
 
   'targets': [
     {
-      'target_name': 'test_WD_hybrid',
-      'type': 'executable',
+      'target_name': 'test_widgets',
+      'type': 'static_library',
+      'standalone_static_library': 1,
 
-      'product_name': 'WebDriver',
-
-      'dependencies': [
-        'base.gyp:chromium_base',
-        'wd_core.gyp:WebDriver_core',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_web',
-      ],
-      
       'sources': [
-        'src/Test/main.cc',
         'src/Test/ClickTest.cc',
         'src/Test/ClickTest.h',
         '<(INTERMEDIATE_DIR)/moc_ClickTest.cc',
@@ -155,24 +146,78 @@
         'src/Test/BasicMouseInterfaceTest.cc'
       ],
 
-      'conditions': [
+    }, {
+      'target_name': 'test_WD_hybrid',
+      'type': 'executable',
 
+      'product_name': 'WebDriver',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+        'test_widgets',
+      ],
+
+      'defines': [ 'WD_TEST_ENABLE_WEB_VIEW=1' ],
+      
+      'sources': [
+        'src/Test/main.cc',
+      ],
+
+      'conditions': [
       	[ '<(WD_BUILD_MONGOOSE) == 0', {
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
         } ],
 
+        [ '<(QT5) == 1', {
+          'conditions': [
+            ['OS=="linux"', {
+              'libraries': ['-lQt5WebKitWidgets', '-lQt5WebKit',],
+            } ],
+            [ 'OS=="win"', {
+              #TODO: set here Qt5 libs
+              'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
+            } ],
+          ],
+        }, {
+          'conditions': [
+            ['OS=="linux"', {
+              'libraries': ['-lQtWebKit',],
+            } ],
+            [ 'OS=="win"', {
+              'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
+            } ],
+          ],
+        } ],
       ],
 
     }, {
-      'target_name': 'test_WD_native',
+      'target_name': 'test_WD_hybrid_noWebkit',
       'type': 'executable',
 
-      'product_name': 'WebDriverTest_native',
+      'product_name': 'WebDriver_noWebkit',
 
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'test_widgets',
+      ],
+      
       'sources': [
-      	# TODO: widget only WD
+        'src/Test/main.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
       ],
 
     }

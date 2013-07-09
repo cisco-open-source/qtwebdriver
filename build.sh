@@ -52,5 +52,9 @@ do
     then
       cp -f ${output_gen}/out/$platform/$mode/Default/WebDriver ${output_gen}/bin/$platform/$mode/ 2>/dev/null
     fi
+    if [ -f ${output_gen}/out/$platform/$mode/Default/WebDriver_noWebkit ]
+    then
+      cp -f ${output_gen}/out/$platform/$mode/Default/WebDriver_noWebkit ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    fi
   done
 done

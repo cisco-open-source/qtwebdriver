@@ -29,6 +29,7 @@
         ['platform == "desktop"', {
           'dependencies': [
             'wd_test.gyp:test_WD_hybrid',
+            'wd_test.gyp:test_WD_hybrid_noWebkit',
           ],
         } ],
       ],
