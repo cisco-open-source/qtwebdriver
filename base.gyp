@@ -1,19 +1,14 @@
 {
+  'includes': [
+    'wd.gypi',
+    'wd_common.gypi',
+  ],
+
   'targets': [
     {
       'target_name': 'chromium_base',
       'type': 'static_library',
       'standalone_static_library': 1,
-      'msvs_configuration_attributes': {
-        'CharacterSet': '1'
-      },
-
-      'cflags': [
-        '-fPIC',
-        '-Wall',
-        '-W',
-        '-Wno-unused-parameter',
-      ],
 
       'include_dirs': [
         'inc/',
@@ -96,30 +91,6 @@
 
       'conditions': [
 
-        [ 'mode == "debug"', {
-          'cflags': [
-            '-O0',
-            '-g',
-          ],
-        } ],
-
-        [ 'mode == "release"', {
-          'cflags': [
-            '-O3',
-          ],
-
-          'defines': [
-            'NDEBUG',
-          ],
-        } ],
-
-        [ 'mode == "release_dbg"', {
-          'cflags': [
-            '-O3',
-            '-g',
-          ],
-        } ],
-       
         ['OS=="linux"', {
           'defines': [
             '__STDC_FORMAT_MACROS',
