@@ -24,10 +24,8 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-#              '-lQt5WebKitWidgets',
               '-lQt5OpenGL',
               '-lQt5PrintSupport',
-#              '-lQt5WebKit',
               '-lQt5Script',
               '-lQt5Network',
               '-lQt5V8',
@@ -51,7 +49,6 @@
           [ 'OS=="win"', {
             #TODO: set here Qt5 libs
             'libraries': [
-#            	'-l<(QT_LIB_PATH)/QtWebKit4',
             	'-l<(QT_LIB_PATH)/QtNetwork4',
             	'-l<(QT_LIB_PATH)/QtXml4',
             	'-l<(QT_LIB_PATH)/QtGui4',
@@ -64,7 +61,6 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-#              '-lQtWebKit',
               '-lQtNetwork',
               '-lQtXml',
               '-lQtXmlPatterns',
@@ -77,7 +73,6 @@
           } ],
           [ 'OS=="win"', {
             'libraries': [
-#              '-l<(QT_LIB_PATH)/QtWebKit4',
               '-l<(QT_LIB_PATH)/QtNetwork4',
               '-l<(QT_LIB_PATH)/QtXml4',
               '-l<(QT_LIB_PATH)/QtGui4',

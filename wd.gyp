@@ -3,15 +3,6 @@
     'wd.gypi',
   ],
 
-  'variables': {
-    'QT5%': '0',
-    'WD_CONFIG_QWIDGET_VIEW%': '0',
-    'WD_CONFIG_QML_VIEW%': '0',
-    'WD_BUILD_MONGOOSE%': '0',
-    'WD_CONFIG_XPATH%': '1',
-    'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
-  },
-
   # TODO: move generate_wdversion.py here from build.sh
 
   'targets': [
