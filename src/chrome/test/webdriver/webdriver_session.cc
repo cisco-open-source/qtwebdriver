@@ -2591,13 +2591,11 @@ Error* Session::TouchClick(Point location)
 {
     Error* error = NULL;
     RunSessionTask(base::Bind(
-            &Automation::TouchLongClick,
+            &Automation::TouchClick,
             base::Unretained(automation_.get()),
             current_target_.view_id,
             location,
             &error));
-    if (!error)
-      mouse_position_ = location;
     return error;
 }
 
@@ -2610,8 +2608,6 @@ Error* Session::TouchDoubleClick(Point location)
             current_target_.view_id,
             location,
             &error));
-    if (!error)
-      mouse_position_ = location;
     return error;
 }
 
@@ -2624,8 +2620,6 @@ Error* Session::TouchDown(Point location)
             current_target_.view_id,
             location,
             &error));
-    if (!error)
-      mouse_position_ = location;
     return error;
 }
 
@@ -2638,8 +2632,86 @@ Error* Session::TouchUp(Point location)
             current_target_.view_id,
             location,
             &error));
+    return error;
+}
+
+Error* Session::TouchMove(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchMove,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    return error;
+}
+
+Error* Session::TouchLongClick(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchLongClick,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
+    return error;
+}
+
+Error* Session::TouchScroll(Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchScroll,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            location,
+            &error));
     if (!error)
       mouse_position_ = location;
+    return error;
+}
+
+Error* Session::TouchScroll(ElementId element, Point location)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchScrollElement,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            &error));
+    if (!error)
+      mouse_position_ = location;
+    return error;
+}
+
+Error* Session::TouchFlick(int xSpeed, int ySpeed)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchFlick,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            xSpeed,
+            ySpeed,
+            &error));
+    return error;
+}
+
+Error* Session::TouchFlick(ElementId element, Point location, int speed)
+{
+    Error* error = NULL;
+    RunSessionTask(base::Bind(
+            &Automation::TouchFlickElement,
+            base::Unretained(automation_.get()),
+            current_target_.view_id,
+            element,
+            location,
+            speed,
+            &error));
     return error;
 }
 

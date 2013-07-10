@@ -329,6 +329,7 @@ class Automation : public QObject {
   void GetGeolocation(scoped_ptr<base::DictionaryValue>* geolocation,
                       Error** error);
 
+  //touch commands emulation
   void TouchClick(const WebViewId &view_id, const Point &p, Error **error);
 
   void TouchDoubleClick(const WebViewId &view_id, const Point &p, Error **error);
@@ -337,7 +338,17 @@ class Automation : public QObject {
 
   void TouchUp(const WebViewId &view_id, const Point &p, Error **error);
 
+  void TouchMove(const WebViewId &view_id, const Point &p, Error **error);
+
   void TouchLongClick(const WebViewId &view_id, const Point &p, Error **error);
+
+  void TouchScroll(const WebViewId &view_id, const Point &offset, Error **error);
+
+  void TouchScrollElement(const WebViewId &view_id, const ElementId &element, const Point &offset, Error **error);
+
+  void TouchFlick(const WebViewId &view_id, const int &xSpeed, const int &ySpeed, Error **error);
+
+  void TouchFlickElement(const WebViewId &view_id, const ElementId &element, const Point &offset, const int &speed, Error **error);
 
   // Overrides the current geolocation.
   void OverrideGeolocation(const base::DictionaryValue* geolocation,

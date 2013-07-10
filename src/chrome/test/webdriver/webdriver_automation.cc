@@ -2130,16 +2130,8 @@ void Automation::TouchDown(const WebViewId &view_id, const Point &p, Error **err
     points.append(touchPoint);
 
     QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-    QTouchEvent *touchPressEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
 
     QApplication::postEvent(view, touchBeginEvent);
-    QApplication::postEvent(view, touchPressEvent);
-    QApplication::postEvent(view, touchEndEvent);
-
-    //additional we send mouse event for QWebView
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(view, pressEvent);
 
 }
 
@@ -2162,17 +2154,34 @@ void Automation::TouchUp(const WebViewId &view_id, const Point &p, Error **error
     touchPoint.setPressure(1);
     points.append(touchPoint);
 
-    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
-    QTouchEvent *touchReleaseEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
     QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
 
-    QApplication::postEvent(view, touchBeginEvent);
-    QApplication::postEvent(view, touchReleaseEvent);
     QApplication::postEvent(view, touchEndEvent);
 
-    //additional we send mouse event for QWebView
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(view, pressEvent);
+}
+
+void Automation::TouchMove(const WebViewId &view_id, const Point &p, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QPoint point = ConvertPointToQPoint(p);
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointMoved);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointMoved, points);
+
+    QApplication::postEvent(view, touchMoveEvent);
 
 }
 
@@ -2215,6 +2224,65 @@ void Automation::TouchLongClick(const WebViewId &view_id, const Point &p, Error 
     QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Other, point, view->mapToGlobal(point));
     qApp->postEvent(view, contextEvent);
 
+}
+
+void Automation::TouchScroll(const WebViewId &view_id, const Point &offset, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QWebView *webView = qobject_cast<QWebView*>(view);
+    webView->page()->mainFrame()->scroll(offset.x(), offset.y());
+}
+
+void Automation::TouchScrollElement(const WebViewId &view_id, const ElementId &element, const Point &offset, Error **error)
+{
+    element;
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QWebView *webView = qobject_cast<QWebView*>(view);
+    webView->page()->mainFrame()->scroll(-offset.x(), -offset.y());
+}
+
+void Automation::TouchFlick(const WebViewId &view_id, const int &xSpeed, const int &ySpeed, Error **error)
+{
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+
+    QWebView *webView = qobject_cast<QWebView*>(view);
+    std::cout<<"Speed x= "<<xSpeed*3<<" y="<<ySpeed*3<<std::endl;
+    webView->page()->mainFrame()->scroll(xSpeed*3, ySpeed*3);
+}
+
+void Automation::TouchFlickElement(const WebViewId &view_id, const ElementId &element, const Point &offset, const int &speed, Error **error)
+{
+    element;
+    if(!checkView(view_id))
+    {
+        *error = new Error(kNoSuchWindow);
+        return;
+    }
+
+    QWidget *view = view_id.GetView();
+    std::cout<<"Offset x= "<<-offset.x()*(speed+1)<<" y="<<-offset.y()*(speed+1)<<std::endl;
+    QWebView *webView = qobject_cast<QWebView*>(view);
+    webView->page()->mainFrame()->scroll(-offset.x()*(speed+1), -offset.y()*(speed+1));
 }
 
 

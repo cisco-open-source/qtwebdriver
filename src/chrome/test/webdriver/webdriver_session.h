@@ -412,7 +412,19 @@ class Session {
 
   Error* TouchDown(Point location);
 
+  Error* TouchMove(Point location);
+
   Error* TouchUp(Point location);
+
+  Error* TouchLongClick(Point location);
+
+  Error* TouchScroll(Point location);
+
+  Error* TouchScroll(ElementId element, Point location);
+
+  Error* TouchFlick(int xSpeed, int ySpeed);
+
+  Error* TouchFlick(ElementId element, Point location, int speed);
 
   const std::string& id() const;
 

@@ -112,10 +112,13 @@ class TouchLongClickCommand : public TouchCommand {
   TouchLongClickCommand(const std::vector<std::string>& path_segments,
                   const base::DictionaryValue* const parameters);
   virtual ~TouchLongClickCommand();
-
+  virtual bool Init(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
 
- private:
+private:
+  bool has_element_;
+  ElementId element_;
+
   DISALLOW_COPY_AND_ASSIGN(TouchLongClickCommand);
 };
 
