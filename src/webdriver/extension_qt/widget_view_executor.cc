@@ -26,6 +26,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QScrollArea>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -38,6 +39,7 @@
 #include <QtGui/QCheckBox>
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
+#include <QtGui/QScrollArea>
 #endif
 
 #ifdef WD_CONFIG_XPATH
@@ -348,11 +350,14 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
         return;
     }
 
+    session_->logger().Log(kFineLogLevel, "Click on ");
+    session_->logger().Log(kFineLogLevel, pWidget->objectName().toStdString());
     QPoint point;
+    QRect rect;
 
     if ( qobject_cast<QRadioButton*>(pWidget) ||
          qobject_cast<QCheckBox*>(pWidget)) {
-        QRect rect ;
+
         QStyle::SubElement subElement;
         QStyleOptionButton opt;
         if (qobject_cast<QRadioButton*>(pWidget)) {
@@ -364,10 +369,30 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
         }
         opt.initFrom(pWidget);
         rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
-        point = QPoint(rect.width()/2, rect.height()/2);
+        point = pWidget->mapFromGlobal(QPoint(rect.x(), rect.y()));
+        point = pWidget->mapToParent(point);
+        rect.setX(point.x());
+        rect.setY(point.y());
     } else {
-        point = QPoint(pWidget->width()/2, pWidget->height()/2);
+        rect = pWidget->geometry();
     }
+
+    QRect visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
+
+    if(visibleClickableLocation.isEmpty()){
+        QWidget *tmpParent = pWidget;
+        while(tmpParent != NULL && qobject_cast<QScrollArea*>(tmpParent) == NULL){
+            tmpParent = tmpParent->parentWidget();
+        }
+        if(!tmpParent){
+            *error = new Error(kMoveTargetOutOfBounds, "Target is out of view in non scrolable widget");
+            return;
+        }
+    }
+    visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
+    point = QPoint(rect.width()/2, rect.height()/2);
+
+//    rect = pWidget->visibleRegion().intersected(rect).boundingRect();
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
