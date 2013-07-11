@@ -2266,7 +2266,6 @@ void Automation::TouchFlick(const WebViewId &view_id, const int &xSpeed, const i
     QWidget *view = view_id.GetView();
 
     QWebView *webView = qobject_cast<QWebView*>(view);
-    std::cout<<"Speed x= "<<xSpeed*3<<" y="<<ySpeed*3<<std::endl;
     webView->page()->mainFrame()->scroll(xSpeed*3, ySpeed*3);
 }
 
@@ -2280,7 +2279,6 @@ void Automation::TouchFlickElement(const WebViewId &view_id, const ElementId &el
     }
 
     QWidget *view = view_id.GetView();
-    std::cout<<"Offset x= "<<-offset.x()*(speed+1)<<" y="<<-offset.y()*(speed+1)<<std::endl;
     QWebView *webView = qobject_cast<QWebView*>(view);
     webView->page()->mainFrame()->scroll(-offset.x()*(speed+1), -offset.y()*(speed+1));
 }

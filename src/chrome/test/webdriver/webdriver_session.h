@@ -406,6 +406,7 @@ class Session {
   // Overrides the current geolocation.
   Error* OverrideGeolocation(const base::DictionaryValue* geolocation);
 
+  //touch command
   Error* TouchClick(Point location);
 
   Error* TouchDoubleClick(Point location);

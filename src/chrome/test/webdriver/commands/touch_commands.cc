@@ -23,31 +23,20 @@ TouchClickCommand::TouchClickCommand(const std::vector<std::string>& path_segmen
 
 TouchClickCommand::~TouchClickCommand() {}
 
-bool TouchClickCommand::Init(Response* const response) {
-  if (!TouchCommand::Init(response))
-    return false;
-
-  std::string element_name;
-  has_element_ = GetStringParameter("element", &element_name);
-
-  if (has_element_) {
-    element_ = ElementId(element_name);
-  }
-
-  if (!has_element_ ) {
-    response->SetError(new Error(
-        kBadRequest, "Invalid command arguments"));
-  }
-
-  return true;
-}
-
 void TouchClickCommand::ExecutePost(Response* const response) {
     Point location;
     Error* error;
-    printf("Execute Touch Click Comman post\n");
+    std::string element_name;
 
-    error = session_->GetElementLocationInView(element_, &location);
+    if (!GetStringParameter("element", &element_name))
+    {
+        response->SetError(new Error(
+            kBadRequest, "Invalid command arguments"));
+    }
+
+    ElementId element = ElementId(element_name);
+
+    error = session_->GetElementLocationInView(element, &location);
     if (error) {
       response->SetError(error);
       return;
@@ -67,32 +56,22 @@ TouchDoubleClickCommand::TouchDoubleClickCommand(const std::vector<std::string>&
 
 TouchDoubleClickCommand::~TouchDoubleClickCommand() {}
 
-bool TouchDoubleClickCommand::Init(Response* const response) {
-  if (!TouchCommand::Init(response))
-    return false;
-
-  std::string element_name;
-  has_element_ = GetStringParameter("element", &element_name);
-
-  if (has_element_) {
-    element_ = ElementId(element_name);
-  }
-
-  if (!has_element_ ) {
-    response->SetError(new Error(
-        kBadRequest, "Invalid command arguments"));
-  }
-
-  return true;
-}
 
 void TouchDoubleClickCommand::ExecutePost(Response *const response)
 {
     Point location;
     Error* error;
-    printf("Execute Touch Double Click Comman post\n");
+    std::string element_name;
 
-    error = session_->GetElementLocationInView(element_, &location);
+    if (!GetStringParameter("element", &element_name))
+    {
+        response->SetError(new Error(
+            kBadRequest, "Invalid command arguments"));
+    }
+
+    ElementId element = ElementId(element_name);
+
+    error = session_->GetElementLocationInView(element, &location);
     if (error) {
       response->SetError(error);
       return;
@@ -115,9 +94,8 @@ TouchDownCommand::~TouchDownCommand() {}
 void TouchDownCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Touch Down Comman post\n");
-
     int x, y;
+
     if (!GetIntegerParameter("x", &x) ||
         !GetIntegerParameter("y", &y)) {
       response->SetError(new Error(
@@ -146,9 +124,8 @@ TouchUpCommand::~TouchUpCommand() {}
 void TouchUpCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Touch Up Comman post\n");
-
     int x, y;
+
     if (!GetIntegerParameter("x", &x) ||
         !GetIntegerParameter("y", &y)) {
       response->SetError(new Error(
@@ -177,9 +154,8 @@ TouchMoveCommand::~TouchMoveCommand() {}
 void TouchMoveCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Touch Move Comman post\n");
-
     int x, y;
+
     if (!GetIntegerParameter("x", &x) ||
         !GetIntegerParameter("y", &y)) {
       response->SetError(new Error(
@@ -208,9 +184,8 @@ TouchScrollCommand::~TouchScrollCommand() {}
 void TouchScrollCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Scroll Comman post\n");
-
     int x, y;
+
     if (!GetIntegerParameter("xoffset", &x) ||
         !GetIntegerParameter("yoffset", &y)) {
       response->SetError(new Error(
@@ -254,33 +229,21 @@ TouchLongClickCommand::TouchLongClickCommand(const std::vector<std::string>& pat
 
 TouchLongClickCommand::~TouchLongClickCommand() {}
 
-bool TouchLongClickCommand::Init(Response* const response) {
-  if (!TouchCommand::Init(response))
-    return false;
-
-  std::string element_name;
-  has_element_ = GetStringParameter("element", &element_name);
-
-  if (has_element_) {
-    element_ = ElementId(element_name);
-  }
-
-  if (!has_element_ ) {
-    response->SetError(new Error(
-        kBadRequest, "Invalid command arguments"));
-  }
-
-  return true;
-}
-
 void TouchLongClickCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Touch LongClick post\n");
-
     Point location;
+    std::string element_name;
 
-    error = session_->GetElementLocationInView(element_, &location);
+    if (!GetStringParameter("element", &element_name))
+    {
+        response->SetError(new Error(
+            kBadRequest, "Invalid command arguments"));
+    }
+
+    ElementId element = ElementId(element_name);
+
+    error = session_->GetElementLocationInView(element, &location);
     if (error) {
       response->SetError(error);
       return;
@@ -304,11 +267,10 @@ TouchFlickCommand::~TouchFlickCommand() {}
 void TouchFlickCommand::ExecutePost(Response *const response)
 {
     Error* error;
-    printf("Execute Touch Flick post\n");
-
     int xSpeed, ySpeed;
     int xoffset, yoffset, speed;
     std::string element_name;
+
     if (GetIntegerParameter("xspeed", &xSpeed) &&
         GetIntegerParameter("yspeed", &ySpeed))
     {
@@ -323,8 +285,6 @@ void TouchFlickCommand::ExecutePost(Response *const response)
     }
     else
     {
-        if (GetStringParameter("element", &element_name))
-            printf("ElementName\n");
         response->SetError(new Error(
             kBadRequest,
             "Missing or invalid parameters"));

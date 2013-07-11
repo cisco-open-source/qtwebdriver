@@ -2668,8 +2668,6 @@ Error* Session::TouchScroll(Point location)
             current_target_.view_id,
             location,
             &error));
-    if (!error)
-      mouse_position_ = location;
     return error;
 }
 
@@ -2683,8 +2681,6 @@ Error* Session::TouchScroll(ElementId element, Point location)
             element,
             location,
             &error));
-    if (!error)
-      mouse_position_ = location;
     return error;
 }
 

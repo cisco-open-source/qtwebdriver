@@ -27,22 +27,19 @@ class TouchCommand : public WebDriverCommand {
   DISALLOW_COPY_AND_ASSIGN(TouchCommand);
 };
 
+//Single tap on the touch enabled device.
 class TouchClickCommand : public TouchCommand {
  public:
   TouchClickCommand(const std::vector<std::string>& path_segments,
                const base::DictionaryValue* const parameters);
   virtual ~TouchClickCommand();
 
-  virtual bool Init(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
-
- private:
-  bool has_element_;
-  ElementId element_;
 
   DISALLOW_COPY_AND_ASSIGN(TouchClickCommand);
 };
 
+//Finger down on the screen.
 class TouchDownCommand : public TouchCommand {
  public:
   TouchDownCommand(const std::vector<std::string>& path_segments,
@@ -55,6 +52,8 @@ class TouchDownCommand : public TouchCommand {
   DISALLOW_COPY_AND_ASSIGN(TouchDownCommand);
 };
 
+
+//Finger up on the screen.
 class TouchUpCommand : public TouchCommand {
  public:
   TouchUpCommand(const std::vector<std::string>& path_segments,
@@ -67,22 +66,19 @@ class TouchUpCommand : public TouchCommand {
   DISALLOW_COPY_AND_ASSIGN(TouchUpCommand);
 };
 
+//Double tap on the touch screen using finger motion events.
 class TouchDoubleClickCommand : public TouchCommand {
  public:
   TouchDoubleClickCommand(const std::vector<std::string>& ps,
                      const base::DictionaryValue* const parameters);
   virtual ~TouchDoubleClickCommand();
 
-  virtual bool Init(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
-
- private:
-  bool has_element_;
-  ElementId element_;
 
   DISALLOW_COPY_AND_ASSIGN(TouchDoubleClickCommand);
 };
 
+//Finger move on the screen.
 class TouchMoveCommand : public TouchCommand {
  public:
   TouchMoveCommand(const std::vector<std::string>& path_segments,
@@ -95,6 +91,7 @@ class TouchMoveCommand : public TouchCommand {
   DISALLOW_COPY_AND_ASSIGN(TouchMoveCommand);
 };
 
+//Scroll on the touch screen using finger based motion events.
 class TouchScrollCommand : public TouchCommand {
  public:
   TouchScrollCommand(const std::vector<std::string>& path_segments,
@@ -107,21 +104,18 @@ class TouchScrollCommand : public TouchCommand {
   DISALLOW_COPY_AND_ASSIGN(TouchScrollCommand);
 };
 
+//Long press on the touch screen using finger motion events.
 class TouchLongClickCommand : public TouchCommand {
  public:
   TouchLongClickCommand(const std::vector<std::string>& path_segments,
                   const base::DictionaryValue* const parameters);
   virtual ~TouchLongClickCommand();
-  virtual bool Init(Response* const response) OVERRIDE;
   virtual void ExecutePost(Response* const response) OVERRIDE;
-
-private:
-  bool has_element_;
-  ElementId element_;
 
   DISALLOW_COPY_AND_ASSIGN(TouchLongClickCommand);
 };
 
+//Flick on the touch screen using finger motion events.
 class TouchFlickCommand : public TouchCommand {
  public:
   TouchFlickCommand(const std::vector<std::string>& path_segments,
