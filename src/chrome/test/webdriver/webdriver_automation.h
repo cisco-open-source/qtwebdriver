@@ -17,6 +17,10 @@
 #include <QtCore/QHash>
 #include <QtGui/QKeyEvent>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtGui/QTouchDevice>
+#endif
+
 #include "base/command_line.h"
 #include "base/file_path.h"
 // #include "base/memory/ref_counted.h"
@@ -484,6 +488,10 @@ class Automation : public QObject {
   bool isLoading;
   QMap<int, int> keyMap;
   QHash<QString, ElementMap* > windowsElementMap;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  QTouchDevice touchDevice;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(Automation);
 

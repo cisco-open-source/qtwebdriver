@@ -2046,8 +2046,11 @@ void Automation::TouchClick(const WebViewId &view_id, const Point &p, Error **er
     touchPoint.setState(Qt::TouchPointPressed);
     touchPoint.setPressure(1);
     points.append(touchPoint);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
+#else
     QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-
+#endif
     points.clear();
     touchPoint.setPos(point);
     touchPoint.setScreenPos(view->mapToGlobal(point));
@@ -2055,10 +2058,14 @@ void Automation::TouchClick(const WebViewId &view_id, const Point &p, Error **er
     touchPoint.setState(Qt::TouchPointReleased);
     touchPoint.setPressure(1);
     points.append(touchPoint);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
+#else
     QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+#endif
 
     QApplication::postEvent(view, touchBeginEvent);
-//    QApplication::postEvent(view, touchEndEvent);
+    QApplication::postEvent(view, touchEndEvent);
 
     //additional we send mouse event for QWebView
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
@@ -2129,7 +2136,11 @@ void Automation::TouchDown(const WebViewId &view_id, const Point &p, Error **err
     touchPoint.setPressure(1);
     points.append(touchPoint);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
+#else
     QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+#endif
 
     QApplication::postEvent(view, touchBeginEvent);
 
@@ -2154,7 +2165,12 @@ void Automation::TouchUp(const WebViewId &view_id, const Point &p, Error **error
     touchPoint.setPressure(1);
     points.append(touchPoint);
 
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
+#else
     QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+#endif
 
     QApplication::postEvent(view, touchEndEvent);
 
@@ -2179,7 +2195,11 @@ void Automation::TouchMove(const WebViewId &view_id, const Point &p, Error **err
     touchPoint.setPressure(1);
     points.append(touchPoint);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, &touchDevice, Qt::NoModifier, Qt::TouchPointMoved, points);
+#else
     QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointMoved, points);
+#endif
 
     QApplication::postEvent(view, touchMoveEvent);
 
