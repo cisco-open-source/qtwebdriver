@@ -22,7 +22,7 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
     if (factory.empty())
         return false;
 
-	if (className.empty()) {
+	if (className.empty() || className == "WebView") {
 		// get first found QWebView
         CreateViewMethod createMethod = factory.begin()->second;
         handle = new QViewHandle(static_cast<QWidget*>(createMethod()));

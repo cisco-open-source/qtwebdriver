@@ -5,6 +5,10 @@ There are two capabilities which define strategy what view will be current after
 - "browserStartWindow" - HWD will search all existed views and attach to one with same title. Or if this capablities equals "*" then to first one.
 - "browserClass" - HWD will call ViewFactory and create window registered with specified classname.
 
+For browserClass customizer can define some generic classes. In example in default 
+QT extension there is handling of "WidgetView" and "WebView" values for this capability.
+In this case ViewFactory will create first registered class of related view's type.
+
 Both options can be passed in desired and required capabilities.
 
 */

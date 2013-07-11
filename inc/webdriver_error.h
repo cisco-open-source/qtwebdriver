@@ -29,6 +29,7 @@ enum ErrorCode {
     kUnableToSetCookie = 25,
     kUnexpectedAlertOpen = 26,
     kNoAlertOpenError = 27,
+    kMoveTargetOutOfBounds = 34,
 
     // HTTP status codes.
     kSeeOther = 303,

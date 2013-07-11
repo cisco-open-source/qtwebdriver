@@ -1,21 +1,17 @@
-#include <QtCore/QFuture>
-#include <QtCore/QFutureWatcher>
 #include <QtCore/QObject>
 #include <QtCore/QTextCodec>
 
-#include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtConcurrent/QtConcurrentRun>
-#include <QtWebKitWidgets/QWebView>
-#include <QtWidgets/QApplication>
+    #include <QtConcurrent/QtConcurrentRun>
+    #if (WD_TEST_ENABLE_WEB_VIEW == 1)
+        #include <QtWebKitWidgets/QWebView>
+    #endif
+    #include <QtWidgets/QApplication>
 #else
-#include <QtCore/QtConcurrentRun>
-//#include <QDebug>
-
-#include <QtGui/QApplication>
-
-#include <QtWebKit/QtWebKit>
-
+    #include <QtGui/QApplication>
+    #if (WD_TEST_ENABLE_WEB_VIEW == 1)
+        #include <QtWebKit/QtWebKit>
+    #endif
 #endif
 
 #include <iostream>
@@ -40,12 +36,16 @@
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
+
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
+#include "extension_qt/qwebviewext.h"
+#endif
+
 #include "extension_qt/q_view_runner.h"
 #include "extension_qt/q_session_lifecycle_actions.h"
-#include "extension_qt/qwebviewext.h"
 #include "extension_qt/widget_view_creator.h"
 #include "extension_qt/widget_view_enumerator.h"
 #include "extension_qt/widget_view_executor.h"
@@ -73,8 +73,16 @@ int main(int argc, char *argv[])
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)    
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
+
+#endif    
 
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
@@ -94,13 +102,10 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
 
-    webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
 
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
 
     CommandLine options(argc, argv);
@@ -128,6 +133,7 @@ int main(int argc, char *argv[])
 }
 
 void setQtSettings() {
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)    
     QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
@@ -143,6 +149,7 @@ void setQtSettings() {
     QWebSettings::globalSettings()->setLocalStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
+#endif    
 }
 
 void PrintVersion() {

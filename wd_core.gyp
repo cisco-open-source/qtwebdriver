@@ -1,27 +1,17 @@
 {
   'includes': [
     'wd.gypi',
+    'wd_common.gypi',
   ],
-
-  'variables': {
-    'WD_BUILD_MONGOOSE%': '0',
-    'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
-  },
 
   'targets': [
     {
       'target_name': 'WebDriver_core',
       'type': 'static_library',
       'standalone_static_library': 1,
-      'msvs_configuration_attributes': {
-        'CharacterSet': '1'
-      },
 
-      'cflags': [
-        '-fPIC',
-        '-Wall',
-        '-W',
-        '-Wno-unused-parameter',
+      'includes': [
+        'wd_build_options.gypi',
       ],
 
       'include_dirs': [
@@ -92,51 +82,7 @@
             'src/third_party/mongoose/mongoose.c',
           ],
         } ],
-
-        [ 'mode == "debug"', {
-          'cflags': [
-            '-O0',
-            '-g',
-          ],
-        } ],
-
-        [ 'mode == "release"', {
-          'cflags': [
-            '-O3',
-          ],
-
-          'defines': [
-            'NDEBUG',
-          ],
-        } ],
-
-        [ 'mode == "release_dbg"', {
-          'cflags': [
-            '-O3',
-            '-g',
-          ],
-        } ],
-       
-        ['OS=="linux"', {
-          'defines': [
-            '__STDC_FORMAT_MACROS',
-            'OS_POSIX',
-          ],
-        } ],
-
-        [ 'OS == "win"', {
-          'defines': [
-            '_WIN32',
-            'OS_WIN',
-            'NOMINMAX',
-            '_CRT_RAND_S',
-            'WIN32',
-            '_WINSOCKAPI_',
-          ],
-          'msvs_configuration_attributes': {
-            'CharacterSet': '1'
-          },
-        } ],
+        
       ],
     }
   ],

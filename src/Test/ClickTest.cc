@@ -18,9 +18,10 @@ ClickTestWidget::ClickTestWidget()
     this->checkBox->move(40, 40);
 
     this->scrollArea = new QScrollArea(this);
-    this->scrollArea->move(80, 80);
+    this->scrollArea->move(100, 100);
+    this->scrollArea->resize(40,40);
     this->btnOnScroolArea = new QPushButton(this);
-    this->btnOnScroolArea->move(80, 80);
+    this->btnOnScroolArea->resize(80,80);
     this->scrollArea->setWidget(btnOnScroolArea);
 
     connect(this->normalBtn, SIGNAL(clicked()), this, SLOT(OnNormalBtnClick()));

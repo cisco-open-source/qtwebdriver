@@ -42,11 +42,19 @@ do
     [ $? -ne 0 ] && exit 1
     mkdir -p ${output_gen}/bin/$platform/$mode/
     [ $? -ne 0 ] && echo "**** ERROR: Can't create ${output_gen}/bin/$platform/$mode" && exit 1
-    cp -f ${output_gen}/out/$platform/$mode/Default/libWebDriver.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
-    cp -f ${output_gen}/out/$platform/$mode/Default/lib.target/libWebDriver.so ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+
+    cp -f ${output_gen}/out/$platform/$mode/Default/libchromium_base.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    cp -f ${output_gen}/out/$platform/$mode/Default/libWebDriver_core.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    cp -f ${output_gen}/out/$platform/$mode/Default/libWebDriver_extension_qt_base.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    cp -f ${output_gen}/out/$platform/$mode/Default/libWebDriver_extension_qt_web.a ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    #cp -f ${output_gen}/out/$platform/$mode/Default/lib.target/libWebDriver.so ${output_gen}/bin/$platform/$mode/ 2>/dev/null
     if [ -f ${output_gen}/out/$platform/$mode/Default/WebDriver ]
     then
       cp -f ${output_gen}/out/$platform/$mode/Default/WebDriver ${output_gen}/bin/$platform/$mode/ 2>/dev/null
+    fi
+    if [ -f ${output_gen}/out/$platform/$mode/Default/WebDriver_noWebkit ]
+    then
+      cp -f ${output_gen}/out/$platform/$mode/Default/WebDriver_noWebkit ${output_gen}/bin/$platform/$mode/ 2>/dev/null
     fi
   done
 done
