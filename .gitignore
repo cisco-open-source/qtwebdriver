@@ -21,4 +21,4 @@ report/*
 /Makefile
 /WebDriver.target.mk
 /WebDriverTest.target.mk
-src/webdriver/webdriver_version.cc
+/src/webdriver/webdriver_version.cc
