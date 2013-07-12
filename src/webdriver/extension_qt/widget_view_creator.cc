@@ -5,7 +5,9 @@
 
 #include "widget_view_util.h"
 #include "extension_qt/widget_view_handle.h"
+#include "q_event_filter.h"
 
+#include <QtCore/QEventLoop>
 #include <QtCore/QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
@@ -41,7 +43,12 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
         std::string objClassName(widget->metaObject()->className());
 
         if (NULL != widget) {
+            QEventLoop loop;
+            QRepaintEventFilter filter(widget);
+            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
+            widget->installEventFilter(&filter);
             widget->show();
+            loop.exec();
 
             logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by class name - "+className);
 

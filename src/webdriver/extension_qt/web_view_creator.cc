@@ -7,10 +7,11 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 #include "q_content_type_resolver.h"
+#include "q_event_filter.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QString>
-
+#include <QtCore/QEventLoop>
 
 namespace webdriver {
 
@@ -40,7 +41,12 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
         std::string objClassName(widget->metaObject()->className());
 
         if (NULL != widget) {
+            QEventLoop loop;
+            QRepaintEventFilter filter(widget);
+            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
+            widget->installEventFilter(&filter);
             widget->show();
+            loop.exec();
         
             logger.Log(kInfoLogLevel, "QWebViewCreator created view ("
                             + objClassName +") by class name - "+className);
@@ -91,7 +97,12 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
         std::string objClassName(widget->metaObject()->className());
 
         if (NULL != widget) {
+            QEventLoop loop;
+            QRepaintEventFilter filter(widget);
+            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
+            widget->installEventFilter(&filter);
             widget->show();
+            loop.exec();
         
             logger.Log(kInfoLogLevel, "QWebViewCreator created view("
                         + objClassName + ") by url - " + url);
