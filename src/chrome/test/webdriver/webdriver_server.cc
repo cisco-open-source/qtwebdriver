@@ -355,7 +355,8 @@ int RunChromeDriver() {
               << "                                  JSON format with specified WD parameters as"    << std::endl
               << "                                  described above (port, root, etc.)"             << std::endl
               << "wi-server      false              If true, web inspector will be enabled"         << std::endl
-              << "wi-port        9222               Web inspector listening port"                   << std::endl;
+              << "wi-port        9222               Web inspector listening port"                   << std::endl
+              << "version                           Print version information to stdout and exit"   << std::endl;
 
      return (EXIT_SUCCESS);
   }
@@ -457,7 +458,7 @@ int RunChromeDriver() {
     }
   }
   if (cmd_line->HasSwitch("wi-port"))
-      wi_port = QString(cmd_line->GetSwitchValueASCII("wi=port").c_str()).toInt();
+      wi_port = QString(cmd_line->GetSwitchValueASCII("wi-port").c_str()).toInt();
 
 //  if (cmd_line->HasSwitch(kEnableKeepAlive))
 //    enable_keep_alive = true;
