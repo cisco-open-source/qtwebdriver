@@ -58,6 +58,9 @@ struct Capabilities {
     static const char kLoadAsync[];
     static const char kBrowserStartWindow[];
     static const char kBrowserClass[];
+    static const char kWindowSize[];
+    static const char kWindowPosition[];
+    static const char kMaximize[];
 
     Capabilities();
     ~Capabilities();
