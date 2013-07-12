@@ -38,11 +38,6 @@ Server::Server()
 
 Server::~Server() {}
 
-int Server::Init(int argc, char *argv[]) {
-    CommandLine options(argc,argv);
-    return Init(options);
-}
-
 int Server::Init(const CommandLine &options) {
     int ret_val = 0;
 
@@ -53,12 +48,10 @@ int Server::Init(const CommandLine &options) {
 
     options_.InitFromArgv(options.argv());
 
-#if !defined(OS_WIN)    
     ret_val = ParseConfigToOptions();
     if (ret_val) {
         std::cerr << "Init failure: can't parse config file, skip options in config." << std::endl;
     }
-#endif
 
     ret_val = InitMongooseOptions();
     if (ret_val) {
@@ -544,15 +537,12 @@ int Server::InitLogging() {
     return 0;
 }
 
-#if !defined(OS_WIN)
 int Server::ParseConfigToOptions() {
     if (options_.HasSwitch("config"))
     {
         //parse json config file and set value
         std::string config_json;
-        std::string configPathString = options_.GetSwitchValueASCII("config");
-
-        FilePath configPath(configPathString);
+        FilePath configPath(options_.GetSwitchValueNative("config"));
 
         if (file_util::ReadFileToString(configPath, &config_json))
         {
@@ -589,7 +579,6 @@ int Server::ParseConfigToOptions() {
                 options_.AppendSwitchASCII("log-path", log_path);
 
             return 0;
-
         }
         else
         {
@@ -600,7 +589,6 @@ int Server::ParseConfigToOptions() {
 
     return 0;
 }
-#endif //!defined(OS_WIN)
 
 }  // namespace webdriver
 

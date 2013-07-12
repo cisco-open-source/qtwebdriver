@@ -107,22 +107,28 @@ int main(int argc, char *argv[])
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
+	
+	CommandLine cmd_line(CommandLine::NO_PROGRAM);
+#if defined(OS_WIN)
+    cmd_line.ParseFromString(::GetCommandLineW());
+#elif defined(OS_POSIX)
+    cmd_line.InitFromArgv(argc, argv);
+#endif
 
-    CommandLine options(argc, argv);
-    // check if --help CL argument is present
-    if (options.HasSwitch("help")) {
+	// check if --help CL argument is present
+    if (cmd_line.HasSwitch("help")) {
         PrintHelp();
         return 0;
     }
 
     // check if --version CL argument is present
-    if (options.HasSwitch("version"))
+    if (cmd_line.HasSwitch("version"))
     {
       PrintVersion();
       return 0;
     }
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
-    if (0 != wd_server->Init(argc, argv)) {
+    if (0 != wd_server->Init(cmd_line)) {
         return 1;
     }
 
@@ -178,7 +184,10 @@ void PrintHelp() {
                 << "                                  present"                                        << std::endl
                 << "config                            The path to config file (e.g. config.json) in"  << std::endl
                 << "                                  JSON format with specified WD parameters as"    << std::endl
-                << "                                  described above (port, root, etc.)"             << std::endl;
+                << "                                  described above (port, root, etc.)"             << std::endl
+                << "wi-server      false              If true, web inspector will be enabled"         << std::endl
+                << "wi-port        9222               Web inspector listening port"                   << std::endl
+                << "version                           Print version information to stdout and exit"   << std::endl;
 }
 
 

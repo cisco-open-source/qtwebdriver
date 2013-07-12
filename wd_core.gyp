@@ -5,7 +5,7 @@
   ],
 
   'targets': [
-    {
+  {
       'target_name': 'WebDriver_core',
       'type': 'static_library',
       'standalone_static_library': 1,
@@ -84,6 +84,5 @@
         } ],
         
       ],
-    }
-  ],
+  } ],
 }

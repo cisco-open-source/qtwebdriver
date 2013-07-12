@@ -87,12 +87,6 @@ public:
     /// @return 0 - if init was success, error code otherwise.
     int Init(const CommandLine &options);
 
-    /// Init server, parse arguments as options, creates DefaultRouteTable. 
-    /// @param argc count of arguments
-    /// @param argv array of arguments
-    /// @return 0 - if init was success, error code otherwise.
-    int Init(int argc, char *argv[]);
-
     /// Set route table for this server. Server should be stopped.
     /// @param routeTable routeTable to set. Server keeps own copy of RouteTable.
     /// @return 0 - if success, error code otherwise.
@@ -166,9 +160,7 @@ private:
 
     int InitLogging();
 
-#if !defined(OS_WIN)
     int ParseConfigToOptions();
-#endif
 
     DISALLOW_COPY_AND_ASSIGN(Server);
 };

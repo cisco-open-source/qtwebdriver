@@ -101,7 +101,11 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
 
     QPixmap pixmap = QPixmap::grabWidget(view);
 
-    session_->logger().Log(kInfoLogLevel, "Save screenshot to - "+path.value());
+#if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
 
 #if defined(OS_POSIX)
     if (!pixmap.save(path.value().c_str())) 

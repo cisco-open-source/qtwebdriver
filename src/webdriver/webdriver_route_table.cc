@@ -129,9 +129,15 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
         // '-' + vendor prefix + '-' + command name
         std::vector<std::string> prefix_segments;
         base::SplitString(url_segments[3], '-', &prefix_segments);
+#if defined(OS_WIN)
         if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
-                || prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
-            GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
+                || prefix_segments[1].empty() || !isalpha(prefix_segments[1].at(0))) {
+#else //OS_WIN
+		if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
+				|| prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
+#endif //OS_WIN
+
+			GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
             return false;
         }
 

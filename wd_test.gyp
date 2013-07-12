@@ -46,13 +46,23 @@
               '-licui18n',
             ],
           } ],
-          [ 'OS=="win"', {
-            #TODO: set here Qt5 libs
+          ['OS=="win"', {
             'libraries': [
-            	'-l<(QT_LIB_PATH)/QtNetwork4',
-            	'-l<(QT_LIB_PATH)/QtXml4',
-            	'-l<(QT_LIB_PATH)/QtGui4',
-            	'-l<(QT_LIB_PATH)/QtCore4',
+             '-l<(QT_LIB_PATH)/Qt5WebKitWidgets',
+#             '-l<(QT_LIB_PATH)/Qt5WebKit',
+             '-l<(QT_LIB_PATH)/Qt5Network',
+             '-l<(QT_LIB_PATH)/Qt5Xml',
+             '-l<(QT_LIB_PATH)/Qt5XmlPatterns',
+             '-l<(QT_LIB_PATH)/Qt5Gui',
+             '-l<(QT_LIB_PATH)/Qt5Core',
+             '-l<(QT_LIB_PATH)/Qt5Widgets',
+             '-luser32.lib',
+             '-lws2_32.lib',
+             '-lshell32.lib',
+             '-ladvapi32.lib',
+             '-lpsapi.lib',
+             '-lkernel32.lib',
+             '-luserenv.lib',
             ],
           } ],
         ],
@@ -174,8 +184,7 @@
               'libraries': ['-lQt5WebKitWidgets', '-lQt5WebKit',],
             } ],
             [ 'OS=="win"', {
-              #TODO: set here Qt5 libs
-              'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
+              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit',],
             } ],
           ],
         }, {
