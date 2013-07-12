@@ -35,8 +35,7 @@ do
   for mode in $modes
   do
     cd $current_dir
-    GYP=`which gyp`
-    python $GYP --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} -D QT_DIR=${qt_dir} --generator-output=${output_gen}/$platform/$mode wd.gyp
+    gyp --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} -D QT_DIR=${qt_dir} --generator-output=${output_gen}/$platform/$mode wd.gyp
     [ $? -ne 0 ] && exit 1
     cd ${output_gen}/$platform/$mode
     [ $? -ne 0 ] && echo "**** ERROR: Can't access to ${output_gen}/$platform/$mode" && exit 1
