@@ -10,6 +10,8 @@
 #include "base/scoped_temp_dir.h"
 #include "base/values.h"
 #include "base/bind.h"
+#include "base/string_split.h"
+#include "base/string_number_conversions.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_server.h"
@@ -100,6 +102,13 @@ void CreateSession::ExecutePost(Response* const response) {
         session->Terminate();
         return;
     }
+
+    scoped_ptr<Error> ignore_err(SetWindowBounds(desired_caps_dict, session, startView));
+
+    if (ignore_err != NULL) {
+        session->logger().Log(kWarningLogLevel, "Error in CreateSession::SetWindowBounds. Can't create window with desired capabilities");
+    }
+    //error = SetWindowBounds(desired_caps_dict, session, startView);
 
     // Redirect to a relative URI. Although prohibited by the HTTP standard,
     // this is what the IEDriver does. Finding the actual IP address is
@@ -207,6 +216,85 @@ Error* CreateSession::GetViewTitle(Session* session, const ViewId& viewId, std::
                 title,
                 &error));
 
+    return error;
+}
+
+Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,Session* session, ViewId startView) {
+    Error* error = NULL;
+    ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, startView));
+    if (NULL == executor.get()) {
+        error = new Error(kBadRequest, "cant get view executor.");
+        session->logger().Log(kWarningLogLevel, "Can't get view executor.");
+        return error;
+    }
+
+    bool maximized;
+    if (desired_caps_dict->GetBoolean(Capabilities::kMaximize, &maximized)) {
+        if (maximized) {
+            session->RunSessionTask(base::Bind(
+                    &ViewCmdExecutor::Maximize,
+                    base::Unretained(executor.get()),
+                    &error));
+            if (error) {
+                session->logger().Log(kWarningLogLevel, "Can't maximized window ");
+            }
+            return error;
+        }
+    }
+
+    Rect currentbounds;
+    session->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetBounds,
+            base::Unretained(executor.get()),
+            &currentbounds,
+            &error));
+
+    if (error) {
+        session->logger().Log(kWarningLogLevel, "Can't get current rect ");
+        return error;
+    }
+
+    int x, y, w, h;
+    std::string window_size;
+    if (desired_caps_dict->GetString(Capabilities::kWindowSize, &window_size)) {
+        std::vector<std::string> vect;
+        base::SplitString(window_size, ',', &vect);
+        if (vect.size() == 2) {
+            base::StringToInt(vect.at(0), &w);
+            base::StringToInt(vect.at(1), &h);
+            x = currentbounds.x();
+            y = currentbounds.y();
+        } else {
+            session->logger().Log(kInfoLogLevel, "Wrong parameter kWindowSize ");
+            return error;
+        }
+    }
+
+    std::string window_position;
+    if (desired_caps_dict->GetString(Capabilities::kWindowPosition, &window_position)) {
+        std::vector<std::string> vect;
+        base::SplitString(window_position, ',', &vect);
+        if (vect.size() == 2) {
+            base::StringToInt(vect.at(0), &x);
+            base::StringToInt(vect.at(1), &y);
+            w = currentbounds.width();
+            h = currentbounds.height();
+        } else {
+            session->logger().Log(kInfoLogLevel, "Wrong parameter kWindowPosition");
+            return error;
+        }
+    }
+
+    Rect desiredbounds(x, y, w, h);
+    session->RunSessionTask(base::Bind(
+                &ViewCmdExecutor::SetBounds,
+                base::Unretained(executor.get()),
+                desiredbounds,
+                &error));
+    if (error) {
+        session->logger().Log(kWarningLogLevel, "Can't create window with desired bounds ");
+        return error;
+    }
     return error;
 }
 
