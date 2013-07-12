@@ -1,10 +1,10 @@
 {
-	# do not require cygwin
+   # do not require cygwin
   'msvs_cygwin_shell': 0,
 
   'msvs_configuration_attributes': {
-        'CharacterSet': '1'
-      },
+     'CharacterSet': '1'
+  },
 
   'cflags': [
     '-fPIC',
@@ -18,56 +18,55 @@
     'QT_GUI_LIB',
     'QT_CORE_LIB',
     'QT_SHARED',
+    'QT_NO_OPENGL',
   ],
 
-  'conditions': [
-
+  'conditions': [ 
     [ 'mode == "debug"', {
       'cflags': [
         '-O0',
         '-g',
       ],
     } ],
+     
     [ 'mode == "release"', {
       'cflags': [
         '-O3',
       ],
-
       'defines': [
         'NDEBUG',
       ],
     } ],
+
     [ 'mode == "release_dbg"', {
       'cflags': [
         '-O3',
         '-g',
       ],
     } ],
-    ['OS=="linux"', {
-      'defines': [
-        '__STDC_FORMAT_MACROS',
-        'OS_POSIX',
-      ],
+
+    [ 'OS == "linux"', {
+       'actions': [ {
+         'action_name': 'input_dir',
+         'inputs':      [],
+         'outputs':     ['<(INTERMEDIATE_DIR)'],
+         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],	    
+       } ],
+       'defines': [ 
+         '__STDC_FORMAT_MACROS',
+         'OS_POSIX',
+       ],
     } ],
+     
     [ 'OS == "win"', {
       'defines': [
-          '_WIN32',
-          'WIN32'
-          'OS_WIN',
-          'NOMINMAX',
-          '_UNICODE',
-          '_WINSOCKAPI_',
+         '_WIN32',
+         'WIN32'
+         'OS_WIN',
+         'NOMINMAX',
+         '_UNICODE',
+         '_WINSOCKAPI_',
       ],
-    } ]
+    } ],
   ],
-
-	# TODO: extract this to separated gypi file  
-  'actions': [{
-    'action_name' : 'input_dir',
-    'inputs' : [],
-    'outputs': [
-      '<(INTERMEDIATE_DIR)',
-    ],
-    'action': ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
-  }],
 }
