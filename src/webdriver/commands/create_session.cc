@@ -108,7 +108,6 @@ void CreateSession::ExecutePost(Response* const response) {
     if (ignore_err != NULL) {
         session->logger().Log(kWarningLogLevel, "Error in CreateSession::SetWindowBounds. Can't create window with desired capabilities");
     }
-    //error = SetWindowBounds(desired_caps_dict, session, startView);
 
     // Redirect to a relative URI. Although prohibited by the HTTP standard,
     // this is what the IEDriver does. Finding the actual IP address is
