@@ -15,6 +15,10 @@
         'src/',
       ],
 
+      'includes': [
+        'wd_build_options.gypi',
+      ],
+
       'sources': [
         'src/base/at_exit.cc',
         'src/base/atomicops_internals_x86_gcc.cc',
@@ -131,9 +135,7 @@
             'WIN32',
             '_WINSOCKAPI_',
           ],
-          'msvs_configuration_attributes': {
-            'CharacterSet': '1'
-          },
+
           'sources': [
             'src/base/cpu.cc',
             'src/base/time_win.cc',
