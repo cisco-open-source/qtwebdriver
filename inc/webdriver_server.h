@@ -36,14 +36,13 @@ wd_server->Start();
 \endcode
 
 <h2>Options</h2>
-- <b>http-threads</b> The number of threads to use for handling HTTP requests
-- <b>log-path</b> The path to use for the QtWebDriver server log
-- <b>root</b> The path of location to serve files from
-- <b>port</b> The port that QtWebDriver listens on
-- <b>silence</b> If true, QtWebDriver will not log anything to stdout/stderr
-- <b>verbose</b> If true, QtWebDriver will log lots of stuff to stdout/stderr
-- <b>url-base</b> The URL path prefix to use for all incoming WebDriver REST requests. A prefix and postfix '/' will automatically be appended if not present
-- <b>config</b> The path to config file (e.g. config.json) in JSON format with specified WD parameters as described above (port, root, etc.)
+All server options are represented in command line form. In example:
+\code 
+--verbose --port=9517 --log-path=/var/log/wd.log
+\endcode
+
+For all options please refer:
+\subpage page_webdriver_switches
 
 */
 

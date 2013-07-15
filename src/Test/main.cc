@@ -36,7 +36,6 @@
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
-#include "webdriver_switches.h"
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -117,13 +116,13 @@ int main(int argc, char *argv[])
 #endif
 
 	// check if --help CL argument is present
-    if (cmd_line.HasSwitch(webdriver::Switches::kHelp)) {
+    if (cmd_line.HasSwitch("help")) {
         PrintHelp();
         return 0;
     }
 
     // check if --version CL argument is present
-    if (cmd_line.HasSwitch(webdriver::Switches::kVersion)) {
+    if (cmd_line.HasSwitch("version")) {
       PrintVersion();
       return 0;
     }
