@@ -4,6 +4,9 @@
 There are two capabilities which define strategy what view will be current after session create:
 - "browserStartWindow" - HWD will search all existed views and attach to one with same title. Or if this capablities equals "*" then to first one.
 - "browserClass" - HWD will call ViewFactory and create window registered with specified classname.
+- "windowsize" - HWD will be try create window with given size, as a string (e.g. - "600, 600")
+- "windowposition" - HWD will be try start window with desired position, as a string (e.g. - "80, 60")
+- "maximize" - HWD will be try start window with maximum size
 
 For browserClass customizer can define some generic classes. In example in default 
 QT extension there is handling of "WidgetView" and "WebView" values for this capability.
@@ -58,8 +61,11 @@ struct Capabilities {
     static const char kLoadAsync[];
     static const char kBrowserStartWindow[];
     static const char kBrowserClass[];
+    /// desired size, as a string (e.g. - "600, 600") for start window
     static const char kWindowSize[];
+    /// desired position, as a string (e.g. - "80, 60") for start window
     static const char kWindowPosition[];
+    /// start window with maximum size
     static const char kMaximize[];
 
     Capabilities();
