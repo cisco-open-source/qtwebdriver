@@ -4,6 +4,7 @@
 #include <QtCore/QTime>
 #include <QtCore/QDebug>
 #include <QtNetwork/QNetworkProxy>
+#include "webdriver_switches.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
 #else
@@ -36,11 +37,11 @@ void QWebViewExt::setWebInspectorProperty(QWebViewExt *view)
     view->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
 
-    if (cmdLine.HasSwitch("wi-server"))
+    if (cmdLine.HasSwitch(webdriver::Switches::kWIServer))
     {
-        if (cmdLine.HasSwitch("wi-port"))
+        if (cmdLine.HasSwitch(webdriver::Switches::kWIPort))
         {
-            std::string wiPort = cmdLine.GetSwitchValueASCII("wi-port");
+            std::string wiPort = cmdLine.GetSwitchValueASCII(webdriver::Switches::kWIPort);
             int port = QString(wiPort.c_str()).toInt();
             view->page()->setProperty("_q_webInspectorServerPort", port);
         }

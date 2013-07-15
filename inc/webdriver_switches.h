@@ -9,23 +9,50 @@ namespace webdriver {
 
 class Switches {
 public:
-	/// Instructs the mongoose webserver to enable HTTP persistent
-	/// connections.
-	static const char kEnableKeepAlive[];
+    /// The URL path prefix to use for all incoming
+    /// WebDriver REST requests. A prefix and postfix
+    /// '/' will automatically be appended if not present
+    static const char kUrlBase[];
 
-	/// Forces proxy auto-detection.
-	static const char kProxyAutoDetect[];
+    /// The port that QtWebDriver listens on
+    /// by default - 9571
+    static const char kPort[];
 
-	/// Uses the pac script at the given URL
-	static const char kProxyPacUrl[];
+    /// The path of location to serve files from
+    /// by default - ./web
+    static const char kRoot[];
 
-	/// Uses a specified proxy server, overrides system settings. This switch only
-	/// affects HTTP and HTTPS requests.
-	static const char kProxyServer[];
+    /// The number of threads to use for handling HTTP requests
+    /// by default - 4
+    static const char kHttpThread[];
 
-	/// Don't use a proxy server, always make direct connections. Overrides any
-	/// other proxy server flags that are passed.
-	static const char kNoProxyServer[];
+    /// The path to use for the QtWebDriver server log
+    /// by default - ./webdriver.log
+    static const char kLogPath[];
+
+    /// If true, QtWebDriver will log lots of stuff to stdout/stderr (false by default)
+    static const char kVerbose[];
+
+    /// If true, QtWebDriver will not log anything to stdout/stderr (false by default)
+    static const char kSilence[];
+
+    ///  The path to config file (e.g. config.json) in
+    /// JSON format with specified WD parameters as
+    /// described above (port, root, etc.)
+    static const char kConfig[];
+
+    /// If true, web inspector will be enabled (false by default)
+    static const char kWIServer[];
+
+    /// Web inspector listening port (by default - 9222)
+    static const char kWIPort[];
+
+    /// if "--help" CL argument is present will print help to stdout and exit
+    static const char kHelp[];
+
+    /// if "--version" CL argument is present will
+    /// print version information to stdout and exit
+    static const char kVersion[];
 };
 
 }  // namespace webdriver

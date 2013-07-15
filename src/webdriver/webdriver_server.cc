@@ -26,6 +26,7 @@
 #include "webdriver_route_patterns.h"
 #include "url_command_wrapper.h"
 #include "versioninfo.h"
+#include "webdriver_switches.h"
 
 namespace webdriver {
 
@@ -65,8 +66,8 @@ int Server::Init(const CommandLine &options) {
         return ret_val;
     }
 
-    if (options_.HasSwitch("url-base"))
-        url_base_ = options_.GetSwitchValueASCII("url-base");
+    if (options_.HasSwitch(webdriver::Switches::kUrlBase))
+        url_base_ = options_.GetSwitchValueASCII(webdriver::Switches::kUrlBase);
 
     std::string driver_info = "*** Webdriver ****\nVersion:    "+ VersionInfo::Name() + "-" + VersionInfo::Version() +
                             "\nBuild Time: "+ VersionInfo::BuildDateTime() ;
@@ -459,29 +460,24 @@ int Server::InitMongooseOptions() {
     std::string port = "9517";
     std::string root;
     int http_threads = 4;
-    bool enable_keep_alive = false;
 
-    if (options_.HasSwitch("port"))
-        port = options_.GetSwitchValueASCII("port");
+    if (options_.HasSwitch(webdriver::Switches::kPort))
+        port = options_.GetSwitchValueASCII(webdriver::Switches::kPort);
     // The 'root' flag allows the user to specify a location to serve files from.
     // If it is not given, a callback will be registered to forbid all file
     // requests.
-    if (options_.HasSwitch("root"))
-        root = options_.GetSwitchValueASCII("root");
-    if (options_.HasSwitch("http-threads")) {
-        if (!base::StringToInt(options_.GetSwitchValueASCII("http-threads"),
+    if (options_.HasSwitch(webdriver::Switches::kRoot))
+        root = options_.GetSwitchValueASCII(webdriver::Switches::kRoot);
+    if (options_.HasSwitch(webdriver::Switches::kHttpThread)) {
+        if (!base::StringToInt(options_.GetSwitchValueASCII(webdriver::Switches::kHttpThread),
                            &http_threads)) {
             std::cerr << "'http-threads' option must be an integer";
             return 1;
         }
     }
-//  if (options_->HasSwitch(kEnableKeepAlive))
-//      enable_keep_alive = true;
 
     mg_options_.push_back("listening_ports");
     mg_options_.push_back(port);
-    mg_options_.push_back("enable_keep_alive");
-    mg_options_.push_back(enable_keep_alive ? "yes" : "no");
     mg_options_.push_back("num_threads");
     mg_options_.push_back(base::IntToString(http_threads));
     if (!root.empty()) {
@@ -497,8 +493,8 @@ int Server::InitMongooseOptions() {
 int Server::InitLogging() {
     FilePath log_path;
 
-    if (options_.HasSwitch("log-path"))
-        log_path = options_.GetSwitchValuePath("log-path");
+    if (options_.HasSwitch(webdriver::Switches::kLogPath))
+        log_path = options_.GetSwitchValuePath(webdriver::Switches::kLogPath);
 
     // Init global file log.
     FileLog* fileLog;
@@ -525,12 +521,12 @@ int Server::InitLogging() {
 
     StdOutLog::SetGlobalLog(stdLog);
 
-    if (options_.HasSwitch("verbose")) {
+    if (options_.HasSwitch(webdriver::Switches::kVerbose)) {
         stdLog->set_min_log_level(kAllLogLevel);
     }
 
     // check if silence mode
-    if (options_.HasSwitch("silence")) {
+    if (options_.HasSwitch(webdriver::Switches::kSilence)) {
         stdLog->set_min_log_level(kOffLogLevel);
     }
 
@@ -538,11 +534,11 @@ int Server::InitLogging() {
 }
 
 int Server::ParseConfigToOptions() {
-    if (options_.HasSwitch("config"))
+    if (options_.HasSwitch(webdriver::Switches::kConfig))
     {
         //parse json config file and set value
         std::string config_json;
-        FilePath configPath(options_.GetSwitchValueNative("config"));
+        FilePath configPath(options_.GetSwitchValueNative(webdriver::Switches::kConfig));
 
         if (file_util::ReadFileToString(configPath, &config_json))
         {
@@ -567,16 +563,16 @@ int Server::ParseConfigToOptions() {
             std::string url_base;
             int http_threads;
             std::string log_path;
-            if (result_dict->GetInteger("port", &port))
-                options_.AppendSwitchASCII("port", base::IntToString(port));
-            if (result_dict->GetString("root", &root))
-                options_.AppendSwitchASCII("root", root);
-            if (result_dict->GetString("url-base", &url_base))
-                options_.AppendSwitchASCII("url-base", url_base);
-            if (result_dict->GetInteger("http-threads", &http_threads))
-                options_.AppendSwitchASCII("http-threads", base::IntToString(http_threads));
-            if (result_dict->GetString("log-path", &log_path))
-                options_.AppendSwitchASCII("log-path", log_path);
+            if (result_dict->GetInteger(webdriver::Switches::kPort, &port))
+                options_.AppendSwitchASCII(webdriver::Switches::kPort, base::IntToString(port));
+            if (result_dict->GetString(webdriver::Switches::kRoot, &root))
+                options_.AppendSwitchASCII(webdriver::Switches::kRoot, root);
+            if (result_dict->GetString(webdriver::Switches::kUrlBase, &url_base))
+                options_.AppendSwitchASCII(webdriver::Switches::kUrlBase, url_base);
+            if (result_dict->GetInteger(webdriver::Switches::kHttpThread, &http_threads))
+                options_.AppendSwitchASCII(webdriver::Switches::kHttpThread, base::IntToString(http_threads));
+            if (result_dict->GetString(webdriver::Switches::kLogPath, &log_path))
+                options_.AppendSwitchASCII(webdriver::Switches::kLogPath, log_path);
 
             return 0;
         }
