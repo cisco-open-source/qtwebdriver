@@ -263,7 +263,7 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
             }
         } else {
             QKeySequence tmp_keysq = QKeySequence::fromString(QString(key), QKeySequence::NativeText);
-            key_code = static_cast<Qt::Key>(int(tmp_keysq));
+            key_code = static_cast<Qt::Key>(tmp_keysq[0]);
             Qt::KeyboardModifiers necessary_modifiers(0);
 //            ConvertCharToKeyCode(key, &key_code, &necessary_modifiers);
             all_modifiers |= necessary_modifiers;
