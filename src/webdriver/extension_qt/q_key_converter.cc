@@ -11,6 +11,8 @@
 //#include "chrome/test/webdriver/keycode_text_conversion.h"
 #include "webdriver_logging.h"
 
+#include <QtCore/QDebug>
+
 namespace webdriver {
 
 const QKeyConverter::ModifierMaskAndKeyCode QKeyConverter::kModifiers[] = {
@@ -150,6 +152,7 @@ bool QKeyConverter::KeyCodeFromShorthandKey(char16 key_utf16,
     return true;
 }
 
+
 bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
                                const Logger& logger,
                                bool release_modifiers,
@@ -258,6 +261,8 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
 //                    all_modifiers | webdriver_modifiers);
             }
         } else {
+            QKeySequence tmp_keysq = QKeySequence::fromString(QString(key), QKeySequence::NativeText);
+            key_code = static_cast<Qt::Key>(int(tmp_keysq));
             Qt::KeyboardModifiers necessary_modifiers(0);
 //            ConvertCharToKeyCode(key, &key_code, &necessary_modifiers);
             all_modifiers |= necessary_modifiers;
@@ -308,9 +313,12 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
             }
         }
     }
+
     client_key_events->swap(key_events);
     *modifiers = sticky_modifiers;
     return true;
 }
+
+
 
 }  // namespace webdriver
