@@ -12,6 +12,7 @@
 #include "webdriver_logging.h"
 
 #include <QtCore/QDebug>
+#include <QtGui/QKeySequence>
 
 namespace webdriver {
 
