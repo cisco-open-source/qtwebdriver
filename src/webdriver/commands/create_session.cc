@@ -254,6 +254,7 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
     }
 
     int x, y, w, h;
+    bool changed = false;
     std::string window_size;
     if (desired_caps_dict->GetString(Capabilities::kWindowSize, &window_size)) {
         std::vector<std::string> vect;
@@ -263,6 +264,7 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
             base::StringToInt(vect.at(1), &h);
             x = currentbounds.x();
             y = currentbounds.y();
+            changed = true;
         } else {
             session->logger().Log(kInfoLogLevel, "Wrong parameter kWindowSize ");
             return error;
@@ -278,6 +280,7 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
             base::StringToInt(vect.at(1), &y);
             w = currentbounds.width();
             h = currentbounds.height();
+            changed = true;
         } else {
             session->logger().Log(kInfoLogLevel, "Wrong parameter kWindowPosition");
             return error;
@@ -285,14 +288,17 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
     }
 
     Rect desiredbounds(x, y, w, h);
-    session->RunSessionTask(base::Bind(
+    if (changed) {
+        session->RunSessionTask(base::Bind(
                 &ViewCmdExecutor::SetBounds,
                 base::Unretained(executor.get()),
                 desiredbounds,
                 &error));
-    if (error) {
-        session->logger().Log(kWarningLogLevel, "Can't create window with desired bounds ");
-        return error;
+
+        if (error) {
+            session->logger().Log(kWarningLogLevel, "Can't create window with desired bounds ");
+            return error;
+        }
     }
     return error;
 }
