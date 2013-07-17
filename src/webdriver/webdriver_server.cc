@@ -28,6 +28,12 @@
 #include "versioninfo.h"
 #include "webdriver_switches.h"
 
+#include "base/bind.h"
+#include "webdriver_session.h"
+#include "webdriver_view_enumerator.h"
+#include "webdriver_view_executor.h"
+
+
 namespace webdriver {
 
 Server::Server()
@@ -126,6 +132,70 @@ int Server::Start() {
     }
 
     state_ = STATE_RUNNING;
+
+    return 0;
+}
+
+int Server::Stop(bool force) {
+    typedef scoped_ptr<ViewCmdExecutor> ExecutorPtr;        
+
+    if (state_ != STATE_RUNNING)
+        return 0; // nothing todo
+
+    // get all sessions and terminate
+    std::map<std::string, Session*> sessions = SessionManager::GetInstance()->GetSessions();
+    std::map<std::string, Session*>::iterator sessionsItr = sessions.begin();
+
+    GlobalLogger::Log(kInfoLogLevel, "Server::Stop().");
+
+    if ((false == force) && (sessions.size() > 0)) {
+        GlobalLogger::Log(kInfoLogLevel, "Server::Stop() force = false, still sessions are active, failed.");        
+        return 1;
+    }
+
+    mg_stop(mg_ctx_);
+
+    while (sessionsItr != sessions.end()) {
+        Session* session = (*sessionsItr).second;
+
+        GlobalLogger::Log(kInfoLogLevel, "Server::Stop(): force close session("+session->id()+").");
+
+        // close all views
+        std::vector<ViewId> views;
+
+        session->RunSessionTask(base::Bind(
+            &ViewEnumerator::EnumerateViews,
+            session,
+            &views));
+
+        for (size_t i = 0; i < views.size(); ++i) {
+            Error* error = NULL;
+            ExecutorPtr executor(ViewCmdExecutorFactory::GetInstance()->CreateExecutor(session, views.at(i)));
+
+            if (NULL == executor.get()) {
+                GlobalLogger::Log(kWarningLogLevel, "Server::Stop(): cant terminate view(no executor), skip.");
+                continue;
+            }
+
+            session->RunSessionTask(base::Bind(
+                    &ViewCmdExecutor::Close,
+                    base::Unretained(executor.get()),
+                    &error));
+
+            if (error) {
+                GlobalLogger::Log(kWarningLogLevel, "Server::Stop(): cant terminate view(close failed), skip.");
+                delete error;
+                continue;
+            }
+        }
+
+        // Session manages its own lifetime, so do not call delete.
+        session->Terminate();
+
+        ++sessionsItr;
+    }
+
+    state_ = STATE_IDLE;
 
     return 0;
 }

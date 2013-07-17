@@ -95,6 +95,11 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Start();
 
+    /// Stop server.
+    /// @param force force to close opened sessions. If false and there is any open session stop will fail.
+    /// @return 0 - if success, error code otherwise.
+    int Stop(bool force = false);
+
     const RouteTable& GetRouteTable() const;
     const std::string& url_base() const;
     const CommandLine& GetCommandLine() const;

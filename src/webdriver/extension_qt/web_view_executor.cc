@@ -311,7 +311,7 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
-    int modifiers = session_->get_sticky_modifiers();
+    int modifiers = Qt::NoModifier;
 
     if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
                                session_->logger(),
@@ -323,8 +323,6 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
         *error = new Error(kUnknownError, "ElementSendKeys - cant convert keys:"+err_msg);
         return;
     }
-
-    session_->set_sticky_modifiers(modifiers);
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
