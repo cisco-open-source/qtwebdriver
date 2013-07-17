@@ -28,12 +28,17 @@ can be passed after init.
 Example:
 \code
 webdriver::Server* wd_server = webdriver::Server::GetInstance();
-if (0 != wd_server->Init(argc, argv)) {
+if (0 != wd_server->Configure(argc, argv)) {
     return 1;
 }
 
 wd_server->Start();
 \endcode
+
+For reconfiguring server:
+- stop server - webdriver::Server::Stop()
+- reset configuration - webdriver::Server::Reset()
+- now can call configure and start again.
 
 <h2>Options</h2>
 All server options are represented in command line form. In example:
