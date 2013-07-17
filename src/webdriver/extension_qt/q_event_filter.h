@@ -24,8 +24,8 @@ public:
                 QObject(NULL) {is_painting = false;}
     bool isPainting() {return is_painting;}
 
-signals:
-    void painted();
+//signals:
+//    void painted();
 
 public slots:
     void pagePainted();

@@ -51,8 +51,10 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
             QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
 
             widget->installEventFilter(&filter);
+            logger.Log(kInfoLogLevel, "********** CreateViewByClassName() before show()");
 
             widget->show();
+            logger.Log(kInfoLogLevel, "********** CreateViewByClassName()  after show()");
             
             if (!painter.isPainting())
                 loop.exec();
