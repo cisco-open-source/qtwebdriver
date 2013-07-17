@@ -46,7 +46,10 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
             QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
             widget->installEventFilter(&filter);
             widget->show();
-            loop.exec();
+            QCheckPagePaint painter;
+            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+            if (!painter.isPainting())
+                    loop.exec();
         
             logger.Log(kInfoLogLevel, "QWebViewCreator created view ("
                             + objClassName +") by class name - "+className);
@@ -102,7 +105,10 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
             QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
             widget->installEventFilter(&filter);
             widget->show();
-            loop.exec();
+            QCheckPagePaint painter;
+            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+            if (!painter.isPainting())
+                    loop.exec();
         
             logger.Log(kInfoLogLevel, "QWebViewCreator created view("
                         + objClassName + ") by url - " + url);

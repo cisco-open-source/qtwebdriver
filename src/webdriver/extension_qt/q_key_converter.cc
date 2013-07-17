@@ -242,12 +242,14 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
                 return false;
             }
 
-            if (key_code == Qt::Key_Return) {
+            if (key_code == Qt::Key_Return || key_code == Qt::Key_Space ||
+                    key_code == Qt::Key_Asterisk || key_code == Qt::Key_Plus ||
+                    key_code == Qt::Key_Comma || key_code == Qt::Key_Minus ||
+                    key_code == Qt::Key_Period || key_code == Qt::Key_Slash ||
+                    key_code == Qt::Key_Equal || key_code == Qt::Key_Semicolon) {
                 // TODO: check this
                 // For some reason Chrome expects a carriage return for the return key.
-                modified_text = unmodified_text = "\r";
-            } else if (key_code == Qt::Key_Space) {
-                modified_text = unmodified_text = " ";
+                modified_text = unmodified_text = (char)key_code;
             } else {
                 // TODO: check this
                 // WebDriver assumes a numpad key should translate to the number,
