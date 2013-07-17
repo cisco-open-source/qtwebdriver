@@ -12,6 +12,9 @@ bool QRepaintEventFilter::eventFilter(QObject *pobject, QEvent *pevent) {
         emit repainted();
     }
     return false;
-
 }
 
+void QCheckPagePaint::pagePainted() {
+    is_painting = true;
+    emit painted();
+}
