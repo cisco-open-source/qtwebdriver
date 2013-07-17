@@ -19,7 +19,7 @@ Topics:
 /*! \page page_wd_server WD Server
 Entry point for HWD is webdriver::Server singleton class.
 It allows to configure, set predefined command routes and start
-webdriver service. 
+webdriver service. It is not thread safe.
 
 Server accepts options in form of command line arguments.
 Also by default it uses webdriver::DefaultRouteTable. Or custom route table
@@ -81,10 +81,10 @@ public:
         STATE_RUNNING = 2
     };
 
-    /// Init server from command line
+    /// Configure server from command line
     /// @param options - obtained command line
     /// @return 0 - if init was success, error code otherwise.
-    int Init(const CommandLine &options);
+    int Configure(const CommandLine &options);
 
     /// Set route table for this server. Server should be stopped.
     /// @param routeTable routeTable to set. Server keeps own copy of RouteTable.
@@ -100,6 +100,10 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Stop(bool force = false);
 
+    /// Reset server to unconfigured state. Can be applied only in idle state.
+    /// @return 0 - if success, error code otherwise.
+    int Reset();
+
     const RouteTable& GetRouteTable() const;
     const std::string& url_base() const;
     const CommandLine& GetCommandLine() const;
@@ -113,7 +117,7 @@ private:
 
     friend class XDRPCCommand;
 
-    CommandLine options_;
+    scoped_ptr<CommandLine> options_;
     scoped_ptr<RouteTable> routeTable_;
     std::vector<std::string> mg_options_;
     std::string url_base_;
