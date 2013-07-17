@@ -45,13 +45,17 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
         if (NULL != widget) {
             QEventLoop loop;
             QRepaintEventFilter filter(widget);
-            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
-            widget->installEventFilter(&filter);
-            widget->show();
             QCheckPagePaint painter;
+
+            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
             QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+
+            widget->installEventFilter(&filter);
+
+            widget->show();
+            
             if (!painter.isPainting())
-                    loop.exec();
+                loop.exec();
 
             logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by class name - "+className);
 
