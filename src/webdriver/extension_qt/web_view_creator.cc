@@ -12,6 +12,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QString>
 #include <QtCore/QEventLoop>
+#include <QtCore/QTimer>
 
 namespace webdriver {
 
@@ -43,11 +44,17 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
         if (NULL != widget) {
             QEventLoop loop;
             QRepaintEventFilter filter(widget);
-            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
+            QCheckPagePaint painter;
+            QObject::connect(&filter, SIGNAL(repainted()), &loop, SLOT(quit()));
+            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+
+            QTimer timer;
+            timer.setSingleShot(true);
+            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            timer.start(500);
+
             widget->installEventFilter(&filter);
             widget->show();
-            QCheckPagePaint painter;
-            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
             if (!painter.isPainting())
                     loop.exec();
         
@@ -102,11 +109,17 @@ bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& 
         if (NULL != widget) {
             QEventLoop loop;
             QRepaintEventFilter filter(widget);
-            QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
+            QCheckPagePaint painter;
+            QObject::connect(&filter, SIGNAL(repainted()), &loop, SLOT(quit()));
+            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+
+            QTimer timer;
+            timer.setSingleShot(true);
+            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            timer.start(500);
+
             widget->installEventFilter(&filter);
             widget->show();
-            QCheckPagePaint painter;
-            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
             if (!painter.isPainting())
                     loop.exec();
         

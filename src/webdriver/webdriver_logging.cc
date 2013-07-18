@@ -100,6 +100,8 @@ LogHandler::~LogHandler() { }
 
 // static
 void FileLog::SetGlobalLog(FileLog* log) {
+    if (NULL != singleton_)
+        delete singleton_;
     singleton_ = log;
 }
 
@@ -198,6 +200,8 @@ const FilePath& FileLog::path() const {
 
 // static
 void StdOutLog::SetGlobalLog(StdOutLog* log) {
+    if (NULL != singleton_)
+        delete singleton_;
     singleton_ = log;
 }
 

@@ -37,7 +37,7 @@
 namespace webdriver {
 
 Server::Server()
-    : options_(CommandLine::NO_PROGRAM),
+    : options_(NULL),
       routeTable_(NULL),
       mg_ctx_(NULL),
       state_(STATE_UNCONFIGURED) {
@@ -45,7 +45,7 @@ Server::Server()
 
 Server::~Server() {}
 
-int Server::Init(const CommandLine &options) {
+int Server::Configure(const CommandLine &options) {
     int ret_val = 0;
 
     if (state_ != STATE_UNCONFIGURED) {
@@ -53,7 +53,8 @@ int Server::Init(const CommandLine &options) {
         return 1;
     }
 
-    options_.InitFromArgv(options.argv());
+    options_.reset(new CommandLine(CommandLine::NO_PROGRAM));
+    options_->InitFromArgv(options.argv());
 
     ret_val = ParseConfigToOptions();
     if (ret_val) {
@@ -72,8 +73,8 @@ int Server::Init(const CommandLine &options) {
         return ret_val;
     }
 
-    if (options_.HasSwitch(webdriver::Switches::kUrlBase))
-        url_base_ = options_.GetSwitchValueASCII(webdriver::Switches::kUrlBase);
+    if (options_->HasSwitch(webdriver::Switches::kUrlBase))
+        url_base_ = options_->GetSwitchValueASCII(webdriver::Switches::kUrlBase);
 
     std::string driver_info = "*** Webdriver ****\nVersion:    "+ VersionInfo::Name() + "-" + VersionInfo::Version() +
                             "\nBuild Time: "+ VersionInfo::BuildDateTime() ;
@@ -83,6 +84,24 @@ int Server::Init(const CommandLine &options) {
     routeTable_.reset(new DefaultRouteTable());
 
     state_ = STATE_IDLE;
+
+    return 0;
+}
+
+int Server::Reset() {
+    if (state_ == STATE_UNCONFIGURED)
+        return 0; // nothing todo
+
+    if (state_ != STATE_IDLE)
+        return 1; // cant reset not idle 
+
+    mg_options_.clear();
+    routeTable_.reset(NULL);
+    options_.reset(NULL);
+    FileLog::SetGlobalLog(NULL);
+    StdOutLog::SetGlobalLog(NULL);
+
+    state_ = STATE_UNCONFIGURED;
 
     return 0;
 }
@@ -154,6 +173,8 @@ int Server::Stop(bool force) {
     }
 
     mg_stop(mg_ctx_);
+
+    mg_ctx_ = NULL;
 
     while (sessionsItr != sessions.end()) {
         Session* session = (*sessionsItr).second;
@@ -300,7 +321,7 @@ void Server::WriteHttpResponse(struct mg_connection* connection,
 
 const CommandLine& Server::GetCommandLine() const
 {
-    return options_;
+    return *(options_.get());
 }
 
 void Server::PrepareHttpResponse(const std::string& request_method,
@@ -531,15 +552,15 @@ int Server::InitMongooseOptions() {
     std::string root;
     int http_threads = 4;
 
-    if (options_.HasSwitch(webdriver::Switches::kPort))
-        port = options_.GetSwitchValueASCII(webdriver::Switches::kPort);
+    if (options_->HasSwitch(webdriver::Switches::kPort))
+        port = options_->GetSwitchValueASCII(webdriver::Switches::kPort);
     // The 'root' flag allows the user to specify a location to serve files from.
     // If it is not given, a callback will be registered to forbid all file
     // requests.
-    if (options_.HasSwitch(webdriver::Switches::kRoot))
-        root = options_.GetSwitchValueASCII(webdriver::Switches::kRoot);
-    if (options_.HasSwitch(webdriver::Switches::kHttpThread)) {
-        if (!base::StringToInt(options_.GetSwitchValueASCII(webdriver::Switches::kHttpThread),
+    if (options_->HasSwitch(webdriver::Switches::kRoot))
+        root = options_->GetSwitchValueASCII(webdriver::Switches::kRoot);
+    if (options_->HasSwitch(webdriver::Switches::kHttpThread)) {
+        if (!base::StringToInt(options_->GetSwitchValueASCII(webdriver::Switches::kHttpThread),
                            &http_threads)) {
             std::cerr << "'http-threads' option must be an integer";
             return 1;
@@ -563,8 +584,8 @@ int Server::InitMongooseOptions() {
 int Server::InitLogging() {
     FilePath log_path;
 
-    if (options_.HasSwitch(webdriver::Switches::kLogPath))
-        log_path = options_.GetSwitchValuePath(webdriver::Switches::kLogPath);
+    if (options_->HasSwitch(webdriver::Switches::kLogPath))
+        log_path = options_->GetSwitchValuePath(webdriver::Switches::kLogPath);
 
     // Init global file log.
     FileLog* fileLog;
@@ -591,12 +612,12 @@ int Server::InitLogging() {
 
     StdOutLog::SetGlobalLog(stdLog);
 
-    if (options_.HasSwitch(webdriver::Switches::kVerbose)) {
+    if (options_->HasSwitch(webdriver::Switches::kVerbose)) {
         stdLog->set_min_log_level(kAllLogLevel);
     }
 
     // check if silence mode
-    if (options_.HasSwitch(webdriver::Switches::kSilence)) {
+    if (options_->HasSwitch(webdriver::Switches::kSilence)) {
         stdLog->set_min_log_level(kOffLogLevel);
     }
 
@@ -604,11 +625,11 @@ int Server::InitLogging() {
 }
 
 int Server::ParseConfigToOptions() {
-    if (options_.HasSwitch(webdriver::Switches::kConfig))
+    if (options_->HasSwitch(webdriver::Switches::kConfig))
     {
         //parse json config file and set value
         std::string config_json;
-        FilePath configPath(options_.GetSwitchValueNative(webdriver::Switches::kConfig));
+        FilePath configPath(options_->GetSwitchValueNative(webdriver::Switches::kConfig));
 
         if (file_util::ReadFileToString(configPath, &config_json))
         {
@@ -634,15 +655,15 @@ int Server::ParseConfigToOptions() {
             int http_threads;
             std::string log_path;
             if (result_dict->GetInteger(webdriver::Switches::kPort, &port))
-                options_.AppendSwitchASCII(webdriver::Switches::kPort, base::IntToString(port));
+                options_->AppendSwitchASCII(webdriver::Switches::kPort, base::IntToString(port));
             if (result_dict->GetString(webdriver::Switches::kRoot, &root))
-                options_.AppendSwitchASCII(webdriver::Switches::kRoot, root);
+                options_->AppendSwitchASCII(webdriver::Switches::kRoot, root);
             if (result_dict->GetString(webdriver::Switches::kUrlBase, &url_base))
-                options_.AppendSwitchASCII(webdriver::Switches::kUrlBase, url_base);
+                options_->AppendSwitchASCII(webdriver::Switches::kUrlBase, url_base);
             if (result_dict->GetInteger(webdriver::Switches::kHttpThread, &http_threads))
-                options_.AppendSwitchASCII(webdriver::Switches::kHttpThread, base::IntToString(http_threads));
+                options_->AppendSwitchASCII(webdriver::Switches::kHttpThread, base::IntToString(http_threads));
             if (result_dict->GetString(webdriver::Switches::kLogPath, &log_path))
-                options_.AppendSwitchASCII(webdriver::Switches::kLogPath, log_path);
+                options_->AppendSwitchASCII(webdriver::Switches::kLogPath, log_path);
 
             return 0;
         }

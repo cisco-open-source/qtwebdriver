@@ -708,7 +708,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
     }
 
     if (locator == LocatorType::kXpath) {
-        FindNativeElementByXpath(parentWidget, query, elements, error);
+        FindNativeElementsByXpath(parentWidget, query, elements, error);
     } else {
         // list all child widgets and find matched locator
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
@@ -804,7 +804,7 @@ bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std
     return false;
 }
 
-void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
+void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
 #ifndef WD_CONFIG_XPATH
     *error = new Error(kXPathLookupError, "Finding elements by xpath is not supported");
     return;
@@ -831,7 +831,6 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
     xmlquery.evaluateTo(&result);
 
     buff.close();
-
     QXmlItem item(result.next());
     while (!item.isNull()) {
         if (item.isNode()) {
@@ -862,7 +861,6 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
     }
     if (elements->empty())
     {
-        *error = new Error(kNoSuchElement);
         return;
     }
 #endif

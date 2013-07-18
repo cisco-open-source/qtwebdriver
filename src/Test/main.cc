@@ -62,11 +62,7 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 #endif
-    //QFutureWatcher<int> watcher;
-    //QObject::connect(&watcher, SIGNAL(finished()), qApp, SLOT(quit()));
-    //QFuture<int> future = QtConcurrent::run(main_server, argc, argv);
-    //watcher.setFuture(future);
-
+    
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
 
     webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
@@ -127,7 +123,7 @@ int main(int argc, char *argv[])
       return 0;
     }
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
-    if (0 != wd_server->Init(cmd_line)) {
+    if (0 != wd_server->Configure(cmd_line)) {
         return 1;
     }
 

@@ -19,7 +19,7 @@ Topics:
 /*! \page page_wd_server WD Server
 Entry point for HWD is webdriver::Server singleton class.
 It allows to configure, set predefined command routes and start
-webdriver service. 
+webdriver service. It is not thread safe.
 
 Server accepts options in form of command line arguments.
 Also by default it uses webdriver::DefaultRouteTable. Or custom route table
@@ -28,12 +28,17 @@ can be passed after init.
 Example:
 \code
 webdriver::Server* wd_server = webdriver::Server::GetInstance();
-if (0 != wd_server->Init(argc, argv)) {
+if (0 != wd_server->Configure(argc, argv)) {
     return 1;
 }
 
 wd_server->Start();
 \endcode
+
+For reconfiguring server:
+- stop server - webdriver::Server::Stop()
+- reset configuration - webdriver::Server::Reset()
+- now can call configure and start again.
 
 <h2>Options</h2>
 All server options are represented in command line form. In example:
@@ -81,10 +86,10 @@ public:
         STATE_RUNNING = 2
     };
 
-    /// Init server from command line
+    /// Configure server from command line
     /// @param options - obtained command line
     /// @return 0 - if init was success, error code otherwise.
-    int Init(const CommandLine &options);
+    int Configure(const CommandLine &options);
 
     /// Set route table for this server. Server should be stopped.
     /// @param routeTable routeTable to set. Server keeps own copy of RouteTable.
@@ -100,6 +105,10 @@ public:
     /// @return 0 - if success, error code otherwise.
     int Stop(bool force = false);
 
+    /// Reset server to unconfigured state. Can be applied only in idle state.
+    /// @return 0 - if success, error code otherwise.
+    int Reset();
+
     const RouteTable& GetRouteTable() const;
     const std::string& url_base() const;
     const CommandLine& GetCommandLine() const;
@@ -113,7 +122,7 @@ private:
 
     friend class XDRPCCommand;
 
-    CommandLine options_;
+    scoped_ptr<CommandLine> options_;
     scoped_ptr<RouteTable> routeTable_;
     std::vector<std::string> mg_options_;
     std::string url_base_;
