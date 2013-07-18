@@ -680,6 +680,7 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         *element_text = checkBox->text().toStdString();
         return;
     }
+    *error = new Error(kNoSuchElement);
 }
 
 void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
