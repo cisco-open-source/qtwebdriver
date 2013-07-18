@@ -651,6 +651,12 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         return;
     }
 
+    QTextEdit *pText = qobject_cast<QTextEdit*>(pWidget);
+    if (NULL != pText) {
+        *element_text = pText->toPlainText().toStdString();
+        return;
+    }
+
     QPushButton *pushButton = qobject_cast<QPushButton*>(pWidget);
     if (NULL != pushButton) {
         *element_text = pushButton->text().toStdString();
@@ -674,8 +680,6 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         *element_text = checkBox->text().toStdString();
         return;
     }
-
-    *element_text = "";
 }
 
 void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
