@@ -367,12 +367,8 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
         }
         opt.initFrom(pWidget);
         rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
-        point = pWidget->mapFromGlobal(QPoint(rect.x(), rect.y()));
-        point = pWidget->mapToParent(point);
-        rect.setX(point.x());
-        rect.setY(point.y());
     } else {
-        rect = pWidget->geometry();
+        rect = pWidget->rect();
     }
 
     QRect visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
@@ -387,10 +383,7 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
             return;
         }
     }
-    visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
-    point = QPoint(rect.width()/2, rect.height()/2);
-
-//    rect = pWidget->visibleRegion().intersected(rect).boundingRect();
+    point = QPoint(rect.x() + rect.width()/2, rect.y() + rect.height()/2);
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
