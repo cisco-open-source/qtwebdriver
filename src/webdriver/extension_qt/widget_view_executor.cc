@@ -11,6 +11,8 @@
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "extension_qt/event_dispatcher.h"
+#include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -161,7 +163,18 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(pWidget, &(*it));
+
+        //////////////////////
+        bool consumed = false;
+        QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
+        foreach (EventDispatcher* item, dispatchers)
+        {
+            consumed = item->dispatch(&(*it), consumed);
+        }
+        //////////////////////
+
+        if (!consumed)
+            qApp->sendEvent(pWidget, &(*it));
         ++it;
     }
 }

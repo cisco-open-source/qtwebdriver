@@ -16,6 +16,9 @@
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 
+#include "extension_qt/event_dispatcher.h"
+#include "extension_qt/wd_event_dispatcher.h"
+
 #include <QtCore/QtGlobal>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
@@ -326,7 +329,17 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(view, &(*it));
+
+        //////////////////////
+        bool consumed = false;
+        QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
+        foreach (EventDispatcher* item, dispatchers)
+        {
+            consumed = item->dispatch(&(*it), consumed);
+        }
+        //////////////////////
+        if (!consumed)
+            qApp->sendEvent(view, &(*it));
         ++it;
     }
 }
