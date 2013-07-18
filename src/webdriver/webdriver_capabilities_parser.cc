@@ -108,7 +108,7 @@ Error* CapabilitiesParser::Parse() {
     DictionaryValue::key_iterator key_iter = dict_->begin_keys();
     for (; key_iter != dict_->end_keys(); ++key_iter) {
         if (parser_map.find(*key_iter) == parser_map.end()) {
-            logger_.Log(kWarningLogLevel, "Unrecognized capability: " +  *key_iter);
+            logger_.Log(kFineLogLevel, "Capability: " +  *key_iter + " skipped by parser.");
             continue;
         }
 
