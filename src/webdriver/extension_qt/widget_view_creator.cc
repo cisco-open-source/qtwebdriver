@@ -8,6 +8,7 @@
 #include "q_event_filter.h"
 
 #include <QtCore/QEventLoop>
+#include <QtCore/QTimer>
 #include <QtCore/QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
@@ -50,12 +51,13 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
             QObject::connect(&filter, SIGNAL(repainted()), &loop,SLOT(quit()));
             QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
 
-            widget->installEventFilter(&filter);
-            logger.Log(kInfoLogLevel, "********** CreateViewByClassName() before show()");
+            QTimer timer;
+            timer.setSingleShot(true);
+            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            timer.start(500);
 
+            widget->installEventFilter(&filter);
             widget->show();
-            logger.Log(kInfoLogLevel, "********** CreateViewByClassName()  after show()");
-            
             if (!painter.isPainting())
                 loop.exec();
 
