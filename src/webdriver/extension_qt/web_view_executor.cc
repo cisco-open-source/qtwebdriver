@@ -335,7 +335,7 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
         QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
         foreach (EventDispatcher* item, dispatchers)
         {
-            consumed = item->dispatch(&(*it), consumed);
+            consumed |= item->dispatch(&(*it), consumed);
         }
         //////////////////////
         if (!consumed)

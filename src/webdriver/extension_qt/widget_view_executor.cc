@@ -169,7 +169,7 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
         QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
         foreach (EventDispatcher* item, dispatchers)
         {
-            consumed = item->dispatch(&(*it), consumed);
+            consumed |= item->dispatch(&(*it), consumed);
         }
         //////////////////////
 
