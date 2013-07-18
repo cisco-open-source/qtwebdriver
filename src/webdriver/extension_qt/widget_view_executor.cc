@@ -462,6 +462,12 @@ void QWidgetViewCmdExecutor::ClearElement(const ElementId& element, Error** erro
         return;
     }
 
+    QTextEdit *textEdit = qobject_cast<QTextEdit*>(pWidget);
+    if (NULL != textEdit) {
+        textEdit->clear();
+        return;
+    }
+
     QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
     if (NULL != lineEdit) {
         lineEdit->clear();
