@@ -641,6 +641,11 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     if (NULL == pWidget)
         return;
 
+    if (!pWidget->isVisible()) {
+        *element_text = "";
+        return;
+    }
+
     QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
     if (NULL != comboBox) {
         *element_text = comboBox->currentText().toStdString();
