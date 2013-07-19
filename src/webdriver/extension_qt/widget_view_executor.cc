@@ -27,6 +27,7 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QProgressBar>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -693,6 +694,7 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         *element_text = progressBar->text().toStdString();
         return;
     }
+
     *error = new Error(kNoSuchElement);
 }
 
