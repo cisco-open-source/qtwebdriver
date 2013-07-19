@@ -40,6 +40,7 @@
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
 #include <QtGui/QScrollArea>
+#include <QtGui/QProgressBar>
 #endif
 
 #ifdef WD_CONFIG_XPATH
@@ -684,6 +685,12 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
     if (NULL != checkBox) {
         *element_text = checkBox->text().toStdString();
+        return;
+    }
+
+    QProgressBar *progressBar= qobject_cast<QProgressBar*>(pWidget);
+    if (NULL != progressBar) {
+        *element_text = progressBar->text().toStdString();
         return;
     }
     *error = new Error(kNoSuchElement);
