@@ -23,15 +23,33 @@ bool QWebViewUtil::isUrlSupported(QWebView* pWebView, const std::string& url, Er
         GlobalLogger::Log(kWarningLogLevel, " Invalid QNetworkAccessManager* ");
         return false;
     }
-    QContentTypeResolver *presolver = new QContentTypeResolver(pmanager);
+
+    scoped_ptr<QContentTypeResolver> presolver(new QContentTypeResolver(pmanager));
+
+    std::string mimeType;
+
+    *error = presolver->resolveContentType(url, mimeType);
+    if (NULL != *error) {
+        return false;
+    }
+
+    return pWebPage->supportsContentType(QString::fromStdString(mimeType));
+}	
+
+bool QWebViewUtil::isUrlSupported(const std::string& url, Error **error) {
+    scoped_ptr<QNetworkAccessManager> pmanager(new QNetworkAccessManager());
+    scoped_ptr<QContentTypeResolver> presolver(new QContentTypeResolver(pmanager.get()));
 
     std::string mimeType ;
     *error = presolver->resolveContentType(url, mimeType);
     if (NULL != *error) {
         return false;
     }
+
+    scoped_ptr<QWebPage> pWebPage(new QWebPage());
+
     return pWebPage->supportsContentType(QString::fromStdString(mimeType));
-}	
+}   
 
 QWebView* QWebViewUtil::getWebView(Session* session, const ViewId& viewId) {
 	ViewHandle* viewHandle =  session->GetViewHandle(viewId);

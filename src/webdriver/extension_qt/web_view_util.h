@@ -19,6 +19,7 @@ class Error;
 class QWebViewUtil {
 public:
     static bool isUrlSupported(QWebView* pWebView, const std::string& url, Error **error);
+    static bool isUrlSupported(const std::string& url, Error **error);
     static QWebView* getWebView(Session* session, const ViewId& viewId);
 
 private:

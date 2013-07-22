@@ -8,6 +8,7 @@
 namespace webdriver {
 
 class Session;
+class ViewHandle;
 
 /// base class for custom view's creators
 class QWebViewCreator : public ViewCreator {
@@ -20,6 +21,7 @@ public:
     virtual bool CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const;    
 
 private:
+	bool ShowView(const Logger& logger, ViewHandle* viewHandle) const;
 
     DISALLOW_COPY_AND_ASSIGN(QWebViewCreator);
 };
