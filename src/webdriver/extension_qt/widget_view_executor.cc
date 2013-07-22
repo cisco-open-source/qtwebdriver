@@ -27,6 +27,8 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QListView>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -40,6 +42,8 @@
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
 #include <QtGui/QScrollArea>
+#include <QtGui/QProgressBar>
+#include <QtGui/QListView>
 #endif
 
 #ifdef WD_CONFIG_XPATH
@@ -367,12 +371,8 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
         }
         opt.initFrom(pWidget);
         rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
-        point = pWidget->mapFromGlobal(QPoint(rect.x(), rect.y()));
-        point = pWidget->mapToParent(point);
-        rect.setX(point.x());
-        rect.setY(point.y());
     } else {
-        rect = pWidget->geometry();
+        rect = pWidget->rect();
     }
 
     QRect visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
@@ -387,10 +387,7 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
             return;
         }
     }
-    visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
-    point = QPoint(rect.width()/2, rect.height()/2);
-
-//    rect = pWidget->visibleRegion().intersected(rect).boundingRect();
+    point = QPoint(rect.x() + rect.width()/2, rect.y() + rect.height()/2);
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
@@ -466,6 +463,12 @@ void QWidgetViewCmdExecutor::ClearElement(const ElementId& element, Error** erro
     QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit*>(pWidget);
     if (NULL != plainTextEdit) {
         plainTextEdit->clear();
+        return;
+    }
+
+    QTextEdit *textEdit = qobject_cast<QTextEdit*>(pWidget);
+    if (NULL != textEdit) {
+        textEdit->clear();
         return;
     }
 
@@ -640,6 +643,11 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     if (NULL == pWidget)
         return;
 
+    if (!pWidget->isVisible()) {
+        *element_text = "";
+        return;
+    }
+
     QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
     if (NULL != comboBox) {
         *element_text = comboBox->currentText().toStdString();
@@ -655,6 +663,12 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit*>(pWidget);
     if (NULL != plainText) {
         *element_text = plainText->toPlainText().toStdString();
+        return;
+    }
+
+    QTextEdit *pText = qobject_cast<QTextEdit*>(pWidget);
+    if (NULL != pText) {
+        *element_text = pText->toPlainText().toStdString();
         return;
     }
 
@@ -682,7 +696,25 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         return;
     }
 
-    *element_text = "";
+    QProgressBar *progressBar= qobject_cast<QProgressBar*>(pWidget);
+    if (NULL != progressBar) {
+        *element_text = progressBar->text().toStdString();
+        return;
+    }
+
+    QListView *listView = qobject_cast<QListView*>(pWidget);
+    if (NULL != listView)
+    {
+        QStringList list;
+        foreach(const QModelIndex &index, listView->selectionModel()->selectedIndexes())
+        {
+            list.append(index.data().toString());
+        }
+        *element_text = list.join("\n").toStdString();
+        return;
+    }
+
+    *error = new Error(kNoSuchElement);
 }
 
 void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
@@ -715,7 +747,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
     }
 
     if (locator == LocatorType::kXpath) {
-        FindNativeElementByXpath(parentWidget, query, elements, error);
+        FindNativeElementsByXpath(parentWidget, query, elements, error);
     } else {
         // list all child widgets and find matched locator
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
@@ -786,8 +818,9 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     if (NULL == view)
         return;
 
-    // TODO: check if we can implement this command
-    *error = new Error(kUnknownError, "widget getURL - TBD.");
+    std::string className(view->metaObject()->className());
+
+    *url = QWidgetViewUtil::makeUrlByClassName(className);
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
@@ -811,7 +844,7 @@ bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std
     return false;
 }
 
-void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
+void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
 #ifndef WD_CONFIG_XPATH
     *error = new Error(kXPathLookupError, "Finding elements by xpath is not supported");
     return;
@@ -838,7 +871,6 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
     xmlquery.evaluateTo(&result);
 
     buff.close();
-
     QXmlItem item(result.next());
     while (!item.isNull()) {
         if (item.isNode()) {
@@ -869,7 +901,6 @@ void QWidgetViewCmdExecutor::FindNativeElementByXpath(QWidget* parent, const std
     }
     if (elements->empty())
     {
-        *error = new Error(kNoSuchElement);
         return;
     }
 #endif

@@ -24,6 +24,12 @@ std::string QWidgetViewUtil::extractClassName(const std::string& url) {
 	return url.substr(widget_prefix.length());
 }
 
+std::string QWidgetViewUtil::makeUrlByClassName(const std::string& className) {
+	const std::string widget_prefix(url_protocol);
+
+	return widget_prefix + className;	
+}
+
 QWidget* QWidgetViewUtil::getView(Session* session, const ViewId& viewId) {
 	ViewHandle* viewHandle =  session->GetViewHandle(viewId);
 	if (NULL == viewHandle) 
