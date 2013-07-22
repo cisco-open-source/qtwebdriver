@@ -818,8 +818,9 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     if (NULL == view)
         return;
 
-    // TODO: check if we can implement this command
-    *error = new Error(kUnknownError, "widget getURL - TBD.");
+    std::string className(view->metaObject()->className());
+
+    *url = QWidgetViewUtil::makeUrlByClassName(className);
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {

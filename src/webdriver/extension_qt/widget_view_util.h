@@ -19,6 +19,7 @@ class QWidgetViewUtil {
 public:
     static bool isUrlSupported(const std::string& url);
     static std::string extractClassName(const std::string& url);
+    static std::string makeUrlByClassName(const std::string& className);
     static QWidget* getView(Session* session, const ViewId& viewId);
 
 private:
