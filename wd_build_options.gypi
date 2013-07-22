@@ -57,7 +57,7 @@
          'OS_POSIX',
        ],
     } ],
-     
+
     [ 'OS == "win"', {
       'defines': [
          '_WIN32',
@@ -68,5 +68,11 @@
          '_WINSOCKAPI_',
       ],
     } ],
+
+    [ 'OS == "mac"', {
+       'defines': [
+         'OS_POSIX',
+       ],
+     } ],
   ],
 }

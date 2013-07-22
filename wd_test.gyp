@@ -96,6 +96,21 @@
               '-luserenv.lib',
             ],
           } ],
+          [ 'OS=="mac"', {
+            'link_settings': {
+              'libraries': [
+                '<(QT_LIB_PATH)/QtGui.framework',
+                '<(QT_LIB_PATH)/QtCore.framework',
+                '<(QT_LIB_PATH)/QtXml.framework',
+                '<(QT_LIB_PATH)/QtXmlPatterns.framework',
+                '<(QT_LIB_PATH)/QtNetwork.framework',
+                'Foundation.framework',
+                'CoreFoundation.framework',
+                'ApplicationServices.framework',
+                'Security.framework',
+              ],
+            },
+          } ],
         ],
       } ],
     ], # conditions
@@ -186,6 +201,11 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit',],
             } ],
+            [ 'OS=="mac"', {
+              'link_settings': {
+                'libraries': ['<(QT_LIB_PATH)/Qt5WebKit.framework',],
+              },
+            } ],
           ],
         }, {
           'conditions': [
@@ -194,6 +214,11 @@
             } ],
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
+            } ],
+            [ 'OS=="mac"', {
+              'link_settings': {
+                'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
+              },
             } ],
           ],
         } ],
