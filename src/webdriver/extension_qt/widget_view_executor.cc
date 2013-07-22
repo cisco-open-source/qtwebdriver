@@ -27,6 +27,8 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QListView>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -40,6 +42,8 @@
 #include <QtGui/QRadioButton>
 #include <QtGui/QLabel>
 #include <QtGui/QScrollArea>
+#include <QtGui/QProgressBar>
+#include <QtGui/QListView>
 #endif
 
 #ifdef WD_CONFIG_XPATH
@@ -639,6 +643,11 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     if (NULL == pWidget)
         return;
 
+    if (!pWidget->isVisible()) {
+        *element_text = "";
+        return;
+    }
+
     QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
     if (NULL != comboBox) {
         *element_text = comboBox->currentText().toStdString();
@@ -686,6 +695,25 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         *element_text = checkBox->text().toStdString();
         return;
     }
+
+    QProgressBar *progressBar= qobject_cast<QProgressBar*>(pWidget);
+    if (NULL != progressBar) {
+        *element_text = progressBar->text().toStdString();
+        return;
+    }
+
+    QListView *listView = qobject_cast<QListView*>(pWidget);
+    if (NULL != listView)
+    {
+        QStringList list;
+        foreach(const QModelIndex &index, listView->selectionModel()->selectedIndexes())
+        {
+            list.append(index.data().toString());
+        }
+        *element_text = list.join("\n").toStdString();
+        return;
+    }
+
     *error = new Error(kNoSuchElement);
 }
 
