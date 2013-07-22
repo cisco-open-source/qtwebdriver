@@ -183,7 +183,6 @@
             'src/base/synchronization/lock_impl_posix.cc',
             'src/base/synchronization/waitable_event_posix.cc',
             'src/base/sys_info_posix.cc',
-            #'src/base/sys_string_conversions_posix.cc',
             'src/base/sys_string_conversions_mac.mm',
             'src/base/threading/platform_thread_posix.cc',
             'src/base/threading/thread_local_posix.cc',
