@@ -15,7 +15,9 @@ report/*
 /bin/
 /lib/
 /out/
+/build/
 /docs/
+/mocs/
 /wd.gypi
 /wd.Makefile
 /Makefile
