@@ -49,6 +49,10 @@
 #include "extension_qt/widget_view_creator.h"
 #include "extension_qt/widget_view_enumerator.h"
 #include "extension_qt/widget_view_executor.h"
+#include "extension_qt/wd_event_dispatcher.h"
+#include "extension_qt/vnc_event_dispatcher.h"
+
+#include "vnc/vncclient.h"
 
 void setQtSettings();
 void PrintVersion();
@@ -127,7 +131,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    setQtSettings();
+    VNCClient *client = new VNCClient();
+    client->Init("http://127.0.0.1", 5900);
+
+    WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+	
+	setQtSettings();
     wd_server->Start();
 
     return app.exec();
