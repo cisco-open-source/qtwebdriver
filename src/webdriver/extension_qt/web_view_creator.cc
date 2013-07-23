@@ -47,25 +47,13 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 }
 
 bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-    if (factory.empty())
-        return false;
-    
     Error* tmp_err = NULL;
     if (!QWebViewUtil::isUrlSupported(url, &tmp_err)) {
         if (tmp_err) delete tmp_err;
         return false;
     }
     
-    // get first found QWebView
-    CreateViewMethod createMethod = factory.begin()->second;
-    ViewHandle* handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
-
-    if (NULL != handle && ShowView(logger, handle)) {
-        *view = handle;
-        return true;
-    }
-
-	return false;
+    return CreateViewByClassName(logger, "", view);
 }
 
 bool QWebViewCreator::ShowView(const Logger& logger, ViewHandle* viewHandle) const {
