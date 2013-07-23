@@ -12,14 +12,14 @@ namespace webdriver {
 bool QWebViewUtil::isUrlSupported(QWebView* pWebView, const std::string& url, Error **error) {
     QWebPage* pWebPage = pWebView->page();
     if (NULL == pWebPage) {
-        *error = new Error(kBadRequest);
+        //*error = new Error(kBadRequest);
         GlobalLogger::Log(kWarningLogLevel, " Invalid QWebPage* ");
         return false;
     }
 
     QNetworkAccessManager *pmanager =  pWebPage->networkAccessManager();
     if (NULL == pmanager) {
-        *error = new Error(kBadRequest);
+        //*error = new Error(kBadRequest);
         GlobalLogger::Log(kWarningLogLevel, " Invalid QNetworkAccessManager* ");
         return false;
     }
@@ -28,8 +28,8 @@ bool QWebViewUtil::isUrlSupported(QWebView* pWebView, const std::string& url, Er
 
     std::string mimeType;
 
-    *error = presolver->resolveContentType(url, mimeType);
-    if (NULL != *error) {
+    scoped_ptr<Error> ignore_error(presolver->resolveContentType(url, mimeType));
+    if (ignore_error != NULL) {
         return false;
     }
 
