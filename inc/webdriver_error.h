@@ -30,6 +30,7 @@ enum ErrorCode {
     kUnexpectedAlertOpen = 26,
     kNoAlertOpenError = 27,
     kMoveTargetOutOfBounds = 34,
+    kCommandNotSupported = 50,
 
     // HTTP status codes.
     kSeeOther = 303,

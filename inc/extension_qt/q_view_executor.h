@@ -19,7 +19,7 @@
 
 namespace webdriver {
 
-#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
+#define NOT_SUPPORTED_IMPL      {*error = new Error(kCommandNotSupported, "Current view doesnt support this command.");}
 //#define NOT_IMPLEMENTED_IMPL    {*error = new Error(kUnknownError, "Command not implemented.");}
 //#define RET_IF_ERROR(e)         {if(e) {*error = e; return;}}
 
