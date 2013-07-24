@@ -53,6 +53,7 @@
 #include "extension_qt/vnc_event_dispatcher.h"
 
 #include "vnc/vncclient.h"
+#include "webdriver_switches.h"
 
 void setQtSettings();
 void PrintVersion();
@@ -143,7 +144,13 @@ int main(int argc, char *argv[])
     VNCClient *client = new VNCClient();
     client->Init("http://127.0.0.1", 5900);
 
-    WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch(webdriver::Switches::kVNCEnabled))
+    {
+        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+    }
 	
 	setQtSettings();
     wd_server->Start();
