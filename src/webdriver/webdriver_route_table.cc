@@ -119,28 +119,23 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
         std::vector<std::string> url_segments;
         base::SplitString(uri_pattern, '/', &url_segments);
 
-        if (url_segments.size() < 4
-                || !url_segments[0].empty() || url_segments[1] != "session" || url_segments[2] != "*") {
-            GlobalLogger::Log(kWarningLogLevel, "Custom commands must begin with \"/session/*/\"");
+        if (url_segments.size() < 2
+                || !url_segments[0].empty()) {
+            GlobalLogger::Log(kWarningLogLevel, "Custom commands too short");
             return false;
         }
-
-        // check custom prefix, should be of the form:
-        // '-' + vendor prefix + '-' + command name
-        std::vector<std::string> prefix_segments;
-        base::SplitString(url_segments[3], '-', &prefix_segments);
-#if defined(OS_WIN)
-        if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
-                || prefix_segments[1].empty() || !isalpha(prefix_segments[1].at(0))) {
-#else //OS_WIN
-		if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
-				|| prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
-#endif //OS_WIN
-
-			GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
+        if (url_segments.size() >= 2
+                && url_segments[0].empty() && url_segments[1] != "session") {
+            if (!CheckCustomPrefix(url_segments[1]))
+                return false;
+        } else  if (url_segments.size() < 4 || !url_segments[0].empty()
+                    || url_segments[1] != "session" || url_segments[2] != "*") {
+            GlobalLogger::Log(kWarningLogLevel, "Invalid custom commands");
             return false;
+        } else {
+            if (!CheckCustomPrefix(url_segments[3]))
+                return false;
         }
-
     }
     std::vector<webdriver::internal::RouteDetails>::iterator route;
     for (route = routes_.begin();
@@ -162,6 +157,23 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
     routes_.push_back(webdriver::internal::RouteDetails(
                          uri_pattern,
                          creator));
+    return true;
+}
+
+bool RouteTable::CheckCustomPrefix(const std::string& prefix) {
+    std::vector<std::string> prefix_segments;
+    base::SplitString(prefix, '-', &prefix_segments);
+#if defined(OS_WIN)
+    if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
+            || prefix_segments[1].empty() || !isalpha(prefix_segments[1].at(0))) {
+#else //OS_WIN
+    if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
+            || prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
+#endif //OS_WIN
+
+        GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
+        return false;
+    }
     return true;
 }
 
