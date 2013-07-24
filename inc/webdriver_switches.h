@@ -67,6 +67,11 @@ public:
     /// Web inspector listening port (by default - 9222)
     static const char kWIPort[];
 
+    /// \page page_webdriver_switches WD Server switches
+    /// - <b>vnc</b><br>
+    /// Enabling VNC support (by default - false)
+    static const char kVNCEnabled[];
+
 };
 
 }  // namespace webdriver
