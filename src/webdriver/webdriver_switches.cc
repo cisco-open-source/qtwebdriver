@@ -22,6 +22,8 @@ const char Switches::kWIServer[] = "wi-server";
 
 const char Switches::kWIPort[] = "wi-port";
 
-const char Switches::kVNCEnabled[] = "vnc";
+const char Switches::kVNCPort[] = "vnc-port";
+
+const char Switches::kVNCServer[] = "vnc-server";
 
 }  // namespace webdriver
