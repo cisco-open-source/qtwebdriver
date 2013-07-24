@@ -3,7 +3,6 @@
 #include <iostream>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMap>
-#include <X11/keysymdef.h>
 
 #define MAJOR_INDEX 6
 #define MINOR_INDEX 10
