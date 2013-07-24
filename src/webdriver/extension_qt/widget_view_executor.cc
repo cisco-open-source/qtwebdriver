@@ -168,14 +168,7 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
 
-        //////////////////////
-        bool consumed = false;
-        QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
-        foreach (EventDispatcher* item, dispatchers)
-        {
-            consumed |= item->dispatch(&(*it), consumed);
-        }
-        //////////////////////
+        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
 
         if (!consumed)
             qApp->sendEvent(pWidget, &(*it));
@@ -728,19 +721,6 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     }
 
     *error = new Error(kNoSuchElement);
-}
-
-void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
-	QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    std::vector<ElementId> elements;
-    FindElements(root_element, locator, query, &elements, error);
-    if (*error == NULL && elements.size() != 0)
-        *element = elements[0];
-    else if(*error == NULL)
-        *error = new Error(kNoSuchElement);
 }
 
 void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {

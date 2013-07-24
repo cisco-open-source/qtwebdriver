@@ -30,3 +30,15 @@ QVector<EventDispatcher*>& WDEventDispatcher::getDispatchers()
 {
     return _dispatchers;
 }
+
+bool WDEventDispatcher::dispatch(QEvent *event)
+{
+    bool consumed = false;
+    QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
+    foreach (EventDispatcher* item, dispatchers)
+    {
+        consumed |= item->dispatch(event, consumed);
+    }
+
+    return consumed;
+}

@@ -138,6 +138,11 @@ private:
     bool AddRoute(const std::string& uri_pattern,
                   const CommandCreatorPtr& creator);
 
+    // check custom prefix, should be of the form:
+    // '-' + vendor prefix + '-' + command name
+    // return true if prefix correct
+    bool CheckCustomPrefix(const std::string& prefix);
+
     // return true if pattern1 is bestmatch then pattern2
     bool CompareBestMatch(const std::string& uri_pattern1, const std::string& uri_pattern2);
 

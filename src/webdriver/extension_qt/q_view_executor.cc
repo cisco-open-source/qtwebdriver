@@ -75,6 +75,11 @@ void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
     if (NULL == view)
         return;
 
+    if (!view->isTopLevel()) {
+        *error = new Error(kUnknownError, "Cant set bounds to non top level view.");
+        return;
+    }
+
     view->setGeometry(ConvertRectToQRect(bounds));
 }
 
@@ -183,6 +188,15 @@ void QViewCmdExecutor::SwitchTo(Error** error) {
     session_->set_current_view(view_id_);
 
     session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
+}
+
+void QViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
+    std::vector<ElementId> elements;
+    FindElements(root_element, locator, query, &elements, error);
+    if (*error == NULL && !elements.empty())
+        *element = elements[0];
+    else if(*error == NULL)
+        *error = new Error(kNoSuchElement);
 }
 
 void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
