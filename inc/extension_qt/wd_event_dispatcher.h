@@ -15,6 +15,7 @@ public:
     static WDEventDispatcher *getInstance();
     void add(EventDispatcher *dispatcher);
     QVector<EventDispatcher*>& getDispatchers();
+    bool dispatch(QEvent *event);
 
 private:
     static WDEventDispatcher *_instance;
