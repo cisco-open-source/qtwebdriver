@@ -169,6 +169,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [
@@ -214,6 +215,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [

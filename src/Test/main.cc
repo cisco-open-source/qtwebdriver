@@ -36,6 +36,8 @@
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
+#include "webdriver_route_table.h"
+#include "shutdown_command.h"
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -126,6 +128,11 @@ int main(int argc, char *argv[])
     if (0 != wd_server->Configure(cmd_line)) {
         return 1;
     }
+
+    webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
+    const char shutdownCommandRoute[] = "/-CISCO-shutdown";
+    routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
+    wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
     setQtSettings();
     wd_server->Start();
