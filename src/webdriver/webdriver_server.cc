@@ -394,6 +394,10 @@ void Server::PrepareHttpResponse(const std::string& request_method,
         http_response->set_status(HttpResponse::kMethodNotAllowed);
         break;
 
+    case kCommandNotSupported:
+        http_response->set_status(HttpResponse::kNotImplemented);
+        break;
+
     // All other errors should be treated as generic 500s. The client
     // will be responsible for inspecting the message body for details.
     case kInternalServerError:
