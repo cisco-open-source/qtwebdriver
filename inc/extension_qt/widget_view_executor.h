@@ -60,7 +60,6 @@ public:
     virtual void ElementSubmit(const ElementId& element, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetElementText(const ElementId& element, std::string* element_text, Error** error);
     virtual void GetElementCssProperty(const ElementId& element, const std::string& property, base::Value** value, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error);
     virtual void FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
     virtual void ActiveElement(ElementId* element, Error** error);
     virtual void SwitchToFrameWithNameOrId(const std::string& name_or_id, Error** error) NOT_SUPPORTED_IMPL;
