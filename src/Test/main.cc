@@ -122,6 +122,15 @@ int main(int argc, char *argv[])
       PrintVersion();
       return 0;
     }
+
+#if defined(OS_WIN)
+#if (QT_VERSION == QT_VERSION_CHECK(5, 1, 0))
+    system("qtenv2.bat vsvars");
+#else  //QT_VERSION
+    system("qtvars.bat vsvars");
+#endif //QT_VERSION
+#endif //OS_WIN
+
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
     if (0 != wd_server->Configure(cmd_line)) {
         return 1;
