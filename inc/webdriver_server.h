@@ -5,7 +5,6 @@ for supporting not only web UI testing. By design it can be extended with
 extension that allow testing native UI. 
 
 Topics:
-- \subpage page_intro
 - \subpage page_wd_server
 - \subpage page_commands_routing
 - \subpage page_sessions

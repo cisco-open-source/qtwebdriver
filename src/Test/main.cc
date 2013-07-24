@@ -51,6 +51,10 @@
 #include "extension_qt/widget_view_creator.h"
 #include "extension_qt/widget_view_enumerator.h"
 #include "extension_qt/widget_view_executor.h"
+#include "extension_qt/wd_event_dispatcher.h"
+#include "extension_qt/vnc_event_dispatcher.h"
+
+#include "vnc/vncclient.h"
 
 void setQtSettings();
 void PrintVersion();
@@ -124,6 +128,15 @@ int main(int argc, char *argv[])
       PrintVersion();
       return 0;
     }
+
+#if defined(OS_WIN)
+#if (QT_VERSION == QT_VERSION_CHECK(5, 1, 0))
+    system("qtenv2.bat vsvars");
+#else  //QT_VERSION
+    system("qtvars.bat vsvars");
+#endif //QT_VERSION
+#endif //OS_WIN
+
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
     if (0 != wd_server->Configure(cmd_line)) {
         return 1;
@@ -134,7 +147,12 @@ int main(int argc, char *argv[])
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
-    setQtSettings();
+    VNCClient *client = new VNCClient();
+    client->Init("http://127.0.0.1", 5900);
+
+    WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+	
+	setQtSettings();
     wd_server->Start();
 
     return app.exec();

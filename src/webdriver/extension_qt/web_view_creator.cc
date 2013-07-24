@@ -37,37 +37,9 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
         }
     }
 
-    if (NULL != handle) {
-        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
-        std::string objClassName(widget->metaObject()->className());
-
-        if (NULL != widget) {
-            QEventLoop loop;
-            QRepaintEventFilter filter(widget);
-            QCheckPagePaint painter;
-            QObject::connect(&filter, SIGNAL(repainted()), &loop, SLOT(quit()));
-            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
-
-            QTimer timer;
-            timer.setSingleShot(true);
-            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-            timer.start(500);
-
-            widget->installEventFilter(&filter);
-            widget->show();
-            if (!painter.isPainting())
-                    loop.exec();
-        
-            logger.Log(kInfoLogLevel, "QWebViewCreator created view ("
-                            + objClassName +") by class name - "+className);
-
-            *view = handle;
-
-            return true;
-        } else {
-            logger.Log(kSevereLogLevel, "QWebViewCreator, smth wrong.");
-            handle->Release();
-        }
+    if (NULL != handle && ShowView(logger, handle)) {
+        *view = handle;
+        return true;
     }
 
     // view was not created
@@ -75,67 +47,45 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 }
 
 bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-    if (factory.empty())
-        return false;
-
-    QNetworkAccessManager *pmanager = new QNetworkAccessManager();
-
-    QContentTypeResolver *presolver = new QContentTypeResolver(pmanager);
-    std::string contentType;
-    scoped_ptr<Error> ignore_err(presolver->resolveContentType(url, contentType));
-    delete pmanager;
-    delete presolver;
-
-    if (ignore_err != NULL) {
+    Error* tmp_err = NULL;
+    if (!QWebViewUtil::isUrlSupported(url, &tmp_err)) {
+        if (tmp_err) delete tmp_err;
         return false;
     }
+    
+    return CreateViewByClassName(logger, "", view);
+}
 
-    QWebPage *pWebPage= new QWebPage();
-    if (!pWebPage->supportsContentType(QString::fromStdString(contentType))) {
-        delete pWebPage;
-        return false;
-    }
-    delete pWebPage;
+bool QWebViewCreator::ShowView(const Logger& logger, ViewHandle* viewHandle) const {
+    QWidget* widget = (dynamic_cast<QViewHandle*>(viewHandle))->get();
 
-    ViewHandle* handle = NULL;
-    // get first found QWebView
-    CreateViewMethod createMethod = factory.begin()->second;
-    handle = new QViewHandle(static_cast<QWidget*>(createMethod()));
-
-    if (NULL != handle) {
-        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
+    if (NULL != widget) {
         std::string objClassName(widget->metaObject()->className());
+        QEventLoop loop;
+        QRepaintEventFilter filter(widget);
+        QCheckPagePaint painter;
+        QObject::connect(&filter, SIGNAL(repainted()), &loop, SLOT(quit()));
+        QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
 
-        if (NULL != widget) {
-            QEventLoop loop;
-            QRepaintEventFilter filter(widget);
-            QCheckPagePaint painter;
-            QObject::connect(&filter, SIGNAL(repainted()), &loop, SLOT(quit()));
-            QObject::connect(&filter, SIGNAL(repainted()), &painter, SLOT(pagePainted()));
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+        timer.start(500);
 
-            QTimer timer;
-            timer.setSingleShot(true);
-            QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-            timer.start(500);
-
-            widget->installEventFilter(&filter);
-            widget->show();
-            if (!painter.isPainting())
-                    loop.exec();
+        widget->installEventFilter(&filter);
+        widget->show();
+        if (!painter.isPainting())
+            loop.exec();
         
-            logger.Log(kInfoLogLevel, "QWebViewCreator created view("
-                        + objClassName + ") by url - " + url);
+        logger.Log(kInfoLogLevel, "QWebViewCreator created view(" + objClassName + ").");
 
-            *view = handle;
-
-            return true;
-        } else {
-            logger.Log(kSevereLogLevel, "QWebViewCreator, smth wrong.");
-            handle->Release();
-        }
+        return true;
+    } else {
+        logger.Log(kSevereLogLevel, "QWebViewCreator, smth wrong.");
+        viewHandle->Release();
     }
 
-	return false;
+    return false;
 }
 
 

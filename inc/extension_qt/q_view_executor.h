@@ -19,7 +19,7 @@
 
 namespace webdriver {
 
-#define NOT_SUPPORTED_IMPL      {*error = new Error(kUnknownError, "Current view doesnt support this command.");}    
+#define NOT_SUPPORTED_IMPL      {*error = new Error(kCommandNotSupported, "Current view doesnt support this command.");}
 //#define NOT_IMPLEMENTED_IMPL    {*error = new Error(kUnknownError, "Command not implemented.");}
 //#define RET_IF_ERROR(e)         {if(e) {*error = e; return;}}
 
@@ -38,6 +38,7 @@ public:
     virtual void SendKeys(const string16& keys, Error** error);
     virtual void Close(Error** error);
     virtual void SwitchTo(Error** error);
+    virtual void FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error);
     virtual void GetAlertMessage(std::string* text, Error** error);
     virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error);
     virtual void AcceptOrDismissAlert(bool accept, Error** error);

@@ -11,6 +11,8 @@
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "extension_qt/event_dispatcher.h"
+#include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -165,7 +167,18 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(pWidget, &(*it));
+
+        //////////////////////
+        bool consumed = false;
+        QVector<EventDispatcher*> dispatchers = WDEventDispatcher::getInstance()->getDispatchers();
+        foreach (EventDispatcher* item, dispatchers)
+        {
+            consumed |= item->dispatch(&(*it), consumed);
+        }
+        //////////////////////
+
+        if (!consumed)
+            qApp->sendEvent(pWidget, &(*it));
         ++it;
     }
 }
@@ -717,19 +730,6 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     *error = new Error(kNoSuchElement);
 }
 
-void QWidgetViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
-	QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    std::vector<ElementId> elements;
-    FindElements(root_element, locator, query, &elements, error);
-    if (*error == NULL && elements.size() != 0)
-        *element = elements[0];
-    else if(*error == NULL)
-        *error = new Error(kNoSuchElement);
-}
-
 void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
 	QWidget* view = getView(view_id_, error);
     if (NULL == view)
@@ -818,8 +818,9 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     if (NULL == view)
         return;
 
-    // TODO: check if we can implement this command
-    *error = new Error(kUnknownError, "widget getURL - TBD.");
+    std::string className(view->metaObject()->className());
+
+    *url = QWidgetViewUtil::makeUrlByClassName(className);
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
