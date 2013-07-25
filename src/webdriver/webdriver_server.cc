@@ -4,9 +4,6 @@
 #include "webdriver_route_table.h"
 #include "commands/command.h"
 #include "commands/response.h"
-#include "vnc/vncclient.h"
-#include "extension_qt/wd_event_dispatcher.h"
-#include "extension_qt/vnc_event_dispatcher.h"
 
 #include "mongoose.h"
 
@@ -140,25 +137,6 @@ int Server::Start() {
         opts[i] = mg_options_[i].c_str();
     }
     opts[mg_options_.size()] = NULL;
-
-    // start VNC module
-    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
-    if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer) || cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
-    {
-        QString address = "127.0.0.1";
-        int port = 5900;
-
-        if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer))
-            address = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCServer).c_str();
-        if (cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
-            port = QString(cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCPort).c_str()).toInt();
-
-        VNCClient *client = new VNCClient();
-        client->Init(address, port);
-
-
-        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
-    }
 
     // Initialize SHTTPD context.
     mg_ctx_ = mg_start((mg_callback_t)&ProcessHttpRequestCb,

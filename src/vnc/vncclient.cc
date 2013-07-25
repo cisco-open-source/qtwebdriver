@@ -8,6 +8,8 @@
 #define MAJOR_INDEX 6
 #define MINOR_INDEX 10
 
+VNCClient* VNCClient::_instance = NULL;
+
 static QMap<quint32, quint16> initializeMap()
 {
     QMap<quint32, quint16> resultMap;
@@ -69,6 +71,16 @@ VNCClient::VNCClient()
 VNCClient::~VNCClient()
 {
     delete _serverParameters;
+}
+
+VNCClient* VNCClient::getInstance()
+{
+    if (NULL == _instance)
+    {
+        _instance = new VNCClient();
+    }
+
+    return _instance;
 }
 
 bool VNCClient::Init(QString remoteHost, quint16 port)
