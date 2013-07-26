@@ -26,8 +26,9 @@ else
   modes=$mode
 fi
 
-OUT_LIB_FILES="libchromium_base.a libWebDriver_core.a libWebDriver_extension_qt_base.a libWebDriver_extension_qt_web.a"
-OUT_BIN_FILES="WebDriver WebDriver_noWebkit"
+OUT_STATIC_LIB_FILES="libchromium_base.a libWebDriver_core.a libWebDriver_extension_qt_base.a libWebDriver_extension_qt_web.a"
+OUT_SHARED_LIB_FILES="libchromium_base.so libWebDriver_core.so libWebDriver_extension_qt_base.so libWebDriver_extension_qt_web.so"
+OUT_BIN_FILES="WebDriver WebDriver_noWebkit WebDriver_noWebkit_sharedLibs"
 GYP=`which gyp`
 
 #generate wdversion.cc
@@ -53,7 +54,8 @@ do
     [ $? -ne 0 ] && echo "**** ERROR: Can't create $OUTPUT_BIN_DIR" && exit 1
 
     # copy libraries
-    for file in $OUT_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/$file $OUTPUT_BIN_DIR 2>/dev/null; done
+    for file in $OUT_STATIC_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/$file $OUTPUT_BIN_DIR 2>/dev/null; done
+    for file in $OUT_SHARED_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/lib.target/$file $OUTPUT_BIN_DIR 2>/dev/null; done
 
     # copy test binaries
     for file in $OUT_BIN_FILES
