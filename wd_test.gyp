@@ -268,6 +268,31 @@
         } ],
       ],
 
+    } , {
+      'target_name': 'test_WD_hybrid_noWebkit_with_shared_libs',
+      'type': 'executable',
+
+      'product_name': 'WebDriver_noWebkit_sharedLibs',
+
+      'dependencies': [
+        'base.gyp:chromium_base_shared',
+        'wd_core.gyp:WebDriver_core_shared',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
+        'test_widgets',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
     }
   ],
 }

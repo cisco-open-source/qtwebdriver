@@ -25,6 +25,7 @@
           'dependencies': [
             'wd_test.gyp:test_WD_hybrid',
             'wd_test.gyp:test_WD_hybrid_noWebkit',
+            'wd_test.gyp:test_WD_hybrid_noWebkit_with_shared_libs',
           ],
         } ],
       ],
