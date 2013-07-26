@@ -77,17 +77,6 @@ int main(int argc, char *argv[])
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
-#if (WD_TEST_ENABLE_WEB_VIEW == 1)    
-    webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
-    webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
-    webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
-
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
-
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
-
-#endif    
-
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
@@ -105,8 +94,19 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)
+    webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
+    webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
 
+
+#endif
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());

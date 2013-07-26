@@ -44,7 +44,8 @@
               '-licuuc',
               '-licudata',
               '-licui18n',
-              '-lQt5WebKit',
+#              '-lQt5WebKit',
+              '-lQt5WebKitWidgets',
             ],
           } ],
           ['OS=="win"', {
@@ -184,9 +185,6 @@
         'src/Test/RestyledLabel.cc',
         'src/Test/DragableWidget.cc',
         'src/Test/BasicMouseInterfaceTest.cc',
-        'src/Test/WindowWithEmbeddedViewTest.cc',
-        'src/Test/WindowWithEmbeddedViewTest.h',
-        '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc'
       ],
 
     }, {
@@ -208,6 +206,9 @@
       'sources': [
         'src/Test/main.cc',
         'src/Test/shutdown_command.cc',
+        'src/Test/WindowWithEmbeddedViewTest.cc',
+        'src/Test/WindowWithEmbeddedViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc',
       ],
 
       'conditions': [
