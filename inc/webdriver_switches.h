@@ -69,8 +69,13 @@ public:
 
     /// \page page_webdriver_switches WD Server switches
     /// - <b>vnc</b><br>
-    /// Enabling VNC support (by default - false)
-    static const char kVNCEnabled[];
+    /// VNC server listening port (by default - 5900)
+    static const char kVNCPort[];
+
+    /// \page page_webdriver_switches WD Server switches
+    /// - <b>vnc</b><br>
+    /// VNC server IP address (by default - 127.0.0.1)
+    static const char kVNCServer[];
 
 };
 

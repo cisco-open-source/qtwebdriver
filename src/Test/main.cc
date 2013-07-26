@@ -37,6 +37,8 @@
 #include "webdriver_server.h"
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
+#include "webdriver_route_table.h"
+#include "shutdown_command.h"
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -143,16 +145,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    VNCClient *client = new VNCClient();
-    client->Init("http://127.0.0.1", 5900);
+    webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
+    const char shutdownCommandRoute[] = "/-CISCO-shutdown";
+    routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
+    wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
-
-    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
-
-    if (cmdLine.HasSwitch(webdriver::Switches::kVNCEnabled))
-    {
-        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
-    }
 	
 	setQtSettings();
     wd_server->Start();
@@ -209,7 +206,9 @@ void PrintHelp() {
                 << "                                  described above (port, root, etc.)"             << std::endl
                 << "wi-server      false              If true, web inspector will be enabled"         << std::endl
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
-                << "version                           Print version information to stdout and exit"   << std::endl;
+                << "version                           Print version information to stdout and exit"   << std::endl
+                << "vnc-port       5900               VNC server listening port"                      << std::endl
+                << "vnc-server     127.0.0.1          VNC server IP address"                          << std::endl;
 }
 
 

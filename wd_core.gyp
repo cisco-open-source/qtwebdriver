@@ -84,5 +84,14 @@
         } ],
         
       ],
+  } , {
+    'target_name': 'WebDriver_core_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_core',
+
+      'dependencies': [
+        'WebDriver_core',
+      ],
   } ],
 }

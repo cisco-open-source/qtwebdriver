@@ -66,13 +66,24 @@
          'NOMINMAX',
          '_UNICODE',
          '_WINSOCKAPI_',
-      ],
+      ],	
     } ],
 
     [ 'OS == "mac"', {
-       'defines': [
+      'actions': [ {                                                                                                                                                 
+        'action_name': 'create_input_dir',                                                                                                                                  
+        'inputs':      [],                                                                                                                                           
+        'outputs':     [],                                                                                                                      
+        'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],                                                                                                  
+       } ],
+       
+      'defines': [ 
          'OS_POSIX',
-       ],
-     } ],
+      ],
+
+      'xcode_settings': {	
+        'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+      },
+    } ],
   ],
 }

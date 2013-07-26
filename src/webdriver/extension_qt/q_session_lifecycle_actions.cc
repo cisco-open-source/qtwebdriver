@@ -1,4 +1,8 @@
 #include "extension_qt/q_session_lifecycle_actions.h"
+#include "extension_qt/wd_event_dispatcher.h"
+#include "extension_qt/vnc_event_dispatcher.h"
+#include "webdriver_switches.h"
+#include "webdriver_server.h"
 
 #include "q_proxy_parser.h"
 
@@ -28,6 +32,25 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 	} else {
 		session_->logger().Log(kInfoLogLevel, "no proxy settings requsted.");
 	}
+
+    // start VNC module
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+    if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer) || cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
+    {
+        QString address = "127.0.0.1";
+        int port = 5900;
+
+        if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer))
+            address = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCServer).c_str();
+        if (cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
+            port = QString(cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCPort).c_str()).toInt();
+
+        VNCClient *client = VNCClient::getInstance();
+        if (!client->isReady())
+            client->Init(address, port);
+
+        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+    }
 
 	return error;
 }

@@ -44,12 +44,12 @@
         'src/webdriver/extension_qt/q_event_filter.cc',
         'src/webdriver/extension_qt/q_event_filter.h',
         '<(INTERMEDIATE_DIR)/moc_q_event_filter.cc',
-	'src/vnc/vncclient.h',
+        'src/vnc/vncclient.h',
         'src/vnc/vncclient.cc',
-	'<(INTERMEDIATE_DIR)/moc_vncclient.cc',
-	'src/vnc/vncserverparameters.cc',
-	'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
-	'src/webdriver/extension_qt/wd_event_dispatcher.cc'
+        '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
+        'src/vnc/vncserverparameters.cc',
+        'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
+        'src/webdriver/extension_qt/wd_event_dispatcher.cc'
       ],
 
       'conditions': [
@@ -79,6 +79,24 @@
         'src/third_party/webdriver/atoms.cc',
       ],
 
+    } , {
+      'target_name': 'WebDriver_extension_qt_base_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_extension_qt_base',
+
+      'dependencies': [
+        'WebDriver_extension_qt_base',
+      ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_web_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_extension_qt_web',
+
+      'dependencies': [
+        'WebDriver_extension_qt_web',
+      ],
     }
   ],
 }

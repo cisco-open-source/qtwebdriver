@@ -90,6 +90,12 @@
         'src/base/utf_string_conversions.cc',
         'src/base/utf_string_conversion_utils.cc',
         'src/base/values.cc',
+        'src/net/base/file_stream.cc',
+        'src/net/base/file_stream_metrics.cc',
+        'src/net/base/file_stream_net_log_parameters.cc',
+        'src/net/base/io_buffer.cc',
+        'src/net/base/net_errors.cc',
+        'src/net/base/net_log.cc',
         'src/third_party/modp_b64/modp_b64.cc'
       ],
 
@@ -204,6 +210,15 @@
             'src/base/sys_info_mac.cc',
           ],
         } ],
+      ],
+    } , {
+      'target_name': 'chromium_base_shared',
+      'type': 'shared_library',
+
+      'product_name': 'chromium_base',
+
+      'dependencies': [
+        'chromium_base',
       ],
     }
   ],
