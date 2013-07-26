@@ -44,6 +44,7 @@
               '-licuuc',
               '-licudata',
               '-licui18n',
+              '-lQt5WebKit',
             ],
           } ],
           ['OS=="win"', {
@@ -95,6 +96,7 @@
               '-lpthread',
               '-lrt',
               '-ldl',
+              '-lQtWebKit',
             ],
           } ],
           [ 'OS=="win"', {
@@ -104,6 +106,7 @@
               '-l<(QT_LIB_PATH)/QtXmlPatterns4',
               '-l<(QT_LIB_PATH)/QtGui4',
               '-l<(QT_LIB_PATH)/QtCore4',
+              '-l<(QT_LIB_PATH)/QtWebKit4',
               '-luser32.lib',
               '-lws2_32.lib',
               '-lshell32.lib',
@@ -180,7 +183,10 @@
         '<(INTERMEDIATE_DIR)/moc_VisibilityTest.cc',
         'src/Test/RestyledLabel.cc',
         'src/Test/DragableWidget.cc',
-        'src/Test/BasicMouseInterfaceTest.cc'
+        'src/Test/BasicMouseInterfaceTest.cc',
+        'src/Test/WindowWithEmbeddedViewTest.cc',
+        'src/Test/WindowWithEmbeddedViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc'
       ],
 
     }, {

@@ -31,6 +31,7 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
+#include "WindowWithEmbeddedViewTest.h"
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -102,6 +103,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+    widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
 
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
