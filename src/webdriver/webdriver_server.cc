@@ -1,4 +1,3 @@
-
 #include "webdriver_server.h"
 #include "webdriver_route_table.h"
 #include "commands/command.h"

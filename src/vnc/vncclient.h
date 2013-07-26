@@ -12,8 +12,9 @@ class VNCClient : public QObject
     Q_OBJECT
 
 public:
-    VNCClient();
     ~VNCClient();
+
+    static VNCClient* getInstance();
 
     bool Init(QString remoteHost, quint16 port);
     void sendKeyEvent(QKeyEvent *key);
@@ -30,6 +31,8 @@ private slots:
     void onError(QAbstractSocket::SocketError error);
 
 private:
+    VNCClient();
+
     bool establishProtocolVersion(QByteArray& data);
     bool establishSecurity(QByteArray& data);
     bool finishHandshaking(QByteArray& data);
@@ -68,6 +71,7 @@ public:
     static QMap<quint32, quint16> _keymap;
 
 private:
+    static VNCClient *_instance;
     QTcpSocket *_socket;
     bool _versionEstablished;
     bool _securityEstablished;

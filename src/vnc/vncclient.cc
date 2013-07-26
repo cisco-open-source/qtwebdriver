@@ -3,9 +3,12 @@
 #include <iostream>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMap>
+#include <QtCore/QRegExp>
 
 #define MAJOR_INDEX 6
 #define MINOR_INDEX 10
+
+VNCClient* VNCClient::_instance = NULL;
 
 static QMap<quint32, quint16> initializeMap()
 {
@@ -70,10 +73,28 @@ VNCClient::~VNCClient()
     delete _serverParameters;
 }
 
+VNCClient* VNCClient::getInstance()
+{
+    if (NULL == _instance)
+    {
+        _instance = new VNCClient();
+    }
+
+    return _instance;
+}
+
 bool VNCClient::Init(QString remoteHost, quint16 port)
 {
     _socket = new QTcpSocket();
-    _socket->connectToHost(QHostAddress::LocalHost, port);
+    QHostAddress addr;
+
+    if (!addr.setAddress(remoteHost))
+    {
+        remoteHost.replace(QRegExp("http*://"), "");
+        addr.setAddress(remoteHost);
+    }
+
+    _socket->connectToHost(addr, port);
 
     // QObject::connect(_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(readSocket(qint64)));
     QObject::connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));

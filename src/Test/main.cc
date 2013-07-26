@@ -148,16 +148,6 @@ int main(int argc, char *argv[])
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
-    VNCClient *client = new VNCClient();
-    client->Init("http://127.0.0.1", 5900);
-
-
-    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
-
-    if (cmdLine.HasSwitch(webdriver::Switches::kVNCEnabled))
-    {
-        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
-    }
 	
 	setQtSettings();
     wd_server->Start();
@@ -214,7 +204,9 @@ void PrintHelp() {
                 << "                                  described above (port, root, etc.)"             << std::endl
                 << "wi-server      false              If true, web inspector will be enabled"         << std::endl
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
-                << "version                           Print version information to stdout and exit"   << std::endl;
+                << "version                           Print version information to stdout and exit"   << std::endl
+                << "vnc-port       5900               VNC server listening port"                      << std::endl
+                << "vnc-server     127.0.0.1          VNC server IP address"                          << std::endl;
 }
 
 
