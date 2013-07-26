@@ -205,6 +205,15 @@
           ],
         } ],
       ],
+    } , {
+      'target_name': 'chromium_base_shared',
+      'type': 'shared_library',
+
+      'product_name': 'chromium_base',
+
+      'dependencies': [
+        'chromium_base',
+      ],
     }
   ],
 }

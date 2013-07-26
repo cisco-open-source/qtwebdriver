@@ -11,9 +11,13 @@
       'type': 'none',
       'dependencies': [
         'base.gyp:chromium_base',
+        'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core',
+        'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_web_shared',
       ],
 
       'conditions': [
