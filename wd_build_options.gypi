@@ -77,9 +77,13 @@
         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],                                                                                                  
        } ],
        
-       'defines': [
+      'defines': [ 
          'OS_POSIX',
-       ],
-     } ],
+      ],
+
+      'xcode_settings': {	
+        'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
+      },
+    } ],
   ],
 }
