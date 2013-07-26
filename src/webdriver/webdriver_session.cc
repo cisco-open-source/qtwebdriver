@@ -406,11 +406,14 @@ void Session::RemoveView(const ViewId& viewId) {
 
 void Session::UpdateViews(const std::set<ViewId>& views) {
     ViewsMap::iterator it;
+    ViewId vi;
 
     for (it = views_.begin(); it != views_.end(); ++it) {
-        if (0 == views.count(ViewId(it->first))) {
+        vi = ViewId(it->first);
+		
+        if (vi.is_valid() && 0 == views.count(vi)) {
             // invalidate handle
-            RemoveView(ViewId(it->first));
+            RemoveView(vi);
         }
     }
 }
