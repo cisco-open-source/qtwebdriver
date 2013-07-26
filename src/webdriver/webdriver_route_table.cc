@@ -115,7 +115,7 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string
 bool RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
     // custom command check
-    if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
+    if (false){//!CommandRoutes::IsStandardRoute(uri_pattern)) {
         std::vector<std::string> url_segments;
         base::SplitString(uri_pattern, '/', &url_segments);
 
