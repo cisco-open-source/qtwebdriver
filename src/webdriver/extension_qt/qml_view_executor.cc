@@ -797,9 +797,29 @@ void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
     if (NULL == view)
         return;
 
-    session_->logger().Log(kFineLogLevel, "Navigate to widget - "+url);
+    session_->logger().Log(kFineLogLevel, "QML - NavigateToURL" + url);
 
-    // TODO: do sync/async load
+    QUrl address(QString(url.c_str()));
+
+    if (sync) {
+        QEventLoop loop;
+        QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
+        view->setSource(address);
+
+        if (QDeclarativeView::Loading == view->status()) {
+            loop.exec();
+        }
+
+        if (QDeclarativeView::Ready != view->status()) {
+            session_->logger().Log(kWarningLogLevel, "QML sync load, smth wrong. View is not in READY state.");
+        }
+
+        session_->logger().Log(kFineLogLevel, "QML sync load - " + url);
+    } else {
+        view->setSource(address);
+
+        session_->logger().Log(kFineLogLevel, "QML async load - " + url);
+    }
 }
 
 void QQmlViewCmdExecutor::GetURL(std::string* url, Error** error) {
