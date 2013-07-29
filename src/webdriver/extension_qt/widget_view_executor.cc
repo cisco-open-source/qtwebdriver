@@ -860,9 +860,9 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
         pugi::xpath_query query_nodes(query.c_str());
         pugi::xpath_node_set found_nodes = query_nodes.evaluate_node_set(doc);
 
-        if (NULL == query_nodes.result().error) {
-            //pugi::xpath_node_set found_nodes = doc.select_nodes(query.c_str());
-            printf("!!!!!!!! found nodes: %d\n", found_nodes.size());
+        if ( (NULL == query_nodes.result().error) && 
+             (pugi::xpath_type_node_set == query_nodes.return_type()) ) {
+
             for (pugi::xpath_node_set::const_iterator it = found_nodes.begin(); it != found_nodes.end(); ++it) {
                 pugi::xpath_node node = *it;
 
@@ -880,7 +880,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
                 }
             }
         } else {
-            std::string error_descr = "Cant evaluate XPath: ";       
+            std::string error_descr = "Cant evaluate XPath to node set: ";       
             error_descr += query_nodes.result().description();
             session_->logger().Log(kWarningLogLevel, error_descr);
             *error = new Error(kXPathLookupError);
