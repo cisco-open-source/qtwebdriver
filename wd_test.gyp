@@ -176,7 +176,6 @@
       'product_name': 'WebDriver',
 
       'dependencies': [
-        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
@@ -239,7 +238,6 @@
       'product_name': 'WebDriver_noWebkit',
 
       'dependencies': [
-        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
@@ -266,7 +264,6 @@
       'product_name': 'WebDriver_noWebkit_sharedLibs',
 
       'dependencies': [
-        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',

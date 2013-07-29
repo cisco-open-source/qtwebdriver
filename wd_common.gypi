@@ -4,7 +4,6 @@
   	'WD_CONFIG_QWIDGET_VIEW%': '0',
     'WD_CONFIG_QML_VIEW%': '0',
     'WD_BUILD_MONGOOSE%': '0',
-    'WD_CONFIG_XPATH%': '1',
 
     'conditions': [
 
