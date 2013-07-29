@@ -10,6 +10,7 @@
       'target_name': 'All',
       'type': 'none',
       'dependencies': [
+        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
