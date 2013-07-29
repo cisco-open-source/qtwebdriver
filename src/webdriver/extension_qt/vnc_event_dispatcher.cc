@@ -15,13 +15,13 @@ bool VNCEventDispatcher::dispatch(QEvent *event, bool consumed)
     if (consumed)
         return false;
 
-    if (isRemoteControlEvent(event))
+    /*if (isRemoteControlEvent(event))
     {
         _vncClient->sendKeyEvent(dynamic_cast<QKeyEvent*>(event));
         return true;
-    }
+    }*/
 
-    /*switch(event->type())
+    switch(event->type())
     {
         case QEvent::KeyPress:
         case QEvent::KeyRelease: _vncClient->sendKeyEvent(dynamic_cast<QKeyEvent*>(event)); break;
@@ -29,9 +29,9 @@ bool VNCEventDispatcher::dispatch(QEvent *event, bool consumed)
         case QEvent::MouseButtonRelease:
         case QEvent::MouseButtonDblClick: _vncClient->sendMouseEvent(dynamic_cast<QMouseEvent*>(event)); break;
         default: break;
-    }*/
+    }
 
-    return false;
+    return true;
 }
 
 bool VNCEventDispatcher::isRemoteControlEvent(QEvent *event)
