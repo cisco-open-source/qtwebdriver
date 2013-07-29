@@ -218,7 +218,7 @@
               'libraries': ['-lQt5WebKitWidgets', '-lQt5WebKit',],
             } ],
             [ 'OS=="win"', {
-              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit',],
+              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
             [ 'OS=="mac"', {
               'link_settings': {
