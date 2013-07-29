@@ -90,6 +90,7 @@
               '-lQtXmlPatterns',
               '-lQtGui',
               '-lQtCore',
+              '-lQtDeclarative',
               '-lpthread',
               '-lrt',
               '-ldl',
@@ -192,7 +193,17 @@
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
         'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
         'test_widgets',
+      ],
+
+      'conditions': [
+        [ '<(QT5) == 1', {
+          # TODO:
+          # 'dependencies': [ 'wd_ext_qt.gyp:WebDriver_extension_qt_quick_2' ],
+        } , {
+          'dependencies': [ 'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1' ],
+        } ],
       ],
 
       'defines': [ 'WD_TEST_ENABLE_WEB_VIEW=1' ],
@@ -253,6 +264,7 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
         'test_widgets',
       ],
       
@@ -279,6 +291,7 @@
         'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
         'test_widgets',
       ],
       

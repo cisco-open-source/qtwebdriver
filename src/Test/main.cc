@@ -40,6 +40,16 @@
 #include "webdriver_route_table.h"
 #include "shutdown_command.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+// TODO: put headers for Quick2 extension
+#else
+#include <QtDeclarative/QDeclarativeView>
+// headers for Quick1 extension
+#include "extension_qt/qml_view_creator.h"
+#include "extension_qt/qml_view_executor.h"
+#include "extension_qt/qml_view_enumerator.h"
+#endif
+
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
@@ -77,6 +87,18 @@ int main(int argc, char *argv[])
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    // TODO: put here registration of Quick2 extension
+#else
+    // Quick1 extension
+    webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
+    qmlCreator->RegisterViewClass<QDeclarativeView>("QDeclarativeView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
+#endif    
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
@@ -152,6 +174,7 @@ int main(int argc, char *argv[])
 
 	
 	setQtSettings();
+
     wd_server->Start();
 
     return app.exec();
