@@ -44,14 +44,10 @@
               '-licuuc',
               '-licudata',
               '-licui18n',
-#              '-lQt5WebKit',
-              '-lQt5WebKitWidgets',
             ],
           } ],
           ['OS=="win"', {
             'libraries': [
-             '-l<(QT_LIB_PATH)/Qt5WebKitWidgets',
-#             '-l<(QT_LIB_PATH)/Qt5WebKit',
              '-l<(QT_LIB_PATH)/Qt5Network',
              '-l<(QT_LIB_PATH)/Qt5Xml',
              '-l<(QT_LIB_PATH)/Qt5XmlPatterns',
@@ -97,7 +93,6 @@
               '-lpthread',
               '-lrt',
               '-ldl',
-              '-lQtWebKit',
             ],
           } ],
           [ 'OS=="win"', {
@@ -107,7 +102,6 @@
               '-l<(QT_LIB_PATH)/QtXmlPatterns4',
               '-l<(QT_LIB_PATH)/QtGui4',
               '-l<(QT_LIB_PATH)/QtCore4',
-              '-l<(QT_LIB_PATH)/QtWebKit4',
               '-luser32.lib',
               '-lws2_32.lib',
               '-lshell32.lib',
