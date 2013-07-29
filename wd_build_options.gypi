@@ -58,6 +58,24 @@
        ],
     } ],
 
+    [ 'OS == "android"', {
+       'actions': [ {
+         'action_name': 'input_dir',
+         'inputs':      [],
+         'outputs':     ['<(INTERMEDIATE_DIR)'],
+         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],     
+       } ],
+       'defines': [ 
+         'OS_ANDROID',
+         '_GLIBCXX_PERMIT_BACKWARD_HASH',
+       ],
+       'include_dirs': [
+          '<(ANDROID_INC)',
+          '<(ANDROID_LIB_INC)',
+          '<(ANDROID_PLATFORM_INC)'
+        ],
+    } ],
+     
     [ 'OS == "win"', {
       'defines': [
          '_WIN32',
