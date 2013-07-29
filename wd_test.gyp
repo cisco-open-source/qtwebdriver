@@ -34,7 +34,6 @@
               '-lQt5Qml',
               '-lQt5Sql',
               '-lQt5Declarative',
-              '-lQt5XmlPatterns',
               '-lQt5Xml',
               '-lQt5Gui',
               '-lQt5Core',
@@ -50,7 +49,6 @@
             'libraries': [
              '-l<(QT_LIB_PATH)/Qt5Network',
              '-l<(QT_LIB_PATH)/Qt5Xml',
-             '-l<(QT_LIB_PATH)/Qt5XmlPatterns',
              '-l<(QT_LIB_PATH)/Qt5Gui',
              '-l<(QT_LIB_PATH)/Qt5Core',
              '-l<(QT_LIB_PATH)/Qt5Widgets',
@@ -68,7 +66,6 @@
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
                 '<(QT_LIB_PATH)/libQt5Xml.a',
-                '<(QT_LIB_PATH)/libQt5XmlPatterns.a',
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
@@ -87,7 +84,6 @@
               '-L<(QT_LIB_PATH)',
               '-lQtNetwork',
               '-lQtXml',
-              '-lQtXmlPatterns',
               '-lQtGui',
               '-lQtCore',
               '-lpthread',
@@ -99,7 +95,6 @@
             'libraries': [
               '-l<(QT_LIB_PATH)/QtNetwork4',
               '-l<(QT_LIB_PATH)/QtXml4',
-              '-l<(QT_LIB_PATH)/QtXmlPatterns4',
               '-l<(QT_LIB_PATH)/QtGui4',
               '-l<(QT_LIB_PATH)/QtCore4',
               '-luser32.lib',
@@ -117,7 +112,6 @@
                 '<(QT_LIB_PATH)/QtGui.framework',
                 '<(QT_LIB_PATH)/QtCore.framework',
                 '<(QT_LIB_PATH)/QtXml.framework',
-                '<(QT_LIB_PATH)/QtXmlPatterns.framework',
                 '<(QT_LIB_PATH)/QtNetwork.framework',
                 'Foundation.framework',
                 'CoreFoundation.framework',
@@ -188,6 +182,7 @@
       'product_name': 'WebDriver',
 
       'dependencies': [
+        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
@@ -250,6 +245,7 @@
       'product_name': 'WebDriver_noWebkit',
 
       'dependencies': [
+        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
@@ -276,6 +272,7 @@
       'product_name': 'WebDriver_noWebkit_sharedLibs',
 
       'dependencies': [
+        'pugixml.gyp:pugixml',
         'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
