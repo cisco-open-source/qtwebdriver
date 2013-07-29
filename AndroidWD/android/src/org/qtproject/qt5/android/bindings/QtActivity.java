@@ -74,9 +74,9 @@ import android.view.accessibility.AccessibilityEvent;
 import dalvik.system.DexClassLoader;
 
 //@ANDROID-11
-//QtCreator import android.app.Fragment;
-//QtCreator import android.view.ActionMode;
-//QtCreator import android.view.ActionMode.Callback;
+import android.app.Fragment;
+import android.view.ActionMode;
+import android.view.ActionMode.Callback;
 //@ANDROID-11
 
 public class QtActivity extends Activity
@@ -1275,130 +1275,130 @@ public class QtActivity extends Activity
     //////////////// Activity API 11 /////////////
 
 //@ANDROID-11
-//QtCreator     @Override
-//QtCreator     public boolean dispatchKeyShortcutEvent(KeyEvent event)
-//QtCreator     {
-//QtCreator         if (QtApplication.m_delegateObject != null  && QtApplication.dispatchKeyShortcutEvent != null)
-//QtCreator             return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.dispatchKeyShortcutEvent, event);
-//QtCreator         else
-//QtCreator             return super.dispatchKeyShortcutEvent(event);
-//QtCreator     }
-//QtCreator     public boolean super_dispatchKeyShortcutEvent(KeyEvent event)
-//QtCreator     {
-//QtCreator         return super.dispatchKeyShortcutEvent(event);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public void onActionModeFinished(ActionMode mode)
-//QtCreator     {
-//QtCreator         if (!QtApplication.invokeDelegate(mode).invoked)
-//QtCreator             super.onActionModeFinished(mode);
-//QtCreator     }
-//QtCreator     public void super_onActionModeFinished(ActionMode mode)
-//QtCreator     {
-//QtCreator         super.onActionModeFinished(mode);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public void onActionModeStarted(ActionMode mode)
-//QtCreator     {
-//QtCreator         if (!QtApplication.invokeDelegate(mode).invoked)
-//QtCreator             super.onActionModeStarted(mode);
-//QtCreator     }
-//QtCreator     public void super_onActionModeStarted(ActionMode mode)
-//QtCreator     {
-//QtCreator         super.onActionModeStarted(mode);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public void onAttachFragment(Fragment fragment)
-//QtCreator     {
-//QtCreator         if (!QtApplication.invokeDelegate(fragment).invoked)
-//QtCreator             super.onAttachFragment(fragment);
-//QtCreator     }
-//QtCreator     public void super_onAttachFragment(Fragment fragment)
-//QtCreator     {
-//QtCreator         super.onAttachFragment(fragment);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public View onCreateView(View parent, String name, Context context, AttributeSet attrs)
-//QtCreator     {
-//QtCreator         QtApplication.InvokeResult res = QtApplication.invokeDelegate(parent, name, context, attrs);
-//QtCreator         if (res.invoked)
-//QtCreator             return (View)res.methodReturns;
-//QtCreator         else
-//QtCreator             return super.onCreateView(parent, name, context, attrs);
-//QtCreator     }
-//QtCreator     public View super_onCreateView(View parent, String name, Context context,
-//QtCreator             AttributeSet attrs) {
-//QtCreator         return super.onCreateView(parent, name, context, attrs);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public boolean onKeyShortcut(int keyCode, KeyEvent event)
-//QtCreator     {
-//QtCreator         if (QtApplication.m_delegateObject != null  && QtApplication.onKeyShortcut != null)
-//QtCreator             return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.onKeyShortcut, keyCode,event);
-//QtCreator         else
-//QtCreator             return super.onKeyShortcut(keyCode, event);
-//QtCreator     }
-//QtCreator     public boolean super_onKeyShortcut(int keyCode, KeyEvent event)
-//QtCreator     {
-//QtCreator         return super.onKeyShortcut(keyCode, event);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public ActionMode onWindowStartingActionMode(Callback callback)
-//QtCreator     {
-//QtCreator         QtApplication.InvokeResult res = QtApplication.invokeDelegate(callback);
-//QtCreator         if (res.invoked)
-//QtCreator             return (ActionMode)res.methodReturns;
-//QtCreator         else
-//QtCreator             return super.onWindowStartingActionMode(callback);
-//QtCreator     }
-//QtCreator     public ActionMode super_onWindowStartingActionMode(Callback callback)
-//QtCreator     {
-//QtCreator         return super.onWindowStartingActionMode(callback);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
+    @Override
+    public boolean dispatchKeyShortcutEvent(KeyEvent event)
+    {
+        if (QtApplication.m_delegateObject != null  && QtApplication.dispatchKeyShortcutEvent != null)
+            return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.dispatchKeyShortcutEvent, event);
+        else
+            return super.dispatchKeyShortcutEvent(event);
+    }
+    public boolean super_dispatchKeyShortcutEvent(KeyEvent event)
+    {
+        return super.dispatchKeyShortcutEvent(event);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public void onActionModeFinished(ActionMode mode)
+    {
+        if (!QtApplication.invokeDelegate(mode).invoked)
+            super.onActionModeFinished(mode);
+    }
+    public void super_onActionModeFinished(ActionMode mode)
+    {
+        super.onActionModeFinished(mode);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public void onActionModeStarted(ActionMode mode)
+    {
+        if (!QtApplication.invokeDelegate(mode).invoked)
+            super.onActionModeStarted(mode);
+    }
+    public void super_onActionModeStarted(ActionMode mode)
+    {
+        super.onActionModeStarted(mode);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public void onAttachFragment(Fragment fragment)
+    {
+        if (!QtApplication.invokeDelegate(fragment).invoked)
+            super.onAttachFragment(fragment);
+    }
+    public void super_onAttachFragment(Fragment fragment)
+    {
+        super.onAttachFragment(fragment);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs)
+    {
+        QtApplication.InvokeResult res = QtApplication.invokeDelegate(parent, name, context, attrs);
+        if (res.invoked)
+            return (View)res.methodReturns;
+        else
+            return super.onCreateView(parent, name, context, attrs);
+    }
+    public View super_onCreateView(View parent, String name, Context context,
+            AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public boolean onKeyShortcut(int keyCode, KeyEvent event)
+    {
+        if (QtApplication.m_delegateObject != null  && QtApplication.onKeyShortcut != null)
+            return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.onKeyShortcut, keyCode,event);
+        else
+            return super.onKeyShortcut(keyCode, event);
+    }
+    public boolean super_onKeyShortcut(int keyCode, KeyEvent event)
+    {
+        return super.onKeyShortcut(keyCode, event);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public ActionMode onWindowStartingActionMode(Callback callback)
+    {
+        QtApplication.InvokeResult res = QtApplication.invokeDelegate(callback);
+        if (res.invoked)
+            return (ActionMode)res.methodReturns;
+        else
+            return super.onWindowStartingActionMode(callback);
+    }
+    public ActionMode super_onWindowStartingActionMode(Callback callback)
+    {
+        return super.onWindowStartingActionMode(callback);
+    }
+    //---------------------------------------------------------------------------
 //@ANDROID-11
     //////////////// Activity API 12 /////////////
 
 //@ANDROID-12
-//QtCreator     @Override
-//QtCreator     public boolean dispatchGenericMotionEvent(MotionEvent ev)
-//QtCreator     {
-//QtCreator         if (QtApplication.m_delegateObject != null  && QtApplication.dispatchGenericMotionEvent != null)
-//QtCreator             return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.dispatchGenericMotionEvent, ev);
-//QtCreator         else
-//QtCreator             return super.dispatchGenericMotionEvent(ev);
-//QtCreator     }
-//QtCreator     public boolean super_dispatchGenericMotionEvent(MotionEvent event)
-//QtCreator     {
-//QtCreator         return super.dispatchGenericMotionEvent(event);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
-//QtCreator 
-//QtCreator     @Override
-//QtCreator     public boolean onGenericMotionEvent(MotionEvent event)
-//QtCreator     {
-//QtCreator         if (QtApplication.m_delegateObject != null  && QtApplication.onGenericMotionEvent != null)
-//QtCreator             return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.onGenericMotionEvent, event);
-//QtCreator         else
-//QtCreator             return super.onGenericMotionEvent(event);
-//QtCreator     }
-//QtCreator     public boolean super_onGenericMotionEvent(MotionEvent event)
-//QtCreator     {
-//QtCreator         return super.onGenericMotionEvent(event);
-//QtCreator     }
-//QtCreator     //---------------------------------------------------------------------------
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent ev)
+    {
+        if (QtApplication.m_delegateObject != null  && QtApplication.dispatchGenericMotionEvent != null)
+            return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.dispatchGenericMotionEvent, ev);
+        else
+            return super.dispatchGenericMotionEvent(ev);
+    }
+    public boolean super_dispatchGenericMotionEvent(MotionEvent event)
+    {
+        return super.dispatchGenericMotionEvent(event);
+    }
+    //---------------------------------------------------------------------------
+
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event)
+    {
+        if (QtApplication.m_delegateObject != null  && QtApplication.onGenericMotionEvent != null)
+            return (Boolean) QtApplication.invokeDelegateMethod(QtApplication.onGenericMotionEvent, event);
+        else
+            return super.onGenericMotionEvent(event);
+    }
+    public boolean super_onGenericMotionEvent(MotionEvent event)
+    {
+        return super.onGenericMotionEvent(event);
+    }
+    //---------------------------------------------------------------------------
 //@ANDROID-12
 
 }

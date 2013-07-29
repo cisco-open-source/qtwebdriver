@@ -43,4 +43,4 @@ export GYP_DEFINES="OS=android"
 
 platform="android"
 
-./build.sh `pwd` $platform $mode
+./build.sh `pwd`/out $platform $mode

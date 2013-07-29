@@ -210,8 +210,8 @@
             'src/base/sys_info_mac.cc',
           ],
         } ],
-      ],
-      ['OS=="android"', {
+
+        ['OS=="android"', {
           'sources': [
             'src/base/string16.cc',
             'src/base/time_posix.cc',
@@ -247,6 +247,7 @@
             'src/base/android/jni_android.cc',
           ],
         } ],
+      ]
     } , {
       'target_name': 'chromium_base_shared',
       'type': 'shared_library',

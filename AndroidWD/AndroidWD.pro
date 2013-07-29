@@ -53,7 +53,8 @@ HEADERS += \
     ../src/Test/ClickTest.h \
     ../src/Test/ClickScrollingTest.h \
     ../src/Test/BasicMouseInterfaceTest.h \
-    ../src/Test/BasicKeyboardInterfaceTest.h
+    ../src/Test/BasicKeyboardInterfaceTest.h \
+    ../src/Test/shutdown_command.h
 
 SOURCES += \
     ../src/Test/XPathElementFindingTest.cc \
@@ -73,7 +74,8 @@ SOURCES += \
     ../src/Test/ClickTest.cc \
     ../src/Test/ClickScrollingTest.cc \
     ../src/Test/BasicMouseInterfaceTest.cc \
-    ../src/Test/BasicKeyboardInterfaceTest.cc
+    ../src/Test/BasicKeyboardInterfaceTest.cc \
+    ../src/Test/shutdown_command.cc
 
 FORMS += \
     ../src/Test/ElementSelectingTest.ui \
@@ -81,12 +83,13 @@ FORMS += \
 
 
 INCLUDEPATH += ../inc/ \
+    ../src/
 
 
 CONFIG( debug, debug|release ) {
-LIBS += -L../bin/android/release_dbg/
+LIBS += -L../out/bin/android/release_dbg/
 } else {
-LIBS += -L../bin/android/release/
+LIBS += -L../out/bin/android/release/
 }
 
 LIBS += -lWebDriver_extension_qt_base \
