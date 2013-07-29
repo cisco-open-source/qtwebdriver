@@ -212,9 +212,6 @@
         } ],
       ],
       ['OS=="android"', {
-          'defines': [
-            'OS_ANDROID',
-          ],
           'sources': [
             'src/base/string16.cc',
             'src/base/time_posix.cc',
