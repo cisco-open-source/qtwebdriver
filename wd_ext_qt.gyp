@@ -49,18 +49,10 @@
         '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
-        'src/webdriver/extension_qt/wd_event_dispatcher.cc'
+        'src/webdriver/extension_qt/wd_event_dispatcher.cc',
+        'src/third_party/pugixml/pugixml.cpp'
       ],
 
-      'conditions': [
-
-        [ '<(WD_CONFIG_XPATH) == 1', {
-          'defines': [
-            'WD_CONFIG_XPATH',
-          ],
-        } ],
-       
-      ],
     }, {
       'target_name': 'WebDriver_extension_qt_web',
       'type': 'static_library',

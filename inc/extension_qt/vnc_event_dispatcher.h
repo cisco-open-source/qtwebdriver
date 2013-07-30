@@ -13,6 +13,9 @@ public:
     bool dispatch(QEvent *event, bool consumed);
 
 private:
+    bool isRemoteControlEvent(QEvent *event);
+
+private:
     VNCClient *_vncClient;
 };
 

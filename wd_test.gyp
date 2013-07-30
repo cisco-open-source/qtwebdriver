@@ -34,8 +34,6 @@
               '-lQt5Qml',
               '-lQt5Sql',
               '-lQt5Declarative',
-              '-lQt5XmlPatterns',
-              '-lQt5Xml',
               '-lQt5Gui',
               '-lQt5Core',
               '-lpthread',
@@ -49,8 +47,6 @@
           ['OS=="win"', {
             'libraries': [
              '-l<(QT_LIB_PATH)/Qt5Network',
-             '-l<(QT_LIB_PATH)/Qt5Xml',
-             '-l<(QT_LIB_PATH)/Qt5XmlPatterns',
              '-l<(QT_LIB_PATH)/Qt5Gui',
              '-l<(QT_LIB_PATH)/Qt5Core',
              '-l<(QT_LIB_PATH)/Qt5Widgets',
@@ -67,8 +63,6 @@
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
-                '<(QT_LIB_PATH)/libQt5Xml.a',
-                '<(QT_LIB_PATH)/libQt5XmlPatterns.a',
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
@@ -86,8 +80,6 @@
             'libraries': [
               '-L<(QT_LIB_PATH)',
               '-lQtNetwork',
-              '-lQtXml',
-              '-lQtXmlPatterns',
               '-lQtGui',
               '-lQtCore',
               '-lpthread',
@@ -98,8 +90,6 @@
           [ 'OS=="win"', {
             'libraries': [
               '-l<(QT_LIB_PATH)/QtNetwork4',
-              '-l<(QT_LIB_PATH)/QtXml4',
-              '-l<(QT_LIB_PATH)/QtXmlPatterns4',
               '-l<(QT_LIB_PATH)/QtGui4',
               '-l<(QT_LIB_PATH)/QtCore4',
               '-luser32.lib',
@@ -116,8 +106,6 @@
               'libraries': [
                 '<(QT_LIB_PATH)/QtGui.framework',
                 '<(QT_LIB_PATH)/QtCore.framework',
-                '<(QT_LIB_PATH)/QtXml.framework',
-                '<(QT_LIB_PATH)/QtXmlPatterns.framework',
                 '<(QT_LIB_PATH)/QtNetwork.framework',
                 'Foundation.framework',
                 'CoreFoundation.framework',
@@ -221,7 +209,7 @@
               'libraries': ['-lQt5WebKitWidgets', '-lQt5WebKit',],
             } ],
             [ 'OS=="win"', {
-              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit',],
+              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
             [ 'OS=="mac"', {
               'link_settings': {
