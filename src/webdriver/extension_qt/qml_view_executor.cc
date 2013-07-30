@@ -647,88 +647,25 @@ void QQmlViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, E
 }
 
 void QQmlViewCmdExecutor::GetElementText(const ElementId& element, std::string* element_text, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    if (!pWidget->isVisible()) {
-        *element_text = "";
-        return;
-    }
+    QVariant propertyValue = pItem->property("text");
 
-    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
-    if (NULL != comboBox) {
-        *element_text = comboBox->currentText().toStdString();
-        return;
-    }
-
-    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
-    if (NULL != lineEdit) {
-        *element_text = lineEdit->text().toStdString();
-        return;
-    }
-
-    QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit*>(pWidget);
-    if (NULL != plainText) {
-        *element_text = plainText->toPlainText().toStdString();
-        return;
-    }
-
-    QTextEdit *pText = qobject_cast<QTextEdit*>(pWidget);
-    if (NULL != pText) {
-        *element_text = pText->toPlainText().toStdString();
-        return;
-    }
-
-    QPushButton *pushButton = qobject_cast<QPushButton*>(pWidget);
-    if (NULL != pushButton) {
-        *element_text = pushButton->text().toStdString();
-        return;
-    }
-
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
-    if (NULL != radioButton) {
-        *element_text = radioButton->text().toStdString();
-        return;
-    }
-
-    QLabel *label = qobject_cast<QLabel*>(pWidget);
-    if (NULL != label) {
-        *element_text = label->text().toStdString();
-        return;
-    }
-
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
-    if (NULL != checkBox) {
-        *element_text = checkBox->text().toStdString();
-        return;
-    }
-
-    QProgressBar *progressBar= qobject_cast<QProgressBar*>(pWidget);
-    if (NULL != progressBar) {
-        *element_text = progressBar->text().toStdString();
-        return;
-    }
-
-    QListView *listView = qobject_cast<QListView*>(pWidget);
-    if (NULL != listView)
-    {
-        QStringList list;
-        foreach(const QModelIndex &index, listView->selectionModel()->selectedIndexes())
-        {
-            list.append(index.data().toString());
+    if (propertyValue.isValid()) {
+        if (QVariant::String == propertyValue.type()) {
+            *element_text = propertyValue.toString().toStdString();
+        } else {
+            session_->logger().Log(kWarningLogLevel, "cant handle non-string \"text\" proprty.");
         }
-        *element_text = list.join("\n").toStdString();
-        return;
+    } else {
+        session_->logger().Log(kWarningLogLevel, "property not found.");
     }
-
-    *error = new Error(kNoSuchElement);
-*/    
 }
 
 void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
