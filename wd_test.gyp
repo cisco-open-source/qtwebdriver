@@ -203,6 +203,9 @@
         'src/Test/WindowWithEmbeddedViewTest.cc',
         'src/Test/WindowWithEmbeddedViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc',
+        'src/Test/WidgetAndWebViewTest.cc',
+        'src/Test/WidgetAndWebViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WidgetAndWebViewTest.cc',
       ],
 
       'conditions': [

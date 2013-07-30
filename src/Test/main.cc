@@ -31,7 +31,7 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
-#include "WindowWithEmbeddedViewTest.h"
+//#include "WindowWithEmbeddedViewTest.h"
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -45,6 +45,8 @@
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/qwebviewext.h"
+#include "WindowWithEmbeddedViewTest.h"
+#include "WidgetAndWebViewTest.h"
 #endif
 
 #include "extension_qt/q_view_runner.h"
@@ -104,6 +106,7 @@ int main(int argc, char *argv[])
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
+    widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
 
 
 #endif

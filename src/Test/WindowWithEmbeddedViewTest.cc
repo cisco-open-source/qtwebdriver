@@ -3,13 +3,12 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKitWidgets/QWebView>
 #else
-#include <QtWebKit/QtWebKit>
+#include <QtWebKit/QWebView>
 #endif
 
 
 WindowWithEmbeddedViewTestWidget::WindowWithEmbeddedViewTestWidget(QWidget *parent) :
-    QWidget(parent)
-{
+    QWidget(parent) {
     setWindowTitle("Test Window");
     pLineEdit = new QLineEdit();
     pLineEdit->setObjectName("inputURL");
