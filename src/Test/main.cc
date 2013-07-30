@@ -96,9 +96,10 @@ int main(int argc, char *argv[])
     webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
-#endif    
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
+    #endif    
+    
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
