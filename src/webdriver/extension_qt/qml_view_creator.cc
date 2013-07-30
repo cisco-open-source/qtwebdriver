@@ -64,12 +64,6 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 
             *view = handle;
 
-            {
-                QDeclarativeView* qmlview = qobject_cast<QDeclarativeView*>(widget);
-                qmlview->setSource(QUrl("/home/andriy/nds/native_driver/comcast-aqua/Main.qml"));
-            }
-
-
             return true;
         } else {
             logger.Log(kSevereLogLevel, "QQmlViewCreator, smth wrong.");

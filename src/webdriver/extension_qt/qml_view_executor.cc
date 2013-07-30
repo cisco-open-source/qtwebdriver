@@ -517,6 +517,7 @@ void QQmlViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_en
     QDeclarativeItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
+
     *is_enabled = pItem->isEnabled();
 }
 
@@ -537,19 +538,19 @@ void QQmlViewCmdExecutor::ElementEquals(const ElementId& element1, const Element
 }
 
 void QQmlViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+/*	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
+    QPoint pos = 
+    pWidget->mapToScene(0.0f, 0.0f));
 
     *location = Point(pos.x(), pos.y());
-*/
+    */
 }
 
 void QQmlViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
@@ -750,14 +751,23 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         // TODO:
         // FindNativeElementsByXpath(parentWidget, query, elements, error);
     } else {
+        // process root        
+        if (FilterElement(parentItem, locator, query)) {
+            ElementId elm;
+            session_->AddElement(view_id_, new QElementHandle(parentItem), &elm);
+            (*elements).push_back(elm);
+
+            session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+        }
+
         // list all child items and find matched locator
         QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
         foreach(QDeclarativeItem *child, childs) {
-//            qDebug() << "-----------------";
-//            qDebug() << "className: " << child->metaObject()->className();
-//            qDebug() << "objectName: " << child->objectName();
-//            qDebug() << "prop id: " << child->property("id");
-//            qDebug() << "prop name: " << child->property("name");
+            qDebug() << "-----------------";
+            qDebug() << "className: " << child->metaObject()->className();
+            qDebug() << "objectName: " << child->objectName();
+            qDebug() << "prop id: " << child->property("id");
+            qDebug() << "prop name: " << child->property("name");
     
             if (FilterElement(child, locator, query)) {
                 ElementId elm;
