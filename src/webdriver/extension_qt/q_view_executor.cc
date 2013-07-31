@@ -5,6 +5,8 @@
 #include "q_key_converter.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "extension_qt/event_dispatcher.h"
+#include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -150,7 +152,11 @@ void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(view, &(*it));
+
+        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
+
+        if (!consumed)
+            qApp->sendEvent(view, &(*it));
         ++it;
     }
 }

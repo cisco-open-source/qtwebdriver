@@ -164,11 +164,7 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-
-        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
-
-        if (!consumed)
-            qApp->sendEvent(pWidget, &(*it));
+        qApp->sendEvent(pWidget, &(*it));
         ++it;
     }
 }
