@@ -153,6 +153,17 @@ public:
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) = 0;
     /// Overrides the current geolocation.
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) = 0;
+    /// Touch commands emulation
+    virtual void TouchClick(const ElementId& element, Error **error) = 0;
+    virtual void TouchDoubleClick(const ElementId& element, Error **error) = 0;
+    virtual void TouchDown(const int &x, const int &y, Error **error) = 0;
+    virtual void TouchUp(const int &x, const int &y, Error **error) = 0;
+    virtual void TouchMove(const int &x, const int &y, Error **error) = 0;
+    virtual void TouchLongClick(const ElementId& element, Error **error) = 0;
+    virtual void TouchScroll(const int &xoffset, const int &yoffset, Error **error) = 0;
+    virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) = 0;
+    virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) = 0;
+    virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) = 0;
 
 protected:
     Session* session_;

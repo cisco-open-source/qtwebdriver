@@ -83,6 +83,16 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchDoubleClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchDown(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchUp(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchMove(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchLongClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchScroll(const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

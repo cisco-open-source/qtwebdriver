@@ -74,6 +74,14 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSessionStorageKey);
 		standardCommandRoutes.insert(kSessionStorageSize);
 		standardCommandRoutes.insert(kGetLocation);
+        standardCommandRoutes.insert(kTouchClick);
+        standardCommandRoutes.insert(kTouchDown);
+        standardCommandRoutes.insert(kTouchUp);
+        standardCommandRoutes.insert(kTouchMove);
+        standardCommandRoutes.insert(kTouchScroll);
+        standardCommandRoutes.insert(kTouchDoubleClick);
+        standardCommandRoutes.insert(kTouchLongClick);
+        standardCommandRoutes.insert(kTouchFlick);
 		standardCommandRoutes.insert(kXdrpc);
 	}
 
@@ -148,6 +156,14 @@ const char CommandRoutes::kSessionStorage[] 			= "/session/*/session_storage";
 const char CommandRoutes::kSessionStorageKey[] 			= "/session/*/session_storage/key/*";
 const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/size";
 const char CommandRoutes::kGetLocation[]				= "/session/*/location";
+const char CommandRoutes::kTouchClick[] 				= "/session/*/touch/click";
+const char CommandRoutes::kTouchDown[]  				= "/session/*/touch/down";
+const char CommandRoutes::kTouchUp[]    				= "/session/*/touch/up";
+const char CommandRoutes::kTouchMove[]  				= "/session/*/touch/move";
+const char CommandRoutes::kTouchScroll[]  				= "/session/*/touch/scroll";
+const char CommandRoutes::kTouchDoubleClick[]			= "/session/*/touch/doubleclick";
+const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
+const char CommandRoutes::kTouchFlick[]		        	= "/session/*/touch/flick";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 
 } // namespace webdriver
