@@ -114,13 +114,15 @@ void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
 }
 
 void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     QDeclarativeItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
+
+    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(view->scene()->focusItem());
 
     if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
@@ -147,15 +149,25 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
         return;
     }
 
+    // set focus to element
+    pItem->setFocus(true);
+    if (!pItem->hasFocus()) {
+        // restore old focus
+        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
+
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
         qApp->sendEvent(view, &(*it));
         ++it;
     }
 
-    {
-        view->rotate(45);
-    }
+    // restore old focus
+    if (NULL != pFocusItem)
+        pFocusItem->setFocus(true);
 }
 
 void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -516,7 +528,7 @@ void QQmlViewCmdExecutor::ElementEquals(const ElementId& element1, const Element
 }
 
 void QQmlViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
-/*	QDeclarativeView* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -524,28 +536,25 @@ void QQmlViewCmdExecutor::GetElementLocation(const ElementId& element, Point* lo
     if (NULL == pItem)
         return;
 
-    QPoint pos = 
-    pWidget->mapToScene(0.0f, 0.0f));
+    QPointF scenePos = pItem->scenePos();
 
-    *location = Point(pos.x(), pos.y());
-*/
+    *location = Point(scenePos.x(), scenePos.y());
 }
 
 void QQmlViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
+    QPointF scenePos = pItem->scenePos();
+    QPoint pos = view->mapFromScene(scenePos);
 
-    // TODO: take into account scrollable area
+    // TODO: need check if pos fits into viewport?    
     *location = Point(pos.x(), pos.y());
-*/    
 }
 
 void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
@@ -644,25 +653,21 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
 }
 
 void QQmlViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget *focusWidget = QApplication::focusWidget();
-    if (NULL == focusWidget || view == focusWidget) {
+    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(view->scene()->focusItem());
+    if (NULL == pFocusItem) {
         *error = new Error(kNoSuchElement);
         return;
     }
 
-    // TODO: do we need to check if focusWidget is child of view?
-
     ElementId active_element;
 
-    session_->AddElement(view_id_, new QElementHandle(focusWidget), &active_element);
+    session_->AddElement(view_id_, new QElementHandle(pFocusItem), &active_element);
 
     *element = active_element;
-*/    
 }
 
 void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
