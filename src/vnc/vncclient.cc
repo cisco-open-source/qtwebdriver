@@ -59,18 +59,21 @@ VNCClient::VNCClient()
     : _socket(NULL),
       _versionEstablished(false),
       _securityEstablished(false),
+      _autenticationPassed(false),
       _handshakeFinished(false),
       _communicationError(false),
       _isReady(false),
       _establishedVersion(38),
       _establishedSecurity(Invalid),
-      _serverParameters(NULL)
+      _serverParameters(NULL),
+      _password(NULL)
 {
 }
 
 VNCClient::~VNCClient()
 {
     delete _serverParameters;
+    delete _password;
 }
 
 VNCClient* VNCClient::getInstance()
@@ -94,7 +97,30 @@ bool VNCClient::Init(QString remoteHost, quint16 port)
         addr.setAddress(remoteHost);
     }
 
+    // QObject::connect(_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(readSocket(qint64)));
+    QObject::connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
+    QObject::connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)),
+                     this, SLOT(onError(QAbstractSocket::SocketError)));
+    QObject::connect(_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
+                     this, SLOT(onStateChanged(QAbstractSocket::SocketState)));
+
     _socket->connectToHost(addr, port);
+    _socket->waitForConnected();
+
+    return _socket->isOpen();
+}
+
+bool VNCClient::Init(QString remoteHost, quint16 port, QString* password)
+{
+    _password = password;
+    _socket = new QTcpSocket();
+    QHostAddress addr;
+
+    if (!addr.setAddress(remoteHost))
+    {
+        remoteHost.replace(QRegExp("http*://"), "");
+        addr.setAddress(remoteHost);
+    }
 
     // QObject::connect(_socket, SIGNAL(bytesWritten(qint64)), this, SLOT(readSocket(qint64)));
     QObject::connect(_socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
@@ -102,6 +128,9 @@ bool VNCClient::Init(QString remoteHost, quint16 port)
                      this, SLOT(onError(QAbstractSocket::SocketError)));
     QObject::connect(_socket, SIGNAL(stateChanged(QAbstractSocket::SocketState)),
                      this, SLOT(onStateChanged(QAbstractSocket::SocketState)));
+
+    _socket->connectToHost(addr, port);
+    _socket->waitForConnected();
 
     return _socket->isOpen();
 }
@@ -129,6 +158,12 @@ QByteArray VNCClient::readSocket()
         }
         establishSecurity(data);
         return data;
+    }
+
+    // Go through autentication
+    if (!_autenticationPassed && VNCAuthentication == _establishedSecurity)
+    {
+        // todo
     }
     if (!_handshakeFinished)
     {
@@ -164,6 +199,12 @@ QByteArray VNCClient::readSocket(qint64 size)
         establishSecurity(data);
         return data;
     }
+
+    // Go through autentication
+    if (!_autenticationPassed && VNCAuthentication == _establishedSecurity)
+    {
+        // todo
+    }
     if (!_handshakeFinished)
     {
         finishHandshaking(data);
@@ -179,8 +220,17 @@ QByteArray VNCClient::readSocket(qint64 size)
 
 qint64 VNCClient::writeToSocket(QByteArray &data)
 {
-    int bytesNmb = _socket->write(data);
-    _socket->flush();
+    int bytesNmb = 0;
+
+    if (QAbstractSocket::ConnectedState == _socket->state())
+    {
+        bytesNmb = _socket->write(data);
+        _socket->flush();
+    }
+    else
+    {
+        std::cout << "#### Socket isn't in connected state. Couldn't write to socket" << std::endl;
+    }
 
     return bytesNmb;
 }
@@ -304,7 +354,20 @@ bool VNCClient::establishSecurity(QByteArray& data)
                 }
                 case None:
                 {
-                    char one = 0x01;
+                    if (NULL == _password)
+                    {
+                        char one = 0x01;
+                        QByteArray response(1, one);
+                        writeToSocket(response);
+                        _securityEstablished = true;
+                        _establishedSecurity = None;
+                        return true;
+                    }
+                    break;
+                }
+                case VNCAuthentication:
+                {
+                    char one = 0x02;
                     QByteArray response(1, one);
                     writeToSocket(response);
                     _securityEstablished = true;
@@ -312,7 +375,6 @@ bool VNCClient::establishSecurity(QByteArray& data)
                     return true;
                     break;
                 }
-                case VNCAuthentication: break;
                 case RA2: break;
                 case RA2ne: break;
                 case Tight: break;
@@ -338,14 +400,30 @@ bool VNCClient::establishSecurity(QByteArray& data)
             }
             case None:
             {
-                _securityEstablished = true;
-                _establishedSecurity = None;
-                return true;
+                if (NULL == _password)
+                {
+                    _securityEstablished = true;
+                    _establishedSecurity = None;
+                    return true;
+                }
                 break;
             }
-            case VNCAuthentication: break;
+            case VNCAuthentication:
+            {
+                _securityEstablished = true;
+                _establishedSecurity = VNCAuthentication;
+                return true;
+            }
+            break;
         }
     }
+
+    return false;
+}
+
+bool VNCClient::passAutentication(QByteArray &data)
+{
+    return false;
 }
 
 bool VNCClient::finishHandshaking(QByteArray &data)
