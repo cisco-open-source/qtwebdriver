@@ -84,13 +84,13 @@ public:
 
 protected:
     QDeclarativeView* getView(const ViewId& viewId, Error** error);
-    typedef QHash<QString, QWidget*> XMLElementMap;    
+    typedef QHash<QString, QDeclarativeItem*> XMLElementMap;    
 
     QDeclarativeItem* getElement(const ElementId &element, Error** error);
     bool FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query);
 //    void FindElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-//    void createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource);
-//    void addElementToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource);
+    void createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
+    void addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QQmlViewCmdExecutor);

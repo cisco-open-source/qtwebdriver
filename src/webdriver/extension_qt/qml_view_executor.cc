@@ -16,11 +16,6 @@
 #include <QtCore/QDebug>
 #include <QtGui/QApplication>
 
-#ifdef WD_CONFIG_XPATH
-#include <QtXmlPatterns/QXmlQuery>
-#include <QtXmlPatterns/QXmlResultItems>
-#endif
-
 namespace webdriver {
 
 const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
@@ -95,22 +90,28 @@ void QQmlViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
 }
 
 void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
-/*	
-    QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
+
+    QDeclarativeItem* parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());
+    if (NULL == parentItem) {
+        session_->logger().Log(kInfoLogLevel, "no root element found.");    
+        *error = new Error(kUnknownError, "no root element found.");
+        return;
+    }
 
     XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-    createUIXML(view, &buff, elementsMap, error, true);
+
+    createUIXML(parentItem, &buff, elementsMap, error);
 
     if (*error)
         return;
 
     *source = byteArray.data();
-*/
 }
 
 void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -795,8 +796,7 @@ void QQmlViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::
 }
 */
 
-/*
-void QQmlViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource) {
+void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
     
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 
@@ -804,50 +804,33 @@ void QQmlViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLEleme
     writer->setAutoFormatting(true);
     writer->writeStartDocument();
 
-    addWidgetToXML(parent, elementsMap, writer, needAddWebSource);
+    addItemToXML(parent, elementsMap, writer);
 
     writer->writeEndDocument();
 
     delete writer;
-    
 }
-*/
 
-/*
-void QQmlViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource) {
+void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
     
     writer->writeStartElement(parent->metaObject()->className());
 
     if (!parent->objectName().isEmpty())
         writer->writeAttribute("id", parent->objectName());
 
-    if (!parent->windowTitle().isEmpty())
-        writer->writeAttribute("name", parent->windowTitle());
-
     QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QWidget>(parent));
+    elementsMap.insert(elementKey, QPointer<QDeclarativeItem>(parent));
     writer->writeAttribute("elementId", elementKey);
 
-// TODO: this executor doesnt know anything about qwebview
-//    QWebView* webview = qobject_cast<QWebView*>(parent);
-//    if (webview && needAddWebSource)
-//    {
-//        writer->writeCharacters(webview->page()->mainFrame()->toHtml());
-//    }
-//    else
-    {
-        QList<QObject*> childs = parent->children();
-        foreach(QObject *child, childs) {
-            QWidget* childWgt = qobject_cast<QWidget*>(child);
-            if (childWgt)
-                addWidgetToXML(childWgt, elementsMap, writer, needAddWebSource);
-        }
+    QList<QObject*> childs = parent->children();
+    foreach(QObject *child, childs) {
+        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
+        if (childItem)
+            addItemToXML(childItem, elementsMap, writer);
     }
-    writer->writeEndElement();
-  
-}
-*/
 
+    writer->writeEndElement();
+}
 
 
 } //namespace webdriver 
