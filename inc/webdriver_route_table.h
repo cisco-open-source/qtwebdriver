@@ -1,37 +1,38 @@
-/*! \page page_commands_routing Commands, routes, route's table
-For managing commands routes webdriver::RouteTable class is used.
-It keeps pairs of url pattern and webdriver::Command derived class that
-can handle this route. 
+/// \page page_commands_routing Commands, routes, route's table
+/// For managing commands routes webdriver::RouteTable class is used.
+/// It keeps pairs of url pattern and webdriver::Command derived class that
+/// can handle this route. 
+/// 
+/// URL pattern is string with some segments wildcarded. Its allowed to wildcard only 
+/// whole segment with single symbol "*". All patterns from JsonWireProtocol protocol
+/// (https://code.google.com/p/selenium/wiki/JsonWireProtocol) can be referenced by
+/// constant in webdriver::CommandRoutes class.
+/// 
+/// Samples of standard patterns:
+/// \code
+/// const char CommandRoutes::kNewSession[]   = "/session";
+/// const char CommandRoutes::kSession[]      = "/session/*";
+/// const char CommandRoutes::kSessions[]     = "/sessions";
+/// \endcode
+/// 
+/// It is usefull to create webdriver::DefaultRouteTable object with default
+/// routes and then modify it by removing, adding, replacing routes.
+/// 
+/// Sample of adding routes:
+/// \code
+/// route_table.Add<SessionStorageCommand>     (CommandRoutes::kSessionStorage);
+/// route_table.Add<SessionStorageKeyCommand>  (CommandRoutes::kSessionStorageKey);
+/// route_table.Add<SessionStorageSizeCommand> (CommandRoutes::kSessionStorageSize);
+/// route_table.Add<HTML5LocationCommand>      (CommandRoutes::kGetLocation);
+/// route_table.Add<XDRPCCommand>              (CommandRoutes::kXdrpc);
+/// \endcode
+/// 
+/// Another note is that webdriver::RouteTable::Add() method will refuse non-standard
+/// routes that dont comply vendor-specific syntax.
+/// 
+/// \todo place here some description about commands 
+/// 
 
-URL pattern is string with some segments wildcarded. Its allowed to wildcard only 
-whole segment with single symbol "*". All patterns from JsonWireProtocol protocol
-(https://code.google.com/p/selenium/wiki/JsonWireProtocol) can be referenced by
-constant in webdriver::CommandRoutes class.
-
-Samples of standard patterns:
-\code
-const char CommandRoutes::kNewSession[]   = "/session";
-const char CommandRoutes::kSession[]      = "/session/*";
-const char CommandRoutes::kSessions[]     = "/sessions";
-\endcode
-
-It is usefull to create webdriver::DefaultRouteTable object with default
-routes and then modify it by removing, adding, replacing routes.
-
-Sample of adding routes:
-\code
-route_table.Add<SessionStorageCommand>     (CommandRoutes::kSessionStorage);
-route_table.Add<SessionStorageKeyCommand>  (CommandRoutes::kSessionStorageKey);
-route_table.Add<SessionStorageSizeCommand> (CommandRoutes::kSessionStorageSize);
-route_table.Add<HTML5LocationCommand>      (CommandRoutes::kGetLocation);
-route_table.Add<XDRPCCommand>              (CommandRoutes::kXdrpc);
-\endcode
-
-Another note is that webdriver::RouteTable::Add() method will refuse non-standard
-routes that dont comply vendor-specific syntax.
-
-\todo place here some description about commands 
-*/
 #ifndef WEBDRIVER_ROUTE_TABLE_H_
 #define WEBDRIVER_ROUTE_TABLE_H_
 
