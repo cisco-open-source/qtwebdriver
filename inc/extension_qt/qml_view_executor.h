@@ -52,8 +52,8 @@ public:
     virtual void GetElementLocation(const ElementId& element, Point* location, Error** error);
     virtual void GetElementLocationInView(const ElementId& element, Point* location, Error** error);
     virtual void GetElementTagName(const ElementId& element, std::string* tag_name, Error** error);
-    virtual void IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error);
-    virtual void SetOptionElementSelected(const ElementId& element, bool selected, Error** error);
+    virtual void IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void SetOptionElementSelected(const ElementId& element, bool selected, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetElementSize(const ElementId& element, Size* size, Error** error);
     virtual void ElementSubmit(const ElementId& element, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetElementText(const ElementId& element, std::string* element_text, Error** error);

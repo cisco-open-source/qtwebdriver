@@ -114,21 +114,20 @@ void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
 }
 
 void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    if (!pWidget->isVisible()) {
+    if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
         return;
     }
 
-    if (!pWidget->isEnabled()) {
+    if (!pItem->isEnabled()) {
         *error = new Error(kInvalidElementState);
         return;
     }
@@ -150,10 +149,13 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(pWidget, &(*it));
+        qApp->sendEvent(view, &(*it));
         ++it;
     }
-*/    
+
+    {
+        view->rotate(45);
+    }
 }
 
 void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -443,58 +445,34 @@ void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::stri
 }
 
 void QQmlViewCmdExecutor::ClearElement(const ElementId& element, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    if (!pWidget->isVisible()) {
+    if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
         return;
     }
 
-    if (!pWidget->isEnabled()) {
+    if (!pItem->isEnabled()) {
         *error = new Error(kInvalidElementState);
         return;
     }
 
-    // check if we can clear element
-    QPlainTextEdit *plainTextEdit = qobject_cast<QPlainTextEdit*>(pWidget);
-    if (NULL != plainTextEdit) {
-        plainTextEdit->clear();
-        return;
-    }
+    QVariant propertyValue = pItem->property("text");
 
-    QTextEdit *textEdit = qobject_cast<QTextEdit*>(pWidget);
-    if (NULL != textEdit) {
-        textEdit->clear();
+    if (propertyValue.isValid()) {
+        pItem->setProperty("text", QVariant(""));
         return;
-    }
-
-    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
-    if (NULL != lineEdit) {
-        lineEdit->clear();
-        return;
-    }
-
-    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
-    if (NULL != comboBox) {
-        if (!comboBox->isEditable())
-        {
-            *error = new Error(kInvalidElementState);
-            return;
-        }
-
-        comboBox->clearEditText();
-        return;
-    }
+    } else {
+        session_->logger().Log(kWarningLogLevel, "there is no \"text\" property.");
+    }    
 
     *error = new Error(kInvalidElementState);
-*/    
 }
 
 void QQmlViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) {
@@ -550,7 +528,7 @@ void QQmlViewCmdExecutor::GetElementLocation(const ElementId& element, Point* lo
     pWidget->mapToScene(0.0f, 0.0f));
 
     *location = Point(pos.x(), pos.y());
-    */
+*/
 }
 
 void QQmlViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
@@ -580,58 +558,6 @@ void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
         return;
 
     *tag_name = pItem->metaObject()->className();
-}
-
-void QQmlViewCmdExecutor::IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
-        return;
-
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
-    if (NULL != checkBox) {
-        *is_selected = checkBox->isChecked();
-        return;
-    }
-
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
-    if (NULL != radioButton) {
-        *is_selected = radioButton->isChecked();
-        return;
-    }
-
-    *error = new Error(kInvalidElementState);
-*/    
-}
-
-void QQmlViewCmdExecutor::SetOptionElementSelected(const ElementId& element, bool selected, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
-        return;
-
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
-    if (NULL != checkBox) {
-        checkBox->setChecked(selected);
-        return;
-    }
-
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
-    if (NULL != radioButton) {
-        radioButton->setChecked(selected);
-        return;
-    }
-
-    *error = new Error(kInvalidElementState);
-*/    
 }
 
 void QQmlViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
