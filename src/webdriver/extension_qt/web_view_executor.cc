@@ -20,12 +20,11 @@
 #include "extension_qt/wd_event_dispatcher.h"
 
 #include <stdexcept>
-#include <curl/curl.h>
-#include <curl/easy.h>
 #include <QtCore/QtGlobal>
 #include <QtCore/QStringBuilder>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
+#include <QtNetwork/QNetworkReply>
 #include <QtCore/QTimer>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -171,272 +170,230 @@ void JSLogger::error(QVariant message)
     browserLogger.Log(kSevereLogLevel, message.toString().toStdString());
 }
 
-//TODO: extract QtCurl class
-extern "C" {
+QWebViewSourceAssembledCommand::QWebViewSourceAssembledCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
+    : executor_(executor), session_(session), view_(view)
+{}
 
-static size_t CurlDataHandler(void* ptr, size_t size, size_t nmemb, void* userdata) {
-    QByteArray* buffer = (QByteArray*)userdata;
-    buffer->append((const char*)ptr, size * nmemb);
-    return size * nmemb;
+void QWebViewSourceAssembledCommand::Execute(std::string* source, Error** error) {
+    // Convert DOM tree to valid XML.
+    const char* kSource =
+        "function() {\n"
+        "  var scripts = document.getElementsByTagName('script');\n"
+        "  for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {\n"
+        "    var script = scripts[scriptIndex];\n"
+        "    script.innerHTML = '';\n"
+        "  }\n"
+        "\n"
+        "  var xhtml = document.implementation.createDocument();\n"
+        "  xhtml = xhtml.importNode(document.documentElement, true);\n"
+        "\n"
+        "  return new XMLSerializer().serializeToString(xhtml);\n"
+        "}";
+
+    *error = executor_->ExecuteScriptAndParse(
+                executor_->GetFrame(view_, session_->current_frame()),
+                kSource,
+                "getSource",
+                new ListValue(),
+                CreateDirectValueParser(source));
+
+    session_->logger().Log(kInfoLogLevel, "[GetSource] before transform:");
+    session_->logger().Log(kInfoLogLevel, *source);
+
+    QSharedPointer<QDomDocument> document = ParseXml(QString::fromStdString(*source), error);
+    if (!document)
+        return;
+
+    QDomElement documentElement = document->documentElement();
+    AssemblePage(documentElement);
+
+    *source = document->toString().toStdString();
+
+    session_->logger().Log(kInfoLogLevel, "[GetSource] after transform:");
+    session_->logger().Log(kInfoLogLevel, *source);
 }
 
-static size_t CurlHeaderHandler(void *ptr, size_t size, size_t nmemb, void *userdata) {
-    static const char* PREFIX = "Content-Type:";
-    static const int PREFIX_LEN = strlen(PREFIX);
+QSharedPointer<QDomDocument> QWebViewSourceAssembledCommand::ParseXml(const QString& input, Error** error) {
+    if (*error) throw std::invalid_argument("error");
 
-    const char* header = (const char*)ptr;
-    if (size * nmemb > PREFIX_LEN &&
-        strncmp(header, PREFIX, PREFIX_LEN) == 0 &&
-        userdata != NULL) {
-        QString* contentType = (QString*)userdata;
-        *contentType = QByteArray(header + PREFIX_LEN, size * nmemb - PREFIX_LEN);
-        *contentType = contentType->trimmed();
+    QString errorMsg;
+    int errorLine = 0, errorColumn = 0;
+    QSharedPointer<QDomDocument> document(new QDomDocument());
+    bool retval = document->setContent(input, &errorMsg, &errorLine, &errorColumn);
+    if (!retval) {
+        *error = new Error(kInternalServerError, errorMsg.toStdString());
+        return QSharedPointer<QDomDocument>();
     }
 
-    return size * nmemb;
+    return document;
 }
 
+void QWebViewSourceAssembledCommand::AssemblePage(QDomElement element) const {
+    if (element.tagName() == "img") {
+        AssembleImg(element);
+    }
+    if (element.tagName() == "link") {
+        AssembleLink(element);
+    }
+    if (element.tagName() == "style") {
+        AssembleStyle(element);
+    }
+
+    if (element.hasAttribute("style")) {
+        AssembleStyle(element.attributeNode("style"));
+    }
+
+    RemoveScripts(element);
+
+    // Chrome does like empty tags like <textarea/>
+    if (element.tagName() != "br" &&
+        element.childNodes().length() == 0)
+        element.appendChild(element.ownerDocument().createTextNode(" "));
+
+    // Recursively walk DOM tree
+    QDomNodeList children = element.childNodes();
+    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+        QDomNode child = children.at(childIndex);
+        if (child.nodeType() == QDomNode::ElementNode) {
+            QDomElement childElement = child.toElement();
+            AssemblePage(childElement);
+        }
+    }
 }
 
-class QWebViewSourceAssembledCommand
-{
-public:
-    QWebViewSourceAssembledCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
-        : executor_(executor), session_(session), view_(view)
-    {}
+void QWebViewSourceAssembledCommand::AssembleLink(QDomElement element) const {
+    QString type = element.attribute("type");
+    if (type != "text/css")
+        return;
 
-    void Execute(std::string* source, Error** error) {
-        // Convert DOM tree to valid XML.
-        const char* kSource =
-            "function() {\n"
-            "  var scripts = document.getElementsByTagName('script');\n"
-            "  for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {\n"
-            "    var script = scripts[scriptIndex];\n"
-            "    script.innerHTML = '';\n"
-            "  }\n"
-            "\n"
-            "  var xhtml = document.implementation.createDocument();\n"
-            "  xhtml = xhtml.importNode(document.documentElement, true);\n"
-            "\n"
-            "  return new XMLSerializer().serializeToString(xhtml);\n"
-            "}";
+    QString url = AbsoluteUrl(element.attribute("href"));
+    QByteArray file;
+    Download(url, &file, NULL);
 
-        *error = executor_->ExecuteScriptAndParse(
-                    executor_->GetFrame(view_, session_->current_frame()),
-                    kSource,
-                    "getSource",
-                    new ListValue(),
-                    CreateDirectValueParser(source));
+    QDomElement style = element.ownerDocument().createElement("style");
+    style.setAttribute("type", "text/css");
+    style.setNodeValue(file);
 
-        session_->logger().Log(kInfoLogLevel, "[GetSource] before transform:");
-        session_->logger().Log(kInfoLogLevel, *source);
+    element.parentNode().replaceChild(style, element);
+}
 
-        QSharedPointer<QDomDocument> document = ParseXml(QString::fromStdString(*source), error);
-        if (!document)
-            return;
+// Convert <img> tag 'src' attribute to base64
+void QWebViewSourceAssembledCommand::AssembleImg(QDomElement element) const {
+    QString url = element.attribute("src");
+    if (url.startsWith("data:"))
+        return;
 
-        QDomElement documentElement = document->documentElement();
-        AssemblePage(documentElement);
+    element.setAttribute("src", DownloadAndEncode(url));
+}
 
-        *source = document->toString().toStdString();
+void QWebViewSourceAssembledCommand::AssembleStyle(QDomElement element) const {
+    QString type = element.attribute("type");
+    if (type.length() != 0 && type != "text/css")
+        return;
 
-        session_->logger().Log(kInfoLogLevel, "[GetSource] after transform:");
-        session_->logger().Log(kInfoLogLevel, *source);
+    QString value = element.text();
+    value = AssembleStyle(value);
+    element.firstChild().toText().setData(value);
+}
+
+void QWebViewSourceAssembledCommand::AssembleStyle(QDomAttr attribute) const {
+    QString value = attribute.value();
+    value = AssembleStyle(value);
+    attribute.setValue(value);
+}
+
+QString QWebViewSourceAssembledCommand::AssembleStyle(const QString& value) const {
+    QRegExp regex(":\\s*url\\(([^\\)]+)\\)");
+    QString result;
+
+    int lastMatchEnd = 0;
+    int newMatchStart;
+    while ((newMatchStart = regex.indexIn(value, lastMatchEnd)) != -1) {
+        result += value.mid(lastMatchEnd, newMatchStart - lastMatchEnd);
+
+        QString url = regex.cap(1);
+        url = trimmed(url, " \t'\"");
+        url = DownloadAndEncode(url);
+        result += ":url('" + url + "')";
+
+        lastMatchEnd = newMatchStart + regex.matchedLength();
     }
 
-private:
-    static QSharedPointer<QDomDocument> ParseXml(const QString& input, Error** error) {
-        if (*error) throw std::invalid_argument("error");
-
-        QString errorMsg;
-        int errorLine = 0, errorColumn = 0;
-        QSharedPointer<QDomDocument> document(new QDomDocument());
-        bool retval = document->setContent(input, &errorMsg, &errorLine, &errorColumn);
-        if (!retval) {
-            *error = new Error(kInternalServerError, errorMsg.toStdString());
-            return QSharedPointer<QDomDocument>();
-        }
-
-        return document;
+    if (lastMatchEnd != value.length() - 1) {
+        result += value.mid(lastMatchEnd, value.length() - lastMatchEnd);
     }
+    return result;
+}
 
-    void AssemblePage(QDomElement element) const {
-        if (element.tagName() == "img") {
-            AssembleImg(element);
-        }
-        if (element.tagName() == "link") {
-            AssembleLink(element);
-        }
-        if (element.tagName() == "style") {
-            AssembleStyle(element);
-        }
+// Remove <script> tags
+void QWebViewSourceAssembledCommand::RemoveScripts(QDomElement element) const {
+    std::vector<QDomNode> scripts;
 
-        if (element.hasAttribute("style")) {
-            AssembleStyle(element.attributeNode("style"));
-        }
-
-        RemoveScripts(element);
-
-        // Chrome does like empty tags like <textarea/>
-        if (element.tagName() != "br" &&
-            element.childNodes().length() == 0)
-            element.appendChild(element.ownerDocument().createTextNode(" "));
-
-        // Recursively walk DOM tree
-        QDomNodeList children = element.childNodes();
-        for (int childIndex = 0; childIndex < children.length(); childIndex++) {
-            QDomNode child = children.at(childIndex);
-            if (child.nodeType() == QDomNode::ElementNode) {
-                QDomElement childElement = child.toElement();
-                AssemblePage(childElement);
+    QDomNodeList children = element.childNodes();
+    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+        QDomNode child = children.at(childIndex);
+        if (child.nodeType() == QDomNode::ElementNode) {
+            QDomElement childElement = child.toElement();
+            if (childElement.tagName() == "script") {
+                scripts.push_back(childElement);
             }
         }
     }
 
-    void AssembleLink(QDomElement element) const {
-        QString type = element.attribute("type");
-        if (type != "text/css")
-            return;
+    for (std::vector<QDomNode>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
+        element.removeChild(*it);
+    }
+}
 
-        QString url = AbsoluteUrl(element.attribute("href"));
-        QByteArray file;
-        Download(url, &file, NULL);
+QString QWebViewSourceAssembledCommand::AbsoluteUrl(const QString& url) const {
+    if (url.contains("://"))
+        return url;
 
-        QDomElement style = element.ownerDocument().createElement("style");
-        style.setAttribute("type", "text/css");
-        style.setNodeValue(file);
+    if (url.startsWith("//"))
+        return view_->url().scheme() + ":" + url;
+    else if (url.startsWith('/'))
+        return view_->url().scheme() + "://" + view_->url().host() + url;
+    else
+        return view_->url().scheme() + "://" + view_->url().host() + view_->url().path() + url;
+}
 
-        element.parentNode().replaceChild(style, element);
+void QWebViewSourceAssembledCommand::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
+    QString absoluteUrl = AbsoluteUrl(url);
+    QSharedPointer<QNetworkReply> reply(view_->page()->networkAccessManager()->get(QNetworkRequest(absoluteUrl)));
+
+    QEventLoop loop;
+    QObject::connect(reply.data(), SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    *buffer = reply->readAll();
+    *contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+}
+
+QString QWebViewSourceAssembledCommand::DownloadAndEncode(const QString& url) const {
+    QByteArray file;
+    QString contentType = "image";
+    Download(url, &file, &contentType);
+
+    QString base64 = file.toBase64();
+    return "data:" + contentType + ";base64," + base64;
+}
+
+QString QWebViewSourceAssembledCommand::trimmed(const QString& str, const QString& symbols) {
+    int start = 0;
+    while (start < str.length() && symbols.contains(str.at(start))) {
+        start++;
     }
 
-    // Convert <img> tag 'src' attribute to base64
-    void AssembleImg(QDomElement element) const {
-        QString url = element.attribute("src");
-        if (url.startsWith("data:"))
-            return;
-
-        element.setAttribute("src", DownloadAndEncode(url));
+    int end = str.length() - 1;
+    while (end >= 0 && symbols.contains(str.at(end))) {
+        end--;
     }
 
-    void AssembleStyle(QDomElement element) const {
-        QString type = element.attribute("type");
-        if (type.length() != 0 && type != "text/css")
-            return;
+    return str.mid(start, end + 1 - start);
+}
 
-        QString value = element.text();
-        value = AssembleStyle(value);
-        element.firstChild().toText().setData(value);
-    }
-
-    void AssembleStyle(QDomAttr attribute) const {
-        QString value = attribute.value();
-        value = AssembleStyle(value);
-        attribute.setValue(value);
-    }
-
-    QString AssembleStyle(const QString& value) const {
-        QRegExp regex(":\\s*url\\(([^\\)]+)\\)");
-        QString result;
-
-        int lastMatchEnd = 0;
-        int newMatchStart;
-        while ((newMatchStart = regex.indexIn(value, lastMatchEnd)) != -1) {
-            result += value.mid(lastMatchEnd, newMatchStart - lastMatchEnd);
-
-            QString url = regex.cap(1);
-            url = trimmed(url, " \t'\"");
-            url = DownloadAndEncode(url);
-            result += ":url('" + url + "')";
-
-            lastMatchEnd = newMatchStart + regex.matchedLength();
-        }
-
-        if (lastMatchEnd != value.length() - 1) {
-            result += value.mid(lastMatchEnd, value.length() - lastMatchEnd);
-        }
-        return result;
-    }
-
-    // Remove <script> tags
-    void RemoveScripts(QDomElement element) const {
-        std::vector<QDomNode> scripts;
-
-        QDomNodeList children = element.childNodes();
-        for (int childIndex = 0; childIndex < children.length(); childIndex++) {
-            QDomNode child = children.at(childIndex);
-            if (child.nodeType() == QDomNode::ElementNode) {
-                QDomElement childElement = child.toElement();
-                if (childElement.tagName() == "script") {
-                    scripts.push_back(childElement);
-                }
-            }
-        }
-
-        for (std::vector<QDomNode>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
-            element.removeChild(*it);
-        }
-    }
-
-    QString AbsoluteUrl(const QString& url) const {
-        if (url.contains("://"))
-            return url;
-
-        if (url.startsWith("//"))
-            return view_->url().scheme() + ":" + url;
-        else if (url.startsWith('/'))
-            return view_->url().scheme() + "://" + view_->url().host() + url;
-        else
-            return view_->url().scheme() + "://" + view_->url().host() + view_->url().path() + url;
-    }
-
-    void Download(const QString& url, QByteArray* buffer, QString* contentType) const {
-        CURL *curl = curl_easy_init();
-
-        QString absoluteUrl = AbsoluteUrl(url);
-        curl_easy_setopt(curl, CURLOPT_URL, absoluteUrl.toStdString().c_str());
-
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, buffer);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlDataHandler);
-
-        curl_easy_setopt(curl, CURLOPT_WRITEHEADER, contentType);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlHeaderHandler);
-
-        CURLcode retval = curl_easy_perform(curl);
-        if (retval != CURLE_OK) {
-            std::stringstream error;
-            error << "curl_easy_perform failed [" << retval << "]";
-            session_->logger().Log(kInfoLogLevel, error.str());
-        }
-        curl_easy_cleanup(curl);
-    }
-
-    QString DownloadAndEncode(const QString& url) const {
-        QByteArray file;
-        QString contentType = "image";
-        Download(url, &file, &contentType);
-
-        QString base64 = file.toBase64();
-        return "data:" + contentType + ";base64," + base64;
-    }
-
-    static QString trimmed(const QString& str, const QString& symbols) {
-        int start = 0;
-        while (start < str.length() && symbols.contains(str.at(start))) {
-            start++;
-        }
-
-        int end = str.length() - 1;
-        while (end >= 0 && symbols.contains(str.at(end))) {
-            end--;
-        }
-
-        return str.mid(start, end + 1 - start);
-    }
-
-    QWebViewCmdExecutor* executor_;
-    Session* session_;
-    QWebView* view_;
-};
+void QWebViewSourceAssembledCommand::DownloadFinished() {
+}
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 

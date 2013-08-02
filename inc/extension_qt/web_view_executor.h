@@ -16,6 +16,8 @@
 
 namespace webdriver {
 
+class QWebViewCmdExecutor;
+
 class FramePath;
 class ValueParser;
 
@@ -99,6 +101,41 @@ public slots:
 
 private:
     JSLogger jslogger;
+};
+
+class QWebViewSourceAssembledCommand : public QObject
+{
+    Q_OBJECT
+
+public:
+    QWebViewSourceAssembledCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
+
+    void Execute(std::string* source, Error** error);
+
+private:
+    static QSharedPointer<QDomDocument> ParseXml(const QString& input, Error** error);
+
+    void AssemblePage(QDomElement element) const;
+    void AssembleLink(QDomElement element) const;
+    void AssembleImg(QDomElement element) const;
+    void AssembleStyle(QDomElement element) const;
+    void AssembleStyle(QDomAttr attribute) const;
+    QString AssembleStyle(const QString& value) const;
+    void RemoveScripts(QDomElement element) const;
+
+    QString AbsoluteUrl(const QString& url) const;
+    void Download(const QString& url, QByteArray* buffer, QString* contentType) const;
+    QString DownloadAndEncode(const QString& url) const;
+
+    static QString trimmed(const QString& str, const QString& symbols);
+
+private Q_SLOTS:
+    void DownloadFinished();
+
+private:
+    QWebViewCmdExecutor* executor_;
+    Session* session_;
+    QWebView* view_;
 };
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {

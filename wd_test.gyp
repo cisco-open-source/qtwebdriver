@@ -83,7 +83,6 @@
               '-lQtGui',
               '-lQtXml',
               '-lQtCore',
-              '-lcurl',
               '-lpthread',
               '-lrt',
               '-ldl',
