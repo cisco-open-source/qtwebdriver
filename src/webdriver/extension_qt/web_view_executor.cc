@@ -19,7 +19,11 @@
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
 
+#include <stdexcept>
+#include <curl/curl.h>
+#include <curl/easy.h>
 #include <QtCore/QtGlobal>
+#include <QtCore/QStringBuilder>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
 #include <QtCore/QTimer>
@@ -324,10 +328,20 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
     if (NULL == view)
         return;
 
+    // Convert DOM tree to valid XML.
     const char* kSource =
-        "function() {"
-        "  return new XMLSerializer().serializeToString(document);"
-        "}";        
+        "function() {\n"
+        "  var scripts = document.getElementsByTagName('script');\n"
+        "  for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {\n"
+        "    var script = scripts[scriptIndex];\n"
+        "    script.innerHTML = '';\n"
+        "  }\n"
+        "\n"
+        "  var xhtml = document.implementation.createDocument();\n"
+        "  xhtml = xhtml.importNode(document.documentElement, true);\n"
+        "\n"
+        "  return new XMLSerializer().serializeToString(xhtml);\n"
+        "}";
 
     *error = ExecuteScriptAndParse(
                 GetFrame(view, session_->current_frame()),
@@ -335,6 +349,21 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
                 "getSource",
                 new ListValue(),
                 CreateDirectValueParser(source));
+
+    session_->logger().Log(kInfoLogLevel, "[GetSource] before transform:");
+    session_->logger().Log(kInfoLogLevel, *source);
+
+    QSharedPointer<QDomDocument> document = ParseXml(QString::fromStdString(*source), error);
+    if (!document)
+        return;
+
+    QDomElement documentElement = document->documentElement();
+    AssemblePage(documentElement);
+
+    *source = document->toString().toStdString();
+
+    session_->logger().Log(kInfoLogLevel, "[GetSource] after transform:");
+    session_->logger().Log(kInfoLogLevel, *source);
 }
 
 void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -479,6 +508,31 @@ void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     }
 }
 
+class QCursorMark : public QWidget
+{
+public:
+    explicit QCursorMark(QWidget* parent)
+        : QWidget(parent)
+    {
+        resize(2 * RADIUS, 2 * RADIUS);
+    }
+
+    virtual void paintEvent(QPaintEvent *event) {
+        QPainter painter(this);
+        painter.setPen(QPen(Qt::red));
+
+        QBrush brush = painter.brush();
+        brush.setColor(Qt::red);
+        brush.setStyle(Qt::SolidPattern);
+        painter.setBrush(brush);
+
+        painter.drawEllipse(QPoint(RADIUS, RADIUS), RADIUS, RADIUS);
+    }
+
+private:
+    static const int RADIUS = 5;
+};
+
 void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
     QWebView* view = getView(view_id_, error);
     if (NULL == view)
@@ -493,6 +547,7 @@ void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(prev_pos);
+    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
@@ -513,6 +568,7 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(location);
+    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
@@ -541,6 +597,7 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(location);
+    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
@@ -2223,5 +2280,236 @@ void QWebViewCmdExecutor::AddBrowserLoggerToView(QWebView* view)
     logHandler->loadConsoleJS(view);
 }
 
+void QWebViewCmdExecutor::DrawMark(const QPoint& point) const {
+    QWebView* view = QWebViewUtil::getWebView(session_, view_id_);
+
+    QList<QCursorMark*> marks = view->findChildren<QCursorMark*>();
+    QCursorMark* mark;
+    if (marks.empty()) {
+        mark = new QCursorMark(view);
+    } else  {
+        mark = marks.front();
+    }
+    mark->move(point);
+    mark->show();
+}
+
+QSharedPointer<QDomDocument> QWebViewCmdExecutor::ParseXml(const QString& input, Error** error) const {
+    if (*error) throw std::invalid_argument("error");
+
+    QString errorMsg;
+    int errorLine = 0, errorColumn = 0;
+    QSharedPointer<QDomDocument> document(new QDomDocument());
+    bool retval = document->setContent(input, &errorMsg, &errorLine, &errorColumn);
+    if (!retval) {
+        *error = new Error(kInternalServerError, errorMsg.toStdString());
+        return QSharedPointer<QDomDocument>();
+    }
+
+    return document;
+}
+
+void QWebViewCmdExecutor::AssemblePage(QDomElement element) const {
+    if (element.tagName() == "img") {
+        AssembleImg(element);
+    }
+    if (element.tagName() == "link") {
+        AssembleLink(element);
+    }
+    if (element.tagName() == "style") {
+        AssembleStyle(element);
+    }
+
+    if (element.hasAttribute("style")) {
+        AssembleStyle(element.attributeNode("style"));
+    }
+
+    // Chrome does not handle <textarea/>
+    if (element.tagName() == "textarea") {
+        if (element.childNodes().length() == 0)
+            element.appendChild(element.ownerDocument().createTextNode(" "));
+    }
+
+    RemoveScripts(element);
+
+    // Recursively walk DOM tree
+    QDomNodeList children = element.childNodes();
+    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+        QDomNode child = children.at(childIndex);
+        if (child.nodeType() == QDomNode::ElementNode) {
+            QDomElement childElement = child.toElement();
+            AssemblePage(childElement);
+        }
+    }
+}
+
+void QWebViewCmdExecutor::AssembleLink(QDomElement element) const {
+    QString type = element.attribute("type");
+    if (type != "text/css")
+        return;
+
+    QString url = AbsoluteUrl(element.attribute("href"));
+    QByteArray file;
+    Download(url, &file, NULL);
+
+    QDomElement style = element.ownerDocument().createElement("style");
+    style.setAttribute("type", "text/css");
+    style.setNodeValue(file);
+
+    element.parentNode().replaceChild(style, element);
+}
+
+// Convert <img> tag 'src' attribute to base64
+void QWebViewCmdExecutor::AssembleImg(QDomElement element) const {
+    QString url = element.attribute("src");
+    if (url.startsWith("data:"))
+        return;
+
+    element.setAttribute("src", DownloadAndEncode(url));
+}
+
+void QWebViewCmdExecutor::AssembleStyle(QDomElement element) const {
+    QString type = element.attribute("type");
+    if (type.length() != 0 && type != "text/css")
+        return;
+
+    QString value = element.text();
+    value = AssembleStyle(value);
+    element.firstChild().toText().setData(value);
+}
+
+void QWebViewCmdExecutor::AssembleStyle(QDomAttr attribute) const {
+    QString value = attribute.value();
+    value = AssembleStyle(value);
+    attribute.setValue(value);
+}
+
+QString QWebViewCmdExecutor::AssembleStyle(const QString& value) const {
+    QRegExp regex(":\\s*url\\(([^\\)]+)\\)");
+    QString result;
+
+    int lastMatchEnd = 0;
+    int newMatchStart;
+    while ((newMatchStart = regex.indexIn(value, lastMatchEnd)) != -1) {
+        result += value.mid(lastMatchEnd, newMatchStart - lastMatchEnd);
+
+        QString url = regex.cap(1);
+        url = trimmed(url, " \t'\"");
+        url = DownloadAndEncode(url);
+        result += ":url('" + url + "')";
+
+        lastMatchEnd = newMatchStart + regex.matchedLength();
+    }
+
+    if (lastMatchEnd != value.length() - 1) {
+        result += value.mid(lastMatchEnd, value.length() - lastMatchEnd);
+    }
+    return result;
+}
+
+// Remove <script> tags
+void QWebViewCmdExecutor::RemoveScripts(QDomElement element) const {
+    std::vector<QDomNode> scripts;
+
+    QDomNodeList children = element.childNodes();
+    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+        QDomNode child = children.at(childIndex);
+        if (child.nodeType() == QDomNode::ElementNode) {
+            QDomElement childElement = child.toElement();
+            if (childElement.tagName() == "script") {
+                scripts.push_back(childElement);
+            }
+        }
+    }
+
+    for (std::vector<QDomNode>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
+        element.removeChild(*it);
+    }
+}
+
+//TODO: extract QtCurl class
+extern "C" {
+
+static size_t CurlDataHandler(void* ptr, size_t size, size_t nmemb, void* userdata) {
+    QByteArray* buffer = (QByteArray*)userdata;
+    buffer->append((const char*)ptr, size * nmemb);
+    return size * nmemb;
+}
+
+static size_t CurlHeaderHandler(void *ptr, size_t size, size_t nmemb, void *userdata) {
+    static const char* PREFIX = "Content-Type:";
+    static const int PREFIX_LEN = strlen(PREFIX);
+
+    const char* header = (const char*)ptr;
+    if (size * nmemb > PREFIX_LEN &&
+        strncmp(header, PREFIX, PREFIX_LEN) == 0 &&
+        userdata != NULL) {
+        QString* contentType = (QString*)userdata;
+        *contentType = QByteArray(header + PREFIX_LEN, size * nmemb - PREFIX_LEN);
+        *contentType = contentType->trimmed();
+    }
+
+    return size * nmemb;
+}
+
+}
+
+QString QWebViewCmdExecutor::AbsoluteUrl(const QString& url) const {
+    if (url.contains("://"))
+        return url;
+
+    QWebView* view = QWebViewUtil::getWebView(session_, view_id_);
+
+    if (url.startsWith("//"))
+        return view->url().scheme() + ":" + url;
+    else if (url.startsWith('/'))
+        return view->url().scheme() + "://" + view->url().host() + url;
+    else
+        return view->url().scheme() + "://" + view->url().host() + view->url().path() + url;
+}
+
+void QWebViewCmdExecutor::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
+    CURL *curl = curl_easy_init();
+
+    QString absoluteUrl = AbsoluteUrl(url);
+    curl_easy_setopt(curl, CURLOPT_URL, absoluteUrl.toStdString().c_str());
+
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, buffer);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlDataHandler);
+
+    curl_easy_setopt(curl, CURLOPT_WRITEHEADER, contentType);
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, CurlHeaderHandler);
+
+    CURLcode retval = curl_easy_perform(curl);
+    if (retval != CURLE_OK) {
+        std::stringstream error;
+        error << "curl_easy_perform failed [" << retval << "]";
+        session_->logger().Log(kInfoLogLevel, error.str());
+    }
+    curl_easy_cleanup(curl);
+}
+
+QString QWebViewCmdExecutor::DownloadAndEncode(const QString& url) const {
+    QByteArray file;
+    QString contentType = "image";
+    Download(url, &file, &contentType);
+
+    QString base64 = file.toBase64();
+    return "data:" + contentType + ";base64," + base64;
+}
+
+QString QWebViewCmdExecutor::trimmed(const QString& str, const QString& symbols) {
+    int start = 0;
+    while (start < str.length() && symbols.contains(str.at(start))) {
+        start++;
+    }
+
+    int end = str.length() - 1;
+    while (end >= 0 && symbols.contains(str.at(end))) {
+        end--;
+    }
+
+    return str.mid(start, end + 1 - start);
+}
 
 } //namespace webdriver 
