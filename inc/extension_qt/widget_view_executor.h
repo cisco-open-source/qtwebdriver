@@ -37,7 +37,6 @@ public:
     virtual void GoBack(Error** error) NOT_SUPPORTED_IMPL;
     virtual void Reload(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetSource(std::string* source, Error** error);
-    virtual void GetSourceAssembled(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
@@ -94,6 +93,8 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
+
+    virtual void VisualizerSource(std::string* source, Error** error);
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

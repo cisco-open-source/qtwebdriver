@@ -103,12 +103,12 @@ private:
     JSLogger jslogger;
 };
 
-class QWebViewSourceAssembledCommand : public QObject
+class QWebViewVisualizerSourceCommand : public QObject
 {
     Q_OBJECT
 
 public:
-    QWebViewSourceAssembledCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
+    QWebViewVisualizerSourceCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
 
     void Execute(std::string* source, Error** error);
 
@@ -166,7 +166,6 @@ public:
     virtual void GoBack(Error** error);
     virtual void Reload(Error** error);
     virtual void GetSource(std::string* source, Error** error);
-    virtual void GetSourceAssembled(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
@@ -227,6 +226,7 @@ public:
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error);
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
 
+    virtual void VisualizerSource(std::string* source, Error** error);
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
@@ -322,7 +322,7 @@ protected:
 
 private:
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
-    friend class QWebViewSourceAssembledCommand;
+    friend class QWebViewVisualizerSourceCommand;
 
     void DrawMark(const QPoint& point) const;
 };

@@ -67,7 +67,6 @@ public:
     static const char kGetWindowHandles[];
     static const char kWindowCmd[];
     static const char kGetPageSource[];
-    static const char kGetPageSourceAssembled[];
     static const char kUrlCmd[];
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];
@@ -93,6 +92,7 @@ public:
     static const char kTouchLongClick[];
     static const char kTouchFlick[];
     static const char kXdrpc[];
+    static const char kVisualizerSource[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

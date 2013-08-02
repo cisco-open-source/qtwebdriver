@@ -281,7 +281,6 @@ DefaultRouteTable::DefaultRouteTable()
     Add<WindowHandlesCommand>           (CommandRoutes::kGetWindowHandles);
     Add<WindowCommand>                  (CommandRoutes::kWindowCmd);
     Add<SourceCommand>                  (CommandRoutes::kGetPageSource);
-    Add<SourceAssembledCommand>         (CommandRoutes::kGetPageSourceAssembled);
     Add<URLCommand>                     (CommandRoutes::kUrlCmd);
     Add<ExecuteCommand>                 (CommandRoutes::kExecuteScript);
     Add<ExecuteAsyncScriptCommand>      (CommandRoutes::kExecuteAsyncScript);
@@ -307,6 +306,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<TouchLongClickCommand>          (CommandRoutes::kTouchLongClick);
     Add<TouchFlickCommand>              (CommandRoutes::kTouchFlick);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
+    Add<VisualizerSourceCommand>        (CommandRoutes::kVisualizerSource);
 
 }
 

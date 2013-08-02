@@ -170,11 +170,11 @@ void JSLogger::error(QVariant message)
     browserLogger.Log(kSevereLogLevel, message.toString().toStdString());
 }
 
-QWebViewSourceAssembledCommand::QWebViewSourceAssembledCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
+QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
     : executor_(executor), session_(session), view_(view)
 {}
 
-void QWebViewSourceAssembledCommand::Execute(std::string* source, Error** error) {
+void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     // Convert DOM tree to valid XML.
     const char* kSource =
         "function() {\n"
@@ -197,7 +197,7 @@ void QWebViewSourceAssembledCommand::Execute(std::string* source, Error** error)
                 new ListValue(),
                 CreateDirectValueParser(source));
 
-    session_->logger().Log(kInfoLogLevel, "[GetSource] before transform:");
+    session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
 
     QSharedPointer<QDomDocument> document = ParseXml(QString::fromStdString(*source), error);
@@ -209,11 +209,11 @@ void QWebViewSourceAssembledCommand::Execute(std::string* source, Error** error)
 
     *source = document->toString().toStdString();
 
-    session_->logger().Log(kInfoLogLevel, "[GetSource] after transform:");
+    session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] after transform:");
     session_->logger().Log(kInfoLogLevel, *source);
 }
 
-QSharedPointer<QDomDocument> QWebViewSourceAssembledCommand::ParseXml(const QString& input, Error** error) {
+QSharedPointer<QDomDocument> QWebViewVisualizerSourceCommand::ParseXml(const QString& input, Error** error) {
     if (*error) throw std::invalid_argument("error");
 
     QString errorMsg;
@@ -228,7 +228,7 @@ QSharedPointer<QDomDocument> QWebViewSourceAssembledCommand::ParseXml(const QStr
     return document;
 }
 
-void QWebViewSourceAssembledCommand::AssemblePage(QDomElement element) const {
+void QWebViewVisualizerSourceCommand::AssemblePage(QDomElement element) const {
     if (element.tagName() == "img") {
         AssembleImg(element);
     }
@@ -261,7 +261,7 @@ void QWebViewSourceAssembledCommand::AssemblePage(QDomElement element) const {
     }
 }
 
-void QWebViewSourceAssembledCommand::AssembleLink(QDomElement element) const {
+void QWebViewVisualizerSourceCommand::AssembleLink(QDomElement element) const {
     QString type = element.attribute("type");
     if (type != "text/css")
         return;
@@ -278,7 +278,7 @@ void QWebViewSourceAssembledCommand::AssembleLink(QDomElement element) const {
 }
 
 // Convert <img> tag 'src' attribute to base64
-void QWebViewSourceAssembledCommand::AssembleImg(QDomElement element) const {
+void QWebViewVisualizerSourceCommand::AssembleImg(QDomElement element) const {
     QString url = element.attribute("src");
     if (url.startsWith("data:"))
         return;
@@ -286,7 +286,7 @@ void QWebViewSourceAssembledCommand::AssembleImg(QDomElement element) const {
     element.setAttribute("src", DownloadAndEncode(url));
 }
 
-void QWebViewSourceAssembledCommand::AssembleStyle(QDomElement element) const {
+void QWebViewVisualizerSourceCommand::AssembleStyle(QDomElement element) const {
     QString type = element.attribute("type");
     if (type.length() != 0 && type != "text/css")
         return;
@@ -296,13 +296,13 @@ void QWebViewSourceAssembledCommand::AssembleStyle(QDomElement element) const {
     element.firstChild().toText().setData(value);
 }
 
-void QWebViewSourceAssembledCommand::AssembleStyle(QDomAttr attribute) const {
+void QWebViewVisualizerSourceCommand::AssembleStyle(QDomAttr attribute) const {
     QString value = attribute.value();
     value = AssembleStyle(value);
     attribute.setValue(value);
 }
 
-QString QWebViewSourceAssembledCommand::AssembleStyle(const QString& value) const {
+QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) const {
     QRegExp regex(":\\s*url\\(([^\\)]+)\\)");
     QString result;
 
@@ -326,7 +326,7 @@ QString QWebViewSourceAssembledCommand::AssembleStyle(const QString& value) cons
 }
 
 // Remove <script> tags
-void QWebViewSourceAssembledCommand::RemoveScripts(QDomElement element) const {
+void QWebViewVisualizerSourceCommand::RemoveScripts(QDomElement element) const {
     std::vector<QDomNode> scripts;
 
     QDomNodeList children = element.childNodes();
@@ -345,7 +345,7 @@ void QWebViewSourceAssembledCommand::RemoveScripts(QDomElement element) const {
     }
 }
 
-QString QWebViewSourceAssembledCommand::AbsoluteUrl(const QString& url) const {
+QString QWebViewVisualizerSourceCommand::AbsoluteUrl(const QString& url) const {
     if (url.contains("://"))
         return url;
 
@@ -357,7 +357,7 @@ QString QWebViewSourceAssembledCommand::AbsoluteUrl(const QString& url) const {
         return view_->url().scheme() + "://" + view_->url().host() + view_->url().path() + url;
 }
 
-void QWebViewSourceAssembledCommand::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
+void QWebViewVisualizerSourceCommand::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
     QString absoluteUrl = AbsoluteUrl(url);
     QSharedPointer<QNetworkReply> reply(view_->page()->networkAccessManager()->get(QNetworkRequest(absoluteUrl)));
 
@@ -369,7 +369,7 @@ void QWebViewSourceAssembledCommand::Download(const QString& url, QByteArray* bu
     *contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
 }
 
-QString QWebViewSourceAssembledCommand::DownloadAndEncode(const QString& url) const {
+QString QWebViewVisualizerSourceCommand::DownloadAndEncode(const QString& url) const {
     QByteArray file;
     QString contentType = "image";
     Download(url, &file, &contentType);
@@ -378,7 +378,7 @@ QString QWebViewSourceAssembledCommand::DownloadAndEncode(const QString& url) co
     return "data:" + contentType + ";base64," + base64;
 }
 
-QString QWebViewSourceAssembledCommand::trimmed(const QString& str, const QString& symbols) {
+QString QWebViewVisualizerSourceCommand::trimmed(const QString& str, const QString& symbols) {
     int start = 0;
     while (start < str.length() && symbols.contains(str.at(start))) {
         start++;
@@ -392,7 +392,7 @@ QString QWebViewSourceAssembledCommand::trimmed(const QString& str, const QStrin
     return str.mid(start, end + 1 - start);
 }
 
-void QWebViewSourceAssembledCommand::DownloadFinished() {
+void QWebViewVisualizerSourceCommand::DownloadFinished() {
 }
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
@@ -563,15 +563,6 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
                 "getSource",
                 new ListValue(),
                 CreateDirectValueParser(source));
-}
-
-void QWebViewCmdExecutor::GetSourceAssembled(std::string* source, Error** error) {
-    QWebView* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    QWebViewSourceAssembledCommand command(this, session_, view);
-    command.Execute(source, error);
 }
 
 void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -1828,6 +1819,15 @@ void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **er
         return;
 
     *browserLog = logHandler->getLog();
+}
+
+void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWebViewVisualizerSourceCommand command(this, session_, view);
+    command.Execute(source, error);
 }
 
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {

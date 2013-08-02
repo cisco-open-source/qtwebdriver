@@ -88,7 +88,6 @@ public:
     virtual void Reload(Error** error) = 0;
     virtual void GetScreenShot(std::string* png, Error** error) = 0;
     virtual void GetSource(std::string* source, Error** error) = 0;
-    virtual void GetSourceAssembled(std::string* source, Error** error) = 0;
     virtual void SendKeys(const string16& keys, Error** error) = 0;
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;
     virtual void MouseDoubleClick(Error** error) = 0;
@@ -166,6 +165,8 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) = 0;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) = 0;
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error) {}
+
+    virtual void VisualizerSource(std::string* source, Error** error) = 0;
 
 protected:
     Session* session_;

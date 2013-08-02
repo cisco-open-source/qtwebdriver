@@ -34,17 +34,17 @@ private:
 };
 
 /// Get the page source with reference artifacts assembled inside.
-class SourceAssembledCommand : public ViewCommand {
+class VisualizerSourceCommand : public ViewCommand {
 public:
-    SourceAssembledCommand(const std::vector<std::string>& path_segments,
+    VisualizerSourceCommand(const std::vector<std::string>& path_segments,
                            const base::DictionaryValue* const parameters);
-    virtual ~SourceAssembledCommand();
+    virtual ~VisualizerSourceCommand();
 
     virtual bool DoesGet() const OVERRIDE;
     virtual void ExecuteGet(Response* const response) OVERRIDE;
 
 private:
-    DISALLOW_COPY_AND_ASSIGN(SourceAssembledCommand);
+    DISALLOW_COPY_AND_ASSIGN(VisualizerSourceCommand);
 };
 
 }  // namespace webdriver

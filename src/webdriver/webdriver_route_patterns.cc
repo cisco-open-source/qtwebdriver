@@ -140,7 +140,6 @@ const char CommandRoutes::kGetCurrentWindowHandle[]		= "/session/*/window_handle
 const char CommandRoutes::kGetWindowHandles[] 			= "/session/*/window_handles";
 const char CommandRoutes::kWindowCmd[] 					= "/session/*/window";
 const char CommandRoutes::kGetPageSource[] 				= "/session/*/source";
-const char CommandRoutes::kGetPageSourceAssembled[]     = "/session/*/-cisco-source_assembled";
 const char CommandRoutes::kUrlCmd[] 					= "/session/*/url";
 const char CommandRoutes::kExecuteScript[] 				= "/session/*/execute";
 const char CommandRoutes::kExecuteAsyncScript[] 		= "/session/*/execute_async";
@@ -166,5 +165,6 @@ const char CommandRoutes::kTouchDoubleClick[]			= "/session/*/touch/doubleclick"
 const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
 const char CommandRoutes::kTouchFlick[]		        	= "/session/*/touch/flick";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
+const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
 
 } // namespace webdriver
