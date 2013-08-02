@@ -503,10 +503,10 @@ void VNCClient::sendKeyEvent(QKeyEvent *key)
 
     quint32 keyValue = convertQtKeyToX11Key(key);
     char value[4];
-    value[0] = (char)(keyValue&0xff000000)>>24;
-    value[1] = (char)(keyValue&0x00ff0000)>>16;
-    value[2] = (char)(keyValue&0x0000ff00)>>8;
-    value[3] = (char)keyValue&0x000000ff;
+    value[0] = (char)((keyValue&0xff000000)>>24);
+    value[1] = (char)((keyValue&0x00ff0000)>>16);
+    value[2] = (char)((keyValue&0x0000ff00)>>8);
+    value[3] = (char)(keyValue&0x000000ff);
     keyMsg.insert(4, value[0]);
     keyMsg.insert(5, value[1]);
     keyMsg.insert(6, value[2]);
