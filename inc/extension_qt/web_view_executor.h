@@ -2,6 +2,7 @@
 #define WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
 
 #include "extension_qt/q_view_executor.h"
+#include "webdriver_logging.h"
 
 #include <QtCore/QtGlobal>
 
@@ -59,6 +60,44 @@ signals:
 private:
     QVariant res;
     bool isCompleted;
+};
+
+class JSLogger : public QObject
+{
+    Q_OBJECT
+
+public:
+    JSLogger();
+    base::ListValue* getLog();
+    void SetMinLogLevel(LogLevel level);
+
+public slots:
+    void log(QVariant message);
+    void warn(QVariant message);
+    void error(QVariant message);
+
+private:
+    InMemoryLog browserLog;
+    Logger browserLogger;
+};
+
+class BrowserLogHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    BrowserLogHandler(QObject* parent);
+    base::ListValue* getLog();
+    void SetMinLogLevel(LogLevel level);
+    void loadConsoleJS(const QWebView* view);
+    void loadJSLogObject(QWebFrame *frame);
+
+public slots:
+    void loadJSLogObject();
+    void loadConsoleJS();
+
+private:
+    JSLogger jslogger;
 };
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
@@ -147,6 +186,7 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error);
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error);
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error);
+    virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
 
 
 protected:
@@ -238,6 +278,8 @@ protected:
 	Error* GetClickableLocation(QWebView* view, const ElementId& element, Point* location);
 
 	Error* ToggleOptionElement(const ElementId& element);
+
+    void AddBrowserLoggerToView(QWebView* view);
 
 
 

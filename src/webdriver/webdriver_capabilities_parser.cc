@@ -62,6 +62,7 @@ Capabilities::Capabilities()
       load_async(false),
       caps(new DictionaryValue()) {
     log_levels[LogType::kDriver] = kAllLogLevel;
+    log_levels[LogType::kBrowser] = kAllLogLevel;
 }
 
 Capabilities::~Capabilities() { }

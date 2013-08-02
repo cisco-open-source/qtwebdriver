@@ -41,6 +41,7 @@ public:
     enum Type {
         kInvalid = -1,  /// invalid type
         kDriver,        /// driver
+        kBrowser,       /// browser (console.log)
         kNum            /// number of sources
     };
 
