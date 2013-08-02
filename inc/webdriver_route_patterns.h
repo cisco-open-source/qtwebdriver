@@ -67,6 +67,7 @@ public:
     static const char kGetWindowHandles[];
     static const char kWindowCmd[];
     static const char kGetPageSource[];
+    static const char kGetPageSourceAssembled[];
     static const char kUrlCmd[];
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];

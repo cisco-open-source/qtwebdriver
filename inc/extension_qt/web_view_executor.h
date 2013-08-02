@@ -129,6 +129,7 @@ public:
     virtual void GoBack(Error** error);
     virtual void Reload(Error** error);
     virtual void GetSource(std::string* source, Error** error);
+    virtual void GetSourceAssembled(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
@@ -284,25 +285,9 @@ protected:
 
 private:
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
+    friend class QWebViewSourceAssembledCommand;
 
     void DrawMark(const QPoint& point) const;
-
-    //TODO: extract to QWebViewSourceCommand
-    QSharedPointer<QDomDocument> ParseXml(const QString& input, Error** error) const;
-
-    void AssemblePage(QDomElement element) const;
-    void AssembleLink(QDomElement element) const;
-    void AssembleImg(QDomElement element) const;
-    void AssembleStyle(QDomElement element) const;
-    void AssembleStyle(QDomAttr attribute) const;
-    QString AssembleStyle(const QString& value) const;
-    void RemoveScripts(QDomElement element) const;
-
-    QString AbsoluteUrl(const QString& url) const;
-    void Download(const QString& url, QByteArray* buffer, QString* contentType) const;
-    QString DownloadAndEncode(const QString& url) const;
-
-    static QString trimmed(const QString& str, const QString& symbols);
 };
 
 }  // namespace webdriver

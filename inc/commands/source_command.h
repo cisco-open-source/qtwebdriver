@@ -33,6 +33,20 @@ private:
   	DISALLOW_COPY_AND_ASSIGN(SourceCommand);
 };
 
+/// Get the page source with reference artifacts assembled inside.
+class SourceAssembledCommand : public ViewCommand {
+public:
+    SourceAssembledCommand(const std::vector<std::string>& path_segments,
+                           const base::DictionaryValue* const parameters);
+    virtual ~SourceAssembledCommand();
+
+    virtual bool DoesGet() const OVERRIDE;
+    virtual void ExecuteGet(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(SourceAssembledCommand);
+};
+
 }  // namespace webdriver
 
 #endif  // WEBDRIVER_COMMANDS_SOURCE_COMMAND_H_

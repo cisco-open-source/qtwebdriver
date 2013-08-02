@@ -43,4 +43,33 @@ void SourceCommand::ExecuteGet(Response* const response) {
     response->SetValue(new StringValue(page_source));
 }
 
+SourceAssembledCommand::SourceAssembledCommand(
+    const std::vector<std::string>& path_segments,
+    const DictionaryValue* const parameters)
+    : ViewCommand(path_segments, parameters) {}
+
+SourceAssembledCommand::~SourceAssembledCommand() {}
+
+bool SourceAssembledCommand::DoesGet() const {
+    return true;
+}
+
+void SourceAssembledCommand::ExecuteGet(Response* const response) {
+    std::string page_source;
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetSourceAssembled,
+            base::Unretained(executor_.get()),
+            &page_source,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+
+    response->SetValue(new StringValue(page_source));
+}
+
 }  // namespace webdriver

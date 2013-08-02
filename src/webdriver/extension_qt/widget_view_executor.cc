@@ -128,6 +128,10 @@ void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
     *source = byteArray.data();
 }
 
+void QWidgetViewCmdExecutor::GetSourceAssembled(std::string* source, Error** error) {
+    GetSource(source, error);
+}
+
 void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
 	QWidget* view = getView(view_id_, error);
     if (NULL == view)
