@@ -2324,13 +2324,12 @@ void QWebViewCmdExecutor::AssemblePage(QDomElement element) const {
         AssembleStyle(element.attributeNode("style"));
     }
 
-    // Chrome does not handle <textarea/>
-    if (element.tagName() == "textarea") {
-        if (element.childNodes().length() == 0)
-            element.appendChild(element.ownerDocument().createTextNode(" "));
-    }
-
     RemoveScripts(element);
+
+    // Chrome does like empty tags like <textarea/>
+    if (element.tagName() != "br" &&
+        element.childNodes().length() == 0)
+        element.appendChild(element.ownerDocument().createTextNode(" "));
 
     // Recursively walk DOM tree
     QDomNodeList children = element.childNodes();
