@@ -172,103 +172,89 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 }
 
 void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint(point.x(), point.y());
 
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
-    }
+    QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
+    dbClckEvent->setScenePos(scenePoint);
+    dbClckEvent->setButton(Qt::LeftButton);
+    dbClckEvent->setButtons(Qt::LeftButton);
 
-    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::LeftButton);
 
-    QApplication::postEvent(receiverWidget, dbEvent);
-    QApplication::postEvent(receiverWidget, releaseEvent);
-*/
+    QApplication::postEvent(view->scene(), dbClckEvent);
+    QApplication::postEvent(view->scene(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint(point.x(), point.y());
 
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
-    }
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::LeftButton);
 
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(receiverWidget, releaseEvent);
-*/    
+    QApplication::postEvent(view->scene(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint(point.x(), point.y());
 
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
-    }
+    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+    pressEvent->setScenePos(scenePoint);
+    pressEvent->setButton(Qt::LeftButton);
+    pressEvent->setButtons(Qt::LeftButton);
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::sendEvent(receiverWidget, pressEvent);
-*/    
+    QApplication::postEvent(view->scene(), pressEvent);
 }
 
 void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
-
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
-    }
+    QPointF scenePoint(point.x(), point.y());
 
     Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
 
-    QApplication::postEvent(receiverWidget, pressEvent);
-    QApplication::postEvent(receiverWidget, releaseEvent);
-    if (Qt::RightButton == mouseButton) {
-        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
-        QApplication::postEvent(receiverWidget, contextEvent);
-    }
-*/    
+    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+    pressEvent->setScenePos(scenePoint);
+    pressEvent->setButton(mouseButton);
+    pressEvent->setButtons(mouseButton);
+
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(mouseButton);
+    releaseEvent->setButtons(mouseButton);
+
+    QApplication::postEvent(view->scene(), pressEvent);
+    QApplication::postEvent(view->scene(), releaseEvent);
+//    if (Qt::RightButton == mouseButton) {
+//        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
+//        QApplication::postEvent(view->scene(), contextEvent);
+//    }
 }
 
 void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -276,81 +262,64 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     prev_pos.Offset(x_offset, y_offset);
 
 	QPoint point = ConvertPointToQPoint(prev_pos);
+    QPointF scenePoint(point.x(), point.y());
 
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
+    if (!view->sceneRect().contains(scenePoint)) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        return;
     }
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(receiverWidget, moveEvent);
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(view->scene(), moveEvent);
 
     session_->set_mouse_position(prev_pos);
-*/    
 }
 
 void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
-    Point location = Point(pos.x(), pos.y());
-    location.Offset(x_offset, y_offset);
+    QPointF scenePoint = pItem->mapToScene(x_offset, y_offset);
 
-    QPoint point = ConvertPointToQPoint(location);
-
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
+    if (!view->sceneRect().contains(scenePoint)) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        return;
     }
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(receiverWidget, moveEvent);
-
-    session_->set_mouse_position(location);
-*/    
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(view->scene(), moveEvent);
+    
+    session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
 
 void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+    QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
-    Point location = Point(pos.x()+pWidget->width()/2, pos.y()+pWidget->height()/2);
+    QPointF scenePoint = pItem->mapToScene(0, 0);
 
-    QPoint point = ConvertPointToQPoint(location);
-
-    // Find child widget that will receive event
-    QWidget *receiverWidget = view->childAt(point);
-    if (NULL != receiverWidget) {
-        point = receiverWidget->mapFrom(view, point);
-    } else {
-        receiverWidget = view;
+    if (!view->sceneRect().contains(scenePoint)) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        return;
     }
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-    QApplication::postEvent(receiverWidget, moveEvent);
-
-    session_->set_mouse_position(location);
-*/    
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(view->scene(), moveEvent);
+    
+    session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
 
 void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
