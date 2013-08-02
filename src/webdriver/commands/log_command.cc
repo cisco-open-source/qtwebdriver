@@ -6,16 +6,18 @@
 
 #include "base/string_util.h"
 #include "base/values.h"
+#include "base/bind.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_session.h"
+#include "webdriver_view_executor.h"
 
 namespace webdriver {
 
 LogCommand::LogCommand(
     const std::vector<std::string>& path_segments,
     const DictionaryValue* parameters)
-    : WebDriverCommand(path_segments, parameters) {
+    : ViewCommand(path_segments, parameters) {
 }
 
 LogCommand::~LogCommand() {
@@ -40,7 +42,31 @@ void LogCommand::ExecutePost(Response* const response) {
 
     if (log_type.type() == LogType::kDriver) {
         response->SetValue(session_->GetLog());
-    } else {
+    }
+    else if (log_type.type() == LogType::kBrowser) {
+        Error* error = NULL;
+        base::ListValue* browserLog = NULL;
+
+        session_->RunSessionTask(base::Bind(
+                    &ViewCmdExecutor::GetBrowserLog,
+                    base::Unretained(executor_.get()),
+                    &browserLog,
+                    &error));
+
+        if (error)
+            response->SetError(error);
+        else if (browserLog == NULL)
+        {
+            browserLog = new base::ListValue();
+            response->SetValue(browserLog);
+        }
+        else
+        {
+            response->SetValue(browserLog);
+        }
+    }
+    else
+    {
         response->SetError(new Error(kUnknownError, "Unrecognized type: " + type));
         return;
     }
@@ -62,7 +88,7 @@ bool LogTypesCommand::DoesGet() const {
 void LogTypesCommand::ExecuteGet(Response* const response) {
     base::ListValue* logTypes_list = new base::ListValue();
     logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kDriver).ToString()));
-
+    logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kBrowser).ToString()));
     response->SetValue(logTypes_list);
 }
 

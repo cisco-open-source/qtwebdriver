@@ -77,6 +77,96 @@ void JSNotifier::setResult(QVariant result)
     emit completed();
 }
 
+BrowserLogHandler::BrowserLogHandler(QObject *parent): QObject(parent), jslogger()
+{
+}
+
+base::ListValue* BrowserLogHandler::getLog()
+{
+    return jslogger.getLog();
+}
+
+void BrowserLogHandler::SetMinLogLevel(LogLevel level)
+{
+    jslogger.SetMinLogLevel(level);
+}
+
+void BrowserLogHandler::loadJSLogObject()
+{
+    QWebFrame *mainFrame = qobject_cast<QWebFrame*>(sender());
+    if (mainFrame)
+        loadJSLogObject(mainFrame);
+}
+
+void BrowserLogHandler::loadJSLogObject(QWebFrame *frame)
+{
+    frame->addToJavaScriptWindowObject("wdconsole", &jslogger);
+}
+
+void BrowserLogHandler::loadConsoleJS()
+{
+    QWebView* view = qobject_cast<QWebView*>(sender());
+    if (view)
+        loadConsoleJS(view);
+}
+
+void BrowserLogHandler::loadConsoleJS(const QWebView *view)
+{
+    QString jscript ("if ( _log == null ){"
+                    "var _log = console.log,"
+                        "_warn = console.warn,"
+                        "_error = console.error;"
+                    "};"
+
+                    "console.log = function() {"
+                        "wdconsole.log(arguments[0]);"
+                        "return _log.apply(console, arguments);"
+                    "};"
+
+                     "console.warn = function() {"
+                        "wdconsole.warn(arguments[0]);"
+                        "return _warn.apply(console, arguments);"
+                     "};"
+
+                     "console.error = function() {"
+                        "wdconsole.error(arguments[0]);"
+                        "return _error.apply(console, arguments);"
+                     "};");
+    view->page()->mainFrame()->evaluateJavaScript(jscript);
+}
+
+JSLogger::JSLogger()
+{
+    browserLogger.AddHandler(&browserLog);
+}
+
+base::ListValue* JSLogger::getLog()
+{
+    base::ListValue* retVal = browserLog.entries_list()->DeepCopy();
+    browserLog.clear_entries_list();
+    return retVal;
+}
+
+void  JSLogger::SetMinLogLevel(LogLevel level)
+{
+    browserLogger.set_min_log_level(level);
+}
+
+void JSLogger::log(QVariant message)
+{
+    browserLogger.Log(kInfoLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::warn(QVariant message)
+{
+    browserLogger.Log(kWarningLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::error(QVariant message)
+{
+    browserLogger.Log(kSevereLogLevel, message.toString().toStdString());
+}
+
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
@@ -766,6 +856,8 @@ void QWebViewCmdExecutor::SwitchTo(Error** error) {
     session_->set_current_view(view_id_);
 
     session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
+
+    AddBrowserLoggerToView(view);
 
     // reset frame path
     session_->frame_elements_.clear();
@@ -1460,6 +1552,19 @@ void QWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffse
     view->page()->mainFrame()->scroll(-xoffset*(speed+1), -yoffset*(speed+1));
 }
 
+void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    BrowserLogHandler* logHandler = view->findChild<BrowserLogHandler*>();
+    if (NULL == logHandler)
+        return;
+
+    *browserLog = logHandler->getLog();
+}
+
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
     if (frame_path.value().empty())
         return NULL;
@@ -1980,7 +2085,7 @@ Error* QWebViewCmdExecutor::SwitchToFrameWithJavaScriptLocatedFrame(
     std::string frame_id = GenerateRandomID();
     error = ExecuteScriptAndParse(
                 frame,
-                "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);  console.log(meta); console.log(child);}",
+                "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);}",
                 "setFrameId",
                 CreateListValueFrom(new_frame_element, frame_id),
                 CreateDirectValueParser(kSkipParsing));
@@ -2101,6 +2206,21 @@ Error* QWebViewCmdExecutor::ToggleOptionElement(const ElementId& element) {
     SetOptionElementSelected(element, !is_selected, &error);
 
     return error;
+}
+
+void QWebViewCmdExecutor::AddBrowserLoggerToView(QWebView* view)
+{
+    BrowserLogHandler* logHandler = view->findChild<BrowserLogHandler*>();
+    if (NULL == logHandler)
+    {
+        logHandler = new BrowserLogHandler(view);
+        logHandler->SetMinLogLevel(session_->capabilities().log_levels[LogType::kBrowser]);
+    }
+
+    QObject::connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), logHandler, SLOT(loadJSLogObject()));
+    QObject::connect(view, SIGNAL(loadFinished(bool)),logHandler, SLOT(loadConsoleJS()), Qt::QueuedConnection);
+    logHandler->loadJSLogObject(view->page()->mainFrame());
+    logHandler->loadConsoleJS(view);
 }
 
 

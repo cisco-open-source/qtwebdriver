@@ -18,7 +18,7 @@ namespace webdriver {
 
 class Response;
 
-class LogCommand : public WebDriverCommand {
+class LogCommand : public ViewCommand {
 public:
   	LogCommand(const std::vector<std::string>& path_segments,
              const base::DictionaryValue* parameters);

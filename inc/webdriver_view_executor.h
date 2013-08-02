@@ -164,6 +164,7 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) = 0;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) = 0;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) = 0;
+    virtual void GetBrowserLog(base::ListValue** browserLog, Error **error) {}
 
 protected:
     Session* session_;
