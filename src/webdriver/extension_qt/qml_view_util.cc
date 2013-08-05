@@ -6,23 +6,39 @@
 #include "extension_qt/widget_view_handle.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtDeclarative/QDeclarativeView>
+#include <QtCore/QFileInfo>
 
 
 namespace webdriver {
 
 bool QQmlViewUtil::isUrlSupported(const std::string& url) {
-    scoped_ptr<QNetworkAccessManager> pmanager(new QNetworkAccessManager());
-    scoped_ptr<QContentTypeResolver> presolver(new QContentTypeResolver(pmanager.get()));
-    std::string contentType;
-    scoped_ptr<Error> ignore_err(presolver->resolveContentType(url, contentType));
+    QUrl qUrl(url.c_str());
+    QString scheme = qUrl.scheme();
 
-    if (ignore_err != NULL) {
-        return false;
+    if ( (0 == scheme.compare("http", Qt::CaseInsensitive)) ||
+         (0 == scheme.compare("https", Qt::CaseInsensitive)) ) {
+
+        scoped_ptr<QNetworkAccessManager> pmanager(new QNetworkAccessManager());
+        scoped_ptr<QContentTypeResolver> presolver(new QContentTypeResolver(pmanager.get()));
+        std::string contentType;
+
+        scoped_ptr<Error> ignore_err(presolver->resolveContentType(url, contentType));
+
+        if (ignore_err != NULL) {
+            return false;
+        }
+
+        return isContentTypeSupported(contentType);
+    } else {
+        // detection fy filename
+        QFileInfo fileInfo(qUrl.path());
+        if (0 == fileInfo.suffix().compare("qml", Qt::CaseInsensitive)) {
+            return true;
+        }
     }
 
-    // TODO: add file detection
 
-    return isContentTypeSupported(contentType);
+    return false;
 }
 
 bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {

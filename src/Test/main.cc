@@ -87,19 +87,6 @@ int main(int argc, char *argv[])
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    // TODO: put here registration of Quick2 extension
-#else
-    // Quick1 extension
-    webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
-    qmlCreator->RegisterViewClass<QDeclarativeView>("QDeclarativeView");
-    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
-
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
-
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
-    #endif    
-    
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
@@ -127,9 +114,21 @@ int main(int argc, char *argv[])
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
-
-
 #endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    // TODO: put here registration of Quick2 extension
+#else
+    // Quick1 extension
+    webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
+    qmlCreator->RegisterViewClass<QDeclarativeView>("QDeclarativeView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
+#endif    
+
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());

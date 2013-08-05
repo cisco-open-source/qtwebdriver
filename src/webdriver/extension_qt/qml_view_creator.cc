@@ -76,9 +76,9 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 }
 
 bool QQmlViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-//    if (!QQmlViewUtil::isUrlSupported(url)) {
-//        return false;
-//    }
+    if (!QQmlViewUtil::isUrlSupported(url)) {
+        return false;
+    }
     
     return CreateViewByClassName(logger, "", view);
 }
