@@ -323,65 +323,42 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
 }
 
 void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
-/*    
-	QWidget* view = getView(view_id_, error);
+	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
         return;
 
-    if (!pWidget->isVisible()) {
+    if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
         return;
     }
 
     session_->logger().Log(kFineLogLevel, "Click on ");
-    session_->logger().Log(kFineLogLevel, pWidget->objectName().toStdString());
-    QPoint point;
-    QRect rect;
+    session_->logger().Log(kFineLogLevel, pItem->objectName().toStdString());
 
-    if ( qobject_cast<QRadioButton*>(pWidget) ||
-         qobject_cast<QCheckBox*>(pWidget)) {
+    //QRectF sceneRect = pItem->mapRectToScene(pItem->boundingRect());
+    QPointF scenePoint = pItem->mapToScene(0, 0);
 
-        QStyle::SubElement subElement;
-        QStyleOptionButton opt;
-        if (qobject_cast<QRadioButton*>(pWidget)) {
-            subElement = QStyle::SE_RadioButtonClickRect;
-        }
-
-        if (qobject_cast<QCheckBox*>(pWidget)) {
-            subElement = QStyle::SE_CheckBoxClickRect;
-        }
-        opt.initFrom(pWidget);
-        rect = pWidget->style()->subElementRect(subElement, &opt, pWidget);
-    } else {
-        rect = pWidget->rect();
+    if (!view->sceneRect().contains(scenePoint)) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        return;
     }
 
-    QRect visibleClickableLocation = pWidget->visibleRegion().boundingRect().intersected(rect);
+    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+    pressEvent->setScenePos(scenePoint);
+    pressEvent->setButton(Qt::LeftButton);
+    pressEvent->setButtons(Qt::LeftButton);
 
-    if(visibleClickableLocation.isEmpty()){
-        QWidget *tmpParent = pWidget;
-        while(tmpParent != NULL && qobject_cast<QScrollArea*>(tmpParent) == NULL){
-            tmpParent = tmpParent->parentWidget();
-        }
-        if(!tmpParent){
-            *error = new Error(kMoveTargetOutOfBounds, "Target is out of view in non scrolable widget");
-            return;
-        }
-    }
-    point = QPoint(rect.x() + rect.width()/2, rect.y() + rect.height()/2);
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::LeftButton);
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-
-    QApplication::postEvent(pWidget, pressEvent);
-    QApplication::postEvent(pWidget, releaseEvent);
-
-    // TODO: session_->set_mouse_position(location);
-*/    
+    QApplication::postEvent(view->scene(), pressEvent);
+    QApplication::postEvent(view->scene(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
@@ -605,11 +582,11 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         // list all child items and find matched locator
         QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
         foreach(QDeclarativeItem *child, childs) {
-            qDebug() << "-----------------";
-            qDebug() << "className: " << child->metaObject()->className();
-            qDebug() << "objectName: " << child->objectName();
-            qDebug() << "prop id: " << child->property("id");
-            qDebug() << "prop name: " << child->property("name");
+            //qDebug() << "-----------------";
+            //qDebug() << "className: " << child->metaObject()->className();
+            //qDebug() << "objectName: " << child->objectName();
+            //qDebug() << "prop id: " << child->property("id");
+            //qDebug() << "prop name: " << child->property("name");
     
             if (FilterElement(child, locator, query)) {
                 ElementId elm;
