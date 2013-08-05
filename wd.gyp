@@ -15,7 +15,7 @@
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
 
         # TODO: put quick1 only for qt4 not qt5
-        #'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
       ],
 
       'conditions': [

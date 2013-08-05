@@ -70,7 +70,17 @@
         '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
         'src/third_party/webdriver/atoms.cc',
       ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_quick_1',
+      'type': 'static_library',
+      'standalone_static_library': 1,
 
+      'sources': [
+        'src/webdriver/extension_qt/qml_view_creator.cc',
+        'src/webdriver/extension_qt/qml_view_enumerator.cc',
+        'src/webdriver/extension_qt/qml_view_executor.cc',
+        'src/webdriver/extension_qt/qml_view_util.cc',
+      ],
     } , {
       'target_name': 'WebDriver_extension_qt_base_shared',
       'type': 'shared_library',
