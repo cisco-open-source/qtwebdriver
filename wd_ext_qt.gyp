@@ -71,16 +71,29 @@
         'src/third_party/webdriver/atoms.cc',
       ],
     } , {
-      'target_name': 'WebDriver_extension_qt_quick_1',
+      'target_name': 'WebDriver_extension_qt_quick',
       'type': 'static_library',
       'standalone_static_library': 1,
 
-      'sources': [
-        'src/webdriver/extension_qt/qml_view_creator.cc',
-        'src/webdriver/extension_qt/qml_view_enumerator.cc',
-        'src/webdriver/extension_qt/qml_view_executor.cc',
-        'src/webdriver/extension_qt/qml_view_util.cc',
-      ],
+      'conditions': [
+      
+        ['<(QT5) == 1', {
+
+          'sources': [
+            # TODO: plae quick2 related files
+          ],
+        } , {
+
+          'sources': [
+            'src/webdriver/extension_qt/qml_view_creator.cc',
+            'src/webdriver/extension_qt/qml_view_enumerator.cc',
+            'src/webdriver/extension_qt/qml_view_executor.cc',
+            'src/webdriver/extension_qt/qml_view_util.cc',
+          ],
+        } ],
+
+      ], # conditions
+
     } , {
       'target_name': 'WebDriver_extension_qt_base_shared',
       'type': 'shared_library',
@@ -98,6 +111,15 @@
 
       'dependencies': [
         'WebDriver_extension_qt_web',
+      ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_quick_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_extension_qt_quick',
+
+      'dependencies': [
+        'WebDriver_extension_qt_quick',
       ],
     }
   ],
