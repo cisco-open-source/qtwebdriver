@@ -43,6 +43,7 @@
         'src/webdriver/commands/source_command.cc',
         'src/webdriver/commands/target_locator_commands.cc',
         'src/webdriver/commands/title_command.cc',
+        'src/webdriver/commands/touch_commands.cc',
         'src/webdriver/commands/url_command.cc',
         'src/webdriver/commands/webdriver_command.cc',
         'src/webdriver/commands/element_commands.cc',

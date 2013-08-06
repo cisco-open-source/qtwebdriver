@@ -34,8 +34,6 @@
               '-lQt5Qml',
               '-lQt5Sql',
               '-lQt5Declarative',
-              '-lQt5XmlPatterns',
-              '-lQt5Xml',
               '-lQt5Gui',
               '-lQt5Core',
               '-lpthread',
@@ -49,8 +47,6 @@
           ['OS=="win"', {
             'libraries': [
              '-l<(QT_LIB_PATH)/Qt5Network',
-             '-l<(QT_LIB_PATH)/Qt5Xml',
-             '-l<(QT_LIB_PATH)/Qt5XmlPatterns',
              '-l<(QT_LIB_PATH)/Qt5Gui',
              '-l<(QT_LIB_PATH)/Qt5Core',
              '-l<(QT_LIB_PATH)/Qt5Widgets',
@@ -67,8 +63,6 @@
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
-                '<(QT_LIB_PATH)/libQt5Xml.a',
-                '<(QT_LIB_PATH)/libQt5XmlPatterns.a',
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
@@ -86,10 +80,9 @@
             'libraries': [
               '-L<(QT_LIB_PATH)',
               '-lQtNetwork',
-              '-lQtXml',
-              '-lQtXmlPatterns',
               '-lQtGui',
               '-lQtCore',
+              '-lQtDeclarative',
               '-lpthread',
               '-lrt',
               '-ldl',
@@ -98,8 +91,6 @@
           [ 'OS=="win"', {
             'libraries': [
               '-l<(QT_LIB_PATH)/QtNetwork4',
-              '-l<(QT_LIB_PATH)/QtXml4',
-              '-l<(QT_LIB_PATH)/QtXmlPatterns4',
               '-l<(QT_LIB_PATH)/QtGui4',
               '-l<(QT_LIB_PATH)/QtCore4',
               '-luser32.lib',
@@ -116,8 +107,6 @@
               'libraries': [
                 '<(QT_LIB_PATH)/QtGui.framework',
                 '<(QT_LIB_PATH)/QtCore.framework',
-                '<(QT_LIB_PATH)/QtXml.framework',
-                '<(QT_LIB_PATH)/QtXmlPatterns.framework',
                 '<(QT_LIB_PATH)/QtNetwork.framework',
                 'Foundation.framework',
                 'CoreFoundation.framework',
@@ -192,6 +181,7 @@
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
         'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
 
@@ -203,6 +193,9 @@
         'src/Test/WindowWithEmbeddedViewTest.cc',
         'src/Test/WindowWithEmbeddedViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc',
+        'src/Test/WidgetAndWebViewTest.cc',
+        'src/Test/WidgetAndWebViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WidgetAndWebViewTest.cc',
       ],
 
       'conditions': [
@@ -218,7 +211,7 @@
               'libraries': ['-lQt5WebKitWidgets', '-lQt5WebKit',],
             } ],
             [ 'OS=="win"', {
-              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit',],
+              'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
             [ 'OS=="mac"', {
               'link_settings': {
@@ -253,6 +246,7 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
       
@@ -279,6 +273,7 @@
         'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared',
         'test_widgets',
       ],
       

@@ -83,6 +83,14 @@ public:
     static const char kSessionStorageKey[];
     static const char kSessionStorageSize[];
     static const char kGetLocation[];
+    static const char kTouchClick[];
+    static const char kTouchDown[];
+    static const char kTouchUp[];
+    static const char kTouchMove[];
+    static const char kTouchScroll[];
+    static const char kTouchDoubleClick[];
+    static const char kTouchLongClick[];
+    static const char kTouchFlick[];
     static const char kXdrpc[];
     static const char kCiscoPlayerState[];
     static const char kCiscoPlayerVolume[];

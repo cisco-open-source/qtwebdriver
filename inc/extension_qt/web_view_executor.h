@@ -2,6 +2,7 @@
 #define WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
 
 #include "extension_qt/q_view_executor.h"
+#include "webdriver_logging.h"
 
 #include <QtCore/QtGlobal>
 
@@ -59,6 +60,44 @@ signals:
 private:
     QVariant res;
     bool isCompleted;
+};
+
+class JSLogger : public QObject
+{
+    Q_OBJECT
+
+public:
+    JSLogger();
+    base::ListValue* getLog();
+    void SetMinLogLevel(LogLevel level);
+
+public slots:
+    void log(QVariant message);
+    void warn(QVariant message);
+    void error(QVariant message);
+
+private:
+    InMemoryLog browserLog;
+    Logger browserLogger;
+};
+
+class BrowserLogHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    BrowserLogHandler(QObject* parent);
+    base::ListValue* getLog();
+    void SetMinLogLevel(LogLevel level);
+    void loadConsoleJS(const QWebView* view);
+    void loadJSLogObject(QWebFrame *frame);
+
+public slots:
+    void loadJSLogObject();
+    void loadConsoleJS();
+
+private:
+    JSLogger jslogger;
 };
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
@@ -137,6 +176,17 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error);
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchClick(const ElementId& element, Error **error);
+    virtual void TouchDoubleClick(const ElementId& element, Error **error);
+    virtual void TouchDown(const int &x, const int &y, Error **error);
+    virtual void TouchUp(const int &x, const int &y, Error **error);
+    virtual void TouchMove(const int &x, const int &y, Error **error);
+    virtual void TouchLongClick(const ElementId& element, Error **error);
+    virtual void TouchScroll(const int &xoffset, const int &yoffset, Error **error);
+    virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error);
+    virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error);
+    virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error);
+    virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
     virtual void GetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState*, webdriver::Error**) const;
     virtual void SetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState, webdriver::Error**);
     virtual void GetPlayerVolume(int*, webdriver::Error**) const;
@@ -234,6 +284,8 @@ protected:
 	Error* GetClickableLocation(QWebView* view, const ElementId& element, Point* location);
 
 	Error* ToggleOptionElement(const ElementId& element);
+
+    void AddBrowserLoggerToView(QWebView* view);
 
 
 

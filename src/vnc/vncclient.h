@@ -17,6 +17,7 @@ public:
     static VNCClient* getInstance();
 
     bool Init(QString remoteHost, quint16 port);
+    bool Init(QString remoteHost, quint16 port, QString* password);
     void sendKeyEvent(QKeyEvent *key);
     void sendMouseEvent(QMouseEvent *mouse);
     bool isReady();
@@ -35,6 +36,7 @@ private:
 
     bool establishProtocolVersion(QByteArray& data);
     bool establishSecurity(QByteArray& data);
+    bool passAutentication(QByteArray& data);
     bool finishHandshaking(QByteArray& data);
     bool initServerParameters(QByteArray& data);
     void sendDoubleClick(QMouseEvent *event);
@@ -75,12 +77,15 @@ private:
     QTcpSocket *_socket;
     bool _versionEstablished;
     bool _securityEstablished;
+    bool _autenticationPassed;
     bool _handshakeFinished;
     bool _communicationError;
     bool _isReady;
     int _establishedVersion;
     Encodings _establishedSecurity;
     ServerParameters* _serverParameters;
+
+    QString *_password;
 };
 
 #endif // VNCCLIENT_H

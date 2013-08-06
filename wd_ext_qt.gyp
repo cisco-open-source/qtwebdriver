@@ -49,18 +49,10 @@
         '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
-        'src/webdriver/extension_qt/wd_event_dispatcher.cc'
+        'src/webdriver/extension_qt/wd_event_dispatcher.cc',
+        'src/third_party/pugixml/pugixml.cpp'
       ],
 
-      'conditions': [
-
-        [ '<(WD_CONFIG_XPATH) == 1', {
-          'defines': [
-            'WD_CONFIG_XPATH',
-          ],
-        } ],
-       
-      ],
     }, {
       'target_name': 'WebDriver_extension_qt_web',
       'type': 'static_library',
@@ -78,6 +70,29 @@
         '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
         'src/third_party/webdriver/atoms.cc',
       ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_quick',
+      'type': 'static_library',
+      'standalone_static_library': 1,
+
+      'conditions': [
+      
+        ['<(QT5) == 1', {
+
+          'sources': [
+            # TODO: plae quick2 related files
+          ],
+        } , {
+
+          'sources': [
+            'src/webdriver/extension_qt/qml_view_creator.cc',
+            'src/webdriver/extension_qt/qml_view_enumerator.cc',
+            'src/webdriver/extension_qt/qml_view_executor.cc',
+            'src/webdriver/extension_qt/qml_view_util.cc',
+          ],
+        } ],
+
+      ], # conditions
 
     } , {
       'target_name': 'WebDriver_extension_qt_base_shared',
@@ -96,6 +111,15 @@
 
       'dependencies': [
         'WebDriver_extension_qt_web',
+      ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_quick_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_extension_qt_quick',
+
+      'dependencies': [
+        'WebDriver_extension_qt_quick',
       ],
     }
   ],

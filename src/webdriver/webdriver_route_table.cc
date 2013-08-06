@@ -36,6 +36,7 @@
 #include "commands/html5_location_commands.h"
 #include "commands/cisco_player_commands.h"
 #include "commands/xdrpc_command.h"
+#include "commands/touch_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -297,6 +298,14 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageKeyCommand>       (CommandRoutes::kSessionStorageKey);
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
     Add<HTML5LocationCommand>           (CommandRoutes::kGetLocation);
+    Add<TouchClickCommand>              (CommandRoutes::kTouchClick);
+    Add<TouchDownCommand>               (CommandRoutes::kTouchDown);
+    Add<TouchUpCommand>                 (CommandRoutes::kTouchUp);
+    Add<TouchMoveCommand>               (CommandRoutes::kTouchMove);
+    Add<TouchScrollCommand>             (CommandRoutes::kTouchScroll);
+    Add<TouchDoubleClickCommand>        (CommandRoutes::kTouchDoubleClick);
+    Add<TouchLongClickCommand>          (CommandRoutes::kTouchLongClick);
+    Add<TouchFlickCommand>              (CommandRoutes::kTouchFlick);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
     Add<CISCO_StateCommand>             (CommandRoutes::kCiscoPlayerState);
     Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);

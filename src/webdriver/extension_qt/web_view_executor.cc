@@ -77,6 +77,96 @@ void JSNotifier::setResult(QVariant result)
     emit completed();
 }
 
+BrowserLogHandler::BrowserLogHandler(QObject *parent): QObject(parent), jslogger()
+{
+}
+
+base::ListValue* BrowserLogHandler::getLog()
+{
+    return jslogger.getLog();
+}
+
+void BrowserLogHandler::SetMinLogLevel(LogLevel level)
+{
+    jslogger.SetMinLogLevel(level);
+}
+
+void BrowserLogHandler::loadJSLogObject()
+{
+    QWebFrame *mainFrame = qobject_cast<QWebFrame*>(sender());
+    if (mainFrame)
+        loadJSLogObject(mainFrame);
+}
+
+void BrowserLogHandler::loadJSLogObject(QWebFrame *frame)
+{
+    frame->addToJavaScriptWindowObject("wdconsole", &jslogger);
+}
+
+void BrowserLogHandler::loadConsoleJS()
+{
+    QWebView* view = qobject_cast<QWebView*>(sender());
+    if (view)
+        loadConsoleJS(view);
+}
+
+void BrowserLogHandler::loadConsoleJS(const QWebView *view)
+{
+    QString jscript ("if ( _log == null ){"
+                    "var _log = console.log,"
+                        "_warn = console.warn,"
+                        "_error = console.error;"
+                    "};"
+
+                    "console.log = function() {"
+                        "wdconsole.log(arguments[0]);"
+                        "return _log.apply(console, arguments);"
+                    "};"
+
+                     "console.warn = function() {"
+                        "wdconsole.warn(arguments[0]);"
+                        "return _warn.apply(console, arguments);"
+                     "};"
+
+                     "console.error = function() {"
+                        "wdconsole.error(arguments[0]);"
+                        "return _error.apply(console, arguments);"
+                     "};");
+    view->page()->mainFrame()->evaluateJavaScript(jscript);
+}
+
+JSLogger::JSLogger()
+{
+    browserLogger.AddHandler(&browserLog);
+}
+
+base::ListValue* JSLogger::getLog()
+{
+    base::ListValue* retVal = browserLog.entries_list()->DeepCopy();
+    browserLog.clear_entries_list();
+    return retVal;
+}
+
+void  JSLogger::SetMinLogLevel(LogLevel level)
+{
+    browserLogger.set_min_log_level(level);
+}
+
+void JSLogger::log(QVariant message)
+{
+    browserLogger.Log(kInfoLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::warn(QVariant message)
+{
+    browserLogger.Log(kWarningLogLevel, message.toString().toStdString());
+}
+
+void JSLogger::error(QVariant message)
+{
+    browserLogger.Log(kSevereLogLevel, message.toString().toStdString());
+}
+
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
 QWebViewCmdExecutorCreator::QWebViewCmdExecutorCreator()
@@ -329,11 +419,7 @@ void QWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-
-        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
-
-        if (!consumed)
-            qApp->sendEvent(view, &(*it));
+        qApp->sendEvent(view, &(*it));
         ++it;
     }
 }
@@ -770,6 +856,8 @@ void QWebViewCmdExecutor::SwitchTo(Error** error) {
     session_->set_current_view(view_id_);
 
     session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
+
+    AddBrowserLoggerToView(view);
 
     // reset frame path
     session_->frame_elements_.clear();
@@ -1244,6 +1332,237 @@ void QWebViewCmdExecutor::GetStorageSize(StorageType type, int* size, Error** er
                 "getStorageSize",
                 new ListValue(),
                 CreateDirectValueParser(size));
+}
+
+void QWebViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location;
+    GetElementLocationInView(element, &location, error);
+    if (*error)
+        return;
+
+    QPoint point = ConvertPointToQPoint(location);
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setScreenPos(view->mapToGlobal(point));
+    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
+#else
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+#endif
+    points.clear();
+    touchPoint.setPos(point);
+    touchPoint.setScreenPos(view->mapToGlobal(point));
+    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+    touchPoint.setState(Qt::TouchPointReleased);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
+#else
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+#endif
+
+    QApplication::postEvent(view, touchBeginEvent);
+    QApplication::postEvent(view, touchEndEvent);
+
+    //additional we send mouse event for QWebView
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view, pressEvent);
+    QApplication::postEvent(view, releaseEvent);
+
+}
+
+void QWebViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location;
+    GetElementLocationInView(element, &location, error);
+    if (*error)
+        return;
+
+    QPoint point = ConvertPointToQPoint(location);
+
+    view->setZoomFactor(2/view->zoomFactor());
+    view->page()->mainFrame()->scroll(point.x(), point.y());
+}
+
+void QWebViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = ConvertPointToQPoint(Point(x, y));
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
+#else
+    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+#endif
+
+    QApplication::postEvent(view, touchBeginEvent);
+}
+
+void QWebViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = ConvertPointToQPoint(Point(x, y));
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointPressed);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
+#else
+    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+#endif
+
+    QApplication::postEvent(view, touchEndEvent);
+}
+
+void QWebViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = ConvertPointToQPoint(Point(x, y));
+
+    QList<QTouchEvent::TouchPoint> points;
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(Qt::TouchPointMoved);
+    touchPoint.setPressure(1);
+    points.append(touchPoint);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, &touchDevice, Qt::NoModifier, Qt::TouchPointMoved, points);
+#else
+    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointMoved, points);
+#endif
+
+    QApplication::postEvent(view, touchMoveEvent);
+
+}
+
+void QWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location;
+    GetElementLocationInView(element, &location, error);
+    if (*error)
+        return;
+
+    QPoint point = ConvertPointToQPoint(location);
+
+//    QList<QTouchEvent::TouchPoint> points;
+//    QTouchEvent::TouchPoint touchPoint(1);
+//    touchPoint.setPos(point);
+//    touchPoint.setScreenPos(view->mapToGlobal(point));
+//    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+//    touchPoint.setState(Qt::TouchPointPressed);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+//    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
+
+//    points.clear();
+//    touchPoint.setPos(point);
+//    touchPoint.setScreenPos(view->mapToGlobal(point));
+//    touchPoint.setStartScreenPos(view->mapToGlobal(point));
+//    touchPoint.setState(Qt::TouchPointReleased);
+//    touchPoint.setPressure(1);
+//    points.append(touchPoint);
+//    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
+
+//    QTimer::singleShot(1000, &loop, SLOT(quit()));
+//    QApplication::postEvent(view, touchBeginEvent);
+//    loop.exec(QEventLoop::ExcludeUserInputEvents);
+//    QApplication::postEvent(view, touchEndEvent);
+
+    QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Other, point, view->mapToGlobal(point));
+    qApp->postEvent(view, contextEvent);
+}
+
+void QWebViewCmdExecutor::TouchScroll(const int &xoffset, const int &yoffset, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    view->page()->mainFrame()->scroll(xoffset, yoffset);
+}
+
+void QWebViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+    view->page()->mainFrame()->scroll(-xoffset, -yoffset);
+}
+
+void QWebViewCmdExecutor::TouchFlick(const int &xSpeed, const int &ySpeed, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    view->page()->mainFrame()->scroll(xSpeed*3, ySpeed*3);
+}
+
+void QWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    view->page()->mainFrame()->scroll(-xoffset*(speed+1), -yoffset*(speed+1));
+}
+
+void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    BrowserLogHandler* logHandler = view->findChild<BrowserLogHandler*>();
+    if (NULL == logHandler)
+        return;
+
+    *browserLog = logHandler->getLog();
 }
 
 void QWebViewCmdExecutor::GetPlayerState(CiscoPlayerCommandsInterface::PlayerState *state, Error **error) const
@@ -1790,7 +2109,7 @@ Error* QWebViewCmdExecutor::SwitchToFrameWithJavaScriptLocatedFrame(
     std::string frame_id = GenerateRandomID();
     error = ExecuteScriptAndParse(
                 frame,
-                "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);  console.log(meta); console.log(child);}",
+                "function(elem, id) { var meta; elem.setAttribute('wd_frame_id_', id); var doc = elem.contentDocument? elem.contentDocument: elem.contentWindow.document; meta=doc.createElement('meta'); meta.name = 'wd_frame_id_'; meta.content = id; var child = doc.body.appendChild(meta);}",
                 "setFrameId",
                 CreateListValueFrom(new_frame_element, frame_id),
                 CreateDirectValueParser(kSkipParsing));
@@ -1912,5 +2231,21 @@ Error* QWebViewCmdExecutor::ToggleOptionElement(const ElementId& element) {
 
     return error;
 }
+
+void QWebViewCmdExecutor::AddBrowserLoggerToView(QWebView* view)
+{
+    BrowserLogHandler* logHandler = view->findChild<BrowserLogHandler*>();
+    if (NULL == logHandler)
+    {
+        logHandler = new BrowserLogHandler(view);
+        logHandler->SetMinLogLevel(session_->capabilities().log_levels[LogType::kBrowser]);
+    }
+
+    QObject::connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), logHandler, SLOT(loadJSLogObject()));
+    QObject::connect(view, SIGNAL(loadFinished(bool)),logHandler, SLOT(loadConsoleJS()), Qt::QueuedConnection);
+    logHandler->loadJSLogObject(view->page()->mainFrame());
+    logHandler->loadConsoleJS(view);
+}
+
 
 } //namespace webdriver 

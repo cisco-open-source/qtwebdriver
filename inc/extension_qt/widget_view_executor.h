@@ -83,6 +83,16 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchDoubleClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchDown(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchUp(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchMove(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchLongClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchScroll(const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void GetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState*, webdriver::Error**) const;
     virtual void SetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState, webdriver::Error**);
     virtual void GetPlayerVolume(int*, webdriver::Error**) const;
@@ -96,8 +106,8 @@ protected:
     QWidget* getElement(const ElementId &element, Error** error);
     bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    void createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource);
-    void addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource);
+    void createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
+    void addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);

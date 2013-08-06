@@ -13,12 +13,16 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_web',
-        # TODO: put quick1 only for qt4 not qt5
-        #'wd_ext_qt.gyp:WebDriver_extension_qt_quick_1',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
       ],
 
       'conditions': [
+      
+        ['platform != "android"', {
+          'dependencies': [
+            'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+          ],
+        } ],
 
         [ 'OS == "linux"', {
           'dependencies': [
@@ -26,6 +30,7 @@
             'wd_core.gyp:WebDriver_core_shared',
             'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
             'wd_ext_qt.gyp:WebDriver_extension_qt_web_shared',
+            'wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared',
           ],
         } ],
 

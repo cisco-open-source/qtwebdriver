@@ -13,6 +13,7 @@
 #include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
+#include <QtGui/QTouchDevice>
 #else
 #include <QtGui/QWidget>
 #endif
@@ -49,6 +50,11 @@ protected:
     QRect ConvertRectToQRect(const Rect &rect);
     QPoint ConvertPointToQPoint(const Point &p);
     Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+  QTouchDevice touchDevice;
+#endif
+
 private:
     DISALLOW_COPY_AND_ASSIGN(QViewCmdExecutor);
 };

@@ -31,7 +31,7 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
-#include "WindowWithEmbeddedViewTest.h"
+//#include "WindowWithEmbeddedViewTest.h"
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -40,11 +40,23 @@
 #include "webdriver_route_table.h"
 #include "shutdown_command.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+// TODO: put headers for Quick2 extension
+#else
+#include <QtDeclarative/QDeclarativeView>
+// headers for Quick1 extension
+#include "extension_qt/qml_view_creator.h"
+#include "extension_qt/qml_view_executor.h"
+#include "extension_qt/qml_view_enumerator.h"
+#endif
+
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/qwebviewext.h"
+#include "WindowWithEmbeddedViewTest.h"
+#include "WidgetAndWebViewTest.h"
 #endif
 
 #include "extension_qt/q_view_runner.h"
@@ -104,9 +116,22 @@ int main(int argc, char *argv[])
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
-
-
+    widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
 #endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    // TODO: put here registration of Quick2 extension
+#else
+    // Quick1 extension
+    webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
+    qmlCreator->RegisterViewClass<QDeclarativeView>("QDeclarativeView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
+#endif    
+
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
@@ -150,7 +175,27 @@ int main(int argc, char *argv[])
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
+    // start VNC module
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+    if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer) || cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
+    {
+        QString address = "127.0.0.1";
+        int port = 5900;
+
+        if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer))
+            address = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCServer).c_str();
+        if (cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
+            port = QString(cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCPort).c_str()).toInt();
+
+        VNCClient *client = VNCClient::getInstance();
+        if (!client->isReady())
+            client->Init(address, port);
+
+        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+    }
+
 	setQtSettings();
+
     wd_server->Start();
 
     return app.exec();
