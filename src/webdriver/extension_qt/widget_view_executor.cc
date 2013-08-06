@@ -120,7 +120,7 @@ void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-    createUIXML(view, &buff, elementsMap, error, true);
+    createUIXML(view, &buff, elementsMap, error);
 
     if (*error)
         return;
@@ -836,7 +836,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
 
     buff.open(QIODevice::ReadWrite);
     XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error, false);
+    createUIXML(parent, &buff, elementsMap, error);
     if (*error)
         return;
 
@@ -896,21 +896,21 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
     buff.close();
 }
 
-void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource) {
+void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 
     writer->setDevice(buff);
     writer->setAutoFormatting(true);
     writer->writeStartDocument();
 
-    addWidgetToXML(parent, elementsMap, writer, needAddWebSource);
+    addWidgetToXML(parent, elementsMap, writer);
 
     writer->writeEndDocument();
 
     delete writer;
 }
 
-void QWidgetViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer, bool needAddWebSource) {
+void QWidgetViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
     writer->writeStartElement(parent->metaObject()->className());
 
     if (!parent->objectName().isEmpty())
@@ -923,21 +923,13 @@ void QWidgetViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elem
     elementsMap.insert(elementKey, QPointer<QWidget>(parent));
     writer->writeAttribute("elementId", elementKey);
 
-// TODO: this executor doesnt know anything about qwebview
-//    QWebView* webview = qobject_cast<QWebView*>(parent);
-//    if (webview && needAddWebSource)
-//    {
-//        writer->writeCharacters(webview->page()->mainFrame()->toHtml());
-//    }
-//    else
-    {
-        QList<QObject*> childs = parent->children();
-        foreach(QObject *child, childs) {
-            QWidget* childWgt = qobject_cast<QWidget*>(child);
-            if (childWgt)
-                addWidgetToXML(childWgt, elementsMap, writer, needAddWebSource);
-        }
+    QList<QObject*> childs = parent->children();
+    foreach(QObject *child, childs) {
+        QWidget* childWgt = qobject_cast<QWidget*>(child);
+        if (childWgt)
+            addWidgetToXML(childWgt, elementsMap, writer);
     }
+
     writer->writeEndElement();
 }
 
