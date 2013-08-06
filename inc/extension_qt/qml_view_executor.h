@@ -98,7 +98,7 @@ protected:
 
     QDeclarativeItem* getElement(const ElementId &element, Error** error);
     bool FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query);
-//    void FindElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
+    void FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     void createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
     void addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     

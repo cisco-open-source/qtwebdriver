@@ -16,6 +16,8 @@
 #include <QtCore/QDebug>
 #include <QtGui/QApplication>
 
+#include "third_party/pugixml/pugixml.hpp"
+
 namespace webdriver {
 
 const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
@@ -567,8 +569,7 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
     }
 
     if (locator == LocatorType::kXpath) {
-        // TODO:
-        // FindNativeElementsByXpath(parentWidget, query, elements, error);
+        FindElementsByXpath(parentItem, query, elements, error);
     } else {
         // process root        
         if (FilterElement(parentItem, locator, query)) {
@@ -676,71 +677,71 @@ bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std:
     return false;
 }
 
-/*
-void QQmlViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
-    
-#ifndef WD_CONFIG_XPATH
-    *error = new Error(kXPathLookupError, "Finding elements by xpath is not supported");
-    return;
-#else
-    QXmlResultItems result;
+void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
 
     buff.open(QIODevice::ReadWrite);
     XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error, false);
+    createUIXML(parent, &buff, elementsMap, error);
     if (*error)
         return;
 
     buff.seek(0);
-    QXmlQuery xmlquery;
-    xmlquery.bindVariable("buff", &buff);
-    xmlquery.setQuery("doc($buff) "+QString(query.c_str()));
 
-    if (!xmlquery.isValid()) {
-        *error = new Error(kXPathLookupError);
-        return;
-    }
-    xmlquery.evaluateTo(&result);
+    // prepare pointer to data to parse
+    const void* content = byteArray.data();
+    int content_size = byteArray.size();
 
-    buff.close();
-    QXmlItem item(result.next());
-    while (!item.isNull()) {
-        if (item.isNode()) {
-            xmlquery.setFocus(item);
-            xmlquery.setQuery("./@elementId/string()");
-            if (!xmlquery.isValid()) {
-                *error = new Error(kXPathLookupError);
-                return;
-            }
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_buffer(content, content_size);
 
-            QString elementId;
-            xmlquery.evaluateTo(&elementId);
-            if (!elementId.isEmpty()) {
-                // TODO: what this? why do we need to remove EOL?
-                elementId.remove('\n');
+    if (result) {
+        session_->logger().Log(kFineLogLevel, "UI XML parsed without errors");
 
-                if (elementsMap.contains(elementId)) {
-                    ElementId elm;
-                    session_->AddElement(view_id_, new QElementHandle(elementsMap[elementId]), &elm);
-                    (*elements).push_back(elm);
-                    session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-                } else {
-                    session_->logger().Log(kSevereLogLevel, "cant get element from map, skipped");
+        // Select nodes via compiled query
+        pugi::xpath_query query_nodes(query.c_str());
+        pugi::xpath_node_set found_nodes = query_nodes.evaluate_node_set(doc);
+
+        if ( (NULL == query_nodes.result().error) && 
+             (pugi::xpath_type_node_set == query_nodes.return_type()) ) {
+
+            for (pugi::xpath_node_set::const_iterator it = found_nodes.begin(); it != found_nodes.end(); ++it) {
+                pugi::xpath_node node = *it;
+
+                QString elemId(node.node().attribute("elementId").value());
+
+                if (!elemId.isEmpty()) {
+                    if (elementsMap.contains(elemId)) {
+                        ElementId elm;
+                        session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
+                        (*elements).push_back(elm);
+                        session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+                    } else {
+                        session_->logger().Log(kSevereLogLevel, "cant get element from map, skipped");
+                    }
                 }
             }
+        } else {
+            std::string error_descr = "Cant evaluate XPath to node set: ";       
+            error_descr += query_nodes.result().description();
+            session_->logger().Log(kWarningLogLevel, error_descr);
+            *error = new Error(kXPathLookupError);
         }
-        item = result.next();
     }
-    if (elements->empty())
+    else
     {
-        return;
+        std::string error_descr = "   Error description: ";
+        error_descr += result.description();
+        session_->logger().Log(kWarningLogLevel, "UI XML parsed with errors:");
+        session_->logger().Log(kWarningLogLevel, error_descr);
     }
-#endif
 
+    // destroy tree
+    doc.reset();
+
+    buff.close();
 }
-*/
 
 void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
     
