@@ -46,6 +46,8 @@ webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new 
 #include "webdriver_view_id.h"
 #include "webdriver_element_id.h"
 
+#include "webdriver_cisco_player_commands_interface.h"
+
 namespace base {
 class Value;    
 }
@@ -72,7 +74,7 @@ enum StorageType {
 };
 
 /// base class for custom view's executors
-class ViewCmdExecutor {
+class ViewCmdExecutor : public CiscoPlayerCommandsInterface{
 public:
     explicit ViewCmdExecutor(Session* session, ViewId viewId);
     virtual ~ViewCmdExecutor();

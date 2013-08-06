@@ -137,6 +137,12 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error);
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState*, webdriver::Error**) const;
+    virtual void SetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState, webdriver::Error**);
+    virtual void GetPlayerVolume(int*, webdriver::Error**) const;
+    virtual void SetPlayerVolume(int, webdriver::Error**);
+    virtual void GetPlayingPosition(double*, webdriver::Error**) const;
+    virtual void SetPlayingPosition(double, webdriver::Error**);
 
 
 protected:

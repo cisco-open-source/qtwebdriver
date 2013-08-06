@@ -84,6 +84,9 @@ public:
     static const char kSessionStorageSize[];
     static const char kGetLocation[];
     static const char kXdrpc[];
+    static const char kCiscoPlayerState[];
+    static const char kCiscoPlayerVolume[];
+    static const char kCiscoPlayingPosition[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

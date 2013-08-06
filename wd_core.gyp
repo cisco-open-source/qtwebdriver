@@ -49,6 +49,7 @@
         'src/webdriver/commands/window_commands.cc',
         'src/webdriver/commands/non_session_commands.cc',
         'src/webdriver/commands/xdrpc_command.cc',
+        'src/webdriver/commands/cisco_player_commands.cc',
         'src/webdriver/webdriver_route_patterns.cc',
         'src/webdriver/frame_path.cc',
         'src/webdriver/http_response.cc',

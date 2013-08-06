@@ -34,6 +34,7 @@
 #include "commands/cookie_commands.h"
 #include "commands/html5_storage_commands.h"
 #include "commands/html5_location_commands.h"
+#include "commands/cisco_player_commands.h"
 #include "commands/xdrpc_command.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
@@ -297,6 +298,9 @@ DefaultRouteTable::DefaultRouteTable()
     Add<SessionStorageSizeCommand>      (CommandRoutes::kSessionStorageSize);
     Add<HTML5LocationCommand>           (CommandRoutes::kGetLocation);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
+    Add<CISCO_StateCommand>             (CommandRoutes::kCiscoPlayerState);
+    Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);
+    Add<CISCO_SeekCommand>              (CommandRoutes::kCiscoPlayingPosition);
 
 }
 

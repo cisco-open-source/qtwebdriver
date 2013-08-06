@@ -816,6 +816,32 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     *url = QWidgetViewUtil::makeUrlByClassName(className);
 }
 
+void QWidgetViewCmdExecutor::GetPlayerState(CiscoPlayerCommandsInterface::PlayerState *state, Error **error) const
+{
+    session_->logger().Log(kFineLogLevel, "Get state executed");
+}
+
+void QWidgetViewCmdExecutor::SetPlayerState(CiscoPlayerCommandsInterface::PlayerState state, Error **error)
+{
+    session_->logger().Log(kFineLogLevel, "Post state executed");
+}
+
+void QWidgetViewCmdExecutor::GetPlayerVolume(int *level, Error **error) const
+{
+}
+
+void QWidgetViewCmdExecutor::SetPlayerVolume(int level, Error **error)
+{
+}
+
+void QWidgetViewCmdExecutor::GetPlayingPosition(double *position, Error **error) const
+{
+}
+
+void QWidgetViewCmdExecutor::SetPlayingPosition(double position, Error **error)
+{
+}
+
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
         if (query == widget->metaObject()->className())

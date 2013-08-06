@@ -150,7 +150,6 @@ int main(int argc, char *argv[])
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
-	
 	setQtSettings();
     wd_server->Start();
 

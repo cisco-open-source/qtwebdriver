@@ -75,6 +75,9 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSessionStorageSize);
 		standardCommandRoutes.insert(kGetLocation);
 		standardCommandRoutes.insert(kXdrpc);
+        standardCommandRoutes.insert(kCiscoPlayerState);
+        standardCommandRoutes.insert(kCiscoPlayerVolume);
+        standardCommandRoutes.insert(kCiscoPlayingPosition);
 	}
 
 	// check if paatern is presence in set
@@ -149,5 +152,8 @@ const char CommandRoutes::kSessionStorageKey[] 			= "/session/*/session_storage/
 const char CommandRoutes::kSessionStorageSize[] 		= "/session/*/session_storage/size";
 const char CommandRoutes::kGetLocation[]				= "/session/*/location";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
+const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-CISCO-player-element/state";
+const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
+const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
 
 } // namespace webdriver
