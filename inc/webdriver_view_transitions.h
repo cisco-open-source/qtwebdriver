@@ -22,6 +22,8 @@ public:
     /// @param session session to work within
     /// @param viewId viewId not able to handle requested URL
     virtual void HandleOldView(Session* session, const ViewId& viewId) const = 0;
+
+    virtual ~URLTransitionAction(){}
 };
 
 /// transition action - close old view
