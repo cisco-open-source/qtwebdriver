@@ -6,6 +6,7 @@
 #include <QtCore/QMap>
 
 #include "vncserverparameters.h"
+#include "webdriver_logging.h"
 
 class VNCClient : public QObject
 {
@@ -15,6 +16,7 @@ public:
     ~VNCClient();
 
     static VNCClient* getInstance();
+    static void SplitVncLoginParameters(QString &loginInfo, QString *login, QString *passwd, QString *ip, QString *port);
 
     bool Init(QString remoteHost, quint16 port);
     bool Init(QString remoteHost, quint16 port, QString* password);
@@ -24,7 +26,7 @@ public:
 
 public slots:
     QByteArray readSocket();
-    QByteArray readSocket(qint64 size);
+    // QByteArray readSocket(qint64 size);
     qint64 writeToSocket(QByteArray& data);
 
 private slots:
@@ -84,6 +86,7 @@ private:
     int _establishedVersion;
     Encodings _establishedSecurity;
     ServerParameters* _serverParameters;
+    webdriver::StdOutLog *_logger;
 
     QString *_password;
 };

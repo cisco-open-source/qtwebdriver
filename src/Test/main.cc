@@ -177,19 +177,25 @@ int main(int argc, char *argv[])
 
     // start VNC module
     CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
-    if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer) || cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
+    if (cmdLine.HasSwitch(webdriver::Switches::kVNCLogin))
     {
         QString address = "127.0.0.1";
-        int port = 5900;
+        QString login = "anonymous";
+        QString *password = new QString();
+        QString port = "5900";
 
-        if (cmdLine.HasSwitch(webdriver::Switches::kVNCServer))
-            address = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCServer).c_str();
-        if (cmdLine.HasSwitch(webdriver::Switches::kVNCPort))
-            port = QString(cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCPort).c_str()).toInt();
+        QString loginInfo = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCLogin).c_str();
+        VNCClient::SplitVncLoginParameters(loginInfo, &login, password, &address, &port);
 
         VNCClient *client = VNCClient::getInstance();
         if (!client->isReady())
-            client->Init(address, port);
+        {
+            std::cout << "#### Password: " << password->toStdString() << std::endl;
+            if (password->isEmpty())
+                client->Init(address, port.toInt());
+            else
+                client->Init(address, port.toInt(), password);
+        }
 
         WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
     }
@@ -251,8 +257,8 @@ void PrintHelp() {
                 << "wi-server      false              If true, web inspector will be enabled"         << std::endl
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
                 << "version                           Print version information to stdout and exit"   << std::endl
-                << "vnc-port       5900               VNC server listening port"                      << std::endl
-                << "vnc-server     127.0.0.1          VNC server IP address"                          << std::endl;
+                << "vnc-login      127.0.0.1:5900     VNC server login parameters"                    << std::endl
+                << "                                  Fomat: login.password@ip:port"                  << std::endl;
 }
 
 

@@ -1,12 +1,15 @@
 #include "vncclient.h"
+#include "third_party/des/d3des.h"
 
-#include <iostream>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMap>
 #include <QtCore/QRegExp>
+#include <QtCore/QStringList>
 
 #define MAJOR_INDEX 6
 #define MINOR_INDEX 10
+
+using namespace webdriver;
 
 VNCClient* VNCClient::_instance = NULL;
 
@@ -68,6 +71,7 @@ VNCClient::VNCClient()
       _serverParameters(NULL),
       _password(NULL)
 {
+    _logger = StdOutLog::Get();
 }
 
 VNCClient::~VNCClient()
@@ -139,10 +143,10 @@ QByteArray VNCClient::readSocket()
 {
     QByteArray data = _socket->readAll();
 
-    std::cout << "#### Read from socket: " << data.data() << std::endl;
+    _logger->Log(kInfoLogLevel, base::Time::Now(), std::string("#### Read from socket: ") + std::string(data.data()));
     for (int i=0; i<data.size(); i++)
-        std::cout << data.at(i) << " ";
-    std::cout << std::endl;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), QString(data.at(i)).toStdString());
+    _logger->Log(kInfoLogLevel, base::Time::Now(), "\n");
 
     if (!_versionEstablished)
     {
@@ -163,7 +167,8 @@ QByteArray VNCClient::readSocket()
     // Go through autentication
     if (!_autenticationPassed && VNCAuthentication == _establishedSecurity)
     {
-        // todo
+        passAutentication(data);
+        return data;
     }
     if (!_handshakeFinished)
     {
@@ -178,7 +183,7 @@ QByteArray VNCClient::readSocket()
     return data;
 }
 
-QByteArray VNCClient::readSocket(qint64 size)
+/* QByteArray VNCClient::readSocket(qint64 size)
 {
     QByteArray data = _socket->read(size);
 
@@ -203,7 +208,8 @@ QByteArray VNCClient::readSocket(qint64 size)
     // Go through autentication
     if (!_autenticationPassed && VNCAuthentication == _establishedSecurity)
     {
-        // todo
+        passAutentication(data);
+        return data;
     }
     if (!_handshakeFinished)
     {
@@ -216,7 +222,7 @@ QByteArray VNCClient::readSocket(qint64 size)
     }
 
     return data;
-}
+}*/
 
 qint64 VNCClient::writeToSocket(QByteArray &data)
 {
@@ -229,7 +235,7 @@ qint64 VNCClient::writeToSocket(QByteArray &data)
     }
     else
     {
-        std::cout << "#### Socket isn't in connected state. Couldn't write to socket" << std::endl;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket isn't in connected state. Couldn't write to socket");
     }
 
     return bytesNmb;
@@ -240,19 +246,19 @@ void VNCClient::onStateChanged(QAbstractSocket::SocketState state)
     switch (state)
     {
     case QAbstractSocket::UnconnectedState:
-        std::cout << "#### Socket state: UnconnectedState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Socket state: UnconnectedState"); break;
     case QAbstractSocket::HostLookupState:
-        std::cout << "#### Sockte state: HostLookupState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Sockte state: HostLookupState"); break;
     case QAbstractSocket::ConnectingState:
-        std::cout << "#### Socket state: ConnectingState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Socket state: ConnectingState"); break;
     case QAbstractSocket::ConnectedState:
-        std::cout << "#### Socket state: ConnectedState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Socket state: ConnectedState"); break;
     case QAbstractSocket::BoundState:
-        std::cout << "#### Socket state: BoundState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Socket state: BoundState"); break;
     case QAbstractSocket::ClosingState:
-        std::cout << "#### Socket state: ClosingState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Sockte state: ClosingState"); break;
     case QAbstractSocket::ListeningState:
-        std::cout << "#### Socket state: ListeningState" << std::endl; break;
+        _logger->Log(kInfoLogLevel, base::Time::Now(), "Sockte state: ListeningState"); break;
     }
 }
 
@@ -261,45 +267,45 @@ void VNCClient::onError(QAbstractSocket::SocketError error)
     switch (error)
     {
     case QAbstractSocket::ConnectionRefusedError:
-        std::cout << "#### Socket error: ConnectionRefusedError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ConnectionRefusedError"); break;
     case QAbstractSocket::RemoteHostClosedError:
-        std::cout << "#### Socket error: RemoteHostClosedError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: RemoteHostClosedError"); break;
     case QAbstractSocket::HostNotFoundError:
-        std::cout << "#### Socket error: HostNotFoundError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: HostNotFoundError"); break;
     case QAbstractSocket::SocketAccessError:
-        std::cout << "#### Socket error: SocketAccessError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: SocketAccessError"); break;
     case QAbstractSocket::SocketResourceError:
-        std::cout << "#### Socket error: SocketResourceError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: SocketResourceError"); break;
     case QAbstractSocket::SocketTimeoutError:
-        std::cout << "#### Socket error: SocketTimeoutError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: SocketTimeoutError"); break;
     case QAbstractSocket::DatagramTooLargeError:
-        std::cout << "#### Socket error: DatagramTooLargeError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: DatagramTooLargeError"); break;
     case QAbstractSocket::NetworkError:
-        std::cout << "#### Socket error: NetworkError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: NetworkError"); break;
     case QAbstractSocket::AddressInUseError:
-        std::cout << "#### Socket error: AddressInUseError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: AddressInUseError"); break;
     case QAbstractSocket::SocketAddressNotAvailableError:
-        std::cout << "#### Socket error: SocketAddressNotAvailableError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: SocketAddressNotAvailableError"); break;
     case QAbstractSocket::UnsupportedSocketOperationError:
-        std::cout << "#### Sockte error: UnsupportedSocketOperationError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: UnsupportedSocketOperationError"); break;
     case QAbstractSocket::ProxyAuthenticationRequiredError:
-        std::cout << "#### Socket error: ProxyAuthenticationRequiredError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyAuthenticationRequiredError"); break;
     case QAbstractSocket::SslHandshakeFailedError:
-        std::cout << "#### Socket error: SslHandshakeFailedError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: SslHandshakeFailedError"); break;
     case QAbstractSocket::UnfinishedSocketOperationError:
-        std::cout << "#### Socket error: UnfinishedSocketOperationError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: UnfinishedSocketOperationError"); break;
     case QAbstractSocket::ProxyConnectionRefusedError:
-        std::cout << "#### Socket error: ProxyConnectionRefusedError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyConnectionRefusedError"); break;
     case QAbstractSocket::ProxyConnectionClosedError:
-        std::cout << "#### Socket error: ProxyConnectionClosedError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyConnectionClosedError"); break;
     case QAbstractSocket::ProxyConnectionTimeoutError:
-        std::cout << "#### Socket error: ProxyConnectionTimeoutError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyConnectionTimeoutError"); break;
     case QAbstractSocket::ProxyNotFoundError:
-        std::cout << "#### Socket error: ProxyNotFoundError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyNotFoundError"); break;
     case QAbstractSocket::ProxyProtocolError:
-        std::cout << "#### Socket error: ProxyProtocolError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: ProxyProtocolError"); break;
     case QAbstractSocket::UnknownSocketError:
-        std::cout << "#### Socket error: UnknownSocketError" << std::endl; break;
+        _logger->Log(kWarningLogLevel, base::Time::Now(), "Socket error: UnknownSocketError"); break;
     }
 }
 
@@ -311,7 +317,9 @@ bool VNCClient::establishProtocolVersion(QByteArray &data)
 
     if (3 != major && (3 != minor || 7 != minor || 8 != minor))
     {
-        std::cout << "#### Return false, version: " << major << "." << minor << std::endl;
+        char version[] = {(char)(major+0x30), (char)(minor+0x30)};
+        _logger->Log(kWarningLogLevel, base::Time::Now(), std::string("Bad protocol version: ") + std::string(version));
+        _socket->close();
         return false;
     }
 
@@ -349,6 +357,7 @@ bool VNCClient::establishSecurity(QByteArray& data)
                 case Invalid:
                 {
                     _communicationError = true;
+                    _socket->close();
                     return false;
                     break;
                 }
@@ -371,7 +380,7 @@ bool VNCClient::establishSecurity(QByteArray& data)
                     QByteArray response(1, one);
                     writeToSocket(response);
                     _securityEstablished = true;
-                    _establishedSecurity = None;
+                    _establishedSecurity = VNCAuthentication;
                     return true;
                     break;
                 }
@@ -395,6 +404,7 @@ bool VNCClient::establishSecurity(QByteArray& data)
             case Invalid:
             {
                 _communicationError = true;
+                _socket->close();
                 return false;
                 break;
             }
@@ -418,12 +428,34 @@ bool VNCClient::establishSecurity(QByteArray& data)
         }
     }
 
+    _socket->close();
     return false;
 }
 
 bool VNCClient::passAutentication(QByteArray &data)
 {
-    return false;
+    if (16 != data.size())
+    {
+        _socket->close();
+        return false;
+    }
+
+    _password->toStdString();
+
+    QByteArray passwd = _password->toLocal8Bit();
+
+    rfbDesKey((unsigned char*)passwd.data(), EN0);
+    unsigned char response[16];
+    memcpy(response, data.data(), 16);
+    rfbDes((unsigned char*)data.data(), response);
+    rfbDes((unsigned char*)data.data()+8, response+8);
+
+    QByteArray encrypted((const char*)response);
+
+    _socket->write(encrypted.left(16));
+    _autenticationPassed = true;
+
+    return true;
 }
 
 bool VNCClient::finishHandshaking(QByteArray &data)
@@ -434,8 +466,8 @@ bool VNCClient::finishHandshaking(QByteArray &data)
     if (0 == response)
     {
         _handshakeFinished = true;
-        char zero = 0x00;
-        QByteArray initMsg(1, zero);
+        char one = 0x01;
+        QByteArray initMsg(1, one);
         writeToSocket(initMsg);
         result = true;
     }
@@ -444,6 +476,7 @@ bool VNCClient::finishHandshaking(QByteArray &data)
         QByteArray error("Security type not established");
         handleZeroError(error);
         result = false;
+        _socket->close();
     }
 
     return result;
@@ -478,7 +511,7 @@ void VNCClient::handleZeroError(QByteArray& data)
     char *msg;
     msg = (data.right(size)).data();
 
-    std::cout << "#### Error: " << msg << std::endl;
+    _logger->Log(kWarningLogLevel, base::Time::Now(), msg);
 
     _socket->close();
 }
@@ -512,12 +545,12 @@ void VNCClient::sendKeyEvent(QKeyEvent *key)
     keyMsg.insert(6, value[2]);
     keyMsg.insert(7, value[3]);
 
-    std::cout << "#### Send key message: " << std::endl;
+    _logger->Log(kInfoLogLevel, base::Time::Now(), "Send key message: ");
     for (int i=0; i<keyMsg.size(); i++)
     {
-        std::cout << (int)keyMsg.at(i) << " ";
+        _logger->Log(kInfoLogLevel, base::Time::Now(), QString(keyMsg.at(i)).toStdString());
     }
-    std::cout << std::endl;
+    _logger->Log(kInfoLogLevel, base::Time::Now(), "\n");
 
     writeToSocket(keyMsg);
 }
@@ -663,4 +696,64 @@ quint16 VNCClient::convertQtKeyToX11Key(QKeyEvent *key)
     }
 
     return keysym;
+}
+
+void VNCClient::SplitVncLoginParameters(QString &loginInfo, QString *login, QString *passwd, QString *ip, QString *port)
+{
+    //
+    //  Format: - login.password@ip:port
+    //
+
+    QStringList parts = loginInfo.split("@");
+
+    if (2 == parts.count())
+    {
+        QString logInfo = parts[0];
+        QString vncAddress = parts[1];
+
+        // split login and password
+        if (!logInfo.isEmpty())
+        {
+            parts = logInfo.split(".");
+
+            if (2 == parts.count())
+            {
+                *login = parts[0];
+                *passwd = parts[1];
+            }
+            else
+            {
+                *passwd = parts[0];
+            }
+        }
+
+        // split ip and port
+        if (!vncAddress.isEmpty())
+        {
+            parts = vncAddress.split(":");
+
+            if (2 == parts.count())
+            {
+                *ip = parts[0];
+                *port = parts[1];
+            }
+            else
+            {
+                *port = parts[0];
+            }
+        }
+    }
+    else
+    {
+        loginInfo = parts[0];
+
+        if (!loginInfo.isEmpty())
+        {
+            parts = loginInfo.split(":");
+
+            *ip = parts[0];
+            *port = parts[1];
+        }
+    }
+
 }
