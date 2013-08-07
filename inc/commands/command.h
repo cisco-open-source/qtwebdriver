@@ -11,6 +11,7 @@
 #include "base/basictypes.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/values.h"
+#include "base/yasper.h"
 #include "build/build_config.h"
 
 #if defined(OS_MACOSX)
@@ -33,6 +34,8 @@ public:
     /// @param parameters container of parsed JSON input
     Command(const std::vector<std::string>& path_segments,
             const DictionaryValue* const parameters);
+
+    Command(const Command& other);
 
     virtual ~Command();
 
@@ -124,8 +127,8 @@ protected:
     bool GetListParameter(const std::string& key, const ListValue** out) const;
 
     const std::vector<std::string> path_segments_;
-    //const scoped_ptr<const DictionaryValue> parameters_;
-    scoped_ptr<const DictionaryValue> parameters_;
+
+    yasper::ptr<const DictionaryValue> parameters_;
 
 private:
 #if defined(OS_MACOSX)
@@ -137,7 +140,7 @@ private:
     base::mac::ScopedNSAutoreleasePool autorelease_pool;
 #endif
 
-    DISALLOW_COPY_AND_ASSIGN(Command);
+    void operator=(const Command&);
 };
 
 }  // namespace webdriver

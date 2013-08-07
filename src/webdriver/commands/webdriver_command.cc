@@ -48,8 +48,8 @@ bool WebDriverCommand::Init(Response* const response) {
 
     std::string message = base::StringPrintf(
         "Command received (%s)", JoinString(path_segments_, '/').c_str());
-    if (parameters_.get())
-        message += " with params " + JsonStringifyForDisplay(parameters_.get());
+    if (parameters_)
+        message += " with params " + JsonStringifyForDisplay(parameters_.GetRawPointer());
     session_->logger().Log(kFineLogLevel, message);
 
     if (ShouldRunPreAndPostCommandHandlers()) {
