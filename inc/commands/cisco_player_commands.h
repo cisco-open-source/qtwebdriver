@@ -2,7 +2,7 @@
 #define CISCO_VOLUMECOMMAND_H
 
 #include "commands/webdriver_command.h"
-#include "webdriver_cisco_player_commands_interface.h"
+#include "commands/element_commands.h"
 #include "base/values.h"
 #include "base/bind.h"
 #include "commands/response.h"
@@ -19,7 +19,7 @@ namespace webdriver {
 
 class Response;
 
-class CISCO_VolumeCommand : public ViewCommand
+class CISCO_VolumeCommand : public ElementCommand
 {
 public:
     CISCO_VolumeCommand(const std::vector<std::string>& path_segments,
@@ -35,7 +35,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(CISCO_VolumeCommand);
 };
 
-class CISCO_StateCommand : public ViewCommand
+class CISCO_StateCommand : public ElementCommand
 {
 public:
     CISCO_StateCommand(const std::vector<std::string>& path_segments,
@@ -51,7 +51,7 @@ private:
     DISALLOW_COPY_AND_ASSIGN(CISCO_StateCommand);
 };
 
-class CISCO_SeekCommand : public ViewCommand
+class CISCO_SeekCommand : public ElementCommand
 {
 public:
     CISCO_SeekCommand(const std::vector<std::string>& path_segments,

@@ -809,29 +809,29 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     *url = QWidgetViewUtil::makeUrlByClassName(className);
 }
 
-void QWidgetViewCmdExecutor::GetPlayerState(CiscoPlayerCommandsInterface::PlayerState *state, Error **error) const
+void QWidgetViewCmdExecutor::GetPlayerState(const ElementId& element, PlayerState *state, Error **error) const
 {
     session_->logger().Log(kFineLogLevel, "Get state executed");
 }
 
-void QWidgetViewCmdExecutor::SetPlayerState(CiscoPlayerCommandsInterface::PlayerState state, Error **error)
+void QWidgetViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState state, Error **error)
 {
     session_->logger().Log(kFineLogLevel, "Post state executed");
 }
 
-void QWidgetViewCmdExecutor::GetPlayerVolume(int *level, Error **error) const
+void QWidgetViewCmdExecutor::GetPlayerVolume(const ElementId& element, int *level, Error **error) const
 {
 }
 
-void QWidgetViewCmdExecutor::SetPlayerVolume(int level, Error **error)
+void QWidgetViewCmdExecutor::SetPlayerVolume(const ElementId& element, int level, Error **error)
 {
 }
 
-void QWidgetViewCmdExecutor::GetPlayingPosition(double *position, Error **error) const
+void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId& element, double *position, Error **error) const
 {
 }
 
-void QWidgetViewCmdExecutor::SetPlayingPosition(double position, Error **error)
+void QWidgetViewCmdExecutor::SetPlayingPosition(const ElementId& element, double position, Error **error)
 {
 }
 
