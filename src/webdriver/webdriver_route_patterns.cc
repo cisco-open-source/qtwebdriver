@@ -83,6 +83,9 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
         standardCommandRoutes.insert(kTouchLongClick);
         standardCommandRoutes.insert(kTouchFlick);
 		standardCommandRoutes.insert(kXdrpc);
+        standardCommandRoutes.insert(kCiscoPlayerState);
+        standardCommandRoutes.insert(kCiscoPlayerVolume);
+        standardCommandRoutes.insert(kCiscoPlayingPosition);
 	}
 
 	// check if paatern is presence in set
@@ -165,5 +168,8 @@ const char CommandRoutes::kTouchDoubleClick[]			= "/session/*/touch/doubleclick"
 const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
 const char CommandRoutes::kTouchFlick[]		        	= "/session/*/touch/flick";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
+const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-CISCO-player-element/state";
+const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
+const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
 
 } // namespace webdriver

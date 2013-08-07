@@ -93,6 +93,12 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState*, webdriver::Error**) const;
+    virtual void SetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState, webdriver::Error**);
+    virtual void GetPlayerVolume(int*, webdriver::Error**) const;
+    virtual void SetPlayerVolume(int, webdriver::Error**);
+    virtual void GetPlayingPosition(double*, webdriver::Error**) const;
+    virtual void SetPlayingPosition(double, webdriver::Error**);
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

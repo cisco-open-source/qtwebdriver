@@ -92,6 +92,9 @@ public:
     static const char kTouchLongClick[];
     static const char kTouchFlick[];
     static const char kXdrpc[];
+    static const char kCiscoPlayerState[];
+    static const char kCiscoPlayerVolume[];
+    static const char kCiscoPlayingPosition[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

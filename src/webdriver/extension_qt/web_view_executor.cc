@@ -1565,6 +1565,30 @@ void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **er
     *browserLog = logHandler->getLog();
 }
 
+void QWebViewCmdExecutor::GetPlayerState(CiscoPlayerCommandsInterface::PlayerState *state, Error **error) const
+{
+}
+
+void QWebViewCmdExecutor::SetPlayerState(CiscoPlayerCommandsInterface::PlayerState state, Error **error)
+{
+}
+
+void QWebViewCmdExecutor::GetPlayerVolume(int *level, Error **error) const
+{
+}
+
+void QWebViewCmdExecutor::SetPlayerVolume(int level, Error **error)
+{
+}
+
+void QWebViewCmdExecutor::GetPlayingPosition(double *position, Error **error) const
+{
+}
+
+void QWebViewCmdExecutor::SetPlayingPosition(double position, Error **error)
+{
+}
+
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
     if (frame_path.value().empty())
         return NULL;

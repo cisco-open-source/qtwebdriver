@@ -34,6 +34,7 @@
 #include "commands/cookie_commands.h"
 #include "commands/html5_storage_commands.h"
 #include "commands/html5_location_commands.h"
+#include "commands/cisco_player_commands.h"
 #include "commands/xdrpc_command.h"
 #include "commands/touch_commands.h"
 #include "webdriver_logging.h"
@@ -306,6 +307,9 @@ DefaultRouteTable::DefaultRouteTable()
     Add<TouchLongClickCommand>          (CommandRoutes::kTouchLongClick);
     Add<TouchFlickCommand>              (CommandRoutes::kTouchFlick);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
+    Add<CISCO_StateCommand>             (CommandRoutes::kCiscoPlayerState);
+    Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);
+    Add<CISCO_SeekCommand>              (CommandRoutes::kCiscoPlayingPosition);
 
 }
 

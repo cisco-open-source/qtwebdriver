@@ -91,6 +91,12 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerState(CiscoPlayerCommandsInterface::PlayerState*, Error** error) const NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerState(CiscoPlayerCommandsInterface::PlayerState, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerVolume(int*, Error** error) const NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerVolume(int, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayingPosition(double*, Error** error) const NOT_SUPPORTED_IMPL;
+    virtual void SetPlayingPosition(double, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
     QDeclarativeView* getView(const ViewId& viewId, Error** error);
