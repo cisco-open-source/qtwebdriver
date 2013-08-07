@@ -701,7 +701,7 @@ quint16 VNCClient::convertQtKeyToX11Key(QKeyEvent *key)
 void VNCClient::SplitVncLoginParameters(QString &loginInfo, QString *login, QString *passwd, QString *ip, QString *port)
 {
     //
-    //  Format: - login.password@ip:port
+    //  Format: - login:password@ip:port
     //
 
     QStringList parts = loginInfo.split("@");
@@ -714,7 +714,7 @@ void VNCClient::SplitVncLoginParameters(QString &loginInfo, QString *login, QStr
         // split login and password
         if (!logInfo.isEmpty())
         {
-            parts = logInfo.split(".");
+            parts = logInfo.split(":");
 
             if (2 == parts.count())
             {
