@@ -67,7 +67,7 @@ public:
     virtual void SwitchToTopFrameIfCurrentFrameInvalid(Error** error) NOT_SUPPORTED_IMPL;
     virtual void NavigateToURL(const std::string& url, bool sync, Error** error);
     virtual void GetURL(std::string* url, Error** error);
-    virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetAppCacheStatus(int* status, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetCookies(const std::string& url, base::ListValue** cookies, Error** error) NOT_SUPPORTED_IMPL;
