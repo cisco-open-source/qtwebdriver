@@ -262,19 +262,28 @@ void QWebViewVisualizerSourceCommand::AssemblePage(QDomElement element) const {
 }
 
 void QWebViewVisualizerSourceCommand::AssembleLink(QDomElement element) const {
+    QString rel = element.attribute("rel");
     QString type = element.attribute("type");
-    if (type != "text/css")
+    if (rel != "stylesheet" && type != "text/css")
         return;
 
     QString url = AbsoluteUrl(element.attribute("href"));
     QByteArray file;
-    Download(url, &file, NULL);
+    QString contentType;
+    Download(url, &file, &contentType);
 
     QDomElement style = element.ownerDocument().createElement("style");
-    style.setAttribute("type", "text/css");
-    style.setNodeValue(file);
+    if (!type.isEmpty())
+        style.setAttribute("type", type);
+    else if (!contentType.isEmpty())
+        style.setAttribute("type", contentType.split(';')[0]);
 
-    element.parentNode().replaceChild(style, element);
+    if (!file.isEmpty()) {
+        style.appendChild(style.ownerDocument().createTextNode(file));
+        element.parentNode().replaceChild(style, element);
+    } else {
+        element.parentNode().removeChild(element);
+    }
 }
 
 // Convert <img> tag 'src' attribute to base64
@@ -366,7 +375,8 @@ void QWebViewVisualizerSourceCommand::Download(const QString& url, QByteArray* b
     loop.exec();
 
     *buffer = reply->readAll();
-    *contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
+    if (contentType)
+        *contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
 }
 
 QString QWebViewVisualizerSourceCommand::DownloadAndEncode(const QString& url) const {
