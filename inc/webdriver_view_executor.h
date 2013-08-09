@@ -179,6 +179,8 @@ public:
     virtual void SetPlayerVolume(const ElementId& element, const int level, Error** error) = 0;
     virtual void GetPlayingPosition(const ElementId& element, double* reletivePos, Error** error) const =0;
     virtual void SetPlayingPosition(const ElementId& element, const double reletivePos, Error** error) = 0;
+	virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
+    virtual void GetOrientation(std::string *orientation, Error **error) = 0;
 
 protected:
     Session* session_;

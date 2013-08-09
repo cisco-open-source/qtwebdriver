@@ -13,7 +13,7 @@
 #include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
-#include <QtGui/QTouchDevice>
+#include <QtGui/QTouchDevice>   
 #else
 #include <QtGui/QWidget>
 #endif
@@ -43,6 +43,8 @@ public:
     virtual void GetAlertMessage(std::string* text, Error** error);
     virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error);
     virtual void AcceptOrDismissAlert(bool accept, Error** error);
+    virtual void SetOrientation(const std::string &orientation, Error **error);
+    virtual void GetOrientation(std::string *orientation, Error **error);
 
 protected:
     QWidget* getView(const ViewId& viewId, Error** error);
