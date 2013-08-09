@@ -17,6 +17,10 @@ public:
 
     virtual void ExecutePost(Response* const response) OVERRIDE;
 
+    virtual bool DoesGet() const OVERRIDE;
+
+    virtual void ExecuteGet(Response* const response) OVERRIDE;
+
 private:
     DISALLOW_COPY_AND_ASSIGN(ShutdownCommand);
 };
