@@ -279,18 +279,21 @@ void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
 
 void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **error)
 {
-#ifdef OS_ANDROID
-    int android_orientation;
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
 
+    int screen_orientation;
     if (orientation == "LANDSCAPE")
-        android_orientation = 0;
+       screen_orientation = 0;
     else if (orientation == "PORTRAIT")
-        android_orientation = 1;
+       screen_orientation = 1;
     else
     {
         *error = new Error(kBadRequest, "Invalid \"orientation\" parameter");
     }
 
+#ifdef OS_ANDROID
     QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
     JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
 
@@ -312,15 +315,23 @@ void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **er
         return;
     }
 
-    g_env->CallVoidMethod(activity, mid, android_orientation);
+    g_env->CallVoidMethod(activity, mid,screen_orientation);
     currVM->DetachCurrentThread();
 #else
-    NOT_SUPPORTED_IMPL
+    if (((screen_orientation == 0) && (view->height() > view->width())) || 
+        ((screen_orientation == 1) && (view->height() < view->width()))) 
+    {
+        view->setGeometry(view->x(), view->y(), view->height(), view->width());
+    }
+
 #endif
 }
 
 void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
 {
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
 #ifdef OS_ANDROID
     int android_orientation;
 
@@ -359,7 +370,11 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
     }
 
 #else
-    NOT_SUPPORTED_IMPL
+    // This command is emulating
+    if (view->height() > view->width())
+        *orientation = "PORTRAIT";
+    else
+        *orientation = "LANDSCAPE";
 #endif
 }
 
