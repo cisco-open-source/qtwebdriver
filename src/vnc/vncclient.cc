@@ -1,4 +1,4 @@
-#include "vncclient.h"
+#include "extension_qt/vncclient.h"
 
 #include <iostream>
 #include <QtNetwork/QHostAddress>
