@@ -30,4 +30,14 @@ bool ShutdownCommand::DoesPost() const
     return true;
 }
 
+bool ShutdownCommand::DoesGet() const
+{
+    return true;
+}
+
+void ShutdownCommand::ExecuteGet(Response * const response)
+{
+    ExecutePost(response);
+}
+
 }

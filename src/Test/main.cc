@@ -200,9 +200,11 @@ int main(int argc, char *argv[])
         WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
     }
 
-	setQtSettings();
+    setQtSettings();
 
-    wd_server->Start();
+    int startError = wd_server->Start();
+    if (startError)
+        return startError;
 
     return app.exec();
 }

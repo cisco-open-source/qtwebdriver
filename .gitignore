@@ -24,3 +24,11 @@ wd.gypi
 /WebDriver.target.mk
 /WebDriverTest.target.mk
 /src/webdriver/webdriver_version.cc
+/build-*
+/AndroidWD/android/bin
+/AndroidWD/android/gen
+/AndroidWD/android/libs
+/AndroidWD/android/build.xml
+/AndroidWD/android/local.properties
+/AndroidWD/android/proguard-project.txt
+/AndroidWD/android/project.properties
