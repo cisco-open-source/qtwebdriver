@@ -2,7 +2,7 @@
 #define VNCEVENTDISPATCHER_H
 
 #include "event_dispatcher.h"
-#include "extension_qt/vncclient.h"
+#include "vncclient.h"
 
 class VNCEventDispatcher : public EventDispatcher
 {

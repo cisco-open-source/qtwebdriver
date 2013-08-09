@@ -1,6 +1,6 @@
-#include "extension_qt/vncclient.h"
-#include "third_party/des/d3des.h"
+#include "vncclient.h"
 
+#include <iostream>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMap>
 #include <QtCore/QRegExp>
