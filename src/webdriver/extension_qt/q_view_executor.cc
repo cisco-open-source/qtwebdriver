@@ -14,6 +14,10 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
+#ifdef OS_ANDROID
+    #include <qpa/qplatformnativeinterface.h>
+    #include <jni.h> 
+#endif //OS_ANDROID
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -271,6 +275,107 @@ void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
             *error = new Error(kNoAlertOpenError);
         }
     }
+}
+
+void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **error)
+{
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    int screen_orientation;
+    if (orientation == "LANDSCAPE")
+       screen_orientation = 0;
+    else if (orientation == "PORTRAIT")
+       screen_orientation = 1;
+    else
+    {
+        *error = new Error(kBadRequest, "Invalid \"orientation\" parameter");
+    }
+
+#ifdef OS_ANDROID
+    QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
+    JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
+
+    JNIEnv * g_env = NULL;
+    jint ret = currVM->AttachCurrentThread(&g_env, NULL);
+    if (ret != JNI_OK)
+    {
+        *error = new Error(kUnknownError, "JNI error: AttachCurrentThread failed");
+        return;
+    }
+    jobject activity = (jobject)interface->nativeResourceForIntegration("QtActivity");
+
+    jclass cls = g_env->GetObjectClass(activity);
+    jmethodID mid = g_env->GetMethodID(cls, "setRequestedOrientation", "(I)V");
+
+    if (mid == 0)
+    {
+        *error = new Error(kUnknownError, "JNI error: Method getRequestedOrientation not found");
+        return;
+    }
+
+    g_env->CallVoidMethod(activity, mid,screen_orientation);
+    currVM->DetachCurrentThread();
+#else
+    if (((screen_orientation == 0) && (view->height() > view->width())) || 
+        ((screen_orientation == 1) && (view->height() < view->width()))) 
+    {
+        view->setGeometry(view->x(), view->y(), view->height(), view->width());
+    }
+
+#endif
+}
+
+void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
+{
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+#ifdef OS_ANDROID
+    int android_orientation;
+
+    QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
+    JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
+
+    JNIEnv * g_env = NULL;
+    jint ret = currVM->AttachCurrentThread(&g_env, NULL);
+    if (ret != JNI_OK)
+    {
+        *error = new Error(kUnknownError, "JNI error: AttachCurrentThread failed");
+        return;
+    }
+    jobject activity = (jobject)interface->nativeResourceForIntegration("QtActivity");
+
+    jclass cls = g_env->GetObjectClass(activity);
+    jmethodID mid = g_env->GetMethodID(cls, "getRequestedOrientation", "()I");
+
+    if (mid == 0)
+    {
+        *error = new Error(kUnknownError, "JNI error: Method getRequestedOrientation not found");
+        return;
+    }
+
+    android_orientation = g_env->CallIntMethod(activity, mid);
+    currVM->DetachCurrentThread();
+
+    if (android_orientation == 0)
+        *orientation = "LANDSCAPE";
+    else if (android_orientation == 1)
+        *orientation = "PORTRAIT";
+    else
+    {
+        *error = new Error(kUnknownError, "Unknown orientation");
+        return;
+    }
+
+#else
+    // This command is emulating
+    if (view->height() > view->width())
+        *orientation = "PORTRAIT";
+    else
+        *orientation = "LANDSCAPE";
+#endif
 }
 
 Rect QViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {

@@ -46,8 +46,6 @@ webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new 
 #include "webdriver_view_id.h"
 #include "webdriver_element_id.h"
 
-#include "webdriver_cisco_player_commands_interface.h"
-
 namespace base {
 class Value;    
 }
@@ -73,8 +71,16 @@ enum StorageType {
     kSessionStorageType
 };
 
+///@enum PlayerState possible states
+enum PlayerState{
+    Stopped = 0,
+    Playing,
+    Paused
+};
+
+
 /// base class for custom view's executors
-class ViewCmdExecutor : public CiscoPlayerCommandsInterface{
+class ViewCmdExecutor{
 public:
     explicit ViewCmdExecutor(Session* session, ViewId viewId);
     virtual ~ViewCmdExecutor();
@@ -167,6 +173,14 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) = 0;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) = 0;
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error) {}
+    virtual void GetPlayerState(const ElementId& element, PlayerState *state, Error** error) const = 0;
+    virtual void SetPlayerState(const ElementId& element, const PlayerState state, Error** error) = 0;
+    virtual void GetPlayerVolume(const ElementId& element, int *level, Error** error) const = 0;
+    virtual void SetPlayerVolume(const ElementId& element, const int level, Error** error) = 0;
+    virtual void GetPlayingPosition(const ElementId& element, double* reletivePos, Error** error) const =0;
+    virtual void SetPlayingPosition(const ElementId& element, const double reletivePos, Error** error) = 0;
+	virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
+    virtual void GetOrientation(std::string *orientation, Error **error) = 0;
 
 protected:
     Session* session_;

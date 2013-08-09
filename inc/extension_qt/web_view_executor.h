@@ -187,12 +187,12 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error);
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error);
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
-    virtual void GetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState*, webdriver::Error**) const;
-    virtual void SetPlayerState(webdriver::CiscoPlayerCommandsInterface::PlayerState, webdriver::Error**);
-    virtual void GetPlayerVolume(int*, webdriver::Error**) const;
-    virtual void SetPlayerVolume(int, webdriver::Error**);
-    virtual void GetPlayingPosition(double*, webdriver::Error**) const;
-    virtual void SetPlayingPosition(double, webdriver::Error**);
+    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**) const;
+    virtual void SetPlayerState(const ElementId& element, PlayerState, Error**);
+    virtual void GetPlayerVolume(const ElementId& element, int*, Error**) const;
+    virtual void SetPlayerVolume(const ElementId& element, int, Error**);
+    virtual void GetPlayingPosition(const ElementId& element, double*, Error**) const;
+    virtual void SetPlayingPosition(const ElementId& element, double, Error**);
 
 
 protected:

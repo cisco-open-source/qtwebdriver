@@ -20,6 +20,7 @@ void CISCO_VolumeCommand::ExecuteGet(webdriver::Response * const response)
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::GetPlayerVolume,
             base::Unretained(executor_.get()),
+            element,
             &volume,
             &error));
 
@@ -43,6 +44,7 @@ void CISCO_VolumeCommand::ExecutePost(webdriver::Response * const response)
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::SetPlayerVolume,
             base::Unretained(executor_.get()),
+            element,
             level,
             &error));
 
@@ -55,7 +57,7 @@ void CISCO_VolumeCommand::ExecutePost(webdriver::Response * const response)
 CISCO_VolumeCommand::CISCO_VolumeCommand(
         const std::vector<std::string> &path_segments,
         const base::DictionaryValue *parameters)
-    : ViewCommand(path_segments, parameters)
+    : ElementCommand(path_segments, parameters)
 {
 }
 
@@ -76,12 +78,13 @@ bool CISCO_StateCommand::DoesPost() const
 
 void CISCO_StateCommand::ExecuteGet(webdriver::Response * const response)
 {
-    webdriver::CiscoPlayerCommandsInterface::PlayerState state;
+    PlayerState state;
     Error* error = NULL;
 
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::GetPlayerState,
             base::Unretained(executor_.get()),
+            element,
             &state,
             &error));
 
@@ -93,7 +96,7 @@ void CISCO_StateCommand::ExecuteGet(webdriver::Response * const response)
 
 void CISCO_StateCommand::ExecutePost(webdriver::Response * const response)
 {
-    webdriver::CiscoPlayerCommandsInterface::PlayerState state;
+    PlayerState state;
     if (!GetIntegerParameter("state", (int*)&state)) {
         response->SetError(new Error(
             kBadRequest, "'level' is missing or invalid"));
@@ -105,6 +108,7 @@ void CISCO_StateCommand::ExecutePost(webdriver::Response * const response)
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::SetPlayerState,
             base::Unretained(executor_.get()),
+            element,
             state,
             &error));
 
@@ -117,7 +121,7 @@ void CISCO_StateCommand::ExecutePost(webdriver::Response * const response)
 CISCO_StateCommand::CISCO_StateCommand(
         const std::vector<std::string> &path_segments,
         const base::DictionaryValue *parameters)
-    : ViewCommand(path_segments, parameters)
+    : ElementCommand(path_segments, parameters)
 {
 }
 
@@ -144,6 +148,7 @@ void CISCO_SeekCommand::ExecuteGet(webdriver::Response * const response)
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::GetPlayingPosition,
             base::Unretained(executor_.get()),
+            element,
             &position,
             &error));
 
@@ -167,6 +172,7 @@ void CISCO_SeekCommand::ExecutePost(webdriver::Response * const response)
     session_->RunSessionTask(base::Bind(
             &ViewCmdExecutor::SetPlayingPosition,
             base::Unretained(executor_.get()),
+            element,
             position,
             &error));
 
@@ -179,7 +185,7 @@ void CISCO_SeekCommand::ExecutePost(webdriver::Response * const response)
 CISCO_SeekCommand::CISCO_SeekCommand(
         const std::vector<std::string> &path_segments,
         const base::DictionaryValue *parameters)
-    : ViewCommand(path_segments, parameters)
+    : ElementCommand(path_segments, parameters)
 {
 }
 

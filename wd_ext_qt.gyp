@@ -82,6 +82,7 @@
 
           'sources': [
             # TODO: plae quick2 related files
+            'src/webdriver/extension_qt/qml_quick2_stub.cc',
           ],
         } , {
 

@@ -2,6 +2,7 @@
 
 #include "base/stringprintf.h"
 #include "base/string_number_conversions.h"
+#include "base/json/json_writer.h"
 
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
@@ -16,9 +17,20 @@
 #include <QtCore/QDebug>
 #include <QtGui/QApplication>
 
+#include <QtDeclarative/QDeclarativeExpression>
+#include <QtDeclarative/QDeclarativeEngine>
+
 #include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
+
+#if 1 
+#define REMOVE_INTERNAL_SUFIXES(qstr)   \
+            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+#else
+#define REMOVE_INTERNAL_SUFIXES(qstr)
+#endif            
 
 const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
@@ -515,7 +527,10 @@ void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
     if (NULL == pItem)
         return;
 
-    *tag_name = pItem->metaObject()->className();
+    QString className(pItem->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
+
+    *tag_name = className.toStdString();
 }
 
 void QQmlViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
@@ -583,12 +598,6 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         // list all child items and find matched locator
         QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
         foreach(QDeclarativeItem *child, childs) {
-            //qDebug() << "-----------------";
-            //qDebug() << "className: " << child->metaObject()->className();
-            //qDebug() << "objectName: " << child->objectName();
-            //qDebug() << "prop id: " << child->property("id");
-            //qDebug() << "prop name: " << child->property("name");
-    
             if (FilterElement(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
@@ -656,12 +665,70 @@ void QQmlViewCmdExecutor::GetURL(std::string* url, Error** error) {
     *url = view->source().toString().toStdString();
 }
 
+void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    std::string args_as_json;
+    base::JSONWriter::Write(static_cast<const Value* const>(args), &args_as_json);
+
+    std::string jscript = base::StringPrintf(
+        "(function(x) { %s }(%s));",
+        script.c_str(),
+        args_as_json.c_str());
+
+    QDeclarativeExpression *expr = new QDeclarativeExpression(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
+    QVariant result = expr->evaluate();
+    if (expr->hasError()) {
+        *error = new Error(kUnknownError, expr->error().toString().toStdString());
+        session_->logger().Log(kWarningLogLevel, expr->error().toString().toStdString());
+        return;
+    }
+
+    Value* val = NULL;
+
+    if (result.isValid()) {
+        // convert QVariant to base::Value
+        switch (result.type()) {
+        case QVariant::Bool:
+            val = Value::CreateBooleanValue(result.toBool());
+            break;
+        case QVariant::Int:
+            val = Value::CreateIntegerValue(result.toInt());
+            break;
+        case QVariant::Double:
+            val = Value::CreateDoubleValue(result.toDouble());
+            break;
+        case QVariant::String:
+            val = Value::CreateStringValue(result.toString().toStdString());
+            break;
+        default:
+            session_->logger().Log(kWarningLogLevel, "cant handle result type.");
+            *error = new Error(kUnknownError, "cant handle result type.");
+        }
+    } else {
+        session_->logger().Log(kWarningLogLevel, "result is not valid.");
+        *error = new Error(kUnknownError, "result is not valid.");
+    }
+
+    if (NULL == val) {
+        val = Value::CreateNullValue();
+    }
+
+    scoped_ptr<Value> ret_value(val);
+    *value = static_cast<Value*>(ret_value.release());
+}
+
 bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query) {
+    QString className(item->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
+
     if (locator == LocatorType::kClassName) {
-        if (query == item->metaObject()->className())
+        if (query == className.toStdString())
             return true;
     } else if (locator == LocatorType::kTagName) {
-        if (query == item->metaObject()->className())
+        if (query == className.toStdString())
             return true;
     } else if (locator == LocatorType::kId) {
         if (query == item->objectName().toStdString())
@@ -759,8 +826,10 @@ void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff,
 }
 
 void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
+    QString className(parent->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
     
-    writer->writeStartElement(parent->metaObject()->className());
+    writer->writeStartElement(className);
 
     if (!parent->objectName().isEmpty())
         writer->writeAttribute("id", parent->objectName());
