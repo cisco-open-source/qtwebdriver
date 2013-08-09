@@ -44,7 +44,7 @@
         'src/webdriver/extension_qt/q_event_filter.cc',
         'src/webdriver/extension_qt/q_event_filter.h',
         '<(INTERMEDIATE_DIR)/moc_q_event_filter.cc',
-        'src/vnc/vncclient.h',
+        'inc/vncclient.h',
         'src/vnc/vncclient.cc',
         '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
 	'src/third_party/des/d3des.c',
