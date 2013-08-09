@@ -1,4 +1,4 @@
-#include "vncserverparameters.h"
+#include "extension_qt/vncserverparameters.h"
 
 
 ServerParameters::ServerParameters()

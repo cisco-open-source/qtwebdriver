@@ -67,7 +67,7 @@
 #include "extension_qt/wd_event_dispatcher.h"
 #include "extension_qt/vnc_event_dispatcher.h"
 
-#include "vncclient.h"
+#include "extension_qt/vncclient.h"
 #include "webdriver_switches.h"
 
 void setQtSettings();
