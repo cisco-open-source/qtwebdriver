@@ -24,6 +24,14 @@
 
 namespace webdriver {
 
+#if 1 
+#define REMOVE_INTERNAL_SUFIXES(qstr)   \
+            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+#else
+#define REMOVE_INTERNAL_SUFIXES(qstr)
+#endif            
+
 const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
 QQmlViewCmdExecutorCreator::QQmlViewCmdExecutorCreator()
@@ -519,7 +527,10 @@ void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
     if (NULL == pItem)
         return;
 
-    *tag_name = pItem->metaObject()->className();
+    QString className(pItem->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
+
+    *tag_name = className.toStdString();
 }
 
 void QQmlViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
@@ -587,12 +598,6 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         // list all child items and find matched locator
         QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
         foreach(QDeclarativeItem *child, childs) {
-            //qDebug() << "-----------------";
-            //qDebug() << "className: " << child->metaObject()->className();
-            //qDebug() << "objectName: " << child->objectName();
-            //qDebug() << "prop id: " << child->property("id");
-            //qDebug() << "prop name: " << child->property("name");
-    
             if (FilterElement(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
@@ -716,11 +721,14 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
 }
 
 bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query) {
+    QString className(item->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
+
     if (locator == LocatorType::kClassName) {
-        if (query == item->metaObject()->className())
+        if (query == className.toStdString())
             return true;
     } else if (locator == LocatorType::kTagName) {
-        if (query == item->metaObject()->className())
+        if (query == className.toStdString())
             return true;
     } else if (locator == LocatorType::kId) {
         if (query == item->objectName().toStdString())
@@ -818,8 +826,10 @@ void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff,
 }
 
 void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
+    QString className(parent->metaObject()->className());
+    REMOVE_INTERNAL_SUFIXES(className);
     
-    writer->writeStartElement(parent->metaObject()->className());
+    writer->writeStartElement(className);
 
     if (!parent->objectName().isEmpty())
         writer->writeAttribute("id", parent->objectName());
