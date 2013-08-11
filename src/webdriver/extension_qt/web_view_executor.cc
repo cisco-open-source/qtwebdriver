@@ -221,7 +221,9 @@ QSharedPointer<QDomDocument> QWebViewVisualizerSourceCommand::ParseXml(const QSt
     QSharedPointer<QDomDocument> document(new QDomDocument());
     bool retval = document->setContent(input, &errorMsg, &errorLine, &errorColumn);
     if (!retval) {
-        *error = new Error(kInternalServerError, errorMsg.toStdString());
+        std::string details = base::StringPrintf(
+                    "ParseXml failed with error message '%s' at line %d column %d", errorMsg.toStdString().c_str(), errorLine, errorColumn);
+        *error = new Error(kInternalServerError, details);
         return QSharedPointer<QDomDocument>();
     }
 
