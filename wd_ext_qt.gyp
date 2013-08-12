@@ -81,8 +81,8 @@
         ['<(QT5) == 1', {
 
           'sources': [
-            # TODO: plae quick2 related files
-            'src/webdriver/extension_qt/qml_quick2_stub.cc',
+            'src/webdriver/extension_qt/quick2_view_handle.cc',
+            'src/webdriver/extension_qt/quick2_view_enumerator.cc',
           ],
         } , {
 
