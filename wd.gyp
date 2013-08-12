@@ -1,6 +1,7 @@
 {
   'includes': [
     'wd.gypi',
+    'wd_common.gypi',
   ],
 
   # TODO: move generate_wdversion.py here from build.sh
@@ -12,15 +13,37 @@
       'dependencies': [
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
       ],
 
       'conditions': [
-      
-        ['platform != "android"', {
-          'dependencies': [
-            'wd_ext_qt.gyp:WebDriver_extension_qt_web',
+
+        ['<(WD_CONFIG_QWIDGET_BASE) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_base'],
+
+          'conditions': [
+            [ 'OS == "linux"', { 
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_base_shared'],
+            } ],
+          ],
+        } ],
+
+        ['<(WD_CONFIG_QUICK) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick'],
+
+          'conditions': [
+            [ 'OS == "linux"', { 
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared'],
+            } ],
+          ],
+        } ],
+
+        ['<(WD_CONFIG_WEBKIT) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_web'],
+
+          'conditions': [
+            [ 'OS == "linux"', { 
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_web_shared'],
+            } ],
           ],
         } ],
 
@@ -28,9 +51,6 @@
           'dependencies': [
             'base.gyp:chromium_base_shared',
             'wd_core.gyp:WebDriver_core_shared',
-            'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
-            'wd_ext_qt.gyp:WebDriver_extension_qt_web_shared',
-            'wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared',
           ],
         } ],
 

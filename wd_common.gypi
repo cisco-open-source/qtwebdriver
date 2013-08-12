@@ -1,8 +1,9 @@
 {
   'variables': {
     'QT5%': '0',
-    'WD_CONFIG_QWIDGET_VIEW%': '0',
-    'WD_CONFIG_QML_VIEW%': '0',
+    'WD_CONFIG_QWIDGET_BASE%': '1',
+    'WD_CONFIG_WEBKIT%': '1',
+    'WD_CONFIG_QUICK%': '1',
     'WD_BUILD_MONGOOSE%': '0',
 
     'QT_BIN_PATH%': '/usr/lib/qt4/bin',

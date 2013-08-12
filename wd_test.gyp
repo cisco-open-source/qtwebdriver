@@ -13,7 +13,6 @@
     # TODO: review include_dirs
     'include_dirs': [
       'inc/',
-      'src/',
       '<(QT_INC_PATH)',
       '<(INTERMEDIATE_DIR)',
     ],
