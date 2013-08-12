@@ -8,6 +8,7 @@ ST40_CC14_0_1_TOOLCHAIN_DIR=/opt/softs/compilers/st/st40/LINUX_4.2.4.jan0711/STL
 ST40_CC15_0_0_TOOLCHAIN_DIR=/opt/softs/compilers2/st/st40/LINUX_4.2.4_0.8.0/STLinux-2.4/devkit/sh4_uclibc
 UPCH_TOOLCHAIN_DIR=/opt/softs/toolchains/UPCH_SAMVGW_INTELGRV_LNUX_01/M16.0_126_7.1/platform_cfg/linux/compiler/i686_gcc_x86_linux_01/i686-linux-elf
 VOO_TOOLCHAIN_DIR=/opt/softs/toolchains/VOO_CISCOISB8K_BCM7241_LNUX_01/M6.0.75_M3_8.2/platform_cfg/linux/compiler/mips4k_gcc_x86_linux_22
+ARM_TOOLCHAIN_DIR=/opt/softs/compilers/st/arm/LINUX_4.6.3_112/armv7
 
 
 function SetPlatformVariable
@@ -66,6 +67,11 @@ function SetPlatformVariable
 			export CXX=${VOO_TOOLCHAIN_DIR}/bin/mipsel-linux-uclibc-g++
 			export LINK=${VOO_TOOLCHAIN_DIR}/bin/mipsel-linux-uclibc-g++
 			;;
+		ARM)
+			export CC=${ARM_TOOLCHAIN_DIR}/bin/armv7-linux-gcc
+			export CXX=${ARM_TOOLCHAIN_DIR}/bin/armv7-linux-g++
+			export LINK=${ARM_TOOLCHAIN_DIR}/bin/armv7-linux-g++
+			;;
 	esac
 }
 
@@ -83,7 +89,7 @@ fi
 if [ "$TARGET_LIST" = "all" ]
 then
 	echo "TARGET = all"
-	TARGET_LIST="desktop BCM CHANALD NEWCO REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOO"
+	TARGET_LIST="desktop BCM CHANALD NEWCO REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOO ARM"
 fi
 
 if [ -z "$MODE_LIST" ]
@@ -97,7 +103,7 @@ then
 	OUTDIR=`pwd`
 fi
 
-SUPPORTED_TARGETS="desktop,BCM,CHANALD,NEWCO,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO"
+SUPPORTED_TARGETS="desktop,BCM,CHANALD,NEWCO,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO,ARM"
 SUPPORTED_MODES="release_dbg,release"
 
 for TmpTarget in $TARGET_LIST
