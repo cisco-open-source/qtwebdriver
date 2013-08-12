@@ -8,7 +8,7 @@
     'conditions': [
 
   		# WORKAROUND: this is for compatibility with CISCO-NDS build system
-  		[ 'platform != "desktop"', {
+  		[ 'platform != "desktop" and platform != "android"', {
 		    	'QT_BIN_PATH': '<(CISCO_QT_BIN_PATH)',
         	'QT_INC_PATH': '<(CISCO_QT_INC_PATH)',
         	'QT_LIB_PATH': '<(CISCO_QT_LIB_PATH)',
