@@ -178,10 +178,13 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
     // Convert DOM tree to valid XML.
     const char* kSource =
         "function() {\n"
-        "  var scripts = document.getElementsByTagName('script');\n"
-        "  for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {\n"
-        "    var script = scripts[scriptIndex];\n"
-        "    script.innerHTML = '';\n"
+        "  var elements = document.getElementsByTagName('*');\n"
+        "  for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {\n"
+        "    var element = elements[elementIndex];\n"
+        "    if (element.tagName.toLowerCase() == 'script')\n"
+        "      element.innerHTML = '';\n"
+        "    if (element.hasAttribute('\"'))\n"
+        "      element.removeAttribute('\"');\n"
         "  }\n"
         "\n"
         "  var xhtml = document.implementation.createDocument();\n"
