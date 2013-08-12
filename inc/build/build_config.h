@@ -102,6 +102,11 @@
 #define ARCH_CPU_X86 1
 #define ARCH_CPU_32_BITS 1
 #define ARCH_CPU_LITTLE_ENDIAN 1
+#elif defined(__MIPSEB__)
+#define ARCH_CPU_MIPS_FAMILY 1
+#define ARCH_CPU_MIPSEB 1
+#define ARCH_CPU_32_BITS 1
+#define ARCH_CPU_BIG_ENDIAN 1
 #elif defined(__ARMEL__)
 #define ARCH_CPU_ARM_FAMILY 1
 #define ARCH_CPU_ARMEL 1
