@@ -2,6 +2,7 @@
 output_gen=$1
 platform=$2
 mode=$3
+qt_dir=$4
 
 current_dir=`pwd`
 if [ -z $output_gen ];
@@ -44,7 +45,7 @@ do
     OUTPUT_DIR_OUT=${output_gen}/$platform/$mode/Default
     OUTPUT_BIN_DIR=${output_gen}/bin/$platform/$mode
 
-    python $GYP --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} --generator-output=${output_gen}/$platform/$mode wd.gyp
+    python $GYP --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} -D QT_DIR=${qt_dir} --generator-output=${output_gen}/$platform/$mode wd.gyp
     [ $? -ne 0 ] && exit 1
     cd $OUTPUT_DIR
     [ $? -ne 0 ] && echo "**** ERROR: Can't access to $OUTPUT_DIR" && exit 1
