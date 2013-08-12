@@ -12,10 +12,10 @@
 
 namespace webdriver {
 
-class QQuick2ViewHandle : public ViewHandle {
+class Quick2ViewHandle : public ViewHandle {
 public:
-    QQuick2ViewHandle();
-    QQuick2ViewHandle(QQuickWindow* view);
+    Quick2ViewHandle();
+    Quick2ViewHandle(QQuickWindow* view);
     
     virtual bool is_valid() const { return !view_.isNull(); };
     virtual bool equals(const ViewHandle* other) const;
@@ -24,7 +24,7 @@ public:
 protected:
     QPointer<QQuickWindow> view_;
 //private:
-	virtual ~QQuick2ViewHandle() {};
+	virtual ~Quick2ViewHandle() {};
 };
 
 }  // namespace webdriver

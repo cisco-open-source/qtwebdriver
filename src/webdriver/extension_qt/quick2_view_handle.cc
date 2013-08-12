@@ -2,14 +2,14 @@
 
 namespace webdriver {
 
-QQuick2ViewHandle::QQuick2ViewHandle() 
+Quick2ViewHandle::Quick2ViewHandle() 
 	: view_(NULL) { }
 
-QQuick2ViewHandle::QQuick2ViewHandle(QQuickWindow* view) 
+Quick2ViewHandle::Quick2ViewHandle(QQuickWindow* view) 
 	: view_(view) { }
 
-bool QQuick2ViewHandle::equals(const ViewHandle* other) const {
-	const QQuick2ViewHandle* toCompare = dynamic_cast<const QQuick2ViewHandle*>(other);
+bool Quick2ViewHandle::equals(const ViewHandle* other) const {
+	const Quick2ViewHandle* toCompare = dynamic_cast<const Quick2ViewHandle*>(other);
 	if (NULL == toCompare) return false;
 
 	return view_ == toCompare->view_;
