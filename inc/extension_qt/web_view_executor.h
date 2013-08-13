@@ -114,6 +114,7 @@ public:
 
 private:
     static QSharedPointer<QDomDocument> ParseXml(const QString& input, Error** error);
+    static void UnescapeXml(QString& input);
 
     void AssemblePage(QDomElement element) const;
     void AssembleLink(QDomElement element) const;
@@ -133,6 +134,8 @@ private Q_SLOTS:
     void DownloadFinished();
 
 private:
+    static const char DATA_PROTOCOL[];
+
     QWebViewCmdExecutor* executor_;
     Session* session_;
     QWebView* view_;

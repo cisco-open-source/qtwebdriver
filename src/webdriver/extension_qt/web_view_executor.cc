@@ -185,6 +185,14 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "      element.innerHTML = '';\n"
         "    if (element.hasAttribute('\"'))\n"
         "      element.removeAttribute('\"');\n"
+        "\n"
+        "    var childNodes = element.childNodes;\n"
+        "    for (var childIndex = 0; childIndex < childNodes.length; childIndex++) {\n"
+        "      var child = childNodes[childIndex];\n"
+        "      if (child.nodeType == Node.TEXT_NODE) {\n"
+        "        child.nodeValue = child.nodeValue.replace(/&/g, '&amp;');\n"
+        "      }\n"
+        "    }\n"
         "  }\n"
         "\n"
         "  var xhtml = document.implementation.createDocument();\n"
@@ -233,6 +241,10 @@ QSharedPointer<QDomDocument> QWebViewVisualizerSourceCommand::ParseXml(const QSt
     return document;
 }
 
+void QWebViewVisualizerSourceCommand::UnescapeXml(QString& input) {
+    input.replace("&amp;", "&");
+}
+
 void QWebViewVisualizerSourceCommand::AssemblePage(QDomElement element) const {
     if (element.tagName() == "img") {
         AssembleImg(element);
@@ -272,7 +284,9 @@ void QWebViewVisualizerSourceCommand::AssembleLink(QDomElement element) const {
     if (rel != "stylesheet" && type != "text/css")
         return;
 
-    QString url = AbsoluteUrl(element.attribute("href"));
+    QString href = element.attribute("href");
+    UnescapeXml(href);
+    QString url = AbsoluteUrl(href);
     QByteArray file;
     QString contentType;
     Download(url, &file, &contentType);
@@ -294,10 +308,12 @@ void QWebViewVisualizerSourceCommand::AssembleLink(QDomElement element) const {
 // Convert <img> tag 'src' attribute to base64
 void QWebViewVisualizerSourceCommand::AssembleImg(QDomElement element) const {
     QString url = element.attribute("src");
-    if (url.startsWith("data:"))
-        return;
+    if (!url.startsWith(DATA_PROTOCOL)) {
+        element.setAttribute("src", DownloadAndEncode(url));
+    }
 
-    element.setAttribute("src", DownloadAndEncode(url));
+    if (element.hasAttribute("srcset"))
+        element.removeAttribute("srcset");
 }
 
 void QWebViewVisualizerSourceCommand::AssembleStyle(QDomElement element) const {
@@ -327,7 +343,10 @@ QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) con
 
         QString url = regex.cap(1);
         url = trimmed(url, " \t'\"");
-        url = DownloadAndEncode(url);
+
+        if (!url.startsWith(DATA_PROTOCOL))
+            url = DownloadAndEncode(url);
+
         result += ":url('" + url + "')";
 
         lastMatchEnd = newMatchStart + regex.matchedLength();
@@ -372,7 +391,7 @@ QString QWebViewVisualizerSourceCommand::AbsoluteUrl(const QString& url) const {
 }
 
 void QWebViewVisualizerSourceCommand::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
-    QString absoluteUrl = AbsoluteUrl(url);
+    QUrl absoluteUrl = QUrl::fromEncoded(AbsoluteUrl(url).toUtf8());
     QSharedPointer<QNetworkReply> reply(view_->page()->networkAccessManager()->get(QNetworkRequest(absoluteUrl)));
 
     QEventLoop loop;
@@ -380,6 +399,8 @@ void QWebViewVisualizerSourceCommand::Download(const QString& url, QByteArray* b
     loop.exec();
 
     *buffer = reply->readAll();
+    if (reply->error() != QNetworkReply::NoError)
+        session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand::Download] " + reply->errorString().toStdString());
     if (contentType)
         *contentType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
 }
@@ -409,6 +430,8 @@ QString QWebViewVisualizerSourceCommand::trimmed(const QString& str, const QStri
 
 void QWebViewVisualizerSourceCommand::DownloadFinished() {
 }
+
+const char QWebViewVisualizerSourceCommand::DATA_PROTOCOL[] = "data:";
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
