@@ -23,6 +23,7 @@ enum ErrorCode {
     kInvalidElementState = 12,
     kUnknownError = 13,
     kElementNotSelectable = 15,
+    kJavaScriptError = 17,
     kXPathLookupError = 19,
     kNoSuchWindow = 23,
     kInvalidCookieDomain = 24,

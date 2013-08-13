@@ -681,7 +681,7 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
     QDeclarativeExpression *expr = new QDeclarativeExpression(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
     QVariant result = expr->evaluate();
     if (expr->hasError()) {
-        *error = new Error(kUnknownError, expr->error().toString().toStdString());
+        *error = new Error(kJavaScriptError, expr->error().toString().toStdString());
         session_->logger().Log(kWarningLogLevel, expr->error().toString().toStdString());
         return;
     }
@@ -709,7 +709,7 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
         }
     } else {
         session_->logger().Log(kWarningLogLevel, "result is not valid.");
-        *error = new Error(kUnknownError, "result is not valid.");
+        *error = new Error(kJavaScriptError, "result is not valid.");
     }
 
     if (NULL == val) {
