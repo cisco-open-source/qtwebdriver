@@ -1,14 +1,11 @@
 {
   'variables': {
 	'QT5': '0', # change to '1' for enabling Qt5
-	'WD_CONFIG_QWIDGET_VIEW': '1',
-    'WD_CONFIG_QWIDGET_VIEW_ACCESSABILITY': '0',
-    'WD_CONFIG_QML_VIEW': '1',
     'WD_BUILD_MONGOOSE': '1',
     'WD_BUILD_MODP_B64': '0',
-    'CISCO_QT_INC_PATH':   '<(QT_DIR)/include',
-    'CISCO_QT_LIB_PATH':   '<(QT_DIR)/lib/',
-    'CISCO_QT_BIN_PATH':   '<(QT_DIR)/bin/',
-    'CISCO_MONGOOSE_INC_PATH':    'src/third_party/mongoose',
+    'QT_INC_PATH':   '<(QT_DIR)/include',
+    'QT_LIB_PATH':   '<(QT_DIR)/lib/',
+    'QT_BIN_PATH':   '<(QT_DIR)/bin/',
+    'MONGOOSE_INC_PATH':    'src/third_party/mongoose',
   },
 }
