@@ -74,6 +74,11 @@ public:
     /// Password for authentication (by default - no password)
     static const char kVNCLogin[];
 
+    /// \page page_webdriver_switches WD Server switches
+    /// - <b>uinput</b><br>
+    /// if parameter specified, user input device enabled
+    static const char kUserInputDevice[];
+
 };
 
 }  // namespace webdriver
