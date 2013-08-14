@@ -291,6 +291,7 @@ void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **er
     else
     {
         *error = new Error(kBadRequest, "Invalid \"orientation\" parameter");
+        return;
     }
 
 #ifdef OS_ANDROID
