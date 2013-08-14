@@ -175,7 +175,7 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(view, &(*it));
+        QGuiApplication::sendEvent(view, &(*it));
         ++it;
     }
 
@@ -587,7 +587,7 @@ void Quick2ViewCmdExecutor::GetElementText(const ElementId& element, std::string
 }
 
 void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
-    	QQuickView* view = getView(view_id_, error);
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -605,26 +605,22 @@ void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const st
     if (locator == LocatorType::kXpath) {
         FindElementsByXpath(parentItem, query, elements, error);
     } else {
-        // process root        
-        if (FilterElement(parentItem, locator, query)) {
-            ElementId elm;
-            session_->AddElement(view_id_, new QElementHandle(parentItem), &elm);
-            (*elements).push_back(elm);
+        FindElements(parentItem, locator, query, elements, error);
+    }
+}
 
-            session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-        }
+void Quick2ViewCmdExecutor::FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+    if (FilterElement(parent, locator, query)) {
+        ElementId elm;
+        session_->AddElement(view_id_, new QElementHandle(parent), &elm);
+        (*elements).push_back(elm);
 
-        // list all child items and find matched locator
-        QList<QQuickItem*> childs = parentItem->findChildren<QQuickItem*>();
-        foreach(QQuickItem *child, childs) {
-            if (FilterElement(child, locator, query)) {
-                ElementId elm;
-                session_->AddElement(view_id_, new QElementHandle(child), &elm);
-                (*elements).push_back(elm);
+        session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+    }
 
-                session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-            }
-        }
+    QList<QQuickItem*> childs = parent->childItems();
+    foreach(QQuickItem *child, childs) {
+        FindElements(child, locator, query, elements, error);
     }
 }
 
@@ -887,11 +883,9 @@ void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elem
     elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
     writer->writeAttribute("elementId", elementKey);
 
-    QList<QObject*> childs = parent->children();
-    foreach(QObject *child, childs) {
-        QQuickItem* childItem = qobject_cast<QQuickItem*>(child);
-        if (childItem)
-            addItemToXML(childItem, elementsMap, writer);
+    QList<QQuickItem*> childs = parent->childItems();
+    foreach(QQuickItem *child, childs) {
+        if (child) addItemToXML(child, elementsMap, writer);
     }
 
     writer->writeEndElement();

@@ -108,6 +108,7 @@ protected:
     QQuickItem* getElement(const ElementId &element, Error** error);
     bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
+    void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
     void createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
     void addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
