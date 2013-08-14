@@ -31,7 +31,6 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
-//#include "WindowWithEmbeddedViewTest.h"
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -41,7 +40,10 @@
 #include "shutdown_command.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-// TODO: put headers for Quick2 extension
+// headers for Quick2 extension
+#include "extension_qt/quick2_view_creator.h"
+#include "extension_qt/quick2_view_executor.h"
+#include "extension_qt/quick2_view_enumerator.h"
 #else
 #include <QtDeclarative/QDeclarativeView>
 // headers for Quick1 extension
@@ -120,7 +122,14 @@ int main(int argc, char *argv[])
 #endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    // TODO: put here registration of Quick2 extension
+    // Quick2 extension
+    webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
+    qmlCreator->RegisterViewClass<QQuickView>("QQuickView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::Quick2ViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::Quick2ViewCmdExecutorCreator());
 #else
     // Quick1 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
