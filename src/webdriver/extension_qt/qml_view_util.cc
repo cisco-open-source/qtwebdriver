@@ -7,7 +7,7 @@
 #include <QtCore/QFileInfo>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include "extension_qt/quick2_view_handle.h"
+#include "extension_qt/qwindow_view_handle.h"
 #include <QtQuick/QQuickWindow>
 #else
 #include "extension_qt/widget_view_handle.h"
@@ -60,7 +60,7 @@ QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     if (NULL == viewHandle) 
         return NULL;
 
-    Quick2ViewHandle* qViewHandle = dynamic_cast<Quick2ViewHandle*>(viewHandle);
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
     if (NULL == qViewHandle)
         return NULL;
 

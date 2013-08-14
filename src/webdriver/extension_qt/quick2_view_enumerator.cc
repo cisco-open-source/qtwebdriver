@@ -3,7 +3,7 @@
 #include "webdriver_session.h"
 #include "webdriver_logging.h"
 
-#include "extension_qt/quick2_view_handle.h"
+#include "extension_qt/qwindow_view_handle.h"
 
 #include <QtCore/QGlobalStatic>
 #include <QtCore/QDebug>
@@ -22,7 +22,7 @@ void Quick2ViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
 
         QQuickWindow* pView = qobject_cast<QQuickWindow*>(pWindow);
         if (pView != NULL) {
-            ViewHandlePtr handle(new Quick2ViewHandle(pView));
+            ViewHandlePtr handle(new QWindowViewHandle(pView));
             ViewId viewId = session->GetViewForHandle(handle);
             if (!viewId.is_valid()) {
                 if (session->AddNewView(handle, &viewId))  {

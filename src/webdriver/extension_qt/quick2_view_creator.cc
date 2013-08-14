@@ -5,7 +5,7 @@
 #include "webdriver_error.h"
 
 #include "qml_view_util.h"
-#include "extension_qt/quick2_view_handle.h"
+#include "extension_qt/qwindow_view_handle.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
 
@@ -27,18 +27,18 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
 	if (className.empty() || className == "QMLView") {
 		// get first found QML view
         CreateViewMethod createMethod = factory.begin()->second;
-        handle = new Quick2ViewHandle(static_cast<QQuickWindow*>(createMethod()));
+        handle = new QWindowViewHandle(static_cast<QWindow*>(createMethod()));
 	} else {
     	FactoryMap::const_iterator it = factory.find(className);
         if (it != factory.end())
         {
         	CreateViewMethod createMethod = it->second;
-            handle = new Quick2ViewHandle(static_cast<QQuickWindow*>(createMethod()));
+            handle = new QWindowViewHandle(static_cast<QWindow*>(createMethod()));
         }
     }
 
     if (NULL != handle) {
-        QQuickWindow* pWindow = (dynamic_cast<Quick2ViewHandle*>(handle))->get();
+        QWindow* pWindow = (dynamic_cast<QWindowViewHandle*>(handle))->get();
         
         if (NULL != pWindow) {
             std::string objClassName(pWindow->metaObject()->className());
