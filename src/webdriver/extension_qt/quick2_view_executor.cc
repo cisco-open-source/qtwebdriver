@@ -16,7 +16,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
-#include <QtGui/QApplication>
+#include <QtGui/QGuiApplication>
 #include <QtQml/QQmlExpression>
 
 #include "third_party/pugixml/pugixml.hpp"

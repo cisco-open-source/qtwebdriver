@@ -4,7 +4,7 @@
 #include "extension_qt/qwindow_view_executor.h"
 
 #include <QtCore/QDebug>
-#include <QtXml/QXmlStreamWriter>
+#include <QtCore/QXmlStreamWriter>
 #include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
 
