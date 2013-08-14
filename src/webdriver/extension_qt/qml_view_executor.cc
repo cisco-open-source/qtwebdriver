@@ -678,11 +678,11 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
         script.c_str(),
         args_as_json.c_str());
 
-    QDeclarativeExpression *expr = new QDeclarativeExpression(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
-    QVariant result = expr->evaluate();
-    if (expr->hasError()) {
-        *error = new Error(kJavaScriptError, expr->error().toString().toStdString());
-        session_->logger().Log(kWarningLogLevel, expr->error().toString().toStdString());
+    QDeclarativeExpression expr(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
+    QVariant result = expr.evaluate();
+    if (expr.hasError()) {
+        *error = new Error(kJavaScriptError, expr.error().toString().toStdString());
+        session_->logger().Log(kWarningLogLevel, expr.error().toString().toStdString());
         return;
     }
 
