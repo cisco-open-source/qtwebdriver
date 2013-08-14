@@ -8,6 +8,7 @@
 #include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QDebug>
+#include <QtGui/QGuiApplication>
 #ifdef OS_ANDROID
     #include <qpa/qplatformnativeinterface.h>
     #include <jni.h> 
@@ -67,11 +68,6 @@ void QWindowViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
     if (NULL == view)
         return;
 
-    if (!view->isWindow()) {
-        *error = new Error(kUnknownError, "Cant set bounds to non top level view.");
-        return;
-    }
-
     view->setGeometry(ConvertRectToQRect(bounds));
 }
 
@@ -79,11 +75,6 @@ void QWindowViewCmdExecutor::Maximize(Error** error) {
     QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
-
-    if (!view->isWindow()) {
-        *error = new Error(kUnknownError, "Cant maximize non top level view.");
-        return;
-    }
 
     view->showMaximized();    
 }
@@ -116,7 +107,7 @@ void QWindowViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
         bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
 
         if (!consumed)
-            qApp->sendEvent(view, &(*it));
+            QGuiApplication::sendEvent(view, &(*it));
         ++it;
     }
 }
@@ -126,10 +117,7 @@ void QWindowViewCmdExecutor::Close(Error** error) {
     if (NULL == view)
         return;
 
-    if (!view->isWindow()) {
-        *error = new Error(kUnknownError, "Cant close non top level view.");
-        return;
-    }
+    // TODO: review this, check if we can close window
 
     session_->logger().Log(kInfoLogLevel, "close View("+view_id_.id()+")");
 
@@ -137,9 +125,7 @@ void QWindowViewCmdExecutor::Close(Error** error) {
 
     // destroy children correctly
     QList<QWindow*> childs = view->findChildren<QWindow*>();
-    foreach(QWindow *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
+    foreach(QWindow *child, childs) {
         child->close();
     }
 
@@ -179,6 +165,7 @@ void QWindowViewCmdExecutor::SetOrientation(const std::string &orientation, Erro
     else
     {
         *error = new Error(kBadRequest, "Invalid \"orientation\" parameter");
+        return;
     }
 
 #ifdef OS_ANDROID

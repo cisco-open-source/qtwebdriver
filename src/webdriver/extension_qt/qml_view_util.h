@@ -7,7 +7,7 @@
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 class QWindow;
-class QQuickWindow;
+class QQuickView;
 #else
 class QDeclarativeView;
 #endif
@@ -25,7 +25,7 @@ public:
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     static QWindow* getQWindowView(Session* session, const ViewId& viewId);
-    static QQuickWindow* getQMLView(Session* session, const ViewId& viewId);
+    static QQuickView* getQMLView(Session* session, const ViewId& viewId);
 #else    
     static QDeclarativeView* getQMLView(Session* session, const ViewId& viewId);
 #endif    

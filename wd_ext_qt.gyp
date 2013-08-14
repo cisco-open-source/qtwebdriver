@@ -82,9 +82,10 @@
 
           'sources': [
             'src/webdriver/extension_qt/qwindow_view_handle.cc',
+            'src/webdriver/extension_qt/qwindow_view_executor.cc',
             'src/webdriver/extension_qt/quick2_view_creator.cc',
             'src/webdriver/extension_qt/quick2_view_enumerator.cc',
-            #'src/webdriver/extension_qt/qwindow_view_executor.cc',
+            'src/webdriver/extension_qt/quick2_view_executor.cc',
             'src/webdriver/extension_qt/qml_view_util.cc',
           ],
         } , {

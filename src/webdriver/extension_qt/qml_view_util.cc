@@ -8,7 +8,7 @@
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "extension_qt/qwindow_view_handle.h"
-#include <QtQuick/QQuickWindow>
+#include <QtQuick/QQuickView>
 #else
 #include "extension_qt/widget_view_handle.h"
 #include <QtDeclarative/QDeclarativeView>
@@ -67,7 +67,7 @@ QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
     return qobject_cast<QWindow*>(qViewHandle->get());
 }
 
-QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
+QQuickView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     ViewHandle* viewHandle =  session->GetViewHandle(viewId);
     if (NULL == viewHandle) 
         return NULL;
@@ -76,7 +76,7 @@ QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     if (NULL == qViewHandle)
         return NULL;
 
-    return qobject_cast<QQuickWindow*>(qViewHandle->get());
+    return qobject_cast<QQuickView*>(qViewHandle->get());
 }
 #else
 QDeclarativeView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {

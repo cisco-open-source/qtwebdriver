@@ -20,7 +20,7 @@ void Quick2ViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
     {
         if (!pWindow->isVisible()) continue;
 
-        QQuickWindow* pView = qobject_cast<QQuickWindow*>(pWindow);
+        QQuickView* pView = qobject_cast<QQuickView*>(pWindow);
         if (pView != NULL) {
             ViewHandlePtr handle(new QWindowViewHandle(pView));
             ViewId viewId = session->GetViewForHandle(handle);
