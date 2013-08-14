@@ -16,9 +16,9 @@
 
 namespace webdriver {
 
-Quick2QmlViewCreator::Quick2QmlViewCreator() {}
+Quick2ViewCreator::Quick2ViewCreator() {}
 
-bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+bool Quick2ViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
 	ViewHandle* handle = NULL;
 
     if (factory.empty())
@@ -61,13 +61,13 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
             if (!painter.isPainting())
                 loop.exec();
         
-            logger.Log(kInfoLogLevel, "Quick2QmlViewCreator created view (" + objClassName +").");
+            logger.Log(kInfoLogLevel, "Quick2ViewCreator created view (" + objClassName +").");
 
             *view = handle;
 
             return true;
         } else {
-            logger.Log(kSevereLogLevel, "Quick2QmlViewCreator, smth wrong.");
+            logger.Log(kSevereLogLevel, "Quick2ViewCreator, smth wrong.");
             handle->Release();
         }
     }
@@ -76,7 +76,7 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
     return false;
 }
 
-bool Quick2QmlViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
+bool Quick2ViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
     if (!QQmlViewUtil::isUrlSupported(url)) {
         return false;
     }
