@@ -55,6 +55,18 @@ bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
+    ViewHandle* viewHandle =  session->GetViewHandle(viewId);
+    if (NULL == viewHandle) 
+        return NULL;
+
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
+    if (NULL == qViewHandle)
+        return NULL;
+
+    return qobject_cast<QWindow*>(qViewHandle->get());
+}
+
 QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     ViewHandle* viewHandle =  session->GetViewHandle(viewId);
     if (NULL == viewHandle) 

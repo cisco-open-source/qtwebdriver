@@ -6,6 +6,7 @@
 #include <QtCore/QDebug>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+class QWindow;
 class QQuickWindow;
 #else
 class QDeclarativeView;
@@ -23,6 +24,7 @@ public:
     static bool isContentTypeSupported(const std::string& mime);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    static QWindow* getQWindowView(Session* session, const ViewId& viewId);
     static QQuickWindow* getQMLView(Session* session, const ViewId& viewId);
 #else    
     static QDeclarativeView* getQMLView(Session* session, const ViewId& viewId);
