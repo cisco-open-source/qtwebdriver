@@ -68,8 +68,10 @@
 #include "extension_qt/widget_view_executor.h"
 #include "extension_qt/wd_event_dispatcher.h"
 #include "extension_qt/vnc_event_dispatcher.h"
+#include "extension_qt/uinput_event_dispatcher.h"
 
 #include "extension_qt/vncclient.h"
+#include "extension_qt/uinput_manager.h"
 #include "webdriver_switches.h"
 
 void setQtSettings();
@@ -199,7 +201,6 @@ int main(int argc, char *argv[])
         VNCClient *client = VNCClient::getInstance();
         if (!client->isReady())
         {
-            std::cout << "#### Password: " << password->toStdString() << std::endl;
             if (password->isEmpty())
                 client->Init(address, port.toInt());
             else
@@ -208,6 +209,20 @@ int main(int argc, char *argv[])
 
         WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
     }
+
+    // start user input device
+#ifdef OS_LINUX
+    if (cmdLine.HasSwitch(webdriver::Switches::kUserInputDevice))
+    {
+        UInputManager *manager = UInputManager::getInstance();
+        if (!manager->isReady())
+        {
+            manager->registerUinputDevice();
+        }
+
+        WDEventDispatcher::getInstance()->add(new UInputEventDispatcher(manager));
+    }
+#endif // OS_LINUX
 
     int startError = wd_server->Start();
     if (startError)
