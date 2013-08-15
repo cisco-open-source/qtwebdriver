@@ -18,6 +18,7 @@
 #include <QtCore/QDebug>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlExpression>
+#include <QtQml/QQmlEngine>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -185,7 +186,6 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 }
 
 void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -193,23 +193,25 @@ void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
-    QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
-    dbClckEvent->setScenePos(scenePoint);
-    dbClckEvent->setButton(Qt::LeftButton);
-    dbClckEvent->setButtons(Qt::LeftButton);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    QMouseEvent *dbClckEvent = new QMouseEvent(QEvent::MouseButtonDblClick,
+                            scenePoint,
+                            Qt::LeftButton,
+                            Qt::LeftButton,
+                            sticky_modifiers);
 
-    QApplication::postEvent(view->scene(), dbClckEvent);
-    QApplication::postEvent(view->scene(), releaseEvent);
-*/    
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+                            scenePoint,
+                            Qt::LeftButton,
+                            Qt::LeftButton,
+                            sticky_modifiers);
+
+    QGuiApplication::postEvent(view, dbClckEvent);
+    QGuiApplication::postEvent(view, releaseEvent);
 }
 
 void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -217,17 +219,18 @@ void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
-    QApplication::postEvent(view->scene(), releaseEvent);
-*/    
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+                            scenePoint,
+                            Qt::LeftButton,
+                            Qt::LeftButton,
+                            sticky_modifiers);
+
+    QGuiApplication::postEvent(view, releaseEvent);
 }
 
 void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -235,17 +238,18 @@ void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
-    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-    pressEvent->setScenePos(scenePoint);
-    pressEvent->setButton(Qt::LeftButton);
-    pressEvent->setButtons(Qt::LeftButton);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
-    QApplication::postEvent(view->scene(), pressEvent);
-*/    
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress,
+                            scenePoint,
+                            Qt::LeftButton,
+                            Qt::LeftButton,
+                            sticky_modifiers);
+
+    QGuiApplication::postEvent(view, pressEvent);
 }
 
 void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -255,27 +259,25 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 
     Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
 
-    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-    pressEvent->setScenePos(scenePoint);
-    pressEvent->setButton(mouseButton);
-    pressEvent->setButtons(mouseButton);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(mouseButton);
-    releaseEvent->setButtons(mouseButton);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress,
+                            scenePoint,
+                            mouseButton,
+                            mouseButton,
+                            sticky_modifiers);
 
-    QApplication::postEvent(view->scene(), pressEvent);
-    QApplication::postEvent(view->scene(), releaseEvent);
-//    if (Qt::RightButton == mouseButton) {
-//        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
-//        QApplication::postEvent(view->scene(), contextEvent);
-//    }
-*/
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+                            scenePoint,
+                            mouseButton,
+                            mouseButton,
+                            sticky_modifiers);
+
+    QGuiApplication::postEvent(view, pressEvent);
+    QGuiApplication::postEvent(view, releaseEvent);
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
-/*    
 	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -286,21 +288,26 @@ void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Er
 	QPoint point = ConvertPointToQPoint(prev_pos);
     QPointF scenePoint(point.x(), point.y());
 
-    if (!view->sceneRect().contains(scenePoint)) {
+    QRectF sceneRect(QPointF(0,0), view->size());
+    if (!sceneRect.contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
+                        scenePoint,
+                        Qt::NoButton,
+                        Qt::NoButton,
+                        sticky_modifiers);
+
+    QGuiApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(prev_pos);
-*/    
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -309,23 +316,28 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, co
     if (NULL == pItem)
         return;
 
-    QPointF scenePoint = pItem->mapToScene(x_offset, y_offset);
+    QPointF scenePoint = pItem->mapToScene(QPointF(x_offset, y_offset));
 
-    if (!view->sceneRect().contains(scenePoint)) {
+    QRectF sceneRect(QPointF(0,0), view->size());
+    if (!sceneRect.contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
+                     scenePoint,
+                     Qt::NoButton,
+                     Qt::NoButton,
+                     sticky_modifiers);
+
+    QGuiApplication::postEvent(view, moveEvent);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
-*/    
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
-/*    
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -334,23 +346,28 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     if (NULL == pItem)
         return;
 
-    QPointF scenePoint = pItem->mapToScene(0, 0);
+    QPointF scenePoint = pItem->mapToScene(QPointF(pItem->width()/2.0, pItem->height()/2.0));
 
-    if (!view->sceneRect().contains(scenePoint)) {
+    QRectF sceneRect(QPointF(0,0), view->size());
+    if (!sceneRect.contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
+                     scenePoint,
+                     Qt::NoButton,
+                     Qt::NoButton,
+                     sticky_modifiers);
+
+    QGuiApplication::postEvent(view, moveEvent);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
-*/    
 }
 
 void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
-/*    
 	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -367,27 +384,28 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
     session_->logger().Log(kFineLogLevel, "Click on ");
     session_->logger().Log(kFineLogLevel, pItem->objectName().toStdString());
 
-    //QRectF sceneRect = pItem->mapRectToScene(pItem->boundingRect());
-    QPointF scenePoint = pItem->mapToScene(0, 0);
+    QPointF scenePoint = pItem->mapToScene(QPointF(0,0));
 
-    if (!view->sceneRect().contains(scenePoint)) {
+    QRectF sceneRect(QPointF(0,0), view->size());
+    if (!sceneRect.contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
     }
 
-    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-    pressEvent->setScenePos(scenePoint);
-    pressEvent->setButton(Qt::LeftButton);
-    pressEvent->setButtons(Qt::LeftButton);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress,
+                             scenePoint,
+                             Qt::LeftButton,
+                             Qt::LeftButton,
+                             Qt::NoModifier);
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
+                             scenePoint,
+                             Qt::LeftButton,
+                             Qt::LeftButton,
+                             Qt::NoModifier);
 
-    QApplication::postEvent(view->scene(), pressEvent);
-    QApplication::postEvent(view->scene(), releaseEvent);
-*/    
+    QGuiApplication::postEvent(view, pressEvent);
+    QGuiApplication::postEvent(view, releaseEvent);
 }
 
 void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
@@ -504,7 +522,6 @@ void Quick2ViewCmdExecutor::ElementEquals(const ElementId& element1, const Eleme
 }
 
 void Quick2ViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
-/*    
 	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -513,14 +530,12 @@ void Quick2ViewCmdExecutor::GetElementLocation(const ElementId& element, Point* 
     if (NULL == pItem)
         return;
 
-    QPointF scenePos = pItem->scenePos();
+    QPointF scenePos = pItem->mapToScene(QPointF(0,0));
 
     *location = Point(scenePos.x(), scenePos.y());
-*/    
 }
 
 void Quick2ViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
-/*    
 	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -529,12 +544,10 @@ void Quick2ViewCmdExecutor::GetElementLocationInView(const ElementId& element, P
     if (NULL == pItem)
         return;
 
-    QPointF scenePos = pItem->scenePos();
-    QPoint pos = view->mapFromScene(scenePos);
+    QPointF scenePos = pItem->mapToScene(QPointF(0,0));
 
     // TODO: need check if pos fits into viewport?    
-    *location = Point(pos.x(), pos.y());
-*/    
+    *location = Point(scenePos.x(), scenePos.y());
 }
 
 void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
@@ -610,6 +623,7 @@ void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const st
 }
 
 void Quick2ViewCmdExecutor::FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+    qDebug() << "******* Element: " << parent << " name:" << parent->objectName();
     if (FilterElement(parent, locator, query)) {
         ElementId elm;
         session_->AddElement(view_id_, new QElementHandle(parent), &elm);
@@ -650,6 +664,8 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
     session_->logger().Log(kFineLogLevel, "QML - NavigateToURL" + url);
 
     QUrl address(QString(url.c_str()));
+
+    view->engine()->clearComponentCache();
 
     if (sync) {
         QEventLoop loop;
