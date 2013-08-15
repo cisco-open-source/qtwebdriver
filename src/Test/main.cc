@@ -31,7 +31,6 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
-//#include "WindowWithEmbeddedViewTest.h"
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -41,7 +40,10 @@
 #include "shutdown_command.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-// TODO: put headers for Quick2 extension
+// headers for Quick2 extension
+#include "extension_qt/quick2_view_creator.h"
+#include "extension_qt/quick2_view_executor.h"
+#include "extension_qt/quick2_view_enumerator.h"
 #else
 #include <QtDeclarative/QDeclarativeView>
 // headers for Quick1 extension
@@ -66,8 +68,10 @@
 #include "extension_qt/widget_view_executor.h"
 #include "extension_qt/wd_event_dispatcher.h"
 #include "extension_qt/vnc_event_dispatcher.h"
+#include "extension_qt/uinput_event_dispatcher.h"
 
 #include "extension_qt/vncclient.h"
+#include "extension_qt/uinput_manager.h"
 #include "webdriver_switches.h"
 
 void setQtSettings();
@@ -120,7 +124,14 @@ int main(int argc, char *argv[])
 #endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    // TODO: put here registration of Quick2 extension
+    // Quick2 extension
+    webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
+    qmlCreator->RegisterViewClass<QQuickView>("QQuickView");
+    webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::Quick2ViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::Quick2ViewCmdExecutorCreator());
 #else
     // Quick1 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
@@ -190,7 +201,6 @@ int main(int argc, char *argv[])
         VNCClient *client = VNCClient::getInstance();
         if (!client->isReady())
         {
-            std::cout << "#### Password: " << password->toStdString() << std::endl;
             if (password->isEmpty())
                 client->Init(address, port.toInt());
             else
@@ -199,6 +209,20 @@ int main(int argc, char *argv[])
 
         WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
     }
+
+    // start user input device
+#ifdef OS_LINUX
+    if (cmdLine.HasSwitch(webdriver::Switches::kUserInputDevice))
+    {
+        UInputManager *manager = UInputManager::getInstance();
+        if (!manager->isReady())
+        {
+            manager->registerUinputDevice();
+        }
+
+        WDEventDispatcher::getInstance()->add(new UInputEventDispatcher(manager));
+    }
+#endif // OS_LINUX
 
     int startError = wd_server->Start();
     if (startError)

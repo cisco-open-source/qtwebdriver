@@ -24,4 +24,6 @@ const char Switches::kWIPort[] = "wi-port";
 
 const char Switches::kVNCLogin[] = "vnc-login";
 
+const char Switches::kUserInputDevice[] = "uinput";
+
 }  // namespace webdriver

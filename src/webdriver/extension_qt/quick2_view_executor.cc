@@ -1,4 +1,4 @@
-#include "extension_qt/qml_view_executor.h"
+#include "extension_qt/quick2_view_executor.h"
 
 #include "base/stringprintf.h"
 #include "base/string_number_conversions.h"
@@ -9,16 +9,15 @@
 #include "webdriver_view_factory.h"
 #include "webdriver_util.h"
 #include "q_key_converter.h"
-#include "extension_qt/widget_element_handle.h"
-#include "extension_qt/widget_view_handle.h"
 #include "qml_view_util.h"
+
+// TODO: rename?
+#include "extension_qt/widget_element_handle.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
-#include <QtGui/QApplication>
-
-#include <QtDeclarative/QDeclarativeExpression>
-#include <QtDeclarative/QDeclarativeEngine>
+#include <QtGui/QGuiApplication>
+#include <QtQml/QQmlExpression>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -32,24 +31,24 @@ namespace webdriver {
 #define REMOVE_INTERNAL_SUFIXES(qstr)
 #endif            
 
-const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
+const ViewType Quick2ViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
-QQmlViewCmdExecutorCreator::QQmlViewCmdExecutorCreator()
+Quick2ViewCmdExecutorCreator::Quick2ViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
-ViewCmdExecutor* QQmlViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-    QDeclarativeView* pView = QQmlViewUtil::getQMLView(session, viewId);
+ViewCmdExecutor* Quick2ViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
+    QQuickView* pView = QQmlViewUtil::getQMLView(session, viewId);
 
     if (NULL != pView) {
-        session->logger().Log(kFineLogLevel, "QML executor for view("+viewId.id()+")");
-        return new QQmlViewCmdExecutor(session, viewId);
+        session->logger().Log(kFineLogLevel, "Quick2 executor for view("+viewId.id()+")");
+        return new Quick2ViewCmdExecutor(session, viewId);
     }
 
 	return NULL;
 }
 
-bool QQmlViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-    QDeclarativeView* pView = QQmlViewUtil::getQMLView(session, viewId);
+bool Quick2ViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
+    QQuickView* pView = QQmlViewUtil::getQMLView(session, viewId);
 
     if (NULL != pView) {
         if (NULL != viewType) *viewType = QML_VIEW_TYPE;
@@ -59,14 +58,14 @@ bool QQmlViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, 
     return false;
 }
 
-QQmlViewCmdExecutor::QQmlViewCmdExecutor(Session* session, ViewId viewId)
-	: QViewCmdExecutor(session, viewId) {
+Quick2ViewCmdExecutor::Quick2ViewCmdExecutor(Session* session, ViewId viewId)
+	: QWindowViewCmdExecutor(session, viewId) {
 }
 
-QQmlViewCmdExecutor::~QQmlViewCmdExecutor() {}
+Quick2ViewCmdExecutor::~Quick2ViewCmdExecutor() {}
 
-QDeclarativeView* QQmlViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    QDeclarativeView* pView = QQmlViewUtil::getQMLView(session_, viewId);
+QQuickView* Quick2ViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
+    QQuickView* pView = QQmlViewUtil::getQMLView(session_, viewId);
 
     if (NULL == pView) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such qml view("+viewId.id()+")");
@@ -77,7 +76,7 @@ QDeclarativeView* QQmlViewCmdExecutor::getView(const ViewId& viewId, Error** err
     return pView;
 }   
 
-QDeclarativeItem* QQmlViewCmdExecutor::getElement(const ElementId &element, Error** error) {
+QQuickItem* Quick2ViewCmdExecutor::getElement(const ElementId &element, Error** error) {
     QElementHandle* element_handle = dynamic_cast<QElementHandle*>(session_->GetElementHandle(view_id_, element));
 
     if (NULL == element_handle) {
@@ -90,25 +89,25 @@ QDeclarativeItem* QQmlViewCmdExecutor::getElement(const ElementId &element, Erro
         return NULL;
     }
 
-    QDeclarativeItem* retObj = qobject_cast<QDeclarativeItem*>(element_handle->get());
+    QQuickItem* retObj = qobject_cast<QQuickItem*>(element_handle->get());
     if (NULL == retObj) {
-        *error = new Error(kUnknownError, "canot cast element to QDeclarativeItem.");
+        *error = new Error(kUnknownError, "canot cast element to QQuickItem.");
         return NULL;
     }
 
     return retObj;
 }
 
-void QQmlViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
+void Quick2ViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
 	*can = QQmlViewUtil::isUrlSupported(url);
 }
 
-void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetSource(std::string* source, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());
+    QQuickItem* parentItem = qobject_cast<QQuickItem*>(view->contentItem());
     if (NULL == parentItem) {
         session_->logger().Log(kInfoLogLevel, "no root element found.");    
         *error = new Error(kUnknownError, "no root element found.");
@@ -128,16 +127,16 @@ void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
     *source = byteArray.data();
 }
 
-void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(view->scene()->focusItem());
+    QQuickItem* pFocusItem = view->activeFocusItem();
 
     if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
@@ -185,8 +184,9 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
         pFocusItem->setFocus(true);
 }
 
-void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -205,10 +205,12 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
 
     QApplication::postEvent(view->scene(), dbClckEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
+*/    
 }
 
-void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -221,10 +223,12 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
     releaseEvent->setButtons(Qt::LeftButton);
 
     QApplication::postEvent(view->scene(), releaseEvent);
+*/    
 }
 
-void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -237,10 +241,12 @@ void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
     pressEvent->setButtons(Qt::LeftButton);
 
     QApplication::postEvent(view->scene(), pressEvent);
+*/    
 }
 
-void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -265,10 +271,12 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 //        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
 //        QApplication::postEvent(view->scene(), contextEvent);
 //    }
+*/
 }
 
-void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
+/*    
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -288,14 +296,16 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     QApplication::postEvent(view->scene(), moveEvent);
 
     session_->set_mouse_position(prev_pos);
+*/    
 }
 
-void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -311,14 +321,16 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
     QApplication::postEvent(view->scene(), moveEvent);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
+*/    
 }
 
-void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
+/*    
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -334,14 +346,16 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     QApplication::postEvent(view->scene(), moveEvent);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
+*/    
 }
 
-void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
+/*    
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -373,14 +387,15 @@ void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) 
 
     QApplication::postEvent(view->scene(), pressEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
+*/    
 }
 
-void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -417,12 +432,12 @@ void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::stri
     *value = static_cast<Value*>(ret_value.release());
 }
 
-void QQmlViewCmdExecutor::ClearElement(const ElementId& element, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::ClearElement(const ElementId& element, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -448,66 +463,69 @@ void QQmlViewCmdExecutor::ClearElement(const ElementId& element, Error** error) 
     *error = new Error(kInvalidElementState);
 }
 
-void QQmlViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
     *is_displayed = pItem->isVisible();
 }
 
-void QQmlViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
     *is_enabled = pItem->isEnabled();
 }
 
-void QQmlViewCmdExecutor::ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem1 = getElement(element1, error);
+    QQuickItem* pItem1 = getElement(element1, error);
     if (NULL == pItem1)
         return;
 
-    QDeclarativeItem* pItem2 = getElement(element2, error);
+    QQuickItem* pItem2 = getElement(element2, error);
     if (NULL == pItem2)
         return;
 
     *is_equal = (pItem1 == pItem2);
 }
 
-void QQmlViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
+/*    
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
     QPointF scenePos = pItem->scenePos();
 
     *location = Point(scenePos.x(), scenePos.y());
+*/    
 }
 
-void QQmlViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
+/*    
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -516,14 +534,15 @@ void QQmlViewCmdExecutor::GetElementLocationInView(const ElementId& element, Poi
 
     // TODO: need check if pos fits into viewport?    
     *location = Point(pos.x(), pos.y());
+*/    
 }
 
-void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -533,24 +552,24 @@ void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
     *tag_name = className.toStdString();
 }
 
-void QQmlViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
     *size = Size(pItem->width(), pItem->height());
 }
 
-void QQmlViewCmdExecutor::GetElementText(const ElementId& element, std::string* element_text, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetElementText(const ElementId& element, std::string* element_text, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pItem = getElement(element, error);
+    QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
 
@@ -567,20 +586,20 @@ void QQmlViewCmdExecutor::GetElementText(const ElementId& element, std::string* 
     }
 }
 
-void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+    	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     session_->logger().Log(kFineLogLevel, "FindElements, loc:"+locator+" query:"+query);
 
     Error* tmp_error = NULL;
-    QDeclarativeItem *parentItem = getElement(root_element, &tmp_error);
+    QQuickItem *parentItem = getElement(root_element, &tmp_error);
     scoped_ptr<Error> scoped_err(tmp_error);
 
     if (NULL == parentItem) {
         session_->logger().Log(kInfoLogLevel, "no root element specified, search from root.");
-        parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());;
+        parentItem = qobject_cast<QQuickItem*>(view->contentItem());;
     }
 
     if (locator == LocatorType::kXpath) {
@@ -596,8 +615,8 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         }
 
         // list all child items and find matched locator
-        QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
-        foreach(QDeclarativeItem *child, childs) {
+        QList<QQuickItem*> childs = parentItem->findChildren<QQuickItem*>();
+        foreach(QQuickItem *child, childs) {
             if (FilterElement(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
@@ -609,12 +628,12 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
     }
 }
 
-void QQmlViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(view->scene()->focusItem());
+    QQuickItem* pFocusItem = view->activeFocusItem();
     if (NULL == pFocusItem) {
         *error = new Error(kNoSuchElement);
         return;
@@ -627,8 +646,8 @@ void QQmlViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
     *element = active_element;
 }
 
-void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -641,11 +660,11 @@ void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
         QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
         view->setSource(address);
 
-        if (QDeclarativeView::Loading == view->status()) {
+        if (QQuickView::Loading == view->status()) {
             loop.exec();
         }
 
-        if (QDeclarativeView::Ready != view->status()) {
+        if (QQuickView::Ready != view->status()) {
             session_->logger().Log(kWarningLogLevel, "QML sync load, smth wrong. View is not in READY state.");
         }
 
@@ -657,16 +676,46 @@ void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
     }
 }
 
-void QQmlViewCmdExecutor::GetURL(std::string* url, Error** error) {
-	QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetURL(std::string* url, Error** error) {
+	QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     *url = view->source().toString().toStdString();
 }
 
-void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
-    QDeclarativeView* view = getView(view_id_, error);
+void Quick2ViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+    
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+    QImage image = view->grabWindow();
+
+#if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");
+}
+
+void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
+    QQuickView* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -678,7 +727,7 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
         script.c_str(),
         args_as_json.c_str());
 
-    QDeclarativeExpression expr(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
+    QQmlExpression expr(view->rootContext(), view->contentItem(), jscript.c_str());
     QVariant result = expr.evaluate();
     if (expr.hasError()) {
         *error = new Error(kJavaScriptError, expr.error().toString().toStdString());
@@ -720,7 +769,7 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
     *value = static_cast<Value*>(ret_value.release());
 }
 
-bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query) {
+bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query) {
     QString className(item->metaObject()->className());
     REMOVE_INTERNAL_SUFIXES(className);
 
@@ -744,7 +793,7 @@ bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std:
     return false;
 }
 
-void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
+void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
 
@@ -810,7 +859,7 @@ void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const st
     buff.close();
 }
 
-void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
+void Quick2ViewCmdExecutor::createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
     
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 
@@ -825,7 +874,7 @@ void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff,
     delete writer;
 }
 
-void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
+void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
     QString className(parent->metaObject()->className());
     REMOVE_INTERNAL_SUFIXES(className);
     
@@ -835,12 +884,12 @@ void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& 
         writer->writeAttribute("id", parent->objectName());
 
     QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QDeclarativeItem>(parent));
+    elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
     writer->writeAttribute("elementId", elementKey);
 
     QList<QObject*> childs = parent->children();
     foreach(QObject *child, childs) {
-        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
+        QQuickItem* childItem = qobject_cast<QQuickItem*>(child);
         if (childItem)
             addItemToXML(childItem, elementsMap, writer);
     }

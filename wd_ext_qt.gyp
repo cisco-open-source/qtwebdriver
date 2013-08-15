@@ -47,10 +47,12 @@
         'inc/extension_qt/vncclient.h',
         'src/vnc/vncclient.cc',
         '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
+        'src/webdriver/extension_qt/uinput_manager.cc',
 	'src/third_party/des/d3des.c',
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
+	'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
         'src/third_party/pugixml/pugixml.cpp'
       ],
 
@@ -81,9 +83,11 @@
         ['<(QT5) == 1', {
 
           'sources': [
-            'src/webdriver/extension_qt/quick2_view_handle.cc',
+            'src/webdriver/extension_qt/qwindow_view_handle.cc',
+            'src/webdriver/extension_qt/qwindow_view_executor.cc',
             'src/webdriver/extension_qt/quick2_view_creator.cc',
             'src/webdriver/extension_qt/quick2_view_enumerator.cc',
+            'src/webdriver/extension_qt/quick2_view_executor.cc',
             'src/webdriver/extension_qt/qml_view_util.cc',
           ],
         } , {

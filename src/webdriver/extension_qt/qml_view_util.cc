@@ -7,8 +7,8 @@
 #include <QtCore/QFileInfo>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include "extension_qt/quick2_view_handle.h"
-#include <QtQuick/QQuickWindow>
+#include "extension_qt/qwindow_view_handle.h"
+#include <QtQuick/QQuickView>
 #else
 #include "extension_qt/widget_view_handle.h"
 #include <QtDeclarative/QDeclarativeView>
@@ -55,16 +55,28 @@ bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {
 }
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
+QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
     ViewHandle* viewHandle =  session->GetViewHandle(viewId);
     if (NULL == viewHandle) 
         return NULL;
 
-    Quick2ViewHandle* qViewHandle = dynamic_cast<Quick2ViewHandle*>(viewHandle);
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
     if (NULL == qViewHandle)
         return NULL;
 
-    return qobject_cast<QQuickWindow*>(qViewHandle->get());
+    return qobject_cast<QWindow*>(qViewHandle->get());
+}
+
+QQuickView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
+    ViewHandle* viewHandle =  session->GetViewHandle(viewId);
+    if (NULL == viewHandle) 
+        return NULL;
+
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
+    if (NULL == qViewHandle)
+        return NULL;
+
+    return qobject_cast<QQuickView*>(qViewHandle->get());
 }
 #else
 QDeclarativeView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {

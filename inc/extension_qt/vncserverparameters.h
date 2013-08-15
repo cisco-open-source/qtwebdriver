@@ -2,6 +2,7 @@
 #define VNCSERVERPARAMETERS_H
 
 #include <QtCore/QTypeInfo>
+#include <QtCore/QString>
 
 class ServerParameters
 {

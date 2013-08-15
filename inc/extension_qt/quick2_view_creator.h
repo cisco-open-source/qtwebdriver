@@ -9,10 +9,10 @@ namespace webdriver {
 
 class Session;
 
-class Quick2QmlViewCreator : public ViewCreator {
+class Quick2ViewCreator : public ViewCreator {
 public:
-    Quick2QmlViewCreator();
-    virtual ~Quick2QmlViewCreator(){}
+    Quick2ViewCreator();
+    virtual ~Quick2ViewCreator(){}
 
     virtual bool CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const;
 
@@ -20,7 +20,7 @@ public:
 
 private:
 
-    DISALLOW_COPY_AND_ASSIGN(Quick2QmlViewCreator);
+    DISALLOW_COPY_AND_ASSIGN(Quick2ViewCreator);
 };
 
 

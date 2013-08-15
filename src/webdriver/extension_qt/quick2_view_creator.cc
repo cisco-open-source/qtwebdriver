@@ -5,7 +5,7 @@
 #include "webdriver_error.h"
 
 #include "qml_view_util.h"
-#include "extension_qt/quick2_view_handle.h"
+#include "extension_qt/qwindow_view_handle.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
 
@@ -16,9 +16,9 @@
 
 namespace webdriver {
 
-Quick2QmlViewCreator::Quick2QmlViewCreator() {}
+Quick2ViewCreator::Quick2ViewCreator() {}
 
-bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+bool Quick2ViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
 	ViewHandle* handle = NULL;
 
     if (factory.empty())
@@ -27,18 +27,18 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
 	if (className.empty() || className == "QMLView") {
 		// get first found QML view
         CreateViewMethod createMethod = factory.begin()->second;
-        handle = new Quick2ViewHandle(static_cast<QQuickWindow*>(createMethod()));
+        handle = new QWindowViewHandle(static_cast<QWindow*>(createMethod()));
 	} else {
     	FactoryMap::const_iterator it = factory.find(className);
         if (it != factory.end())
         {
         	CreateViewMethod createMethod = it->second;
-            handle = new Quick2ViewHandle(static_cast<QQuickWindow*>(createMethod()));
+            handle = new QWindowViewHandle(static_cast<QWindow*>(createMethod()));
         }
     }
 
     if (NULL != handle) {
-        QQuickWindow* pWindow = (dynamic_cast<Quick2ViewHandle*>(handle))->get();
+        QWindow* pWindow = (dynamic_cast<QWindowViewHandle*>(handle))->get();
         
         if (NULL != pWindow) {
             std::string objClassName(pWindow->metaObject()->className());
@@ -61,13 +61,13 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
             if (!painter.isPainting())
                 loop.exec();
         
-            logger.Log(kInfoLogLevel, "Quick2QmlViewCreator created view (" + objClassName +").");
+            logger.Log(kInfoLogLevel, "Quick2ViewCreator created view (" + objClassName +").");
 
             *view = handle;
 
             return true;
         } else {
-            logger.Log(kSevereLogLevel, "Quick2QmlViewCreator, smth wrong.");
+            logger.Log(kSevereLogLevel, "Quick2ViewCreator, smth wrong.");
             handle->Release();
         }
     }
@@ -76,7 +76,7 @@ bool Quick2QmlViewCreator::CreateViewByClassName(const Logger& logger, const std
     return false;
 }
 
-bool Quick2QmlViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
+bool Quick2ViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
     if (!QQmlViewUtil::isUrlSupported(url)) {
         return false;
     }
