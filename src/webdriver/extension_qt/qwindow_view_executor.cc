@@ -123,12 +123,6 @@ void QWindowViewCmdExecutor::Close(Error** error) {
 
     session_->RemoveView(view_id_);
 
-    // destroy children correctly
-    QList<QWindow*> childs = view->findChildren<QWindow*>();
-    foreach(QWindow *child, childs) {
-        child->close();
-    }
-
     view->close();
 }
 
