@@ -37,6 +37,7 @@
 #include "commands/cisco_player_commands.h"
 #include "commands/xdrpc_command.h"
 #include "commands/touch_commands.h"
+#include "commands/orientation_command.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -306,6 +307,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<TouchDoubleClickCommand>        (CommandRoutes::kTouchDoubleClick);
     Add<TouchLongClickCommand>          (CommandRoutes::kTouchLongClick);
     Add<TouchFlickCommand>              (CommandRoutes::kTouchFlick);
+    Add<OrientationCommand>             (CommandRoutes::kOrientation);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
     Add<CISCO_StateCommand>             (CommandRoutes::kCiscoPlayerState);
     Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);

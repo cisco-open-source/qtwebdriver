@@ -1,139 +1,86 @@
-#include "extension_qt/q_view_executor.h"
+#include "extension_qt/qwindow_view_executor.h"
 
 #include "webdriver_logging.h"
 #include "webdriver_session.h"
 #include "q_key_converter.h"
-#include "extension_qt/widget_view_handle.h"
-#include "widget_view_util.h"
+#include "qml_view_util.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QDebug>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QInputDialog>
+#include <QtGui/QGuiApplication>
 #ifdef OS_ANDROID
     #include <qpa/qplatformnativeinterface.h>
     #include <jni.h> 
 #endif //OS_ANDROID
-#else
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QMessageBox>
-#include <QtGui/QInputDialog>
-#endif
 
 namespace webdriver {
 
-QViewCmdExecutor::QViewCmdExecutor(Session* session, ViewId viewId)
+QWindowViewCmdExecutor::QWindowViewCmdExecutor(Session* session, ViewId viewId)
     : ViewCmdExecutor(session, viewId) {
-
 }
 
-QViewCmdExecutor::~QViewCmdExecutor() {
-
+QWindowViewCmdExecutor::~QWindowViewCmdExecutor() {
 };
 
-QWidget* QViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    QWidget* pWidget = QWidgetViewUtil::getView(session_, viewId);
+QWindow* QWindowViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
+    QWindow* pWindow = QQmlViewUtil::getQWindowView(session_, viewId);
 
-    if (NULL == pWidget) {
+    if (NULL == pWindow) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such view("+viewId.id()+")");
         *error = new Error(kNoSuchWindow);
         return NULL;
     }
 
-    return pWidget;
+    return pWindow;
 }
 
-void QViewCmdExecutor::GetTitle(std::string* title, Error **error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::GetTitle(std::string* title, Error **error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    *title = view->windowTitle().toStdString();
+    *title = view->title().toStdString();
 
     session_->logger().Log(kFineLogLevel, "GetTitle - "+*title);
 }
 
-void QViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::GetWindowName(std::string* name, Error ** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    *name = view->windowTitle().toStdString();
+    *name = view->title().toStdString();
 
     session_->logger().Log(kFineLogLevel, "GetWindowName - "+*name);
 }
 
-void QViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
     *bounds = ConvertQRectToRect(view->geometry());
 }
     
-void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
-
-    if (!view->isTopLevel()) {
-        *error = new Error(kUnknownError, "Cant set bounds to non top level view.");
-        return;
-    }
 
     view->setGeometry(ConvertRectToQRect(bounds));
 }
 
-void QViewCmdExecutor::Maximize(Error** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::Maximize(Error** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    if (!view->isTopLevel()) {
-        *error = new Error(kUnknownError, "Cant maximize non top level view.");
-        return;
-    }
-
-    view->setGeometry(QApplication::desktop()->rect());    
+    view->showMaximized();    
 }
 
-void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
-    QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-    
-    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
-    FilePath path = session_->temp_dir().Append(kPngFileName);;
-
-    QPixmap pixmap = QPixmap::grabWidget(view);
-
-#if defined(OS_WIN)
-    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
-#elif defined(OS_POSIX)
-    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
-#endif
-
-#if defined(OS_POSIX)
-    if (!pixmap.save(path.value().c_str())) 
-#elif defined(OS_WIN)
-    if (!pixmap.save(QString::fromUtf16((ushort*)path.value().c_str())))
-#endif // OS_WIN
-    {
-        *error = new Error(kUnknownError, "screenshot was not captured");
-        return;
-    }
-
-    if (!file_util::ReadFileToString(path, png))
-        *error = new Error(kUnknownError, "Could not read screenshot file");
-}
-
-void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -160,38 +107,33 @@ void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
         bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
 
         if (!consumed)
-            qApp->sendEvent(view, &(*it));
+            QGuiApplication::sendEvent(view, &(*it));
         ++it;
     }
 }
 
-void QViewCmdExecutor::Close(Error** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::Close(Error** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    if (!view->isTopLevel()) {
-        *error = new Error(kUnknownError, "Cant close non top level view.");
-        return;
-    }
+    // TODO: review this, check if we can close window
 
     session_->logger().Log(kInfoLogLevel, "close View("+view_id_.id()+")");
 
     session_->RemoveView(view_id_);
 
     // destroy children correctly
-    QList<QWidget*> childs = view->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
+    QList<QWindow*> childs = view->findChildren<QWindow*>();
+    foreach(QWindow *child, childs) {
         child->close();
     }
 
     view->close();
 }
 
-void QViewCmdExecutor::SwitchTo(Error** error) {
-    QWidget* view = getView(view_id_, error);
+void QWindowViewCmdExecutor::SwitchTo(Error** error) {
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -200,7 +142,7 @@ void QViewCmdExecutor::SwitchTo(Error** error) {
     session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
 }
 
-void QViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
+void QWindowViewCmdExecutor::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element, Error** error) {
     std::vector<ElementId> elements;
     FindElements(root_element, locator, query, &elements, error);
     if (*error == NULL && !elements.empty())
@@ -209,77 +151,9 @@ void QViewCmdExecutor::FindElement(const ElementId& root_element, const std::str
         *error = new Error(kNoSuchElement);
 }
 
-void QViewCmdExecutor::GetAlertMessage(std::string* text, Error** error) {
-    QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    // QMessageBox::information(pWeb, "Alert", message->c_str(), QMessageBox::Ok);
-    QMessageBox *msgBox = view->findChild<QMessageBox*>();
-    if (NULL != msgBox) {
-        *text = msgBox->text().toStdString();
-    } else {
-        QInputDialog *msgbox = view->findChild<QInputDialog*>();
-
-        if (NULL != msgbox) {
-            *text = msgbox->labelText().toStdString();
-        } else {
-            *error = new Error(kNoAlertOpenError);
-        }
-    }
-}
-
-void QViewCmdExecutor::SetAlertPromptText(const std::string& alert_prompt_text, Error** error) {
-    QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    std::string message_text;
-    GetAlertMessage(&message_text, error);
-    if (*error)
-        return;
-
-    QInputDialog *alert = view->findChild<QInputDialog*>();
-
-    if (NULL != alert) {
-        alert->setTextValue(alert_prompt_text.c_str());
-    } else {
-        // in python ELEMENT_NOT_VISIBLE = 11
-        // kNoAlertError = 27
-        *error = new Error(kElementNotVisible);
-    }
-}
-
-void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
-    QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    QMessageBox *msgBox = view->findChild<QMessageBox*>();
-
-    if(NULL != msgBox) {
-        if(accept) {
-            msgBox->accept();
-        } else {
-            msgBox->close();
-        }
-    } else {
-        QInputDialog *msgbox = view->findChild<QInputDialog*>();
-        if(NULL != msgbox) {
-            if(accept) {
-                msgbox->accept();
-            } else {
-                msgbox->close();
-            }
-        } else {
-            *error = new Error(kNoAlertOpenError);
-        }
-    }
-}
-
-void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **error)
+void QWindowViewCmdExecutor::SetOrientation(const std::string &orientation, Error **error)
 {
-    QWidget* view = getView(view_id_, error);
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -328,9 +202,9 @@ void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **er
 #endif
 }
 
-void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
+void QWindowViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
 {
-    QWidget* view = getView(view_id_, error);
+    QWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 #ifdef OS_ANDROID
@@ -379,11 +253,11 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
 #endif
 }
 
-Rect QViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {
+Rect QWindowViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {
     return Rect(rect.x(), rect.y(), rect.width(), rect.height());
 }
 
-QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
+QRect QWindowViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
     QRect resultRect;
     resultRect.setX(rect.x());
     resultRect.setY(rect.y());
@@ -393,7 +267,7 @@ QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
     return resultRect;
 }
 
-QPoint QViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
+QPoint QWindowViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
     QPoint resultPoint;
     resultPoint.setX(p.x());
     resultPoint.setY(p.y());
@@ -401,7 +275,7 @@ QPoint QViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
     return resultPoint;
 }
 
-Qt::MouseButton QViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseButton button) {
+Qt::MouseButton QWindowViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseButton button) {
     Qt::MouseButton result = Qt::NoButton;
 
     switch(button)

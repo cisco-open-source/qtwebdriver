@@ -5,7 +5,12 @@
 
 #include <QtCore/QDebug>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+class QWindow;
+class QQuickView;
+#else
 class QDeclarativeView;
+#endif
 
 namespace webdriver {
 
@@ -17,7 +22,13 @@ class QQmlViewUtil {
 public:
     static bool isUrlSupported(const std::string& url);
     static bool isContentTypeSupported(const std::string& mime);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    static QWindow* getQWindowView(Session* session, const ViewId& viewId);
+    static QQuickView* getQMLView(Session* session, const ViewId& viewId);
+#else    
     static QDeclarativeView* getQMLView(Session* session, const ViewId& viewId);
+#endif    
 
 private:
     QQmlViewUtil() {}

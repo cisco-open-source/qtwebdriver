@@ -91,6 +91,7 @@ public:
     static const char kTouchDoubleClick[];
     static const char kTouchLongClick[];
     static const char kTouchFlick[];
+    static const char kOrientation[];
     static const char kXdrpc[];
     static const char kCiscoPlayerState[];
     static const char kCiscoPlayerVolume[];

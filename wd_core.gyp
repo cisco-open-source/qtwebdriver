@@ -36,6 +36,7 @@
         'src/webdriver/commands/mouse_commands.cc',
         'src/webdriver/commands/navigate_commands.cc',
         'src/webdriver/commands/response.cc',
+        'src/webdriver/commands/orientation_command.cc',
         'src/webdriver/commands/screenshot_command.cc',
         'src/webdriver/commands/sessions.cc',
         'src/webdriver/commands/session_with_id.cc',

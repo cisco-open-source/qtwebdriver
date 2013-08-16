@@ -3,10 +3,16 @@
 #include "webdriver_error.h"
 #include "q_content_type_resolver.h"
 
-#include "extension_qt/widget_view_handle.h"
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtDeclarative/QDeclarativeView>
 #include <QtCore/QFileInfo>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include "extension_qt/qwindow_view_handle.h"
+#include <QtQuick/QQuickView>
+#else
+#include "extension_qt/widget_view_handle.h"
+#include <QtDeclarative/QDeclarativeView>
+#endif
 
 
 namespace webdriver {
@@ -48,6 +54,31 @@ bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {
     return false;
 }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
+    ViewHandle* viewHandle =  session->GetViewHandle(viewId);
+    if (NULL == viewHandle) 
+        return NULL;
+
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
+    if (NULL == qViewHandle)
+        return NULL;
+
+    return qobject_cast<QWindow*>(qViewHandle->get());
+}
+
+QQuickView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
+    ViewHandle* viewHandle =  session->GetViewHandle(viewId);
+    if (NULL == viewHandle) 
+        return NULL;
+
+    QWindowViewHandle* qViewHandle = dynamic_cast<QWindowViewHandle*>(viewHandle);
+    if (NULL == qViewHandle)
+        return NULL;
+
+    return qobject_cast<QQuickView*>(qViewHandle->get());
+}
+#else
 QDeclarativeView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
 	ViewHandle* viewHandle =  session->GetViewHandle(viewId);
 	if (NULL == viewHandle) 
@@ -59,6 +90,7 @@ QDeclarativeView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewI
 
     return qobject_cast<QDeclarativeView*>(qViewHandle->get());
 }
+#endif
 
 
 } // namespace webdriver

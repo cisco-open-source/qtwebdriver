@@ -3,13 +3,10 @@
     'QT5':                      '0', # change to '1' for enabling Qt5
     'WD_BUILD_MONGOOSE':        '0',
     'WD_BUILD_MODP_B64':        '1',
-    'DESKTOP_QT_BIN_PATH':      '/usr/lib/qt4/bin',
-    'DESKTOP_QT_INC_PATH':      '/usr/include',
-    'DESKTOP_QT_LIB_PATH':      '/usr/lib',
-    'CISCO_QT_INC_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/include',
-    'CISCO_QT_LIB_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/lib/',
-    'CISCO_QT_BIN_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/bin/',
-    'CISCO_MONGOOSE_LIB_PATH':  '<(ROOT_PATH)/MONGOOSE/dist/<(platform)/generic/<(mode)/lib',
-    'CISCO_MONGOOSE_INC_PATH':  '<(ROOT_PATH)/MONGOOSE/dist/<(platform)/generic/<(mode)/h',
+    'QT_INC_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/include',
+    'QT_LIB_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/lib/',
+    'QT_BIN_PATH':        '<(ROOT_PATH)/WEBKITQT48_SRC/dist/<(platform)/<(mode)/bin/',
+    'MONGOOSE_LIB_PATH':  '<(ROOT_PATH)/MONGOOSE/dist/<(platform)/generic/<(mode)/lib',
+    'MONGOOSE_INC_PATH':  '<(ROOT_PATH)/MONGOOSE/dist/<(platform)/generic/<(mode)/h',
   },
 }

@@ -1,34 +1,33 @@
-#ifndef WEBDRIVER_QT_QML_VIEW_EXECUTOR_H_
-#define WEBDRIVER_QT_QML_VIEW_EXECUTOR_H_
+#ifndef WEBDRIVER_QT_QUICK2_VIEW_EXECUTOR_H_
+#define WEBDRIVER_QT_QUICK2_VIEW_EXECUTOR_H_
 
-#include "extension_qt/q_view_executor.h"
+#include "extension_qt/qwindow_view_executor.h"
 
 #include <QtCore/QDebug>
-#include <QtXml/QXmlStreamWriter>
-#include <QtDeclarative/QDeclarativeView>
-#include <QtDeclarative/QDeclarativeItem>
+#include <QtCore/QXmlStreamWriter>
+#include <QtQuick/QQuickView>
+#include <QtQuick/QQuickItem>
 
 namespace webdriver {
 
-class QQmlViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
+class Quick2ViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     static const ViewType QML_VIEW_TYPE;
     
-    QQmlViewCmdExecutorCreator();
-    virtual ~QQmlViewCmdExecutorCreator(){}
+    Quick2ViewCmdExecutorCreator();
+    virtual ~Quick2ViewCmdExecutorCreator(){}
 
     virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const;
 private:
 
-    DISALLOW_COPY_AND_ASSIGN(QQmlViewCmdExecutorCreator);
+    DISALLOW_COPY_AND_ASSIGN(Quick2ViewCmdExecutorCreator);
 };	
 
-/// QDeclarativeView based view's implementation
-class QQmlViewCmdExecutor : public QViewCmdExecutor {
+class Quick2ViewCmdExecutor : public QWindowViewCmdExecutor {
 public:
-    explicit QQmlViewCmdExecutor(Session* session, ViewId viewId);
-    virtual ~QQmlViewCmdExecutor();
+    explicit Quick2ViewCmdExecutor(Session* session, ViewId viewId);
+    virtual ~Quick2ViewCmdExecutor();
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error);
     virtual void GoForward(Error** error) NOT_SUPPORTED_IMPL;
@@ -67,6 +66,7 @@ public:
     virtual void SwitchToTopFrameIfCurrentFrameInvalid(Error** error) NOT_SUPPORTED_IMPL;
     virtual void NavigateToURL(const std::string& url, bool sync, Error** error);
     virtual void GetURL(std::string* url, Error** error);
+    virtual void GetScreenShot(std::string* png, Error** error);
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetAppCacheStatus(int* status, Error** error) NOT_SUPPORTED_IMPL;
@@ -81,6 +81,9 @@ public:
     virtual void GetStorageSize(StorageType type, int* size, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetGeoLocation(base::DictionaryValue** geolocation, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetGeoLocation(const base::DictionaryValue* geolocation, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetAlertMessage(std::string* text, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void SetAlertPromptText(const std::string& alert_prompt_text, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void AcceptOrDismissAlert(bool accept, Error** error) NOT_SUPPORTED_IMPL;
     virtual void TouchClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchDoubleClick(const ElementId& element, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchDown(const int &x, const int &y, Error **error) NOT_SUPPORTED_IMPL;
@@ -91,30 +94,28 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error** error) const NOT_SUPPORTED_IMPL;
     virtual void SetPlayerState(const ElementId& element, PlayerState, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayerVolume(const ElementId& element, double*, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void SetPlayerVolume(const ElementId& element, double, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayingPosition(const ElementId& element, double*, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerVolume(const ElementId& element, int*, Error** error) const NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerVolume(const ElementId& element, int, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayingPosition(const ElementId& element, double*, Error** error) const NOT_SUPPORTED_IMPL;
     virtual void SetPlayingPosition(const ElementId& element, double, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void SetMute(const ElementId& element, bool, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void GetMute(const ElementId& element, bool*, Error**error) NOT_SUPPORTED_IMPL;
-
 
 protected:
-    QDeclarativeView* getView(const ViewId& viewId, Error** error);
-    typedef QHash<QString, QDeclarativeItem*> XMLElementMap;    
+    QQuickView* getView(const ViewId& viewId, Error** error);
+    typedef QHash<QString, QQuickItem*> XMLElementMap;    
 
-    QDeclarativeItem* getElement(const ElementId &element, Error** error);
-    bool FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query);
-    void FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    void createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
-    void addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
+    QQuickItem* getElement(const ElementId &element, Error** error);
+    bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
+    void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
+    void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
+    void createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
+    void addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
-    DISALLOW_COPY_AND_ASSIGN(QQmlViewCmdExecutor);
+    DISALLOW_COPY_AND_ASSIGN(Quick2ViewCmdExecutor);
 };
 
 }  // namespace webdriver
 
-#endif  // WEBDRIVER_QT_QML_VIEW_EXECUTOR_H_
+#endif  // WEBDRIVER_QT_QUICK2_VIEW_EXECUTOR_H_
