@@ -172,10 +172,10 @@
           ],
         } ],
 
-        [ 'OS == "mac"', {
+        [ 'OS == "mac" or OS=="ios"', {
           'defines': [
             'OS_POSIX',
-          ],
+          ],	
           
           'sources': [
             'src/base/string16.cc',
@@ -207,7 +207,26 @@
             'src/base/mac/mac_logging.cc',
             'src/base/threading/platform_thread_mac.mm',
             'src/base/time_mac.cc',
+          ],
+        } ],
+
+        [ 'OS == "mac"', {
+          'defines': [
+            'OS_POSIX',
+          ],	
+          
+          'sources': [
             'src/base/sys_info_mac.cc',
+          ],
+        } ],
+
+        [ 'OS=="ios"', {
+          'defines': [
+            'OS_POSIX',
+          ],	
+          
+          'sources': [
+            'src/base/sys_info_ios.cc',
           ],
         } ],
 
