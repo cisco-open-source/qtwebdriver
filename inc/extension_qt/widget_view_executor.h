@@ -93,12 +93,14 @@ public:
     virtual void TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**) const;
-    virtual void SetPlayerState(const ElementId& element, PlayerState, Error**);
-    virtual void GetPlayerVolume(const ElementId& element, int*, Error**) const;
-    virtual void SetPlayerVolume(const ElementId& element, int, Error**);
-    virtual void GetPlayingPosition(const ElementId& element, double*, Error**) const;
-    virtual void SetPlayingPosition(const ElementId& element, double, Error**);
+    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerState(const ElementId& element, PlayerState, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayerVolume(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerVolume(const ElementId& element, double, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void GetPlayingPosition(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetPlayingPosition(const ElementId& element, double, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetMute(const ElementId& element, bool, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void GetMute(const ElementId& element, bool*, Error**error) NOT_SUPPORTED_IMPL;
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

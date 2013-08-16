@@ -37,6 +37,13 @@ struct ValueConversionTraits<int> {
 };
 
 template <>
+struct ValueConversionTraits<double> {
+  static base::Value* CreateValueFrom(double t);
+  static bool SetFromValue(const base::Value* value, double* t);
+  static bool CanConvert(const base::Value* value);
+};
+
+template <>
 struct ValueConversionTraits<bool> {
   static base::Value* CreateValueFrom(bool t);
   static bool SetFromValue(const base::Value* value, bool* t);

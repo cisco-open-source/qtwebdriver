@@ -13,6 +13,8 @@
 #include <QtWebKit/QtWebKit>
 #endif
 
+#include "webdriver_view_executor.h"
+
 namespace webdriver {
 
 class FramePath;
@@ -187,12 +189,14 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error);
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error);
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
-    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**) const;
+    virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**);
     virtual void SetPlayerState(const ElementId& element, PlayerState, Error**);
-    virtual void GetPlayerVolume(const ElementId& element, int*, Error**) const;
-    virtual void SetPlayerVolume(const ElementId& element, int, Error**);
-    virtual void GetPlayingPosition(const ElementId& element, double*, Error**) const;
+    virtual void GetPlayerVolume(const ElementId& element, double*, Error**);
+    virtual void SetPlayerVolume(const ElementId& element, double, Error**);
+    virtual void GetPlayingPosition(const ElementId& element, double*, Error**);
     virtual void SetPlayingPosition(const ElementId& element, double, Error**);
+    virtual void SetMute(const ElementId& element, bool, Error**);
+    virtual void GetMute(const ElementId& element, bool*, Error**);
 
 
 protected:

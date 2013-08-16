@@ -95,6 +95,7 @@ public:
     static const char kCiscoPlayerState[];
     static const char kCiscoPlayerVolume[];
     static const char kCiscoPlayingPosition[];
+    static const char kCiscoPlayerMute[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

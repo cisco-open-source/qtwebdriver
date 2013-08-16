@@ -310,6 +310,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<CISCO_StateCommand>             (CommandRoutes::kCiscoPlayerState);
     Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);
     Add<CISCO_SeekCommand>              (CommandRoutes::kCiscoPlayingPosition);
+    Add<CISCO_MuteCommand>              (CommandRoutes::kCiscoPlayerMute);
 
 }
 

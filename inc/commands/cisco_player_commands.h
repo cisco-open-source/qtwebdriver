@@ -67,6 +67,22 @@ private:
     DISALLOW_COPY_AND_ASSIGN(CISCO_SeekCommand);
 };
 
+class CISCO_MuteCommand : public ElementCommand
+{
+public:
+    CISCO_MuteCommand(const std::vector<std::string>& path_segments,
+                        const base::DictionaryValue* parameters);
+    virtual ~CISCO_MuteCommand();
+
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
+    virtual void ExecuteGet(Response* const response) OVERRIDE;
+    virtual void ExecutePost(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(CISCO_MuteCommand);
+};
+
 }
 
 #endif // CISCO_VOLUMECOMMAND_H

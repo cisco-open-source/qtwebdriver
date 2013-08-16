@@ -14,7 +14,7 @@ bool CISCO_VolumeCommand::DoesPost() const
 
 void CISCO_VolumeCommand::ExecuteGet(webdriver::Response * const response)
 {
-    int volume;
+    double volume;
     Error* error = NULL;
 
     session_->RunSessionTask(base::Bind(
@@ -28,14 +28,17 @@ void CISCO_VolumeCommand::ExecuteGet(webdriver::Response * const response)
         response->SetError(error);
         return;
     }
+
+    Value* doubleValue = Value::CreateDoubleValue(volume);
+    response->SetValue(doubleValue);
 }
 
 void CISCO_VolumeCommand::ExecutePost(webdriver::Response * const response)
 {
-    int level;
-    if (!GetIntegerParameter("level", &level)) {
+    double volume;
+    if (!GetDoubleParameter("volume", &volume)) {
         response->SetError(new Error(
-            kBadRequest, "'level' is missing or invalid"));
+            kBadRequest, "'volume' is missing or invalid"));
         return;
     }
 
@@ -45,7 +48,7 @@ void CISCO_VolumeCommand::ExecutePost(webdriver::Response * const response)
             &ViewCmdExecutor::SetPlayerVolume,
             base::Unretained(executor_.get()),
             element,
-            level,
+            volume,
             &error));
 
     if (error)
@@ -92,6 +95,8 @@ void CISCO_StateCommand::ExecuteGet(webdriver::Response * const response)
         response->SetError(error);
         return;
     }
+    base::Value* result = base::Value::CreateIntegerValue(state);
+    response->SetValue(result);
 }
 
 void CISCO_StateCommand::ExecutePost(webdriver::Response * const response)
@@ -99,7 +104,7 @@ void CISCO_StateCommand::ExecutePost(webdriver::Response * const response)
     PlayerState state;
     if (!GetIntegerParameter("state", (int*)&state)) {
         response->SetError(new Error(
-            kBadRequest, "'level' is missing or invalid"));
+            kBadRequest, "'state' is missing or invalid"));
         return;
     }
 
@@ -156,6 +161,9 @@ void CISCO_SeekCommand::ExecuteGet(webdriver::Response * const response)
         response->SetError(error);
         return;
     }
+
+    Value* value = Value::CreateDoubleValue(position);
+    response->SetValue(value);
 }
 
 void CISCO_SeekCommand::ExecutePost(webdriver::Response * const response)
@@ -163,7 +171,7 @@ void CISCO_SeekCommand::ExecutePost(webdriver::Response * const response)
     double position;
     if (!GetDoubleParameter("position", &position)) {
         response->SetError(new Error(
-            kBadRequest, "'level' is missing or invalid"));
+            kBadRequest, "'position' is missing or invalid"));
         return;
     }
 
@@ -191,6 +199,70 @@ CISCO_SeekCommand::CISCO_SeekCommand(
 
 CISCO_SeekCommand::~CISCO_SeekCommand()
 {
+}
+
+CISCO_MuteCommand::CISCO_MuteCommand(
+        const std::vector<std::string> &path_segments,
+        const base::DictionaryValue *parameters)
+        : ElementCommand(path_segments, parameters)
+{
+}
+
+CISCO_MuteCommand::~CISCO_MuteCommand()
+{
+}
+
+bool CISCO_MuteCommand::DoesGet() const
+{
+    return true;
+}
+
+bool CISCO_MuteCommand::DoesPost() const
+{
+    return true;
+}
+
+void CISCO_MuteCommand::ExecuteGet(Response * const response)
+{
+    bool mute;
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetMute,
+            base::Unretained(executor_.get()),
+            element,
+            &mute,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+
+    Value* value = Value::CreateBooleanValue(mute);
+    response->SetValue(value);
+}
+
+void CISCO_MuteCommand::ExecutePost(Response * const response)
+{
+    bool mute;
+    if (!GetBooleanParameter("mute", &mute)) {
+        response->SetError(new Error(
+            kBadRequest, "'mute' is missing or invalid"));
+        return;
+    }
+
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::SetMute,
+            base::Unretained(executor_.get()),
+            element,
+            mute,
+            &error));
+
+    if (error)
+        response->SetError(error);
 }
 
 }
