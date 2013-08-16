@@ -79,6 +79,8 @@ bool QWebViewCreator::ShowView(const Logger& logger, ViewHandle* viewHandle) con
         
         logger.Log(kInfoLogLevel, "QWebViewCreator created view(" + objClassName + ").");
 
+        widget->setAttribute(Qt::WA_DeleteOnClose, true);
+
         return true;
     } else {
         logger.Log(kSevereLogLevel, "QWebViewCreator, smth wrong.");

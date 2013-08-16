@@ -638,7 +638,7 @@ void QQmlViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error
 
     if (sync) {
         QEventLoop loop;
-        QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
+        QObject::connect(view, SIGNAL(statusChanged(QDeclarativeView::Status)),&loop,SLOT(quit()));
         view->setSource(address);
 
         if (QDeclarativeView::Loading == view->status()) {

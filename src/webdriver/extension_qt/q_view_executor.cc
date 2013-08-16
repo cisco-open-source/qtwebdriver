@@ -179,14 +179,6 @@ void QViewCmdExecutor::Close(Error** error) {
 
     session_->RemoveView(view_id_);
 
-    // destroy children correctly
-    QList<QWidget*> childs = view->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
-        child->close();
-    }
-
     view->close();
 }
 

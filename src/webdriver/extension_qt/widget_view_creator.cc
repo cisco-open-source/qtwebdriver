@@ -63,6 +63,8 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
 
             logger.Log(kInfoLogLevel, "QWidgetViewCreator created view("+objClassName+") by class name - "+className);
 
+            widget->setAttribute(Qt::WA_DeleteOnClose, true);
+
             *view = handle;
             
             return true;
