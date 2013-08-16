@@ -62,6 +62,8 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
         
             logger.Log(kInfoLogLevel, "QQmlViewCreator created view (" + objClassName +").");
 
+            widget->setAttribute(Qt::WA_DeleteOnClose, true);
+
             *view = handle;
 
             return true;
