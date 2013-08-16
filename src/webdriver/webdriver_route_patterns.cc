@@ -173,5 +173,6 @@ const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-CISCO-player-element/state";
 const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
 const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
+const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/-CISCO-player-element/mute";
 
 } // namespace webdriver

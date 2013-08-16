@@ -23,6 +23,19 @@ bool ValueConversionTraits<int>::CanConvert(const Value* value) {
   return SetFromValue(value, &t);
 }
 
+Value* ValueConversionTraits<double>::CreateValueFrom(double t) {
+    return Value::CreateDoubleValue(t);
+}
+
+bool ValueConversionTraits<double>::SetFromValue(const Value* value, double* t) {
+  return value->GetAsDouble(t);
+}
+
+bool ValueConversionTraits<double>::CanConvert(const Value* value) {
+  double t;
+  return SetFromValue(value, &t);
+}
+
 Value* ValueConversionTraits<bool>::CreateValueFrom(bool t) {
   return Value::CreateBooleanValue(t);
 }

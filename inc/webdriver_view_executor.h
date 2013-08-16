@@ -74,8 +74,8 @@ enum StorageType {
 ///@enum PlayerState possible states
 enum PlayerState{
     Stopped = 0,
-    Playing,
-    Paused
+    Playing = 1,
+    Paused = 2
 };
 
 
@@ -173,13 +173,15 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) = 0;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) = 0;
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error) {}
-    virtual void GetPlayerState(const ElementId& element, PlayerState *state, Error** error) const = 0;
+    virtual void GetPlayerState(const ElementId& element, PlayerState *state, Error** error)  = 0;
     virtual void SetPlayerState(const ElementId& element, const PlayerState state, Error** error) = 0;
-    virtual void GetPlayerVolume(const ElementId& element, int *level, Error** error) const = 0;
-    virtual void SetPlayerVolume(const ElementId& element, const int level, Error** error) = 0;
-    virtual void GetPlayingPosition(const ElementId& element, double* reletivePos, Error** error) const =0;
+    virtual void GetPlayerVolume(const ElementId& element, double *level, Error** error) = 0;
+    virtual void SetPlayerVolume(const ElementId& element, const double level, Error** error) = 0;
+    virtual void GetPlayingPosition(const ElementId& element, double* reletivePos, Error** error) = 0;
     virtual void SetPlayingPosition(const ElementId& element, const double reletivePos, Error** error) = 0;
-	virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
+    virtual void SetMute(const ElementId& element, bool, Error**) = 0;
+    virtual void GetMute(const ElementId& element, bool*, Error**) = 0;
+    virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
     virtual void GetOrientation(std::string *orientation, Error **error) = 0;
 
 protected:

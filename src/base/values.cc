@@ -212,10 +212,12 @@ bool FundamentalValue::GetAsInteger(int* out_value) const {
 }
 
 bool FundamentalValue::GetAsDouble(double* out_value) const {
-  if (out_value && IsType(TYPE_DOUBLE))
+  if (out_value && IsType(TYPE_DOUBLE)){
     *out_value = double_value_;
-  else if (out_value && IsType(TYPE_INTEGER))
+  }
+  else if (out_value && IsType(TYPE_INTEGER)){
     *out_value = integer_value_;
+  }
   return (IsType(TYPE_DOUBLE) || IsType(TYPE_INTEGER));
 }
 

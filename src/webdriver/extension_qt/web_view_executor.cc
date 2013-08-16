@@ -23,6 +23,7 @@
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtNetwork/QNetworkCookie>
 #include <QtCore/QTimer>
+#include <base/values.h>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
@@ -1565,28 +1566,162 @@ void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **er
     *browserLog = logHandler->getLog();
 }
 
-void QWebViewCmdExecutor::GetPlayerState(const ElementId& element, PlayerState *state, Error **error) const
+void QWebViewCmdExecutor::GetPlayerState(const ElementId& element, PlayerState *state, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    bool isPaused = false;
+    base::Value* isPausedValue = base::Value::CreateBooleanValue(isPaused);
+    GetAttribute(element, std::string("paused"), &isPausedValue, error);
+    isPaused = !isPausedValue->IsType(base::Value::TYPE_NULL);
+    delete isPausedValue;
+
+    if(!isPaused){
+        *state = Playing;
+    } else {
+        std::string currentTimeString;
+        base::Value *currentTimeValue = base::Value::CreateStringValue(currentTimeString);
+        GetAttribute(element, std::string("currentTime"), &currentTimeValue, error);
+        currentTimeValue->GetAsString(&currentTimeString);
+        delete currentTimeValue;
+        double currentTime = 0;
+        base::StringToDouble(currentTimeString, &currentTime);
+        if(currentTime == 0){
+            *state = Stopped;
+        } else {
+            *state = Paused;
+        }
+    }
 }
 
 void QWebViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState state, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+
+    Value* value = NULL;
+    switch(state){
+    case Playing:
+            *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem) { elem.play(); }",
+                        "play",
+                        CreateListValueFrom(element),
+                        CreateDirectValueParser(&value));
+            break;
+    case Paused:
+            *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem) { elem.pause(); }",
+                        "pause",
+                        CreateListValueFrom(element),
+                        CreateDirectValueParser(&value));
+            break;
+    case Stopped:
+            *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem) {"
+                            "if(elem.seekable.start() != 0)"
+                                "throw \"Video can't be stopped!\""
+                            "elem.pause();"
+                            "elem.currentTime = 0;"
+                        "}",
+                        "stop",
+                        CreateListValueFrom(element),
+                        CreateDirectValueParser(&value));
+            break;
+    }
 }
 
-void QWebViewCmdExecutor::GetPlayerVolume(const ElementId& element, int *level, Error **error) const
+void QWebViewCmdExecutor::GetPlayerVolume(const ElementId& element, double *volume, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    base::Value* volumeValue = base::Value::CreateDoubleValue(*volume);
+    GetAttribute(element, std::string("volume"), &volumeValue, error);
+    std::string volumeString;
+    volumeValue->GetAsString(&volumeString);
+    base::StringToDouble(volumeString,volume);
+    delete volumeValue;
+
+
 }
 
-void QWebViewCmdExecutor::SetPlayerVolume(const ElementId& element, int level, Error **error)
+void QWebViewCmdExecutor::SetPlayerVolume(const ElementId& element, double volume, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Value* value = NULL;
+    *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem, level) { elem.volume = level; }",
+                        "setVolume",
+                        CreateListValueFrom(element, volume),
+                        CreateDirectValueParser(&value));
 }
 
-void QWebViewCmdExecutor::GetPlayingPosition(const ElementId& element, double *position, Error **error) const
+void QWebViewCmdExecutor::GetPlayingPosition(const ElementId& element, double *position, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    base::Value* volumeValue = base::Value::CreateDoubleValue(*position);
+    GetAttribute(element, std::string("currentTime"), &volumeValue, error);
+    std::string volumeString;
+    volumeValue->GetAsString(&volumeString);
+    base::StringToDouble(volumeString,position);
+    delete volumeValue;
 }
 
 void QWebViewCmdExecutor::SetPlayingPosition(const ElementId& element, double position, Error **error)
 {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Value* value = NULL;
+    *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem, time) { elem.currentTime = time; }",
+                        "setVolume",
+                        CreateListValueFrom(element, position),
+                CreateDirectValueParser(&value));
+}
+
+void QWebViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Value* value = NULL;
+    *error = ExecuteScriptAndParse(
+                        GetFrame(view, session_->current_frame()),
+                        "function(elem, mute) { elem.muted = mute; }",
+                        "setVolume",
+                        CreateListValueFrom(element, mute),
+                CreateDirectValueParser(&value));
+}
+
+void QWebViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **error)
+{
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    base::Value* isMutedValue = base::Value::CreateBooleanValue(mute);
+    GetAttribute(element, std::string("muted"), &isMutedValue, error);
+    *mute = !isMutedValue->IsType(base::Value::TYPE_NULL);
+    delete isMutedValue;
 }
 
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
@@ -1620,6 +1755,7 @@ QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePa
 
 Error* QWebViewCmdExecutor::ExecuteScriptAndParse(QWebFrame* frame,
                                     const std::string& anonymous_func_script,
+
                                     const std::string& script_name,
                                     const ListValue* args,
                                     const ValueParser* parser) {
