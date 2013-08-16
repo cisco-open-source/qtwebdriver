@@ -59,7 +59,7 @@
              '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac"', {
+          [ 'OS=="mac" or OS=="ios"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
@@ -105,7 +105,7 @@
               '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac"', {
+          [ 'OS=="mac" or OS=="ios"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/QtGui.framework',
@@ -217,7 +217,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
-            [ 'OS=="mac"', {
+            [ 'OS=="mac" or OS=="ios"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/libQt5WebKit.a','<(QT_LIB_PATH)/libQt5WebKitWidgets.a',],
               },
@@ -231,7 +231,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
             } ],
-            [ 'OS=="mac"', {
+            [ 'OS=="mac" or OS=="ios"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
               },

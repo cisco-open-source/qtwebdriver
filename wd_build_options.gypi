@@ -1,4 +1,4 @@
-{
+	{
    # do not require cygwin
   'msvs_cygwin_shell': 0,
 
@@ -88,11 +88,11 @@
       ],	
     } ],
 
-    [ 'OS == "mac"', {
+    [ 'OS == "mac" or OS == "ios"', {
       'actions': [ {                                                                                                                                                 
-        'action_name': 'create_input_dir',                                                                                                                                  
-        'inputs':      [],                                                                                                                                           
-        'outputs':     [],                                                                                                                      
+        'action_name': 'create_input_dir',
+        'inputs':      [],
+        'outputs':     [],
         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],                                                                                                  
        } ],
        
