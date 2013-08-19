@@ -74,7 +74,19 @@
                 'Security.framework',
               ],
             }, 
-          } ],       
+          } ],  
+          ['OS=="android"', {
+            'libraries': [
+              '-L<(QT_LIB_PATH)',
+              '-lQt5Widgets',
+              '-lQt5Network',
+              '-lQt5Gui',
+              '-lQt5Core',
+              '-L<(ANDROID_LIB)',
+              '-lgnustl_shared',
+              '-llog',
+            ],
+          } ],     
         ],
       }, {
         'conditions': [
@@ -293,6 +305,32 @@
           ],
         } ],
       ],
+    } , {
+      'target_name': 'test_android_WD_noWebkit',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_noWebkit_android',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'test_widgets',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
+
     }
   ],
 }

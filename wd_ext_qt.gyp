@@ -48,7 +48,7 @@
         'src/vnc/vncclient.cc',
         '<(INTERMEDIATE_DIR)/moc_vncclient.cc',
         'src/webdriver/extension_qt/uinput_manager.cc',
-	'src/third_party/des/d3des.c',
+        'src/third_party/des/d3des.c',
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
