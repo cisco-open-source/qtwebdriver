@@ -167,12 +167,14 @@ const char CommandRoutes::kTouchMove[]  				= "/session/*/touch/move";
 const char CommandRoutes::kTouchScroll[]  				= "/session/*/touch/scroll";
 const char CommandRoutes::kTouchDoubleClick[]			= "/session/*/touch/doubleclick";
 const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
-const char CommandRoutes::kTouchFlick[]		        	= "/session/*/touch/flick";
-const char CommandRoutes::kOrientation[]	        	= "/session/*/orientation";
+const char CommandRoutes::kTouchFlick[]					= "/session/*/touch/flick";
+const char CommandRoutes::kOrientation[]				= "/session/*/orientation";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-CISCO-player-element/state";
 const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
 const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
 const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/-CISCO-player-element/mute";
+const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
+const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
 
 } // namespace webdriver

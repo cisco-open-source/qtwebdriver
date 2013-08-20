@@ -38,6 +38,7 @@
 #include "commands/xdrpc_command.h"
 #include "commands/touch_commands.h"
 #include "commands/orientation_command.h"
+#include "commands/visualizer_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -313,6 +314,8 @@ DefaultRouteTable::DefaultRouteTable()
     Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);
     Add<CISCO_SeekCommand>              (CommandRoutes::kCiscoPlayingPosition);
     Add<CISCO_MuteCommand>              (CommandRoutes::kCiscoPlayerMute);
+    Add<VisualizerSourceCommand>        (CommandRoutes::kVisualizerSource);
+    Add<VisualizerShowPointCommand>     (CommandRoutes::kVisualizerShowPoint);
 
 }
 

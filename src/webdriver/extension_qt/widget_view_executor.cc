@@ -896,6 +896,10 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
     buff.close();
 }
 
+void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
+    GetSource(source, error);
+}
+
 void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 

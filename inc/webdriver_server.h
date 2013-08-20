@@ -128,7 +128,8 @@ private:
     struct mg_context* mg_ctx_;
     State state_;
 
-    void DispatchCommand(Command* command_ptr,
+    void DispatchCommand(const std::string& matched_route,
+                         Command* command_ptr,
                          const std::string& method,
                          Response* response);
 

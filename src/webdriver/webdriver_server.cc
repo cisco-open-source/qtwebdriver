@@ -273,19 +273,12 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
                             &path_segments,
                             &parameters,
                             &response)) {
-        if (matched_route == CommandRoutes::kUrlCmd) {
-            DispatchCommand(
-                    new UrlCommandWrapper(path_segments,
-                            parameters,
-                            cmdCreator->create(path_segments, parameters)),
-                    method,
-                    &response);
-        } else {
-            DispatchCommand(
-                    cmdCreator->create(path_segments, parameters),
-                    method,
-                    &response);
-        }
+        Command* command = cmdCreator->create(path_segments, parameters);
+        DispatchCommand(
+                matched_route,
+                command,
+                method,
+                &response);
     }
     SendResponse(connection,
                 request_info->request_method,
@@ -499,9 +492,14 @@ Server* Server::GetInstance()
     return Singleton<Server>::get();
 }
 
-void Server::DispatchCommand(Command* command_ptr,
+void Server::DispatchCommand(const std::string& matched_route,
+                             Command* command_ptr,
                              const std::string& method,
                              Response* response) {
+    if (matched_route == CommandRoutes::kUrlCmd) {
+        command_ptr = new UrlCommandWrapper(command_ptr);
+    }
+
     CHECK(method == "GET" ||
           method == "POST" ||
           method == "DELETE" ||

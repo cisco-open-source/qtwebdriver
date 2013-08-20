@@ -16,9 +16,7 @@ class Response;
 
 class CommandWrapper : public Command {
 public:
-  	CommandWrapper(const std::vector<std::string>& path_segments,
-             const DictionaryValue* const parameters,
-             Command* delegate);
+    CommandWrapper(Command* delegate);
   	virtual ~CommandWrapper();
 
   	virtual bool DoesDelete() const OVERRIDE;
@@ -38,9 +36,7 @@ private:
 
 class UrlCommandWrapper : public CommandWrapper {
 public:
-  	UrlCommandWrapper(const std::vector<std::string>& path_segments,
-             const DictionaryValue* const parameters,
-             Command* delegate);
+    UrlCommandWrapper(Command* delegate);
   	virtual ~UrlCommandWrapper();
 
     virtual void ExecutePost(Response* const response)  OVERRIDE;

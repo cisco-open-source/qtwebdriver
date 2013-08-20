@@ -15,10 +15,8 @@
 
 namespace webdriver {
 
-CommandWrapper::CommandWrapper(const std::vector<std::string>& path_segments,
-             				const DictionaryValue* const parameters,
-             				Command* delegate) 
-		: Command(path_segments, parameters),
+CommandWrapper::CommandWrapper(Command* delegate)
+        : Command(*delegate),
 		  delegate_(delegate) {
 }
 
@@ -56,10 +54,8 @@ void CommandWrapper::ExecutePost(Response* const response) {
 	delegate_->ExecutePost(response);
 }
 
-UrlCommandWrapper::UrlCommandWrapper(const std::vector<std::string>& path_segments,
-             const DictionaryValue* const parameters,
-             Command* delegate) 
-	: CommandWrapper(path_segments, parameters, delegate) {
+UrlCommandWrapper::UrlCommandWrapper(Command* delegate)
+    : CommandWrapper(delegate) {
 }
 
 UrlCommandWrapper::~UrlCommandWrapper() {}
@@ -154,14 +150,6 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
 
     } while(0);
 
-    scoped_ptr<Error> ignore_error(error);
-
-	// we need to release scoped_ptr parameters_.
-	// Because it references same data as delegate.		
-    const void* ignore_pointer = parameters_.release();
-    // to avoid "unused variable" warning
-    (void)ignore_pointer;
-    
     delegate_->ExecutePost(response);
 }
 

@@ -14,6 +14,7 @@
 #include "webdriver_server.h"
 
 #include "web_view_util.h"
+#include "web_view_visualizer.h"
 #include "extension_qt/widget_view_handle.h"
 
 #include "extension_qt/event_dispatcher.h"
@@ -328,7 +329,7 @@ void QWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
     const char* kSource =
         "function() {"
         "  return new XMLSerializer().serializeToString(document);"
-        "}";        
+        "}";
 
     *error = ExecuteScriptAndParse(
                 GetFrame(view, session_->current_frame()),
@@ -1649,8 +1650,6 @@ void QWebViewCmdExecutor::GetPlayerVolume(const ElementId& element, double *volu
     volumeValue->GetAsString(&volumeString);
     base::StringToDouble(volumeString,volume);
     delete volumeValue;
-
-
 }
 
 void QWebViewCmdExecutor::SetPlayerVolume(const ElementId& element, double volume, Error **error)
@@ -1722,6 +1721,24 @@ void QWebViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **
     GetAttribute(element, std::string("muted"), &isMutedValue, error);
     *mute = !isMutedValue->IsType(base::Value::TYPE_NULL);
     delete isMutedValue;
+}
+
+void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWebViewVisualizerSourceCommand command(this, session_, view);
+    command.Execute(source, error);
+}
+
+void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWebViewVisualizerShowPointCommand command(this, session_, view);
+    command.Execute(error);
 }
 
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
@@ -2382,6 +2399,5 @@ void QWebViewCmdExecutor::AddBrowserLoggerToView(QWebView* view)
     logHandler->loadJSLogObject(view->page()->mainFrame());
     logHandler->loadConsoleJS(view);
 }
-
 
 } //namespace webdriver 

@@ -184,6 +184,9 @@ public:
     virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
     virtual void GetOrientation(std::string *orientation, Error **error) = 0;
 
+    virtual void VisualizerSource(std::string* source, Error** error) = 0;
+    virtual void VisualizerShowPoint(Error** error) = 0;
+
 protected:
     Session* session_;
     ViewId view_id_;

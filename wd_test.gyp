@@ -95,6 +95,7 @@
               '-L<(QT_LIB_PATH)',
               '-lQtNetwork',
               '-lQtGui',
+              '-lQtXml',
               '-lQtCore',
               '-lQtDeclarative',
               '-lpthread',
@@ -106,6 +107,7 @@
             'libraries': [
               '-l<(QT_LIB_PATH)/QtNetwork4',
               '-l<(QT_LIB_PATH)/QtGui4',
+              '-l<(QT_LIB_PATH)/QtXml4',
               '-l<(QT_LIB_PATH)/QtCore4',
               '-l<(QT_LIB_PATH)/QtDeclarative4',
               '-luser32.lib',

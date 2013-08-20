@@ -1,6 +1,6 @@
 {
   'variables': {
-	'QT5': '0', # change to '1' for enabling Qt5
+    'QT5': '0', # change to '1' for enabling Qt5
     'WD_BUILD_MONGOOSE': '1',
     'WD_BUILD_MODP_B64': '0',
     'WD_CONFIG_QUICK': '0',

@@ -198,6 +198,8 @@ public:
     virtual void SetMute(const ElementId& element, bool, Error**);
     virtual void GetMute(const ElementId& element, bool*, Error**);
 
+    virtual void VisualizerSource(std::string* source, Error** error);
+    virtual void VisualizerShowPoint(Error** error);
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
@@ -291,12 +293,10 @@ protected:
 
     void AddBrowserLoggerToView(QWebView* view);
 
-
-
-
-    
 private:
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
+    friend class QWebViewVisualizerSourceCommand;
+    friend class QWebViewVisualizerShowPointCommand;
 };
 
 }  // namespace webdriver

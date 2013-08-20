@@ -18,12 +18,12 @@ class Session;
 /// in case of URLCommand that creates new view for other content. 
 class URLTransitionAction {
 public:
+    virtual ~URLTransitionAction() {}
+
     /// Behavior of handling old view.
     /// @param session session to work within
     /// @param viewId viewId not able to handle requested URL
     virtual void HandleOldView(Session* session, const ViewId& viewId) const = 0;
-
-    virtual ~URLTransitionAction(){}
 };
 
 /// transition action - close old view
@@ -49,8 +49,8 @@ public:
     static void SetURLTransitionAction(URLTransitionAction* transitionAction);
 
 private:
-    ViewTransitionManager() {};
-    ~ViewTransitionManager() {};
+    ViewTransitionManager() {}
+    ~ViewTransitionManager() {}
 
     static URLTransitionActionPtr urlTransitionAction_;
 };

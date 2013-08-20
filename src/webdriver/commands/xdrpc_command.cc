@@ -38,9 +38,11 @@ void XDRPCCommand::ExecutePost(Response* const response) {
     std::string matched_route;
     AbstractCommandCreator* cmdCreator =
         Server::GetInstance()->GetRouteTable().GetRouteForURL(path, &matched_route);
+    Command* command = cmdCreator->create(path_segments, parameters);
 
     Server::GetInstance()->DispatchCommand(
-        cmdCreator->create(path_segments, parameters),
+        matched_route,
+        command,
         method,
         response);
     response->SetStatus(kSuccess);
