@@ -1614,6 +1614,7 @@ void QWebViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState s
                         CreateDirectValueParser(&value));
             break;
     case Paused:
+    case Stopped:
             *error = ExecuteScriptAndParse(
                         GetFrame(view, session_->current_frame()),
                         "function(elem) { elem.pause(); }",
@@ -1621,19 +1622,9 @@ void QWebViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState s
                         CreateListValueFrom(element),
                         CreateDirectValueParser(&value));
             break;
-    case Stopped:
-            *error = ExecuteScriptAndParse(
-                        GetFrame(view, session_->current_frame()),
-                        "function(elem) {"
-                            "if(elem.seekable.start() != 0)"
-                                "throw \"Video can't be stopped!\""
-                            "elem.pause();"
-                            "elem.currentTime = 0;"
-                        "}",
-                        "stop",
-                        CreateListValueFrom(element),
-                        CreateDirectValueParser(&value));
-            break;
+    }
+    if(state == Stopped){
+        SetPlayingPosition(element, 0.0, error);
     }
 }
 
