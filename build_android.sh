@@ -9,9 +9,20 @@ then
   modes="release release_dbg"
 fi
 
-export ANDROID_NDK_ROOT=/opt/android/android-ndk-r8e
-export ANDROID_SDK_ROOT=/opt/android/adt-bundle-linux-x86-20130522/sdk
-export QT_DIR=/opt/Qt5.1/5.1.0
+if [ -z $ANDROID_NDK_ROOT];
+then
+  export ANDROID_NDK_ROOT=/opt/android/android-ndk-r8e
+fi
+
+if [ -z $ANDROID_SDK_ROOT]; 
+then
+  export ANDROID_SDK_ROOT=/opt/android/adt-bundle-linux-x86-20130522/sdk
+fi
+
+if [ -z $QT_DIR ]
+then
+  export QT_DIR=/opt/Qt5.1/5.1.0
+fi
 
 for arch in $archs
 do

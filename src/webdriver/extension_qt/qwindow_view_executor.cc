@@ -163,7 +163,7 @@ void QWindowViewCmdExecutor::SetOrientation(const std::string &orientation, Erro
     }
 
 #ifdef OS_ANDROID
-    QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
+    QPlatformNativeInterface *interface = QGuiApplication::platformNativeInterface();
     JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
 
     JNIEnv * g_env = NULL;
@@ -204,7 +204,7 @@ void QWindowViewCmdExecutor::GetOrientation(std::string *orientation, Error **er
 #ifdef OS_ANDROID
     int android_orientation;
 
-    QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
+    QPlatformNativeInterface *interface = QGuiApplication::platformNativeInterface();
     JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
 
     JNIEnv * g_env = NULL;

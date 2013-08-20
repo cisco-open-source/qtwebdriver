@@ -583,6 +583,12 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
         parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());;
     }
 
+    if (NULL == parentItem) {
+        session_->logger().Log(kWarningLogLevel, "no root element.");
+        *error = new Error(kUnknownError, "no root element.");
+        return;
+    }
+
     if (locator == LocatorType::kXpath) {
         FindElementsByXpath(parentItem, query, elements, error);
     } else {
@@ -826,6 +832,11 @@ void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff,
 }
 
 void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
+    if (NULL == parent) {
+        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
+        return;
+    }
+
     QString className(parent->metaObject()->className());
     REMOVE_INTERNAL_SUFIXES(className);
     
