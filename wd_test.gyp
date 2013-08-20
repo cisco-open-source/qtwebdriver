@@ -82,6 +82,8 @@
               '-lQt5Network',
               '-lQt5Gui',
               '-lQt5Core',
+              '-lQt5Quick',
+              '-lQt5Qml',
               '-L<(ANDROID_LIB)',
               '-lgnustl_shared',
               '-llog',
@@ -315,6 +317,7 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
       

@@ -74,9 +74,14 @@ def copyNecessaryLib(qt_dir, libs_dir, libs_xml):
   tree = ET.parse(libs_xml)
   root = tree.getroot()
 
-  qt_libs = root.findall("./array[@name=\'qt_libs\']/item")
-
-  # shutil.copytree(dest_dir +'/libs/', predef_dir+'/libs/arm')
+  qt_libs = []
+  bundled_libs = []
+  arrays = root.findall("array")
+  for array in arrays:
+    if array.attrib.get('name') == 'qt_libs':
+      qt_libs = array.findall('item')
+    if array.attrib.get ('name') == 'bundled_in_lib':
+      bundled_libs = array.findall('item')
 
   for lib in qt_libs:
     if lib.text == "gnustl_shared" :
@@ -84,8 +89,6 @@ def copyNecessaryLib(qt_dir, libs_dir, libs_xml):
       continue
     lib_src_path = os.path.join(qt_libs_path, "lib"+lib.text+".so")
     shutil.copy(lib_src_path, libs_dir)
-
-  bundled_libs = root.findall("./array[@name=\'bundled_in_lib\']/item")
 
   for lib in bundled_libs:
     if lib.text == "libgnustl_shared.so" :

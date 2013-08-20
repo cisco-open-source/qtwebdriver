@@ -31,6 +31,8 @@
         <item>Qt5Gui</item>
         <item>Qt5Network</item>
         <item>Qt5Widgets</item>
-        <item>Qt5XmlPatterns</item>
+        <item>Qt5V8</item>
+        <item>Qt5Qml</item>
+        <item>Qt5Quick</item>
     </array>
 </resources>
