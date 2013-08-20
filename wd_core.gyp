@@ -47,6 +47,7 @@
         'src/webdriver/commands/url_command.cc',
         'src/webdriver/commands/webdriver_command.cc',
         'src/webdriver/commands/element_commands.cc',
+        'src/webdriver/commands/visualizer_commands.cc',
         'src/webdriver/commands/window_commands.cc',
         'src/webdriver/commands/non_session_commands.cc',
         'src/webdriver/commands/xdrpc_command.cc',

@@ -53,6 +53,18 @@ private:
     QWebView* view_;
 };
 
+class QWebViewVisualizerShowPointCommand {
+public:
+    QWebViewVisualizerShowPointCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
+
+    void Execute(Error** error);
+
+private:
+    QWebViewCmdExecutor* executor_;
+    Session* session_;
+    QWebView* view_;
+};
+
 }  // namespace webdriver
 
 #endif // WEB_VIEW_VISUALIZER_H

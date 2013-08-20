@@ -95,6 +95,7 @@ public:
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
 
     virtual void VisualizerSource(std::string* source, Error** error);
+    virtual void VisualizerShowPoint(Error** error);
 
 protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    

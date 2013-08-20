@@ -191,6 +191,7 @@ public:
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error);
 
     virtual void VisualizerSource(std::string* source, Error** error);
+    virtual void VisualizerShowPoint(Error** error);
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
@@ -287,8 +288,7 @@ protected:
 private:
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
     friend class QWebViewVisualizerSourceCommand;
-
-    void DrawMark(const QPoint& point) const;
+    friend class QWebViewVisualizerShowPointCommand;
 };
 
 }  // namespace webdriver

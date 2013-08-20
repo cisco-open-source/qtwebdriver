@@ -900,6 +900,9 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
     GetSource(source, error);
 }
 
+void QWidgetViewCmdExecutor::VisualizerShowPoint(Error** error) {
+}
+
 void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error, bool needAddWebSource) {
     QXmlStreamWriter* writer = new QXmlStreamWriter();
 

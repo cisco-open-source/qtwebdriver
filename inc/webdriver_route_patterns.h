@@ -93,6 +93,7 @@ public:
     static const char kTouchFlick[];
     static const char kXdrpc[];
     static const char kVisualizerSource[];
+    static const char kVisualizerShowPoint[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

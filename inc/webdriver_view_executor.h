@@ -167,6 +167,7 @@ public:
     virtual void GetBrowserLog(base::ListValue** browserLog, Error **error) {}
 
     virtual void VisualizerSource(std::string* source, Error** error) = 0;
+    virtual void VisualizerShowPoint(Error** error) = 0;
 
 protected:
     Session* session_;

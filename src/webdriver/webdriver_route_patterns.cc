@@ -166,5 +166,6 @@ const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
 const char CommandRoutes::kTouchFlick[]		        	= "/session/*/touch/flick";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
 const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
+const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
 
 } // namespace webdriver

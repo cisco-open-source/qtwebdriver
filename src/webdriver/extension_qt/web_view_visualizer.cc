@@ -271,4 +271,49 @@ void QWebViewVisualizerSourceCommand::DownloadFinished() {
 
 const char QWebViewVisualizerSourceCommand::DATA_PROTOCOL[] = "data:";
 
+class QCursorMark : public QWidget
+{
+public:
+    explicit QCursorMark(QWidget* parent)
+        : QWidget(parent)
+    {
+        resize(2 * RADIUS, 2 * RADIUS);
+    }
+
+    virtual void paintEvent(QPaintEvent *event) {
+        QPainter painter(this);
+        painter.setPen(QPen(Qt::red));
+
+        QBrush brush = painter.brush();
+        brush.setColor(Qt::red);
+        brush.setStyle(Qt::SolidPattern);
+        painter.setBrush(brush);
+
+        painter.drawEllipse(QPoint(RADIUS, RADIUS), RADIUS, RADIUS);
+    }
+
+private:
+    static const int RADIUS = 5;
+};
+
+QWebViewVisualizerShowPointCommand::QWebViewVisualizerShowPointCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
+    : executor_(executor), session_(session), view_(view)
+{}
+
+void QWebViewVisualizerShowPointCommand::Execute(Error** error) {
+    QList<QCursorMark*> marks = view_->findChildren<QCursorMark*>();
+    QCursorMark* mark;
+    if (marks.empty()) {
+        mark = new QCursorMark(view_);
+    } else  {
+        mark = marks.front();
+    }
+
+    Point pos = session_->get_mouse_position();
+    QPoint point = executor_->ConvertPointToQPoint(pos);
+    mark->move(point);
+
+    mark->show();
+}
+
 } //namespace webdriver

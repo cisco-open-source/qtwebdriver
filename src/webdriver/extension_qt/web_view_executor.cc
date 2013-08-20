@@ -482,31 +482,6 @@ void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     }
 }
 
-class QCursorMark : public QWidget
-{
-public:
-    explicit QCursorMark(QWidget* parent)
-        : QWidget(parent)
-    {
-        resize(2 * RADIUS, 2 * RADIUS);
-    }
-
-    virtual void paintEvent(QPaintEvent *event) {
-        QPainter painter(this);
-        painter.setPen(QPen(Qt::red));
-
-        QBrush brush = painter.brush();
-        brush.setColor(Qt::red);
-        brush.setStyle(Qt::SolidPattern);
-        painter.setBrush(brush);
-
-        painter.drawEllipse(QPoint(RADIUS, RADIUS), RADIUS, RADIUS);
-    }
-
-private:
-    static const int RADIUS = 5;
-};
-
 void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
     QWebView* view = getView(view_id_, error);
     if (NULL == view)
@@ -521,7 +496,6 @@ void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(prev_pos);
-    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
@@ -542,7 +516,6 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(location);
-    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
@@ -571,7 +544,6 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     QApplication::postEvent(view, moveEvent);
 
     session_->set_mouse_position(location);
-    DrawMark(point);
 }
 
 void QWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
@@ -1605,6 +1577,15 @@ void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
     command.Execute(source, error);
 }
 
+void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
+    QWebView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWebViewVisualizerShowPointCommand command(this, session_, view);
+    command.Execute(error);
+}
+
 QWebFrame* QWebViewCmdExecutor::FindFrameByPath(QWebFrame* parent, const FramePath &frame_path) {
     if (frame_path.value().empty())
         return NULL;
@@ -2261,20 +2242,6 @@ void QWebViewCmdExecutor::AddBrowserLoggerToView(QWebView* view)
     QObject::connect(view, SIGNAL(loadFinished(bool)),logHandler, SLOT(loadConsoleJS()), Qt::QueuedConnection);
     logHandler->loadJSLogObject(view->page()->mainFrame());
     logHandler->loadConsoleJS(view);
-}
-
-void QWebViewCmdExecutor::DrawMark(const QPoint& point) const {
-    QWebView* view = QWebViewUtil::getWebView(session_, view_id_);
-
-    QList<QCursorMark*> marks = view->findChildren<QCursorMark*>();
-    QCursorMark* mark;
-    if (marks.empty()) {
-        mark = new QCursorMark(view);
-    } else  {
-        mark = marks.front();
-    }
-    mark->move(point);
-    mark->show();
 }
 
 } //namespace webdriver 

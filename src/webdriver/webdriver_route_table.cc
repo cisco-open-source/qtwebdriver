@@ -36,6 +36,7 @@
 #include "commands/html5_location_commands.h"
 #include "commands/xdrpc_command.h"
 #include "commands/touch_commands.h"
+#include "commands/visualizer_commands.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -307,7 +308,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<TouchFlickCommand>              (CommandRoutes::kTouchFlick);
     Add<XDRPCCommand>                   (CommandRoutes::kXdrpc);
     Add<VisualizerSourceCommand>        (CommandRoutes::kVisualizerSource);
-
+    Add<VisualizerShowPointCommand>     (CommandRoutes::kVisualizerShowPoint);
 }
 
 DefaultRouteTable::~DefaultRouteTable() {}
