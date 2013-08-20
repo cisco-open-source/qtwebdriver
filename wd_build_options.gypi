@@ -1,4 +1,4 @@
-{
+	{
    # do not require cygwin
   'msvs_cygwin_shell': 0,
 
@@ -66,7 +66,7 @@
          'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],     
        } ],
        'defines': [ 
-         'OS_ANDROID',
+         'ANDROID',
          '_GLIBCXX_PERMIT_BACKWARD_HASH',
        ],
        'include_dirs': [
@@ -74,6 +74,9 @@
           '<(ANDROID_LIB_INC)',
           '<(ANDROID_PLATFORM_INC)',
           '<(QT_INC_PATH)/QtGui/5.1.0/QtGui'
+        ],
+        'ldflags': [
+          '--sysroot=<!(/bin/echo -n $ANDROID_NDK_ROOT)/platforms/android-9/<!(/bin/echo -n $ANDROID_ARCH)',
         ],
     } ],
      
@@ -88,11 +91,11 @@
       ],	
     } ],
 
-    [ 'OS == "mac"', {
+    [ 'OS == "mac" or OS == "ios"', {
       'actions': [ {                                                                                                                                                 
-        'action_name': 'create_input_dir',                                                                                                                                  
-        'inputs':      [],                                                                                                                                           
-        'outputs':     [],                                                                                                                      
+        'action_name': 'create_input_dir',
+        'inputs':      [],
+        'outputs':     [],
         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],                                                                                                  
        } ],
        

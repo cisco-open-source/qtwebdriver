@@ -67,6 +67,13 @@
           ],
         } ],
 
+        [ 'OS == "android"', {
+          'dependencies': [
+            'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+            'wd_test.gyp:test_android_WD_noWebkit',
+          ],
+        } ],
+
       ], # conditions
 
     }, # target_name: All

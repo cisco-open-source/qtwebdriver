@@ -59,7 +59,7 @@
              '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac"', {
+          [ 'OS=="mac" or OS=="ios"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
@@ -74,7 +74,21 @@
                 'Security.framework',
               ],
             }, 
-          } ],       
+          } ],  
+          ['OS=="android"', {
+            'libraries': [
+              '-L<(QT_LIB_PATH)',
+              '-lQt5Widgets',
+              '-lQt5Network',
+              '-lQt5Gui',
+              '-lQt5Core',
+              '-lQt5Quick',
+              '-lQt5Qml',
+              '-L<(ANDROID_LIB)',
+              '-lgnustl_shared',
+              '-llog',
+            ],
+          } ],     
         ],
       }, {
         'conditions': [
@@ -105,7 +119,7 @@
               '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac"', {
+          [ 'OS=="mac" or OS=="ios"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/QtGui.framework',
@@ -217,7 +231,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
-            [ 'OS=="mac"', {
+            [ 'OS=="mac" or OS=="ios"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/libQt5WebKit.a','<(QT_LIB_PATH)/libQt5WebKitWidgets.a',],
               },
@@ -231,7 +245,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
             } ],
-            [ 'OS=="mac"', {
+            [ 'OS=="mac" or OS=="ios"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
               },
@@ -293,6 +307,33 @@
           ],
         } ],
       ],
+    } , {
+      'target_name': 'test_android_WD_noWebkit',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_noWebkit_android',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
+        'test_widgets',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
+
     }
   ],
 }
