@@ -287,6 +287,10 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     moveEvent->setScenePos(scenePoint);
     QApplication::postEvent(view->scene(), moveEvent);
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)prev_pos.x(),
+                            (int)prev_pos.y()));
+      
     session_->set_mouse_position(prev_pos);
 }
 
@@ -309,6 +313,10 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
     QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
     moveEvent->setScenePos(scenePoint);
     QApplication::postEvent(view->scene(), moveEvent);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)scenePoint.x(),
+                            (int)scenePoint.y()));
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
@@ -332,6 +340,10 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
     moveEvent->setScenePos(scenePoint);
     QApplication::postEvent(view->scene(), moveEvent);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)scenePoint.x(),
+                            (int)scenePoint.y()));
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
