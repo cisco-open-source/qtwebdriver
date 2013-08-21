@@ -1,7 +1,9 @@
 #include "web_view_visualizer.h"
 
 #include <stdexcept>
+#include <QtCore/QEventLoop>
 #include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 #include "base/stringprintf.h"
 #include "extension_qt/web_view_executor.h"
 #include "webdriver_session.h"
