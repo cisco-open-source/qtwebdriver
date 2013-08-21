@@ -680,7 +680,7 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
     base::JSONWriter::Write(static_cast<const Value* const>(args), &args_as_json);
 
     std::string jscript = base::StringPrintf(
-        "(function(x) { %s }(%s));",
+        "(function(x) { %s }.apply(this, %s));",
         script.c_str(),
         args_as_json.c_str());
 

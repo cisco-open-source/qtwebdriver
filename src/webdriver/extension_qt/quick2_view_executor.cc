@@ -615,6 +615,12 @@ void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const st
         parentItem = qobject_cast<QQuickItem*>(view->contentItem());;
     }
 
+    if (NULL == parentItem) {
+        session_->logger().Log(kWarningLogLevel, "no root element.");
+        *error = new Error(kUnknownError, "no root element.");
+        return;
+    }
+
     if (locator == LocatorType::kXpath) {
         FindElementsByXpath(parentItem, query, elements, error);
     } else {
@@ -735,7 +741,7 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
     base::JSONWriter::Write(static_cast<const Value* const>(args), &args_as_json);
 
     std::string jscript = base::StringPrintf(
-        "(function(x) { %s }(%s));",
+        "(function(x) { %s }.apply(this, %s));",
         script.c_str(),
         args_as_json.c_str());
 
@@ -887,6 +893,11 @@ void Quick2ViewCmdExecutor::createUIXML(QQuickItem *parent, QIODevice* buff, XML
 }
 
 void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
+    if (NULL == parent) {
+        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
+        return;
+    }
+
     QString className(parent->metaObject()->className());
     REMOVE_INTERNAL_SUFIXES(className);
     
