@@ -27,8 +27,8 @@ else
   modes=$mode
 fi
 
-OUT_STATIC_LIB_FILES="libchromium_base.a libWebDriver_core.a libWebDriver_extension_qt_base.a libWebDriver_extension_qt_web.a"
-OUT_SHARED_LIB_FILES="libchromium_base.so libWebDriver_core.so libWebDriver_extension_qt_base.so libWebDriver_extension_qt_web.so libWebDriver_noWebkit_android.so"
+OUT_STATIC_LIB_FILES="libchromium_base.a libWebDriver_core.a libWebDriver_extension_qt_base.a libWebDriver_extension_qt_web.a libWebDriver_extension_qt_quick.a"
+OUT_SHARED_LIB_FILES="libchromium_base.so libWebDriver_core.so libWebDriver_extension_qt_base.so libWebDriver_extension_qt_web.so libWebDriver_extension_qt_quick.so libWebDriver_noWebkit_android.so"
 OUT_BIN_FILES="WebDriver WebDriver_noWebkit WebDriver_noWebkit_sharedLibs"
 GYP=`which gyp`
 
