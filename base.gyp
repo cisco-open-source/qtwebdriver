@@ -226,7 +226,7 @@
           ],	
           
           'sources': [
-            'src/base/sys_info_ios.cc',
+            'src/base/sys_info_ios.mm',
           ],
         } ],
 

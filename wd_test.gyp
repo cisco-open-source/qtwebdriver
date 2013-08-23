@@ -61,7 +61,7 @@
              '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac" or OS=="ios"', {
+          [ 'OS=="mac"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/libQt5Network.a',
@@ -71,15 +71,15 @@
                 '<(QT_LIB_PATH)/libQt5Qml.a',
                 '<(QT_LIB_PATH)/libQt5Quick.a',
                 '<(QT_LIB_PATH)/libQt5Xml.a',
-                'Foundation.framework',
-                'CoreFoundation.framework',
-                'ApplicationServices.framework',
-                'Security.framework',
+                '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
+                '$(SDKROOT)/System/Library/Frameworks/Security.framework',
               ],
             }, 
-          } ],  
+          } ], 
           ['OS=="android"', {
-            'libraries': [
+            'libraries': [		
               '-L<(QT_LIB_PATH)',
               '-lQt5Widgets',
               '-lQt5Network',
@@ -92,7 +92,40 @@
               '-lgnustl_shared',
               '-llog',
             ],
-          } ],     
+          } ],
+          [ 'OS=="ios"', {
+            'link_settings': {
+              'libraries': [
+                '<(QT_LIB_PATH)/libQt5Network.a',
+                '<(QT_LIB_PATH)/libQt5Gui.a',
+                '<(QT_LIB_PATH)/libQt5Core.a',
+                '<(QT_LIB_PATH)/libQt5Widgets.a',
+                '<(QT_LIB_PATH)/libQt5Qml.a',
+                '<(QT_LIB_PATH)/libQt5Quick.a',
+                '<(QT_LIB_PATH)/libQt5V8.a',
+                #'<(QT_LIB_PATH)/libQt5OpenGL.a',
+                #'<(QT_LIB_PATH)/libQt5OpenGLExtensions.a',
+                #'<(QT_LIB_PATH)/libQt5PlatformSupport.a',
+                #'<(QT_LIB_PATH)/libQt5Script.a',
+                #'<(QT_LIB_PATH)/../plugins/platforms/libqios.a',
+                #'<(QT_LIB_PATH)/../plugins/platforms/libquikit.a',
+                #'/Developer/Qt4iOS/ios-qml/IOSPluginLibs/ios-clang-release/lib/libqmlcomponectsios.a',
+                '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                '$(SDKROOT)/System/Library/Frameworks/CoreText.framework',
+                '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+              ],
+            }, 
+     
+            'xcode_settings': {
+              'TARGETED_DEVICE_FAMILY': '1,2',
+              'CODE_SIGN_IDENTITY': 'iPhone Developer',
+              'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
+              'ARCHS': '$(ARCHS_STANDARD_32_BIT)',
+              'CLANG_WARN_CXX0X_EXTENSIONS': 'NO',
+            },
+          } ],      
         ],
       }, {
         'conditions': [
@@ -125,17 +158,35 @@
               '-luserenv.lib',
             ],
           } ],
-          [ 'OS=="mac" or OS=="ios"', {
+          [ 'OS=="mac"', {
             'link_settings': {
               'libraries': [
                 '<(QT_LIB_PATH)/QtGui.framework',
                 '<(QT_LIB_PATH)/QtCore.framework',
                 '<(QT_LIB_PATH)/QtNetwork.framework',
                 '<(QT_LIB_PATH)/QtDeclarative.framework',
-                'Foundation.framework',
-                'CoreFoundation.framework',
-                'ApplicationServices.framework',
-                'Security.framework',
+                '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
+                '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
+                '$(SDKROOT)/System/Library/Frameworks/Security.framework',
+              ],
+            },
+          } ],
+          [ 'OS=="ios"', {
+            'link_settings': {
+              'libraries': [
+                '<(QT_LIB_PATH)/QtGui.framework',
+                '<(QT_LIB_PATH)/QtCore.framework',
+                '<(QT_LIB_PATH)/QtNetwork.framework',
+                '<(QT_LIB_PATH)/QtDeclarative.framework',
+                #'<(QT_LIB_PATH)/../plugins/platforms/libqios.a',
+                '<(QT_LIB_PATH)/../plugins/platforms/libcruikit.a',
+                '/Developer/Qt4iOS/ios-qml/IOSPluginLibs/ios-clang-release/lib/libqmlcomponectsios.a',
+                '<(SDK_ROOT)/System/Library/Frameworks/Foundation.framework',
+                '<(SDK_ROOT)/System/Library/Frameworks/CoreFoundation.framework',
+                '<(SDK_ROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                '<(SDK_ROOT)/System/Library/Frameworks/CoreText.framework',
+                '<(SDK_ROOT)/System/Library/Frameworks/UIKit.framework',
               ],
             },
           } ],
@@ -197,7 +248,7 @@
     }, {
       'target_name': 'test_WD_hybrid',
       'type': 'executable',
-
+      
       'product_name': 'WebDriver',
 
       'dependencies': [
@@ -227,6 +278,10 @@
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
+        } ],
+       
+        [ 'OS=="ios"', {
+          'mac_bundle': 1, 
         } ],
 
         [ '<(QT5) == 1', {
@@ -284,6 +339,10 @@
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
+        } ],
+
+        [ 'OS=="ios"', {
+          'mac_bundle': 1, 
         } ],
       ],
 

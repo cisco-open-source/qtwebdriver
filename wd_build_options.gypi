@@ -107,5 +107,12 @@
         'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
       },
     } ],
+
+    [ 'OS=="ios"', {
+      'xcode_settings': {
+        'SDKROOT': 'iphonesimulator',
+        'CLANG_WARN_CXX0X_EXTENSIONS': 'NO',
+      },
+    }], 
   ],
 }
