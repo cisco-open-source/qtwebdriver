@@ -992,12 +992,12 @@ std::string QWidgetViewCmdExecutor::transform(const std::string& source, const s
 
     process.waitForFinished(-1);
 
-    const QByteArray& stderr = process.readAllStandardError();
+    QByteArray stderr = process.readAllStandardError();
     if (stderr.length() > 0) {
         session_->logger().Log(kSevereLogLevel, QString::fromAscii(stderr.data(), stderr.length()).toStdString());
     }
 
-    const QByteArray& stdout = process.readAllStandardOutput();
+    QByteArray stdout = process.readAllStandardOutput();
     return QString::fromAscii(stdout.data(), stdout.length()).toStdString();
 }
 
