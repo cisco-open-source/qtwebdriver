@@ -992,12 +992,13 @@ std::string QWidgetViewCmdExecutor::transform(const std::string& source, const s
 
     process.waitForFinished(-1);
 
-    QString stderr = process.readAllStandardError();
+    const QByteArray& stderr = process.readAllStandardError();
     if (stderr.length() > 0) {
-        session_->logger().Log(kSevereLogLevel, stderr.toStdString());
+        session_->logger().Log(kSevereLogLevel, QString::fromAscii(stderr.data(), stderr.length()).toStdString());
     }
 
-    return QString(process.readAllStandardOutput()).toStdString();
+    const QByteArray& stdout = process.readAllStandardOutput();
+    return QString::fromAscii(stdout.data(), stdout.length()).toStdString();
 }
 
 } //namespace webdriver 
