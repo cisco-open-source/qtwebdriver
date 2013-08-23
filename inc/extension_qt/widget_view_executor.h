@@ -110,8 +110,6 @@ protected:
     QWidget* getElement(const ElementId &element, Error** error);
     bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    void createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
-    void addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);

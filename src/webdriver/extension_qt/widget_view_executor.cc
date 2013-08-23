@@ -52,6 +52,51 @@
 
 namespace webdriver {
 
+class QWidgetXmlSerializer {
+public:
+    typedef QHash<QString, QWidget*> XMLElementMap;
+
+    QWidgetXmlSerializer(QIODevice* buff, XMLElementMap& elementsMap)
+        : elementsMap_(elementsMap)
+    {
+        writer_.setDevice(buff);
+        writer_.setAutoFormatting(true);
+    }
+
+    void createXml(QWidget* widget) {
+        writer_.writeStartDocument();
+        addWidget(widget);
+        writer_.writeEndDocument();
+    }
+
+private:
+    void addWidget(QWidget* widget) {
+        writer_.writeStartElement(widget->metaObject()->className());
+
+        if (!widget->objectName().isEmpty())
+            writer_.writeAttribute("id", widget->objectName());
+
+        if (!widget->windowTitle().isEmpty())
+            writer_.writeAttribute("name", widget->windowTitle());
+
+        QString elementKey = GenerateRandomID().c_str();
+        elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
+        writer_.writeAttribute("elementId", elementKey);
+
+        QList<QObject*> childs = widget->children();
+        foreach(QObject* child, childs) {
+            QWidget* childWgt = qobject_cast<QWidget*>(child);
+            if (childWgt)
+                addWidget(childWgt);
+        }
+
+        writer_.writeEndElement();
+    }
+
+    QXmlStreamWriter writer_;
+    XMLElementMap& elementsMap_;
+};
+
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
 
 QWidgetViewCmdExecutorCreator::QWidgetViewCmdExecutorCreator()
@@ -120,7 +165,8 @@ void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-    createUIXML(view, &buff, elementsMap, error);
+    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    serializer.createXml(view);
 
     if (*error)
         return;
@@ -836,9 +882,8 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
 
     buff.open(QIODevice::ReadWrite);
     XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error);
-    if (*error)
-        return;
+    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    serializer.createXml(parent);
 
     buff.seek(0);
 
@@ -899,44 +944,5 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
 void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
     GetSource(source, error);
 }
-
-void QWidgetViewCmdExecutor::createUIXML(QWidget *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
-    QXmlStreamWriter* writer = new QXmlStreamWriter();
-
-    writer->setDevice(buff);
-    writer->setAutoFormatting(true);
-    writer->writeStartDocument();
-
-    addWidgetToXML(parent, elementsMap, writer);
-
-    writer->writeEndDocument();
-
-    delete writer;
-}
-
-void QWidgetViewCmdExecutor::addWidgetToXML(QWidget* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
-    writer->writeStartElement(parent->metaObject()->className());
-
-    if (!parent->objectName().isEmpty())
-        writer->writeAttribute("id", parent->objectName());
-
-    if (!parent->windowTitle().isEmpty())
-        writer->writeAttribute("name", parent->windowTitle());
-
-    QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QWidget>(parent));
-    writer->writeAttribute("elementId", elementKey);
-
-    QList<QObject*> childs = parent->children();
-    foreach(QObject *child, childs) {
-        QWidget* childWgt = qobject_cast<QWidget*>(child);
-        if (childWgt)
-            addWidgetToXML(childWgt, elementsMap, writer);
-    }
-
-    writer->writeEndElement();
-}
-
-
 
 } //namespace webdriver 
