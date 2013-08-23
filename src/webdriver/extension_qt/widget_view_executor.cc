@@ -992,7 +992,7 @@ std::string QWidgetViewCmdExecutor::transform(const std::string& source, const s
 
     process.waitForFinished(-1);
 
-    QString stderr(process.readAllStandardError());
+    QString stderr = process.readAllStandardError();
     if (stderr.length() > 0) {
         session_->logger().Log(kSevereLogLevel, stderr.toStdString());
     }
