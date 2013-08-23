@@ -110,7 +110,8 @@ protected:
     QWidget* getElement(const ElementId &element, Error** error);
     bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    
+    std::string transform(const std::string& source, const std::string& stylesheet) const;
+
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);
 };

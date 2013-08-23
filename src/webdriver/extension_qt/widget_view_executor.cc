@@ -16,6 +16,8 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
+#include <QtCore/QProcess>
+#include <QtCore/QMetaProperty>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLineEdit>
@@ -57,7 +59,7 @@ public:
     typedef QHash<QString, QWidget*> XMLElementMap;
 
     QWidgetXmlSerializer(QIODevice* buff, XMLElementMap& elementsMap)
-        : elementsMap_(elementsMap)
+        : elementsMap_(elementsMap), dumpAll_(false)
     {
         writer_.setDevice(buff);
         writer_.setAutoFormatting(true);
@@ -69,9 +71,20 @@ public:
         writer_.writeEndDocument();
     }
 
+    void setDumpAll(bool dumpAll) {
+        dumpAll_ = dumpAll;
+    }
+
 private:
     void addWidget(QWidget* widget) {
         writer_.writeStartElement(widget->metaObject()->className());
+
+        if (dumpAll_) {
+            for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
+                const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
+                writer_.writeAttribute(property.name(), property.read(widget).toString());
+            }
+        }
 
         if (!widget->objectName().isEmpty())
             writer_.writeAttribute("id", widget->objectName());
@@ -95,6 +108,7 @@ private:
 
     QXmlStreamWriter writer_;
     XMLElementMap& elementsMap_;
+    bool dumpAll_;
 };
 
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
@@ -167,10 +181,6 @@ void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
     buff.open(QIODevice::ReadWrite);
     QWidgetXmlSerializer serializer(&buff, elementsMap);
     serializer.createXml(view);
-
-    if (*error)
-        return;
-
     *source = byteArray.data();
 }
 
@@ -942,7 +952,52 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
 }
 
 void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
-    GetSource(source, error);
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    XMLElementMap elementsMap;
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+    buff.open(QIODevice::ReadWrite);
+
+    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    serializer.setDumpAll(true);
+    serializer.createXml(view);
+    *source = byteArray.data();
+
+    session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
+    session_->logger().Log(kInfoLogLevel, *source);
+    *source = transform(*source, "src/webdriver/extension_qt/widget_view_visualizer.xsl");
+}
+
+std::string QWidgetViewCmdExecutor::transform(const std::string& source, const std::string& stylesheet) const {
+    QProcess process;
+    QStringList arguments;
+    arguments << "-jar" << "src/third_party/saxon/saxon9he.jar";
+    arguments << QString::fromStdString("-xsl:" + stylesheet);
+    arguments << "-";
+    process.start("java", arguments);
+    if (!process.waitForStarted(-1)) {
+        session_->logger().Log(kSevereLogLevel, "Can not start process!");
+        return "";
+    }
+    qint64 written = process.write(source.data(), source.length());
+    if (written != source.length()) {
+        session_->logger().Log(kSevereLogLevel, "Writting xml to xsl processor failure!");
+        return "";
+    }
+    process.waitForBytesWritten(-1);
+    process.closeWriteChannel();
+
+    process.waitForFinished(-1);
+
+    QString stderr(process.readAllStandardError());
+    if (stderr.length() > 0) {
+        session_->logger().Log(kSevereLogLevel, stderr.toStdString());
+    }
+
+    return QString(process.readAllStandardOutput()).toStdString();
 }
 
 } //namespace webdriver 
