@@ -869,6 +869,7 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
 
 void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState *state, Error **error)
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -889,7 +890,9 @@ void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerStat
         return;
     }
     *state = (PlayerState)(int)player->state();
-
+#else
+    NOT_SUPPORTED_IMPL
+#endif
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
@@ -1021,11 +1024,12 @@ std::string QWidgetViewCmdExecutor::transform(const std::string& source, const s
 
     QByteArray stderr = process.readAllStandardError();
     if (stderr.length() > 0) {
-        session_->logger().Log(kSevereLogLevel, QString::fromAscii(stderr.data(), stderr.length()).toStdString());
+
+        session_->logger().Log(kSevereLogLevel, QString::fromLatin1(stderr.data(), stderr.length()).toStdString());
     }
 
     QByteArray stdout = process.readAllStandardOutput();
-    return QString::fromAscii(stdout.data(), stdout.length()).toStdString();
+    return QString::fromLatin1(stdout.data(), stdout.length()).toStdString();
 }
 
 } //namespace webdriver 
