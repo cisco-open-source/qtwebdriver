@@ -177,6 +177,7 @@
                 '<(QT_LIB_PATH)/QtCore.framework',
                 '<(QT_LIB_PATH)/QtNetwork.framework',
                 '<(QT_LIB_PATH)/QtDeclarative.framework',
+                '<(QT_LIB_PATH)/QtXml.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
