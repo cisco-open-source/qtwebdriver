@@ -31,6 +31,9 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include "VideoTest.h"
+#endif
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -110,6 +113,10 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
+#endif
+
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();

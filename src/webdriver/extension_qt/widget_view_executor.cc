@@ -33,6 +33,8 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
+#include <QtMultimediaWidgets/QVideoWidget>
+#include <QtMultimedia/QMediaPlayer>
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -863,6 +865,31 @@ void QWidgetViewCmdExecutor::GetURL(std::string* url, Error** error) {
     std::string className(view->metaObject()->className());
 
     *url = QWidgetViewUtil::makeUrlByClassName(className);
+}
+
+void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState *state, Error **error)
+{
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    *state = (PlayerState)(int)player->state();
+
 }
 
 bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {

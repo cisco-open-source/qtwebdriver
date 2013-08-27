@@ -23,6 +23,7 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
+              #'-L/opt/lib',
               '-lQt5OpenGL',
               '-lQt5PrintSupport',
               '-lQt5Script',
@@ -41,6 +42,9 @@
               '-licuuc',
               '-licudata',
               '-licui18n',
+              '-lQt5MultimediaWidgets',
+              '-lQt5Sensors',
+              '-lQt5Multimedia',
             ],
           } ],
           ['OS=="win"', {
@@ -52,6 +56,8 @@
              '-l<(QT_LIB_PATH)/Qt5Qml',
              '-l<(QT_LIB_PATH)/Qt5Quick',
              '-l<(QT_LIB_PATH)/Qt5Xml',
+             '-l<(QT_LIB_PATH)/Qt5MultimediaWidgets',
+             '-l<(QT_LIB_PATH)/Qt5Multimedia',
              '-luser32.lib',
              '-lws2_32.lib',
              '-lshell32.lib',
@@ -70,11 +76,17 @@
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
                 '<(QT_LIB_PATH)/libQt5Qml.a',
                 '<(QT_LIB_PATH)/libQt5Quick.a',
+                '<(QT_LIB_PATH)/libQt5MultimediaWidgets.a',
+                '<(QT_LIB_PATH)/libQt5Multimedia.a',
                 '<(QT_LIB_PATH)/libQt5Xml.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
+                'Foundation.framework',
+                'CoreFoundation.framework',
+                'ApplicationServices.framework',
+                'Security.framework',
               ],
             }, 
           } ], 
@@ -244,7 +256,15 @@
         'src/Test/DragableWidget.cc',
         'src/Test/BasicMouseInterfaceTest.cc',
       ],
-
+      'conditions': [
+        [ '<(QT5) == 1', {
+          'sources': [
+            'src/Test/VideoTest.h',
+            'src/Test/VideoTest.cc',
+            '<(INTERMEDIATE_DIR)/moc_VideoTest.cc',
+          ],
+        } ]
+      ],
     }, {
       'target_name': 'test_WD_hybrid',
       'type': 'executable',
