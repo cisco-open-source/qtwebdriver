@@ -675,7 +675,7 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
 
     if (sync) {
         QEventLoop loop;
-        QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
+        QObject::connect(view, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
         view->setSource(address);
 
         if (QQuickView::Loading == view->status()) {
