@@ -27,7 +27,7 @@
       <xsl:call-template name="style"/>
     </input>
   </xsl:template>
-  <xsl:template match="QPushButton">
+  <xsl:template match="QPushButton|QToolButton">
     <input type="submit">
       <xsl:call-template name="style"/>
       <xsl:attribute name="value" select="@text"/>

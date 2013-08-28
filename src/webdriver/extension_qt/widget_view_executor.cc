@@ -77,9 +77,14 @@ public:
         dumpAll_ = dumpAll;
     }
 
+    void setSupportedClasses(const QStringList& classes) {
+        supportedClasses_ = classes;
+    }
+
 private:
     void addWidget(QWidget* widget) {
-        writer_.writeStartElement(widget->metaObject()->className());
+        QString elementName = getElementName(widget);
+        writer_.writeStartElement(elementName);
 
         if (dumpAll_) {
             for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
@@ -98,6 +103,8 @@ private:
         elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
         writer_.writeAttribute("elementId", elementKey);
 
+        writer_.writeAttribute("className", widget->metaObject()->className());
+
         QList<QObject*> childs = widget->children();
         foreach(QObject* child, childs) {
             QWidget* childWgt = qobject_cast<QWidget*>(child);
@@ -108,9 +115,27 @@ private:
         writer_.writeEndElement();
     }
 
+    QString getElementName(const QObject* object) const {
+        QString elementName = object->metaObject()->className();
+        if (supportedClasses_.empty())
+            return elementName;
+
+        const QMetaObject* metaObject = object->metaObject();
+        while (!supportedClasses_.contains(metaObject->className()) &&
+               metaObject->superClass() != NULL) {
+            metaObject = metaObject->superClass();
+        }
+        if (supportedClasses_.contains(metaObject->className()))
+            elementName = metaObject->className();
+
+        return elementName;
+    }
+
+
     QXmlStreamWriter writer_;
     XMLElementMap& elementsMap_;
     bool dumpAll_;
+    QStringList supportedClasses_;
 };
 
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
@@ -993,6 +1018,7 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
 
     QWidgetXmlSerializer serializer(&buff, elementsMap);
     serializer.setDumpAll(true);
+    serializer.setSupportedClasses(QStringList() << "QCheckBox" << "QLabel" << "QLineEdit" << "QPushButton" << "QScrollArea" << "QToolButton");
     serializer.createXml(view);
     *source = byteArray.data();
 
