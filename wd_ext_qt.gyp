@@ -39,6 +39,7 @@
         'src/webdriver/extension_qt/widget_view_creator.cc',
         'src/webdriver/extension_qt/widget_view_executor.cc',
         'src/webdriver/extension_qt/widget_view_enumerator.cc',
+        'src/webdriver/extension_qt/widget_view_visualizer.cc',
         'inc/extension_qt/q_view_runner.h',
         '<(INTERMEDIATE_DIR)/moc_q_view_runner.cc',
         'src/webdriver/extension_qt/q_event_filter.cc',

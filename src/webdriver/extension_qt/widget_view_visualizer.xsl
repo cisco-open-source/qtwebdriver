@@ -44,6 +44,12 @@
       <xsl:apply-templates/>
     </div>
   </xsl:template>
+  <xsl:template match="QPlainTextEdit">
+    <textarea>
+      <xsl:copy-of select="@elementId"/>
+      <xsl:call-template name="style"/>
+     </textarea>
+  </xsl:template>
 
   <xsl:template name="style">
     <xsl:attribute name="style">

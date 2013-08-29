@@ -12,6 +12,46 @@
 
 namespace webdriver {
 
+class QWidgetXmlSerializer {
+public:
+    typedef QHash<QString, QWidget*> XMLElementMap;
+
+    QWidgetXmlSerializer(QIODevice* buff);
+
+    void createXml(QWidget* widget);
+
+    const XMLElementMap& getElementsMap() {
+        return elementsMap_;
+    }
+
+    void setSession(Session* session) {
+        session_ = session;
+    }
+
+    void setViewId(ViewId viewId) {
+        viewId_ = viewId;
+    }
+
+    void setDumpAll(bool dumpAll) {
+        dumpAll_ = dumpAll;
+    }
+
+    void setSupportedClasses(const QStringList& classes) {
+        supportedClasses_ = classes;
+    }
+
+private:
+    void addWidget(QWidget* widget);
+    QString getElementName(const QObject* object) const;
+
+    QXmlStreamWriter writer_;
+    XMLElementMap elementsMap_;
+    Session* session_;
+    ViewId viewId_;
+    bool dumpAll_;
+    QStringList supportedClasses_;
+};
+
 class QWidgetViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     static const ViewType WIDGET_VIEW_TYPE;
@@ -110,7 +150,6 @@ protected:
     QWidget* getElement(const ElementId &element, Error** error);
     bool MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    std::string transform(const std::string& source, const std::string& stylesheet) const;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);
