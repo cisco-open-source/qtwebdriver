@@ -434,21 +434,10 @@ ElementHandle* Session::GetElementHandle(const ViewId& viewId, const ElementId& 
 }
 
 bool Session::AddElement(const ViewId& viewId, ElementHandle* handle, ElementId* elementId) {
-    ElementId targetElement(GenerateRandomID());    
-
-    ViewsElementsMap::iterator it_view;
-
-    it_view = elements_.find(viewId.id());
-    if (it_view == elements_.end()) {
-        elements_[viewId.id()] = ElementsMap();
-    }
-
-    it_view = elements_.find(viewId.id());
-
-    it_view->second[targetElement.id()] = ElementHandlePtr(handle);  
-    
+    ElementId targetElement(GenerateRandomID());
+    ElementsMap& elements = elements_[viewId.id()];
+    elements[targetElement.id()] = ElementHandlePtr(handle);
     *elementId = targetElement;
-
     return true;
 }
 

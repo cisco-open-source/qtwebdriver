@@ -108,7 +108,7 @@ protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    
 
     QWidget* getElement(const ElementId &element, Error** error);
-    bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
+    bool MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     std::string transform(const std::string& source, const std::string& stylesheet) const;
 

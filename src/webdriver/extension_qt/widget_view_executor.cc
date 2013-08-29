@@ -824,7 +824,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
         // list all child widgets and find matched locator
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
         foreach(QWidget *child, childs) {
-            if (FilterNativeWidget(child, locator, query)) {
+            if (MatchNativeWidget(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
                 (*elements).push_back(elm);
@@ -923,7 +923,7 @@ void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerStat
 #endif
 }
 
-bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
+bool QWidgetViewCmdExecutor::MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
         if (query == widget->metaObject()->className())
             return true;

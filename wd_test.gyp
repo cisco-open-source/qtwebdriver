@@ -367,7 +367,7 @@
         } ],
       ],
 
-    } , {
+    }, {
       'target_name': 'test_WD_hybrid_noWebkit_with_shared_libs',
       'type': 'executable',
 
@@ -393,7 +393,7 @@
           ],
         } ],
       ],
-    } , {
+    }, {
       'target_name': 'test_android_WD_noWebkit',
       'type': 'shared_library',
 
