@@ -61,7 +61,7 @@ public:
     typedef QHash<QString, QWidget*> XMLElementMap;
 
     QWidgetXmlSerializer(QIODevice* buff)
-        : dumpAll_(false)
+        : session_(NULL), dumpAll_(false)
     {
         writer_.setDevice(buff);
         writer_.setAutoFormatting(true);
@@ -75,6 +75,14 @@ public:
 
     const XMLElementMap& getElementsMap() {
         return elementsMap_;
+    }
+
+    void setSession(Session* session) {
+        session_ = session;
+    }
+
+    void setViewId(ViewId viewId) {
+        viewId_ = viewId;
     }
 
     void setDumpAll(bool dumpAll) {
@@ -103,7 +111,14 @@ private:
         if (!widget->windowTitle().isEmpty())
             writer_.writeAttribute("name", widget->windowTitle());
 
-        QString elementKey = GenerateRandomID().c_str();
+        QString elementKey;
+        if (session_) {
+            ElementId elementId;
+            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+            elementKey = QString::fromStdString(elementId.id());
+        } else {
+            elementKey = GenerateRandomID().c_str();
+        }
         elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
         writer_.writeAttribute("elementId", elementKey);
 
@@ -135,9 +150,10 @@ private:
         return elementName;
     }
 
-
     QXmlStreamWriter writer_;
     XMLElementMap elementsMap_;
+    Session* session_;
+    ViewId viewId_;
     bool dumpAll_;
     QStringList supportedClasses_;
 };
@@ -1018,6 +1034,8 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
     buff.open(QIODevice::ReadWrite);
 
     QWidgetXmlSerializer serializer(&buff);
+    serializer.setSession(session_);
+    serializer.setViewId(view_id_);
     serializer.setDumpAll(true);
     serializer.setSupportedClasses(QStringList() << "QCheckBox" << "QLabel" << "QLineEdit" << "QPushButton" << "QScrollArea" << "QToolButton");
     serializer.createXml(view);
