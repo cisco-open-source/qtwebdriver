@@ -60,8 +60,8 @@ class QWidgetXmlSerializer {
 public:
     typedef QHash<QString, QWidget*> XMLElementMap;
 
-    QWidgetXmlSerializer(QIODevice* buff, XMLElementMap& elementsMap)
-        : elementsMap_(elementsMap), dumpAll_(false)
+    QWidgetXmlSerializer(QIODevice* buff)
+        : dumpAll_(false)
     {
         writer_.setDevice(buff);
         writer_.setAutoFormatting(true);
@@ -71,6 +71,10 @@ public:
         writer_.writeStartDocument();
         addWidget(widget);
         writer_.writeEndDocument();
+    }
+
+    const XMLElementMap& getElementsMap() {
+        return elementsMap_;
     }
 
     void setDumpAll(bool dumpAll) {
@@ -133,7 +137,7 @@ private:
 
 
     QXmlStreamWriter writer_;
-    XMLElementMap& elementsMap_;
+    XMLElementMap elementsMap_;
     bool dumpAll_;
     QStringList supportedClasses_;
 };
@@ -194,19 +198,18 @@ QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** er
 }
 
 void QWidgetViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
-	*can = QWidgetViewUtil::isUrlSupported(url);
+    *can = QWidgetViewUtil::isUrlSupported(url);
 }
 
 void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
-	QWidget* view = getView(view_id_, error);
+    QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    QWidgetXmlSerializer serializer(&buff);
     serializer.createXml(view);
     *source = byteArray.data();
 }
@@ -944,10 +947,8 @@ bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std
 void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
-
     buff.open(QIODevice::ReadWrite);
-    XMLElementMap elementsMap;
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    QWidgetXmlSerializer serializer(&buff);
     serializer.createXml(parent);
 
     buff.seek(0);
@@ -975,6 +976,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
+                    const XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
@@ -1011,12 +1013,11 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
     if (NULL == view)
         return;
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
 
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    QWidgetXmlSerializer serializer(&buff);
     serializer.setDumpAll(true);
     serializer.setSupportedClasses(QStringList() << "QCheckBox" << "QLabel" << "QLineEdit" << "QPushButton" << "QScrollArea" << "QToolButton");
     serializer.createXml(view);
