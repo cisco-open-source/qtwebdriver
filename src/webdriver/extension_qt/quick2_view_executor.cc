@@ -26,8 +26,9 @@ namespace webdriver {
 
 #if 1 
 #define REMOVE_INTERNAL_SUFIXES(qstr)   \
-            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
+        if (qstr.startsWith(QLatin1String("QQuick"))) qstr = qstr.mid(6);
 #else
 #define REMOVE_INTERNAL_SUFIXES(qstr)
 #endif            
@@ -137,7 +138,11 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     if (NULL == pItem)
         return;
 
+    view->requestActivate();
+
     QQuickItem* pFocusItem = view->activeFocusItem();
+
+    qDebug() << " !!!!! active:" << pFocusItem;
 
     if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
@@ -165,10 +170,13 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     }
 
     // set focus to element
-    pItem->setFocus(true);
+    pItem->forceActiveFocus();
+
+    qDebug() << " !!! after changing focus:" << view->activeFocusItem();
+    qDebug() << " !!! should be:" << pItem;
     if (!pItem->hasFocus()) {
         // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
+        if (NULL != pFocusItem) pFocusItem->forceActiveFocus();        
 
         *error = new Error(kInvalidElementState);
         return;
@@ -182,7 +190,7 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 
     // restore old focus
     if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
+        pFocusItem->forceActiveFocus();
 }
 
 void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -629,7 +637,6 @@ void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const st
 }
 
 void Quick2ViewCmdExecutor::FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
-    qDebug() << "******* Element: " << parent << " name:" << parent->objectName();
     if (FilterElement(parent, locator, query)) {
         ElementId elm;
         session_->AddElement(view_id_, new QElementHandle(parent), &elm);
@@ -675,7 +682,7 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
 
     if (sync) {
         QEventLoop loop;
-        QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
+        QObject::connect(view, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
         view->setSource(address);
 
         if (QQuickView::Loading == view->status()) {
