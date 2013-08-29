@@ -26,8 +26,9 @@ namespace webdriver {
 
 #if 1 
 #define REMOVE_INTERNAL_SUFIXES(qstr)   \
-            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
+        if (qstr.startsWith(QLatin1String("QDeclarative"))) qstr = qstr.mid(12);
 #else
 #define REMOVE_INTERNAL_SUFIXES(qstr)
 #endif            
