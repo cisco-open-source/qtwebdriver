@@ -28,7 +28,7 @@ void WidgetViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
 
         if (!pWidget->isWindow()) continue;
 
-        if(NULL == qobject_cast<QMessageBox*>(pWidget)) continue; //check if it's an alert
+        if(NULL != qobject_cast<QMessageBox*>(pWidget)) continue; //check if it's an alert
 
         ViewHandlePtr handle(new QViewHandle(pWidget));
         ViewId viewId = session->GetViewForHandle(handle);
