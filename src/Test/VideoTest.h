@@ -4,6 +4,7 @@
 #include <QtWidgets/QtWidgets>
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
+#include <QtNetwork/QNetworkRequest>
 
 class VideoTestWidget;
 class QAbstractButton;
