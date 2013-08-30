@@ -31,6 +31,9 @@
       <xsl:attribute name="value">
         <xsl:value-of select="@text"/>
       </xsl:attribute>
+      <xsl:if test="@enabled = 'false'">
+        <xsl:attribute name="disabled"/>
+      </xsl:if>
     </input>
   </xsl:template>
   <xsl:template match="QPushButton|QToolButton">
@@ -51,6 +54,9 @@
     <textarea>
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
+      <xsl:if test="@enabled = 'false'">
+        <xsl:attribute name="disabled"/>
+      </xsl:if>
       <xsl:value-of select="@plainText"/>
     </textarea>
   </xsl:template>
@@ -58,10 +64,13 @@
   <xsl:template name="style">
     <xsl:attribute name="style">
       <xsl:if test="@width">
-        width:<xsl:value-of select="@width"/>;
+        width: <xsl:value-of select="@width"/>;
       </xsl:if>
       <xsl:if test="@height">
-        height:<xsl:value-of select="@height"/>;
+        height: <xsl:value-of select="@height"/>;
+      </xsl:if>
+      <xsl:if test="@visible = 'false'">
+        visibility: hidden;
       </xsl:if>
     </xsl:attribute>
   </xsl:template>
