@@ -12,6 +12,46 @@
 
 namespace webdriver {
 
+class QWidgetXmlSerializer {
+public:
+    typedef QHash<QString, QWidget*> XMLElementMap;
+
+    QWidgetXmlSerializer(QIODevice* buff);
+
+    void createXml(QWidget* widget);
+
+    const XMLElementMap& getElementsMap() {
+        return elementsMap_;
+    }
+
+    void setSession(Session* session) {
+        session_ = session;
+    }
+
+    void setViewId(ViewId viewId) {
+        viewId_ = viewId;
+    }
+
+    void setDumpAll(bool dumpAll) {
+        dumpAll_ = dumpAll;
+    }
+
+    void setSupportedClasses(const QStringList& classes) {
+        supportedClasses_ = classes;
+    }
+
+private:
+    void addWidget(QWidget* widget);
+    QString getElementName(const QObject* object) const;
+
+    QXmlStreamWriter writer_;
+    XMLElementMap elementsMap_;
+    Session* session_;
+    ViewId viewId_;
+    bool dumpAll_;
+    QStringList supportedClasses_;
+};
+
 class QWidgetViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     static const ViewType WIDGET_VIEW_TYPE;
@@ -94,13 +134,13 @@ public:
     virtual void TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) NOT_SUPPORTED_IMPL;
     virtual void GetPlayerState(const ElementId& element, PlayerState*, Error**error);
-    virtual void SetPlayerState(const ElementId& element, PlayerState, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayerVolume(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void SetPlayerVolume(const ElementId& element, double, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void GetPlayingPosition(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void SetPlayingPosition(const ElementId& element, double, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void SetMute(const ElementId& element, bool, Error**error) NOT_SUPPORTED_IMPL;
-    virtual void GetMute(const ElementId& element, bool*, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetPlayerState(const ElementId& element, PlayerState, Error**error);
+    virtual void GetPlayerVolume(const ElementId& element, double*, Error**error);
+    virtual void SetPlayerVolume(const ElementId& element, double, Error**error);
+    virtual void GetPlayingPosition(const ElementId& element, double*, Error**error);
+    virtual void SetPlayingPosition(const ElementId& element, double, Error**error);
+    virtual void SetMute(const ElementId& element, bool, Error**error);
+    virtual void GetMute(const ElementId& element, bool*, Error**error);
     virtual void VisualizerSource(std::string* source, Error** error);
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
 
@@ -108,9 +148,8 @@ protected:
     typedef QHash<QString, QWidget*> XMLElementMap;    
 
     QWidget* getElement(const ElementId &element, Error** error);
-    bool FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
+    bool MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    std::string transform(const std::string& source, const std::string& stylesheet) const;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);

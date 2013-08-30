@@ -183,6 +183,12 @@ public:
     /// @return elementHandle
     ElementHandle* GetElementHandle(const ViewId& viewId, const ElementId& elementId) const;
 
+    /// Get elementId for given element handle in specific view
+    /// @param viewId requested view
+    /// @param handle requested element handle
+    /// @return elementId
+    ElementId GetElementIdForHandle(const ViewId& viewId, const ElementHandle* handle) const;
+
     /// Add element mapping
     /// @param viewId target view
     /// @param handle pointer to element handle, no need to delete

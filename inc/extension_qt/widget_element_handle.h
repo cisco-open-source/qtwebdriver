@@ -26,7 +26,7 @@ public:
     
 protected:
     QPointer<QObject> element_;
-    virtual ~QElementHandle() {};
+    virtual ~QElementHandle() {}
 };
 
 }  // namespace webdriver

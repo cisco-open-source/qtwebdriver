@@ -11,12 +11,12 @@
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "widget_view_visualizer.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
-#include <QtCore/QProcess>
 #include <QtCore/QMetaProperty>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
@@ -56,62 +56,75 @@
 
 namespace webdriver {
 
-class QWidgetXmlSerializer {
-public:
-    typedef QHash<QString, QWidget*> XMLElementMap;
+QWidgetXmlSerializer::QWidgetXmlSerializer(QIODevice* buff)
+    : session_(NULL), dumpAll_(false)
+{
+    writer_.setDevice(buff);
+    writer_.setAutoFormatting(true);
+}
 
-    QWidgetXmlSerializer(QIODevice* buff, XMLElementMap& elementsMap)
-        : elementsMap_(elementsMap), dumpAll_(false)
-    {
-        writer_.setDevice(buff);
-        writer_.setAutoFormatting(true);
-    }
+void QWidgetXmlSerializer::createXml(QWidget* widget) {
+    writer_.writeStartDocument();
+    addWidget(widget);
+    writer_.writeEndDocument();
+}
 
-    void createXml(QWidget* widget) {
-        writer_.writeStartDocument();
-        addWidget(widget);
-        writer_.writeEndDocument();
-    }
+void QWidgetXmlSerializer::addWidget(QWidget* widget) {
+    QString elementName = getElementName(widget);
+    writer_.writeStartElement(elementName);
 
-    void setDumpAll(bool dumpAll) {
-        dumpAll_ = dumpAll;
-    }
-
-private:
-    void addWidget(QWidget* widget) {
-        writer_.writeStartElement(widget->metaObject()->className());
-
-        if (dumpAll_) {
-            for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
-                const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
-                writer_.writeAttribute(property.name(), property.read(widget).toString());
-            }
+    if (dumpAll_) {
+        for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
+            const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
+            writer_.writeAttribute(property.name(), property.read(widget).toString());
         }
-
-        if (!widget->objectName().isEmpty())
-            writer_.writeAttribute("id", widget->objectName());
-
-        if (!widget->windowTitle().isEmpty())
-            writer_.writeAttribute("name", widget->windowTitle());
-
-        QString elementKey = GenerateRandomID().c_str();
-        elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
-        writer_.writeAttribute("elementId", elementKey);
-
-        QList<QObject*> childs = widget->children();
-        foreach(QObject* child, childs) {
-            QWidget* childWgt = qobject_cast<QWidget*>(child);
-            if (childWgt)
-                addWidget(childWgt);
-        }
-
-        writer_.writeEndElement();
     }
 
-    QXmlStreamWriter writer_;
-    XMLElementMap& elementsMap_;
-    bool dumpAll_;
-};
+    if (!widget->objectName().isEmpty())
+        writer_.writeAttribute("id", widget->objectName());
+
+    if (!widget->windowTitle().isEmpty())
+        writer_.writeAttribute("name", widget->windowTitle());
+
+    QString elementKey;
+    if (session_) {
+        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
+        if (!elementId.is_valid())
+            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+        elementKey = QString::fromStdString(elementId.id());
+    } else {
+        elementKey = GenerateRandomID().c_str();
+    }
+    elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
+    writer_.writeAttribute("elementId", elementKey);
+
+    writer_.writeAttribute("className", widget->metaObject()->className());
+
+    QList<QObject*> childs = widget->children();
+    foreach(QObject* child, childs) {
+        QWidget* childWgt = qobject_cast<QWidget*>(child);
+        if (childWgt)
+            addWidget(childWgt);
+    }
+
+    writer_.writeEndElement();
+}
+
+QString QWidgetXmlSerializer::getElementName(const QObject* object) const {
+    QString elementName = object->metaObject()->className();
+    if (supportedClasses_.empty())
+        return elementName;
+
+    const QMetaObject* metaObject = object->metaObject();
+    while (!supportedClasses_.contains(metaObject->className()) &&
+           metaObject->superClass() != NULL) {
+        metaObject = metaObject->superClass();
+    }
+    if (supportedClasses_.contains(metaObject->className()))
+        elementName = metaObject->className();
+
+    return elementName;
+}
 
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
 
@@ -169,19 +182,18 @@ QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** er
 }
 
 void QWidgetViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
-	*can = QWidgetViewUtil::isUrlSupported(url);
+    *can = QWidgetViewUtil::isUrlSupported(url);
 }
 
 void QWidgetViewCmdExecutor::GetSource(std::string* source, Error** error) {
-	QWidget* view = getView(view_id_, error);
+    QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    QWidgetXmlSerializer serializer(&buff);
     serializer.createXml(view);
     *source = byteArray.data();
 }
@@ -796,7 +808,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
         // list all child widgets and find matched locator
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
         foreach(QWidget *child, childs) {
-            if (FilterNativeWidget(child, locator, query)) {
+            if (MatchNativeWidget(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
                 (*elements).push_back(elm);
@@ -892,10 +904,214 @@ void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerStat
     *state = (PlayerState)(int)player->state();
 #else
     NOT_SUPPORTED_IMPL
+        #endif
+}
+
+void QWidgetViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState state, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    switch(state){
+    case Playing: player->play();break;
+    case Stopped: player->stop();break;
+    case Paused: player->pause();break;
+    }
+
+#else
+    NOT_SUPPORTED_IMPL
 #endif
 }
 
-bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
+void QWidgetViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *volume, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    *volume = player->volume() / 100.0;
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::SetPlayerVolume(const ElementId &element, double volume, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    player->setVolume(int(volume*100));
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId &element, double *position, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    *position = player->position()*1.0;
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::SetPlayingPosition(const ElementId &element, double position, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    player->setPosition(qint64(position*1000));
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    player->setMuted(mute);
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **error)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    *mute = player->isMuted();
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+bool QWidgetViewCmdExecutor::MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
         if (query == widget->metaObject()->className())
             return true;
@@ -919,10 +1135,8 @@ bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std
 void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
-
     buff.open(QIODevice::ReadWrite);
-    XMLElementMap elementsMap;
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
+    QWidgetXmlSerializer serializer(&buff);
     serializer.createXml(parent);
 
     buff.seek(0);
@@ -950,6 +1164,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
+                    const XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
@@ -986,50 +1201,8 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
     if (NULL == view)
         return;
 
-    XMLElementMap elementsMap;
-    QByteArray byteArray;
-    QBuffer buff(&byteArray);
-    buff.open(QIODevice::ReadWrite);
-
-    QWidgetXmlSerializer serializer(&buff, elementsMap);
-    serializer.setDumpAll(true);
-    serializer.createXml(view);
-    *source = byteArray.data();
-
-    session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
-    session_->logger().Log(kInfoLogLevel, *source);
-    *source = transform(*source, "src/webdriver/extension_qt/widget_view_visualizer.xsl");
-}
-
-std::string QWidgetViewCmdExecutor::transform(const std::string& source, const std::string& stylesheet) const {
-    QProcess process;
-    QStringList arguments;
-    arguments << "-jar" << "src/third_party/saxon/saxon9he.jar";
-    arguments << QString::fromStdString("-xsl:" + stylesheet);
-    arguments << "-";
-    process.start("java", arguments);
-    if (!process.waitForStarted(-1)) {
-        session_->logger().Log(kSevereLogLevel, "Can not start process!");
-        return "";
-    }
-    qint64 written = process.write(source.data(), source.length());
-    if (written != source.length()) {
-        session_->logger().Log(kSevereLogLevel, "Writting xml to xsl processor failure!");
-        return "";
-    }
-    process.waitForBytesWritten(-1);
-    process.closeWriteChannel();
-
-    process.waitForFinished(-1);
-
-    QByteArray stderr = process.readAllStandardError();
-    if (stderr.length() > 0) {
-
-        session_->logger().Log(kSevereLogLevel, QString::fromLatin1(stderr.data(), stderr.length()).toStdString());
-    }
-
-    QByteArray stdout = process.readAllStandardOutput();
-    return QString::fromLatin1(stdout.data(), stdout.length()).toStdString();
+    QWidgetViewVisualizerSourceCommand command(session_, view_id_, view);
+    command.Execute(source, error);
 }
 
 } //namespace webdriver 
