@@ -36,16 +36,10 @@ QWidgetViewVisualizerSourceCommand::QWidgetViewVisualizerSourceCommand(Session* 
     : session_(session), viewId_(viewId), view_(view)
 {}
 
-QWidgetViewVisualizerSourceCommand::~QWidgetViewVisualizerSourceCommand() {
-    removeAddedElements();
-}
-
 void QWidgetViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
-
-    removeAddedElements();
 
     QWidgetXmlSerializer serializer(&buff);
     serializer.setSession(session_);
@@ -55,18 +49,9 @@ void QWidgetViewVisualizerSourceCommand::Execute(std::string* source, Error** er
     serializer.createXml(view_);
     *source = byteArray.data();
 
-    addedElements_ = serializer.getElementsMap().keys();
-
     session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
     *source = transform(*source, STYLESHEET_PATH.value());
-}
-
-void QWidgetViewVisualizerSourceCommand::removeAddedElements() {
-    foreach (const QString& elementId, addedElements_) {
-        session_->RemoveElement(viewId_, ElementId(elementId.toStdString()));
-    }
-    addedElements_.clear();
 }
 
 std::string QWidgetViewVisualizerSourceCommand::transform(const std::string& source, const std::string& stylesheet) const {
