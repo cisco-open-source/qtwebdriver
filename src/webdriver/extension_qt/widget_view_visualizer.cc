@@ -77,12 +77,11 @@ std::string QWidgetViewVisualizerSourceCommand::transform(const std::string& sou
 
     QByteArray stderr = process.readAllStandardError();
     if (stderr.length() > 0) {
-
-        session_->logger().Log(kSevereLogLevel, QString::fromLatin1(stderr.data(), stderr.length()).toStdString());
+        session_->logger().Log(kSevereLogLevel, QString::fromUtf8(stderr.data(), stderr.length()).toStdString());
     }
 
     QByteArray stdout = process.readAllStandardOutput();
-    return QString::fromLatin1(stdout.data(), stdout.length()).toStdString();
+    return QString::fromUtf8(stdout.data(), stdout.length()).toStdString();
 }
 
 } //namespace webdriver
