@@ -18,14 +18,17 @@ class Session;
 class QWidgetViewVisualizerSourceCommand {
 public:
     QWidgetViewVisualizerSourceCommand(Session* session, ViewId viewId, QWidget* view);
+    ~QWidgetViewVisualizerSourceCommand();
     void Execute(std::string* source, Error** error);
 
 private:
+    void removeAddedElements();
     std::string transform(const std::string& source, const std::string& stylesheet) const;
 
     Session* session_;
     ViewId viewId_;
     QWidget* view_;
+    QList<QString> addedElements_;
 };
 
 }  // namespace webdriver

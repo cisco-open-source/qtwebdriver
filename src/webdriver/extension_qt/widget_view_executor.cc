@@ -153,7 +153,10 @@ bool QWidgetViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewI
 }
 
 QWidgetViewCmdExecutor::QWidgetViewCmdExecutor(Session* session, ViewId viewId)
-	: QViewCmdExecutor(session, viewId) {
+    : QViewCmdExecutor(session, viewId)
+{
+    _visualizerSourceCommand = make_scoped_ptr(new QWidgetViewVisualizerSourceCommand(
+        session, viewId, QWidgetViewUtil::getView(session, viewId)));
 }
 
 QWidgetViewCmdExecutor::~QWidgetViewCmdExecutor() {}
@@ -992,12 +995,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
 }
 
 void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
-    QWidget* view = getView(view_id_, error);
-    if (NULL == view)
-        return;
-
-    QWidgetViewVisualizerSourceCommand command(session_, view_id_, view);
-    command.Execute(source, error);
+    _visualizerSourceCommand->Execute(source, error);
 }
 
 } //namespace webdriver 

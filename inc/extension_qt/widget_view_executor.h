@@ -1,6 +1,7 @@
 #ifndef WEBDRIVER_QT_WIDGET_VIEW_EXECUTOR_H_
 #define WEBDRIVER_QT_WIDGET_VIEW_EXECUTOR_H_
 
+#include "base/memory/scoped_ptr.h"
 #include "extension_qt/q_view_executor.h"
 
 #include <QtCore/QDebug>
@@ -11,6 +12,8 @@
 #endif
 
 namespace webdriver {
+
+class QWidgetViewVisualizerSourceCommand;
 
 class QWidgetXmlSerializer {
 public:
@@ -152,6 +155,7 @@ protected:
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
 
 private:
+    scoped_ptr<QWidgetViewVisualizerSourceCommand> _visualizerSourceCommand;
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutor);
 };
 
