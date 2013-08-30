@@ -202,7 +202,7 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), dbClckEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
@@ -219,7 +219,7 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), releaseEvent);
 }
@@ -258,7 +258,7 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(mouseButton);
-    releaseEvent->setButtons(mouseButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), pressEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
@@ -382,7 +382,7 @@ void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) 
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), pressEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
