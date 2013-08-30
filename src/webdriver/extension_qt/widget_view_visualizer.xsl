@@ -28,6 +28,9 @@
     <input type="text">
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
+      <xsl:attribute name="value">
+        <xsl:value-of select="@text"/>
+      </xsl:attribute>
     </input>
   </xsl:template>
   <xsl:template match="QPushButton|QToolButton">
@@ -48,7 +51,8 @@
     <textarea>
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
-     </textarea>
+      <xsl:value-of select="@plainText"/>
+    </textarea>
   </xsl:template>
 
   <xsl:template name="style">
