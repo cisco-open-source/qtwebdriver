@@ -88,8 +88,9 @@ void QWidgetXmlSerializer::addWidget(QWidget* widget) {
 
     QString elementKey;
     if (session_) {
-        ElementId elementId;
-        session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
+        if (!elementId.is_valid())
+            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
         elementKey = QString::fromStdString(elementId.id());
     } else {
         elementKey = GenerateRandomID().c_str();

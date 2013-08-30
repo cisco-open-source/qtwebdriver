@@ -433,6 +433,23 @@ ElementHandle* Session::GetElementHandle(const ViewId& viewId, const ElementId& 
     return (it_el->second).get();
 }
 
+ElementId Session::GetElementIdForHandle(const ViewId& viewId, const ElementHandle* handle) const {
+    ViewsElementsMap::const_iterator viewIt;
+
+    viewIt = elements_.find(viewId.id());
+    if (viewIt == elements_.end())
+        return ElementId();
+
+    const ElementsMap& elements = viewIt->second;
+    for (ElementsMap::const_iterator elementIt = elements.begin(); elementIt != elements.end(); elementIt++) {
+        if (elementIt->second->equals(handle)) {
+            return ElementId(elementIt->first);
+        }
+    }
+
+    return ElementId();
+}
+
 bool Session::AddElement(const ViewId& viewId, ElementHandle* handle, ElementId* elementId) {
     ElementId targetElement(GenerateRandomID());
     ElementsMap& elements = elements_[viewId.id()];
