@@ -142,8 +142,6 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 
     QQuickItem* pFocusItem = view->activeFocusItem();
 
-    qDebug() << " !!!!! active:" << pFocusItem;
-
     if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
         return;
@@ -172,8 +170,6 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     // set focus to element
     pItem->forceActiveFocus();
 
-    qDebug() << " !!! after changing focus:" << view->activeFocusItem();
-    qDebug() << " !!! should be:" << pItem;
     if (!pItem->hasFocus()) {
         // restore old focus
         if (NULL != pFocusItem) pFocusItem->forceActiveFocus();        
@@ -212,7 +208,7 @@ void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             Qt::LeftButton,
-                            Qt::LeftButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, dbClckEvent);
@@ -232,7 +228,7 @@ void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             Qt::LeftButton,
-                            Qt::LeftButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, releaseEvent);
@@ -278,7 +274,7 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             mouseButton,
-                            mouseButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, pressEvent);
@@ -389,10 +385,10 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
         return;
     }
 
-    session_->logger().Log(kFineLogLevel, "Click on ");
+    session_->logger().Log(kFineLogLevel, "Click on:");
     session_->logger().Log(kFineLogLevel, pItem->objectName().toStdString());
 
-    QPointF scenePoint = pItem->mapToScene(QPointF(0,0));
+    QPointF scenePoint = pItem->mapToScene(QPointF(pItem->width()/2.0,pItem->height()/2.0));
 
     QRectF sceneRect(QPointF(0,0), view->size());
     if (!sceneRect.contains(scenePoint)) {
@@ -409,11 +405,12 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                              scenePoint,
                              Qt::LeftButton,
-                             Qt::LeftButton,
+                             Qt::NoButton,
                              Qt::NoModifier);
 
     QGuiApplication::postEvent(view, pressEvent);
     QGuiApplication::postEvent(view, releaseEvent);
+    QGuiApplication::processEvents();
 }
 
 void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
@@ -752,7 +749,7 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         script.c_str(),
         args_as_json.c_str());
 
-    QQmlExpression expr(view->rootContext(), view->contentItem(), jscript.c_str());
+    QQmlExpression expr(view->rootContext(), view, jscript.c_str());
     QVariant result = expr.evaluate();
     if (expr.hasError()) {
         *error = new Error(kJavaScriptError, expr.error().toString().toStdString());
@@ -912,6 +909,11 @@ void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elem
 
     if (!parent->objectName().isEmpty())
         writer->writeAttribute("id", parent->objectName());
+
+    writer->writeAttribute("x", QString::number(parent->x()));
+    writer->writeAttribute("y", QString::number(parent->y()));
+    writer->writeAttribute("width", QString::number(parent->width()));
+    writer->writeAttribute("height", QString::number(parent->height()));
 
     QString elementKey = GenerateRandomID().c_str();
     elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
