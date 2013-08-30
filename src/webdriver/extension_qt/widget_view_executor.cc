@@ -11,12 +11,12 @@
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "widget_view_visualizer.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
-#include <QtCore/QProcess>
 #include <QtCore/QMetaProperty>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
@@ -56,91 +56,75 @@
 
 namespace webdriver {
 
-class QWidgetXmlSerializer {
-public:
-    typedef QHash<QString, QWidget*> XMLElementMap;
+QWidgetXmlSerializer::QWidgetXmlSerializer(QIODevice* buff)
+    : session_(NULL), dumpAll_(false)
+{
+    writer_.setDevice(buff);
+    writer_.setAutoFormatting(true);
+}
 
-    QWidgetXmlSerializer(QIODevice* buff)
-        : dumpAll_(false)
-    {
-        writer_.setDevice(buff);
-        writer_.setAutoFormatting(true);
-    }
+void QWidgetXmlSerializer::createXml(QWidget* widget) {
+    writer_.writeStartDocument();
+    addWidget(widget);
+    writer_.writeEndDocument();
+}
 
-    void createXml(QWidget* widget) {
-        writer_.writeStartDocument();
-        addWidget(widget);
-        writer_.writeEndDocument();
-    }
+void QWidgetXmlSerializer::addWidget(QWidget* widget) {
+    QString elementName = getElementName(widget);
+    writer_.writeStartElement(elementName);
 
-    const XMLElementMap& getElementsMap() {
-        return elementsMap_;
-    }
-
-    void setDumpAll(bool dumpAll) {
-        dumpAll_ = dumpAll;
-    }
-
-    void setSupportedClasses(const QStringList& classes) {
-        supportedClasses_ = classes;
-    }
-
-private:
-    void addWidget(QWidget* widget) {
-        QString elementName = getElementName(widget);
-        writer_.writeStartElement(elementName);
-
-        if (dumpAll_) {
-            for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
-                const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
-                writer_.writeAttribute(property.name(), property.read(widget).toString());
-            }
+    if (dumpAll_) {
+        for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
+            const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
+            writer_.writeAttribute(property.name(), property.read(widget).toString());
         }
-
-        if (!widget->objectName().isEmpty())
-            writer_.writeAttribute("id", widget->objectName());
-
-        if (!widget->windowTitle().isEmpty())
-            writer_.writeAttribute("name", widget->windowTitle());
-
-        QString elementKey = GenerateRandomID().c_str();
-        elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
-        writer_.writeAttribute("elementId", elementKey);
-
-        writer_.writeAttribute("className", widget->metaObject()->className());
-
-        QList<QObject*> childs = widget->children();
-        foreach(QObject* child, childs) {
-            QWidget* childWgt = qobject_cast<QWidget*>(child);
-            if (childWgt)
-                addWidget(childWgt);
-        }
-
-        writer_.writeEndElement();
     }
 
-    QString getElementName(const QObject* object) const {
-        QString elementName = object->metaObject()->className();
-        if (supportedClasses_.empty())
-            return elementName;
+    if (!widget->objectName().isEmpty())
+        writer_.writeAttribute("id", widget->objectName());
 
-        const QMetaObject* metaObject = object->metaObject();
-        while (!supportedClasses_.contains(metaObject->className()) &&
-               metaObject->superClass() != NULL) {
-            metaObject = metaObject->superClass();
-        }
-        if (supportedClasses_.contains(metaObject->className()))
-            elementName = metaObject->className();
+    if (!widget->windowTitle().isEmpty())
+        writer_.writeAttribute("name", widget->windowTitle());
 
+    QString elementKey;
+    if (session_) {
+        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
+        if (!elementId.is_valid())
+            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+        elementKey = QString::fromStdString(elementId.id());
+    } else {
+        elementKey = GenerateRandomID().c_str();
+    }
+    elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
+    writer_.writeAttribute("elementId", elementKey);
+
+    writer_.writeAttribute("className", widget->metaObject()->className());
+
+    QList<QObject*> childs = widget->children();
+    foreach(QObject* child, childs) {
+        QWidget* childWgt = qobject_cast<QWidget*>(child);
+        if (childWgt)
+            addWidget(childWgt);
+    }
+
+    writer_.writeEndElement();
+}
+
+QString QWidgetXmlSerializer::getElementName(const QObject* object) const {
+    QString elementName = object->metaObject()->className();
+    if (supportedClasses_.empty())
         return elementName;
+
+    const QMetaObject* metaObject = object->metaObject();
+    while (!supportedClasses_.contains(metaObject->className()) &&
+           metaObject->superClass() != NULL) {
+        metaObject = metaObject->superClass();
     }
+    if (supportedClasses_.contains(metaObject->className()))
+        elementName = metaObject->className();
 
-
-    QXmlStreamWriter writer_;
-    XMLElementMap elementsMap_;
-    bool dumpAll_;
-    QStringList supportedClasses_;
-};
+    return elementName;
+}
 
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
 
@@ -824,7 +808,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
         // list all child widgets and find matched locator
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
         foreach(QWidget *child, childs) {
-            if (FilterNativeWidget(child, locator, query)) {
+            if (MatchNativeWidget(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
                 (*elements).push_back(elm);
@@ -1127,7 +1111,7 @@ void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error
 #endif
 }
 
-bool QWidgetViewCmdExecutor::FilterNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
+bool QWidgetViewCmdExecutor::MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
         if (query == widget->metaObject()->className())
             return true;
@@ -1217,50 +1201,8 @@ void QWidgetViewCmdExecutor::VisualizerSource(std::string* source, Error** error
     if (NULL == view)
         return;
 
-    QByteArray byteArray;
-    QBuffer buff(&byteArray);
-    buff.open(QIODevice::ReadWrite);
-
-    QWidgetXmlSerializer serializer(&buff);
-    serializer.setDumpAll(true);
-    serializer.setSupportedClasses(QStringList() << "QCheckBox" << "QLabel" << "QLineEdit" << "QPushButton" << "QScrollArea" << "QToolButton");
-    serializer.createXml(view);
-    *source = byteArray.data();
-
-    session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
-    session_->logger().Log(kInfoLogLevel, *source);
-    *source = transform(*source, "src/webdriver/extension_qt/widget_view_visualizer.xsl");
-}
-
-std::string QWidgetViewCmdExecutor::transform(const std::string& source, const std::string& stylesheet) const {
-    QProcess process;
-    QStringList arguments;
-    arguments << "-jar" << "src/third_party/saxon/saxon9he.jar";
-    arguments << QString::fromStdString("-xsl:" + stylesheet);
-    arguments << "-";
-    process.start("java", arguments);
-    if (!process.waitForStarted(-1)) {
-        session_->logger().Log(kSevereLogLevel, "Can not start process!");
-        return "";
-    }
-    qint64 written = process.write(source.data(), source.length());
-    if (written != source.length()) {
-        session_->logger().Log(kSevereLogLevel, "Writting xml to xsl processor failure!");
-        return "";
-    }
-    process.waitForBytesWritten(-1);
-    process.closeWriteChannel();
-
-    process.waitForFinished(-1);
-
-    QByteArray stderr = process.readAllStandardError();
-    if (stderr.length() > 0) {
-
-        session_->logger().Log(kSevereLogLevel, QString::fromLatin1(stderr.data(), stderr.length()).toStdString());
-    }
-
-    QByteArray stdout = process.readAllStandardOutput();
-    return QString::fromLatin1(stdout.data(), stdout.length()).toStdString();
+    QWidgetViewVisualizerSourceCommand command(session_, view_id_, view);
+    command.Execute(source, error);
 }
 
 } //namespace webdriver 
