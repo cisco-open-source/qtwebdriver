@@ -1,0 +1,368 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		162745DE17D47310000D26ED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745DD17D47310000D26ED /* UIKit.framework */; };
+		162745E017D47310000D26ED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745DF17D47310000D26ED /* Foundation.framework */; };
+		162745E217D47310000D26ED /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745E117D47310000D26ED /* CoreGraphics.framework */; };
+		162745F017D47310000D26ED /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 162745EF17D47310000D26ED /* Default.png */; };
+		162745F217D47310000D26ED /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 162745F117D47310000D26ED /* Default@2x.png */; };
+		162745F417D47311000D26ED /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 162745F317D47311000D26ED /* Default-568h@2x.png */; };
+		162745FB17D47396000D26ED /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 162745FA17D47396000D26ED /* main.mm */; };
+		1627460117D473F0000D26ED /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745FC17D473F0000D26ED /* AudioToolbox.framework */; };
+		1627460217D473F0000D26ED /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745FD17D473F0000D26ED /* CoreText.framework */; };
+		1627460317D473F0000D26ED /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745FE17D473F0000D26ED /* libz.dylib */; };
+		1627460417D473F0000D26ED /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162745FF17D473F0000D26ED /* OpenGLES.framework */; };
+		1627460517D473F0000D26ED /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627460017D473F0000D26ED /* QuartzCore.framework */; };
+		1627471C17D4743D000D26ED /* libQt5Core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471317D4743D000D26ED /* libQt5Core.a */; };
+		1627471D17D4743D000D26ED /* libQt5Gui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471417D4743D000D26ED /* libQt5Gui.a */; };
+		1627471E17D4743D000D26ED /* libQt5Multimedia.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471517D4743D000D26ED /* libQt5Multimedia.a */; };
+		1627471F17D4743D000D26ED /* libQt5MultimediaWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471617D4743D000D26ED /* libQt5MultimediaWidgets.a */; };
+		1627472017D4743D000D26ED /* libQt5Network.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471717D4743D000D26ED /* libQt5Network.a */; };
+		1627472117D4743D000D26ED /* libQt5OpenGL.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471817D4743D000D26ED /* libQt5OpenGL.a */; };
+		1627472217D4743D000D26ED /* libQt5PlatformSupport.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471917D4743D000D26ED /* libQt5PlatformSupport.a */; };
+		1627472317D4743D000D26ED /* libQt5Widgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471A17D4743D000D26ED /* libQt5Widgets.a */; };
+		1627472417D4743D000D26ED /* libQt5Xml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471B17D4743D000D26ED /* libQt5Xml.a */; };
+		1627472617D47466000D26ED /* libwd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472517D47466000D26ED /* libwd.a */; };
+		1627472B17D47487000D26ED /* libchromium_base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472717D47487000D26ED /* libchromium_base.a */; };
+		1627472C17D47487000D26ED /* libtest_widgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472817D47487000D26ED /* libtest_widgets.a */; };
+		1627472D17D47487000D26ED /* libWebDriver_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472917D47487000D26ED /* libWebDriver_core.a */; };
+		1627472E17D47487000D26ED /* libWebDriver_extension_qt_base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472A17D47487000D26ED /* libWebDriver_extension_qt_base.a */; };
+		1627473017D47528000D26ED /* libqios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472F17D47528000D26ED /* libqios.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		162745DA17D47310000D26ED /* wd_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wd_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		162745DD17D47310000D26ED /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		162745DF17D47310000D26ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		162745E117D47310000D26ED /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		162745E517D47310000D26ED /* wd_test-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "wd_test-Info.plist"; sourceTree = "<group>"; };
+		162745EB17D47310000D26ED /* wd_test-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "wd_test-Prefix.pch"; sourceTree = "<group>"; };
+		162745EF17D47310000D26ED /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		162745F117D47310000D26ED /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		162745F317D47311000D26ED /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		162745FA17D47396000D26ED /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		162745FC17D473F0000D26ED /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		162745FD17D473F0000D26ED /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		162745FE17D473F0000D26ED /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		162745FF17D473F0000D26ED /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		1627460017D473F0000D26ED /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		1627471317D4743D000D26ED /* libQt5Core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Core.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Core.a"; sourceTree = "<absolute>"; };
+		1627471417D4743D000D26ED /* libQt5Gui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Gui.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Gui.a"; sourceTree = "<absolute>"; };
+		1627471517D4743D000D26ED /* libQt5Multimedia.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Multimedia.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Multimedia.a"; sourceTree = "<absolute>"; };
+		1627471617D4743D000D26ED /* libQt5MultimediaWidgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5MultimediaWidgets.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5MultimediaWidgets.a"; sourceTree = "<absolute>"; };
+		1627471717D4743D000D26ED /* libQt5Network.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Network.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Network.a"; sourceTree = "<absolute>"; };
+		1627471817D4743D000D26ED /* libQt5OpenGL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5OpenGL.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5OpenGL.a"; sourceTree = "<absolute>"; };
+		1627471917D4743D000D26ED /* libQt5PlatformSupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5PlatformSupport.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5PlatformSupport.a"; sourceTree = "<absolute>"; };
+		1627471A17D4743D000D26ED /* libQt5Widgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Widgets.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Widgets.a"; sourceTree = "<absolute>"; };
+		1627471B17D4743D000D26ED /* libQt5Xml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Xml.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Xml.a"; sourceTree = "<absolute>"; };
+		1627472517D47466000D26ED /* libwd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwd.a; path = ../wd/release/libwd.a; sourceTree = "<group>"; };
+		1627472717D47487000D26ED /* libchromium_base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libchromium_base.a; path = "../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator/libchromium_base.a"; sourceTree = "<group>"; };
+		1627472817D47487000D26ED /* libtest_widgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtest_widgets.a; path = "../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator/libtest_widgets.a"; sourceTree = "<group>"; };
+		1627472917D47487000D26ED /* libWebDriver_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libWebDriver_core.a; path = "../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator/libWebDriver_core.a"; sourceTree = "<group>"; };
+		1627472A17D47487000D26ED /* libWebDriver_extension_qt_base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libWebDriver_extension_qt_base.a; path = "../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator/libWebDriver_extension_qt_base.a"; sourceTree = "<group>"; };
+		1627472F17D47528000D26ED /* libqios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libqios.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms/libqios.a"; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		162745D717D47310000D26ED /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1627473017D47528000D26ED /* libqios.a in Frameworks */,
+				1627472B17D47487000D26ED /* libchromium_base.a in Frameworks */,
+				1627472C17D47487000D26ED /* libtest_widgets.a in Frameworks */,
+				1627472D17D47487000D26ED /* libWebDriver_core.a in Frameworks */,
+				1627472E17D47487000D26ED /* libWebDriver_extension_qt_base.a in Frameworks */,
+				1627472617D47466000D26ED /* libwd.a in Frameworks */,
+				1627471C17D4743D000D26ED /* libQt5Core.a in Frameworks */,
+				1627471D17D4743D000D26ED /* libQt5Gui.a in Frameworks */,
+				1627471E17D4743D000D26ED /* libQt5Multimedia.a in Frameworks */,
+				1627471F17D4743D000D26ED /* libQt5MultimediaWidgets.a in Frameworks */,
+				1627472017D4743D000D26ED /* libQt5Network.a in Frameworks */,
+				1627472117D4743D000D26ED /* libQt5OpenGL.a in Frameworks */,
+				1627472217D4743D000D26ED /* libQt5PlatformSupport.a in Frameworks */,
+				1627472317D4743D000D26ED /* libQt5Widgets.a in Frameworks */,
+				1627472417D4743D000D26ED /* libQt5Xml.a in Frameworks */,
+				1627460117D473F0000D26ED /* AudioToolbox.framework in Frameworks */,
+				1627460217D473F0000D26ED /* CoreText.framework in Frameworks */,
+				1627460317D473F0000D26ED /* libz.dylib in Frameworks */,
+				1627460417D473F0000D26ED /* OpenGLES.framework in Frameworks */,
+				1627460517D473F0000D26ED /* QuartzCore.framework in Frameworks */,
+				162745DE17D47310000D26ED /* UIKit.framework in Frameworks */,
+				162745E017D47310000D26ED /* Foundation.framework in Frameworks */,
+				162745E217D47310000D26ED /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		162745D117D47310000D26ED = {
+			isa = PBXGroup;
+			children = (
+				162745E317D47310000D26ED /* wd_test */,
+				162745DC17D47310000D26ED /* Frameworks */,
+				162745DB17D47310000D26ED /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		162745DB17D47310000D26ED /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				162745DA17D47310000D26ED /* wd_test.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		162745DC17D47310000D26ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1627472F17D47528000D26ED /* libqios.a */,
+				1627472717D47487000D26ED /* libchromium_base.a */,
+				1627472817D47487000D26ED /* libtest_widgets.a */,
+				1627472917D47487000D26ED /* libWebDriver_core.a */,
+				1627472A17D47487000D26ED /* libWebDriver_extension_qt_base.a */,
+				1627471317D4743D000D26ED /* libQt5Core.a */,
+				1627472517D47466000D26ED /* libwd.a */,
+				1627471417D4743D000D26ED /* libQt5Gui.a */,
+				1627471517D4743D000D26ED /* libQt5Multimedia.a */,
+				1627471617D4743D000D26ED /* libQt5MultimediaWidgets.a */,
+				1627471717D4743D000D26ED /* libQt5Network.a */,
+				1627471817D4743D000D26ED /* libQt5OpenGL.a */,
+				1627471917D4743D000D26ED /* libQt5PlatformSupport.a */,
+				1627471A17D4743D000D26ED /* libQt5Widgets.a */,
+				1627471B17D4743D000D26ED /* libQt5Xml.a */,
+				162745FE17D473F0000D26ED /* libz.dylib */,
+				162745FC17D473F0000D26ED /* AudioToolbox.framework */,
+				162745FD17D473F0000D26ED /* CoreText.framework */,
+				162745FF17D473F0000D26ED /* OpenGLES.framework */,
+				1627460017D473F0000D26ED /* QuartzCore.framework */,
+				162745DD17D47310000D26ED /* UIKit.framework */,
+				162745DF17D47310000D26ED /* Foundation.framework */,
+				162745E117D47310000D26ED /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		162745E317D47310000D26ED /* wd_test */ = {
+			isa = PBXGroup;
+			children = (
+				162745E417D47310000D26ED /* Supporting Files */,
+			);
+			path = wd_test;
+			sourceTree = "<group>";
+		};
+		162745E417D47310000D26ED /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				162745FA17D47396000D26ED /* main.mm */,
+				162745E517D47310000D26ED /* wd_test-Info.plist */,
+				162745EB17D47310000D26ED /* wd_test-Prefix.pch */,
+				162745EF17D47310000D26ED /* Default.png */,
+				162745F117D47310000D26ED /* Default@2x.png */,
+				162745F317D47311000D26ED /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		162745D917D47310000D26ED /* wd_test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 162745F717D47311000D26ED /* Build configuration list for PBXNativeTarget "wd_test" */;
+			buildPhases = (
+				162745D617D47310000D26ED /* Sources */,
+				162745D717D47310000D26ED /* Frameworks */,
+				162745D817D47310000D26ED /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = wd_test;
+			productName = wd_test;
+			productReference = 162745DA17D47310000D26ED /* wd_test.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		162745D217D47310000D26ED /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = gl;
+			};
+			buildConfigurationList = 162745D517D47310000D26ED /* Build configuration list for PBXProject "wd_test" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 162745D117D47310000D26ED;
+			productRefGroup = 162745DB17D47310000D26ED /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				162745D917D47310000D26ED /* wd_test */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		162745D817D47310000D26ED /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				162745F017D47310000D26ED /* Default.png in Resources */,
+				162745F217D47310000D26ED /* Default@2x.png in Resources */,
+				162745F417D47311000D26ED /* Default-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		162745D617D47310000D26ED /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				162745FB17D47396000D26ED /* main.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		162745F517D47311000D26ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		162745F617D47311000D26ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		162745F817D47311000D26ED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "wd_test/wd_test-Prefix.pch";
+				INFOPLIST_FILE = "wd_test/wd_test-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib\"",
+					"\"$(SRCROOT)/../wd/release\"",
+					"\"$(SRCROOT)/../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator\"",
+					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms\"",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = armv7;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		162745F917D47311000D26ED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "wd_test/wd_test-Prefix.pch";
+				INFOPLIST_FILE = "wd_test/wd_test-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib\"",
+					"\"$(SRCROOT)/../wd/release\"",
+					"\"$(SRCROOT)/../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator\"",
+					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms\"",
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = armv7;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		162745D517D47310000D26ED /* Build configuration list for PBXProject "wd_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				162745F517D47311000D26ED /* Debug */,
+				162745F617D47311000D26ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		162745F717D47311000D26ED /* Build configuration list for PBXNativeTarget "wd_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				162745F817D47311000D26ED /* Debug */,
+				162745F917D47311000D26ED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 162745D217D47310000D26ED /* Project object */;
+}

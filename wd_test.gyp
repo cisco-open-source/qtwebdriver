@@ -83,10 +83,6 @@
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
-                'Foundation.framework',
-                'CoreFoundation.framework',
-                'ApplicationServices.framework',
-                'Security.framework',
               ],
             }, 
           } ], 
@@ -112,28 +108,29 @@
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
-                '<(QT_LIB_PATH)/libQt5Qml.a',
-                '<(QT_LIB_PATH)/libQt5Quick.a',
-                '<(QT_LIB_PATH)/libQt5V8.a',
+                #'<(QT_LIB_PATH)/libQt5Qml.a',
+                #'<(QT_LIB_PATH)/libQt5Quick.a',
+                #'<(QT_LIB_PATH)/libQt5Declarative.a',
+                '<(QT_LIB_PATH)/libQt5Xml.a',
+                #'<(QT_LIB_PATH)/libQt5XmlPatterns.a',
                 #'<(QT_LIB_PATH)/libQt5OpenGL.a',
                 #'<(QT_LIB_PATH)/libQt5OpenGLExtensions.a',
-                #'<(QT_LIB_PATH)/libQt5PlatformSupport.a',
-                #'<(QT_LIB_PATH)/libQt5Script.a',
-                #'<(QT_LIB_PATH)/../plugins/platforms/libqios.a',
-                #'<(QT_LIB_PATH)/../plugins/platforms/libquikit.a',
-                #'/Developer/Qt4iOS/ios-qml/IOSPluginLibs/ios-clang-release/lib/libqmlcomponectsios.a',
+                '<(QT_LIB_PATH)/libQt5PlatformSupport.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreText.framework',
                 '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+                #'$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
+                #'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
+                'libz.dylib',
               ],
             }, 
      
             'xcode_settings': {
               'TARGETED_DEVICE_FAMILY': '1,2',
               'CODE_SIGN_IDENTITY': 'iPhone Developer',
-              'IPHONEOS_DEPLOYMENT_TARGET': '5.0',
+              'IPHONEOS_DEPLOYMENT_TARGET': '6.1',
               'ARCHS': '$(ARCHS_STANDARD_32_BIT)',
               'CLANG_WARN_CXX0X_EXTENSIONS': 'NO',
             },
@@ -301,10 +298,6 @@
           ],
         } ],
        
-        [ 'OS=="ios"', {
-          'mac_bundle': 1, 
-        } ],
-
         [ '<(QT5) == 1', {
           'conditions': [
             ['OS=="linux"', {
@@ -360,11 +353,7 @@
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
-        } ],
-
-        [ 'OS=="ios"', {
-          'mac_bundle': 1, 
-        } ],
+        } ]
       ],
 
     } , {
@@ -420,6 +409,32 @@
         } ],
       ],
 
-    }
+    }, {
+      'target_name': 'test_ios_WD',
+      'type': 'executable',
+      'mac_bundle': 1,
+
+      'product_name': 'WebDriver_ios',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'test_widgets',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+	
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
+    },	
   ],
 }
