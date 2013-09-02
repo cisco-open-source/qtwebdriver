@@ -49,7 +49,6 @@ Session::Session()
       desired_caps_(NULL),
       required_caps_(NULL),
       view_runner_(ViewRunner::CreateRunner()),
-      life_cycle_actions_(SessionLifeCycleActions::CreateLifeCycleActions(this)),
       sticky_modifiers_(0)
 {
     SessionManager::GetInstance()->Add(this);
@@ -58,6 +57,7 @@ Session::Session()
         logger_.AddHandler(FileLog::Get());
     if (StdOutLog::Get())
         logger_.AddHandler(StdOutLog::Get());
+    life_cycle_actions_ = make_scoped_ptr(SessionLifeCycleActions::CreateLifeCycleActions(this));
 }
 
 Session::~Session() {
