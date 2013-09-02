@@ -31,9 +31,13 @@
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
+
+// Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
+#ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "VideoTest.h"
 #endif
+#endif//OS_IOS
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -42,6 +46,7 @@
 #include "webdriver_route_table.h"
 #include "shutdown_command.h"
 
+#ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 // headers for Quick2 extension
 #include "extension_qt/quick2_view_creator.h"
@@ -54,6 +59,7 @@
 #include "extension_qt/qml_view_executor.h"
 #include "extension_qt/qml_view_enumerator.h"
 #endif
+#endif //OS_IOS
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -113,10 +119,12 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+
+#ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
 #endif
-
+#endif //OS_IOS
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
@@ -130,6 +138,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
 #endif
 
+#ifndef OS_IOS 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
@@ -149,7 +158,8 @@ int main(int argc, char *argv[])
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
 #endif    
-
+#endif //OS_IOS
+    
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
