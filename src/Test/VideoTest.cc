@@ -3,7 +3,7 @@
 VideoTestWidget::VideoTestWidget(QWidget *parent) :
     QMainWindow(parent)
 {
-//    this->setGeometry(0, 0, 600, 400);
+    this->setGeometry(0, 0, 600, 400);
     this->setMinimumSize(400, 400);
     this->setMaximumSize(800, 800);
     mediaPlayer = new QMediaPlayer(NULL, QMediaPlayer::VideoSurface);
@@ -44,8 +44,7 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
     controlsLayout->addWidget(positionSlider);
     controlsLayout->addWidget(volumeSlider);
 
-    QString fileName = QDir::currentPath() + "/big_buck_bunny.ogv";
-    qDebug()<<fileName;
+    QString fileName = QDir::currentPath() + "/TestData/TestVideo.ogv";
 
     if (!fileName.isEmpty()) {
         mediaPlayer->setMedia(QUrl::fromLocalFile(fileName));
@@ -54,8 +53,8 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
         volumeChanged(mediaPlayer->volume());
         playButton->setEnabled(true);
     }
-//    QSize resolution = mediaPlayer->media().canonicalResource().resolution();
-//    this->setGeometry(0,0, resolution.width(), resolution.height());
+    QSize resolution = mediaPlayer->media().canonicalResource().resolution();
+    this->setGeometry(0,0, resolution.width(), resolution.height());
 }
 
 VideoTestWidget::~VideoTestWidget()

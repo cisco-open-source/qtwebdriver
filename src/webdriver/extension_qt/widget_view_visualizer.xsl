@@ -12,32 +12,47 @@
 
   <xsl:template match="QCheckBox">
     <input type="checkbox">
+      <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
       <xsl:value-of select="@text"/>
     </input>
   </xsl:template>
   <xsl:template match="QLabel">
     <span>
+      <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
       <xsl:value-of select="@text"/>
     </span>
   </xsl:template>
   <xsl:template match="QLineEdit">
     <input type="text">
+      <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
+      <xsl:attribute name="value">
+        <xsl:value-of select="@text"/>
+      </xsl:attribute>
     </input>
   </xsl:template>
-  <xsl:template match="QPushButton">
+  <xsl:template match="QPushButton|QToolButton">
     <input type="submit">
+      <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
       <xsl:attribute name="value" select="@text"/>
     </input>
   </xsl:template>
   <xsl:template match="QScrollArea">
     <div>
+      <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
       <xsl:apply-templates/>
     </div>
+  </xsl:template>
+  <xsl:template match="QPlainTextEdit">
+    <textarea>
+      <xsl:copy-of select="@elementId"/>
+      <xsl:call-template name="style"/>
+      <xsl:value-of select="@plainText"/>
+    </textarea>
   </xsl:template>
 
   <xsl:template name="style">

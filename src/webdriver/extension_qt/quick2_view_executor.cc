@@ -26,8 +26,9 @@ namespace webdriver {
 
 #if 1 
 #define REMOVE_INTERNAL_SUFIXES(qstr)   \
-            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
+        if (qstr.startsWith(QLatin1String("QQuick"))) qstr = qstr.mid(6);
 #else
 #define REMOVE_INTERNAL_SUFIXES(qstr)
 #endif            
@@ -137,6 +138,8 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     if (NULL == pItem)
         return;
 
+    view->requestActivate();
+
     QQuickItem* pFocusItem = view->activeFocusItem();
 
     if (!pItem->isVisible()) {
@@ -165,10 +168,11 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     }
 
     // set focus to element
-    pItem->setFocus(true);
+    pItem->forceActiveFocus();
+
     if (!pItem->hasFocus()) {
         // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
+        if (NULL != pFocusItem) pFocusItem->forceActiveFocus();        
 
         *error = new Error(kInvalidElementState);
         return;
@@ -182,7 +186,7 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 
     // restore old focus
     if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
+        pFocusItem->forceActiveFocus();
 }
 
 void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -204,7 +208,7 @@ void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             Qt::LeftButton,
-                            Qt::LeftButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, dbClckEvent);
@@ -224,7 +228,7 @@ void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             Qt::LeftButton,
-                            Qt::LeftButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, releaseEvent);
@@ -270,7 +274,7 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
                             mouseButton,
-                            mouseButton,
+                            Qt::NoButton,
                             sticky_modifiers);
 
     QGuiApplication::postEvent(view, pressEvent);
@@ -381,10 +385,10 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
         return;
     }
 
-    session_->logger().Log(kFineLogLevel, "Click on ");
+    session_->logger().Log(kFineLogLevel, "Click on:");
     session_->logger().Log(kFineLogLevel, pItem->objectName().toStdString());
 
-    QPointF scenePoint = pItem->mapToScene(QPointF(0,0));
+    QPointF scenePoint = pItem->mapToScene(QPointF(pItem->width()/2.0,pItem->height()/2.0));
 
     QRectF sceneRect(QPointF(0,0), view->size());
     if (!sceneRect.contains(scenePoint)) {
@@ -401,11 +405,12 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                              scenePoint,
                              Qt::LeftButton,
-                             Qt::LeftButton,
+                             Qt::NoButton,
                              Qt::NoModifier);
 
     QGuiApplication::postEvent(view, pressEvent);
     QGuiApplication::postEvent(view, releaseEvent);
+    QGuiApplication::processEvents();
 }
 
 void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
@@ -629,7 +634,6 @@ void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const st
 }
 
 void Quick2ViewCmdExecutor::FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
-    qDebug() << "******* Element: " << parent << " name:" << parent->objectName();
     if (FilterElement(parent, locator, query)) {
         ElementId elm;
         session_->AddElement(view_id_, new QElementHandle(parent), &elm);
@@ -675,7 +679,7 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
 
     if (sync) {
         QEventLoop loop;
-        QObject::connect(view, SIGNAL(statusChanged()),&loop,SLOT(quit()));
+        QObject::connect(view, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
         view->setSource(address);
 
         if (QQuickView::Loading == view->status()) {
@@ -745,7 +749,7 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         script.c_str(),
         args_as_json.c_str());
 
-    QQmlExpression expr(view->rootContext(), view->contentItem(), jscript.c_str());
+    QQmlExpression expr(view->rootContext(), view, jscript.c_str());
     QVariant result = expr.evaluate();
     if (expr.hasError()) {
         *error = new Error(kJavaScriptError, expr.error().toString().toStdString());
@@ -905,6 +909,11 @@ void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elem
 
     if (!parent->objectName().isEmpty())
         writer->writeAttribute("id", parent->objectName());
+
+    writer->writeAttribute("x", QString::number(parent->x()));
+    writer->writeAttribute("y", QString::number(parent->y()));
+    writer->writeAttribute("width", QString::number(parent->width()));
+    writer->writeAttribute("height", QString::number(parent->height()));
 
     QString elementKey = GenerateRandomID().c_str();
     elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));

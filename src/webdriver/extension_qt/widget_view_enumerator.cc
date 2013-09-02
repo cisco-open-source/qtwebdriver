@@ -10,8 +10,10 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QMessageBox>
 #else
 #include <QtGui/QWidget>
+#include <QtGui/QMessageBox>
 #include <QtGui/QApplication>
 #endif
 
@@ -24,7 +26,9 @@ void WidgetViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
     {
         if (pWidget->isHidden()) continue;
 
-        if (!pWidget->isTopLevel()) continue;
+        if (!pWidget->isWindow()) continue;
+
+        if(NULL != qobject_cast<QMessageBox*>(pWidget)) continue; //check if it's an alert
 
         ViewHandlePtr handle(new QViewHandle(pWidget));
         ViewId viewId = session->GetViewForHandle(handle);

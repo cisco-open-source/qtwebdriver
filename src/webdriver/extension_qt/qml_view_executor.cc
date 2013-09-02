@@ -26,8 +26,9 @@ namespace webdriver {
 
 #if 1 
 #define REMOVE_INTERNAL_SUFIXES(qstr)   \
-            qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-            qstr.remove(QRegExp(QLatin1String("_QML_\\d+")));
+        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
+        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
+        if (qstr.startsWith(QLatin1String("QDeclarative"))) qstr = qstr.mid(12);
 #else
 #define REMOVE_INTERNAL_SUFIXES(qstr)
 #endif            
@@ -201,7 +202,7 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), dbClckEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
@@ -218,7 +219,7 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), releaseEvent);
 }
@@ -257,7 +258,7 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(mouseButton);
-    releaseEvent->setButtons(mouseButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), pressEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
@@ -381,7 +382,7 @@ void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) 
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
     releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
 
     QApplication::postEvent(view->scene(), pressEvent);
     QApplication::postEvent(view->scene(), releaseEvent);
