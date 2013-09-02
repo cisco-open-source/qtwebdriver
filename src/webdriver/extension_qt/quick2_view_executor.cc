@@ -138,10 +138,6 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     if (NULL == pItem)
         return;
 
-    view->requestActivate();
-
-    QQuickItem* pFocusItem = view->activeFocusItem();
-
     if (!pItem->isVisible()) {
         *error = new Error(kElementNotVisible);
         return;
@@ -167,26 +163,11 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
         return;
     }
 
-    // set focus to element
-    pItem->forceActiveFocus();
-
-    if (!pItem->hasFocus()) {
-        // restore old focus
-        if (NULL != pFocusItem) pFocusItem->forceActiveFocus();        
-
-        *error = new Error(kInvalidElementState);
-        return;
-    }
-
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        QGuiApplication::sendEvent(view, &(*it));
+        view->sendEvent(pItem, &(*it));
         ++it;
     }
-
-    // restore old focus
-    if (NULL != pFocusItem)
-        pFocusItem->forceActiveFocus();
 }
 
 void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
