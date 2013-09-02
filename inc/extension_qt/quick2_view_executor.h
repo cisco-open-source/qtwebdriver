@@ -35,6 +35,7 @@ public:
     virtual void Reload(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetSource(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
+    virtual void SendKeys(const string16& keys, Error** error);
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);
@@ -110,6 +111,7 @@ protected:
     typedef QHash<QString, QQuickItem*> XMLElementMap;    
 
     QQuickItem* getElement(const ElementId &element, Error** error);
+    QQuickItem* getFocusItem(QQuickView* view);
     bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
