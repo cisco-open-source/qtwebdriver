@@ -108,10 +108,13 @@
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
+                # Quick2 isn't supported in QT for iOS
                 #'<(QT_LIB_PATH)/libQt5Qml.a',
                 #'<(QT_LIB_PATH)/libQt5Quick.a',
-                #'<(QT_LIB_PATH)/libQt5Declarative.a',
                 '<(QT_LIB_PATH)/libQt5Xml.a',
+                #'<(QT_LIB_PATH)/libQt5MultimediaWidgets.a',
+                #'<(QT_LIB_PATH)/libQt5Multimedia.a',
+                #'<(QT_LIB_PATH)/libQt5V8.a',
                 #'<(QT_LIB_PATH)/libQt5XmlPatterns.a',
                 #'<(QT_LIB_PATH)/libQt5OpenGL.a',
                 #'<(QT_LIB_PATH)/libQt5OpenGLExtensions.a',
@@ -255,7 +258,8 @@
         'src/Test/BasicMouseInterfaceTest.cc',
       ],
       'conditions': [
-        [ '<(QT5) == 1', {
+        # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
+        [ 'OS != "ios" and <(QT5) == 1', {
           'sources': [
             'src/Test/VideoTest.h',
             'src/Test/VideoTest.cc',
