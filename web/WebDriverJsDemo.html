@@ -246,9 +246,13 @@
         });
       }
 
+      WebDriverJsDemo.prototype.isVisualizerOpened = function() {
+        return this.visualizationWin && !this.visualizationWin.closed && this.visualizationWin.innerHeight > 0;
+      }
+
       WebDriverJsDemo.prototype.openVisualizationWindow = function(size) {
         var winParams = 'width=' + size.width + ',height=' + size.height;
-        var win = this.visualizationWin = window.open('', '', winParams);
+        this.visualizationWin = window.open('', '', winParams);
       }
 
       WebDriverJsDemo.prototype.visualizerAssignEventHandlers = function() {
@@ -316,7 +320,7 @@
 
       WebDriverJsDemo.prototype.showVisualizationWindow = function(source, size) {
         var isQt = this.webPage.startsWith('qtwidget://');
-        var isWinOpened = this.visualizationWin && !this.visualizationWin.closed;
+        var isWinOpened = this.isVisualizerOpened();
 
         if (!isQt && isWinOpened) {
           this.visualizationWin.document.documentElement.innerHTML = source;
