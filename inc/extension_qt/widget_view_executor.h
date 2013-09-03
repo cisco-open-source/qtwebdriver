@@ -40,6 +40,10 @@ public:
         supportedClasses_ = classes;
     }
 
+    void setStylesheet(const QString& stylesheet) {
+        stylesheet_ = stylesheet;
+    }
+
 private:
     void addWidget(QWidget* widget);
     QString getElementName(const QObject* object) const;
@@ -50,6 +54,7 @@ private:
     ViewId viewId_;
     bool dumpAll_;
     QStringList supportedClasses_;
+    QString stylesheet_;
 };
 
 class QWidgetViewCmdExecutorCreator : public ViewCmdExecutorCreator  {

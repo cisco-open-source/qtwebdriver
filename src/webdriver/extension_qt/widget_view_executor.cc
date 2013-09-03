@@ -67,6 +67,9 @@ QWidgetXmlSerializer::QWidgetXmlSerializer(QIODevice* buff)
 
 void QWidgetXmlSerializer::createXml(QWidget* widget) {
     writer_.writeStartDocument();
+    if (!stylesheet_.isEmpty()) {
+        writer_.writeProcessingInstruction("xml-stylesheet", "href=\"" + stylesheet_ + "\"");
+    }
     addWidget(widget);
     writer_.writeEndDocument();
 }

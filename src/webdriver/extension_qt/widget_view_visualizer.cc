@@ -38,7 +38,10 @@ FilePath LookupRecursively(const FilePath& folder, const FilePath& path) {
 }
 
 static const FilePath STYLESHEET_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath::FromUTF8Unsafe("src/webdriver/extension_qt/widget_view_visualizer.xsl"));
+static const QString STYLESHEET_WEB_PATH = "http://localhost:9517/widget_view_visualizer.xsl";
 static const FilePath PROCESSOR_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath::FromUTF8Unsafe("src/third_party/saxon/saxon9he.jar"));
+static bool XSLT_PROCESS = false;
+static bool XSLT_INJECT_STYLESHEET = false;
 
 QWidgetViewVisualizerSourceCommand::QWidgetViewVisualizerSourceCommand(Session* session, ViewId viewId, QWidget* view)
     : session_(session), viewId_(viewId), view_(view)
@@ -54,14 +57,20 @@ void QWidgetViewVisualizerSourceCommand::Execute(std::string* source, Error** er
     serializer.setViewId(viewId_);
     serializer.setDumpAll(true);
     serializer.setSupportedClasses(SUPPORTED_CLASSES);
+    if (XSLT_INJECT_STYLESHEET) {
+        serializer.setStylesheet(STYLESHEET_WEB_PATH);
+    }
     serializer.createXml(view_);
     *source = byteArray.data();
 
-#if defined(OS_LINUX)
     session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
-    *source = transform(*source, STYLESHEET_PATH.value());
+
+    if (XSLT_PROCESS) {
+#if defined(OS_LINUX)
+        *source = transform(*source, STYLESHEET_PATH.value());
 #endif
+    }
 }
 
 #if defined(OS_LINUX)
