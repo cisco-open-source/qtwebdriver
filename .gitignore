@@ -25,3 +25,4 @@ wd.gypi
 /WebDriverTest.target.mk
 /src/webdriver/webdriver_version.cc
 /build-*
+.DS_Store

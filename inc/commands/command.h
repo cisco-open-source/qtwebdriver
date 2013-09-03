@@ -131,15 +131,6 @@ protected:
     yasper::ptr<const DictionaryValue> parameters_;
 
 private:
-#if defined(OS_MACOSX)
-    // An autorelease pool must exist on any thread where Objective C is used,
-    // even implicitly. Otherwise the warning:
-    //   "Objects autoreleased with no pool in place."
-    // is printed for every object deallocated.  Since every incoming command to
-    // chrome driver is allocated a new thread, the release pool is declared here.
-    base::mac::ScopedNSAutoreleasePool autorelease_pool;
-#endif
-
     void operator=(const Command&);
 };
 

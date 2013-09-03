@@ -496,6 +496,15 @@ void Server::DispatchCommand(const std::string& matched_route,
                              Command* command_ptr,
                              const std::string& method,
                              Response* response) {
+#if defined(OS_MACOSX)
+    // An autorelease pool must exist on any thread where Objective C is used,
+    // even implicitly. Otherwise the warning:
+    //   "Objects autoreleased with no pool in place."
+    // is printed for every object deallocated.  Since every incoming command to
+    // chrome driver is allocated a new thread, the release pool is declared here.
+    base::mac::ScopedNSAutoreleasePool autorelease_pool;
+#endif
+
     if (matched_route == CommandRoutes::kUrlCmd) {
         command_ptr = new UrlCommandWrapper(command_ptr);
     }
