@@ -21,7 +21,10 @@ public:
     void Execute(std::string* source, Error** error);
 
 private:
+#if defined(OS_LINUX)
     std::string transform(const std::string& source, const std::string& stylesheet) const;
+    std::string transform(const std::string& source, const std::wstring& stylesheet) const;
+#endif
 
     Session* session_;
     ViewId viewId_;

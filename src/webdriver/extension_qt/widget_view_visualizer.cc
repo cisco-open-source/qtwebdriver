@@ -1,8 +1,12 @@
 #include "widget_view_visualizer.h"
 
+#if !defined(OS_WIN)
 #include <dlfcn.h>
+#endif
 #include <QtCore/QBuffer>
+#if defined(OS_LINUX)
 #include <QtCore/QProcess>
+#endif
 #include "base/file_util.h"
 #include "extension_qt/widget_view_executor.h"
 #include "webdriver_session.h"
@@ -12,9 +16,13 @@ namespace webdriver {
 static const QStringList SUPPORTED_CLASSES = QStringList() << "QCheckBox" << "QLabel" << "QLineEdit" << "QPushButton" << "QScrollArea" << "QToolButton" << "QPlainTextEdit";
 
 FilePath CurrentDynamicObjectPath() {
+#if defined(OS_WIN)
+    return FilePath();
+#else
     Dl_info dl_info;
     dladdr((void *)CurrentDynamicObjectPath, &dl_info);
     return FilePath(dl_info.dli_fname);
+#endif
 }
 
 FilePath LookupRecursively(const FilePath& folder, const FilePath& path) {
@@ -29,8 +37,8 @@ FilePath LookupRecursively(const FilePath& folder, const FilePath& path) {
     return path;
 }
 
-static const FilePath STYLESHEET_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath("src/webdriver/extension_qt/widget_view_visualizer.xsl"));
-static const FilePath PROCESSOR_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath("src/third_party/saxon/saxon9he.jar"));
+static const FilePath STYLESHEET_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath::FromUTF8Unsafe("src/webdriver/extension_qt/widget_view_visualizer.xsl"));
+static const FilePath PROCESSOR_PATH = LookupRecursively(CurrentDynamicObjectPath().DirName(), FilePath::FromUTF8Unsafe("src/third_party/saxon/saxon9he.jar"));
 
 QWidgetViewVisualizerSourceCommand::QWidgetViewVisualizerSourceCommand(Session* session, ViewId viewId, QWidget* view)
     : session_(session), viewId_(viewId), view_(view)
@@ -49,16 +57,23 @@ void QWidgetViewVisualizerSourceCommand::Execute(std::string* source, Error** er
     serializer.createXml(view_);
     *source = byteArray.data();
 
+#if defined(OS_LINUX)
     session_->logger().Log(kInfoLogLevel, "[VisualizerSource] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
     *source = transform(*source, STYLESHEET_PATH.value());
+#endif
 }
 
+#if defined(OS_LINUX)
 std::string QWidgetViewVisualizerSourceCommand::transform(const std::string& source, const std::string& stylesheet) const {
+    return transform(source, std::wstring(stylesheet.begin(), stylesheet.end()));
+}
+
+std::string QWidgetViewVisualizerSourceCommand::transform(const std::string& source, const std::wstring& stylesheet) const {
     QProcess process;
     QStringList arguments;
     arguments << "-jar" << QString::fromStdString(PROCESSOR_PATH.value());
-    arguments << QString::fromStdString("-xsl:" + stylesheet);
+    arguments << QString::fromStdWString(L"-xsl:" + stylesheet);
     arguments << "-";
     process.start("java", arguments);
     if (!process.waitForStarted(-1)) {
@@ -83,5 +98,6 @@ std::string QWidgetViewVisualizerSourceCommand::transform(const std::string& sou
     QByteArray stdout = process.readAllStandardOutput();
     return QString::fromUtf8(stdout.data(), stdout.length()).toStdString();
 }
+#endif
 
 } //namespace webdriver

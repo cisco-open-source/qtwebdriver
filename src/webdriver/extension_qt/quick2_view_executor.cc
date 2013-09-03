@@ -11,6 +11,9 @@
 #include "q_key_converter.h"
 #include "qml_view_util.h"
 
+#include "extension_qt/event_dispatcher.h"
+#include "extension_qt/wd_event_dispatcher.h"
+
 // TODO: rename?
 #include "extension_qt/widget_element_handle.h"
 
@@ -166,6 +169,46 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
         view->sendEvent(pItem, &(*it));
+        ++it;
+    }
+}
+
+void Quick2ViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    std::string err_msg;
+    std::vector<QKeyEvent> key_events;
+    int modifiers = session_->get_sticky_modifiers();
+
+    if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
+                               session_->logger(),
+                               false,
+                               &modifiers,
+                               &key_events,
+                               &err_msg)) {
+        session_->logger().Log(kSevereLogLevel, "SendKeys - cant convert keys:"+err_msg);
+        *error = new Error(kUnknownError, "SendKeys - cant convert keys:"+err_msg);
+        return;
+    }
+
+    QQuickItem* pFocusItem = getFocusItem(view);
+
+    session_->set_sticky_modifiers(modifiers);
+
+    std::vector<QKeyEvent>::iterator it = key_events.begin();
+    while (it != key_events.end()) {
+
+        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
+
+        if (!consumed) {
+            if (NULL != pFocusItem) {
+                view->sendEvent(pFocusItem, &(*it));
+            } else {
+                QGuiApplication::sendEvent(view, &(*it));
+            }
+        }
         ++it;
     }
 }
@@ -634,7 +677,7 @@ void Quick2ViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
     if (NULL == view)
         return;
 
-    QQuickItem* pFocusItem = view->activeFocusItem();
+    QQuickItem* pFocusItem = getFocusItem(view);
     if (NULL == pFocusItem) {
         *error = new Error(kNoSuchElement);
         return;
@@ -772,6 +815,24 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
     *value = static_cast<Value*>(ret_value.release());
 }
 
+QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
+    QQuickItem* pFocusItem = view->activeFocusItem();
+    if (NULL != pFocusItem) return pFocusItem;
+
+    // no active focus - try to find manually
+    QQuickItem* pContentItem = view->contentItem();
+    if (NULL != pContentItem) {
+        pFocusItem = pContentItem;
+        while (pFocusItem->isFocusScope()
+               && pFocusItem->scopedFocusItem()
+               && pFocusItem->scopedFocusItem()->isEnabled()) {
+            pFocusItem = pFocusItem->scopedFocusItem();
+        }
+    }
+
+    return pFocusItem;
+}
+
 bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query) {
     QString className(item->metaObject()->className());
     REMOVE_INTERNAL_SUFIXES(className);
@@ -895,6 +956,9 @@ void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elem
     writer->writeAttribute("y", QString::number(parent->y()));
     writer->writeAttribute("width", QString::number(parent->width()));
     writer->writeAttribute("height", QString::number(parent->height()));
+    writer->writeAttribute("activeFocus", QString(parent->hasActiveFocus()?"true":"false"));
+    writer->writeAttribute("focus", QString(parent->hasFocus()?"true":"false"));
+
 
     QString elementKey = GenerateRandomID().c_str();
     elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
