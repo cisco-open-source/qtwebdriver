@@ -7,7 +7,6 @@ src/moc_*.cc
 test/Java/.idea/workspace.xml
 *.db
 *.orig
-*.png
 test/Java/out
 *.autosave
 .idea*

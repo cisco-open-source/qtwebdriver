@@ -28,8 +28,8 @@
 		1627472217D4743D000D26ED /* libQt5PlatformSupport.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471917D4743D000D26ED /* libQt5PlatformSupport.a */; };
 		1627472317D4743D000D26ED /* libQt5Widgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471A17D4743D000D26ED /* libQt5Widgets.a */; };
 		1627472417D4743D000D26ED /* libQt5Xml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627471B17D4743D000D26ED /* libQt5Xml.a */; };
-		1627472617D47466000D26ED /* libwd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472517D47466000D26ED /* libwd.a */; };
 		1627473017D47528000D26ED /* libqios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1627472F17D47528000D26ED /* libqios.a */; };
+		16B7307E17D5E8A000D60850 /* libwd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16B7307D17D5E8A000D60850 /* libwd.a */; };
 		16E8BAD817D4A0C2005594FD /* libchromium_base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16E8BAD417D4A0C2005594FD /* libchromium_base.a */; };
 		16E8BAD917D4A0C2005594FD /* libtest_widgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16E8BAD517D4A0C2005594FD /* libtest_widgets.a */; };
 		16E8BADA17D4A0C2005594FD /* libWebDriver_core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16E8BAD617D4A0C2005594FD /* libWebDriver_core.a */; };
@@ -61,8 +61,8 @@
 		1627471917D4743D000D26ED /* libQt5PlatformSupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5PlatformSupport.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5PlatformSupport.a"; sourceTree = "<absolute>"; };
 		1627471A17D4743D000D26ED /* libQt5Widgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Widgets.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Widgets.a"; sourceTree = "<absolute>"; };
 		1627471B17D4743D000D26ED /* libQt5Xml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libQt5Xml.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib/libQt5Xml.a"; sourceTree = "<absolute>"; };
-		1627472517D47466000D26ED /* libwd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwd.a; path = ../wd/release/libwd.a; sourceTree = "<group>"; };
 		1627472F17D47528000D26ED /* libqios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libqios.a; path = "/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms/libqios.a"; sourceTree = "<absolute>"; };
+		16B7307D17D5E8A000D60850 /* libwd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwd.a; path = "../build-wd-Qt4iOS2-Release/libwd.a"; sourceTree = "<group>"; };
 		16E8BAD417D4A0C2005594FD /* libchromium_base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libchromium_base.a; path = "../../../out/DerivedData/wd_test/Build/Products/Default-iphonesimulator/libchromium_base.a"; sourceTree = "<group>"; };
 		16E8BAD517D4A0C2005594FD /* libtest_widgets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtest_widgets.a; path = "../../../out/DerivedData/wd_test/Build/Products/Default-iphonesimulator/libtest_widgets.a"; sourceTree = "<group>"; };
 		16E8BAD617D4A0C2005594FD /* libWebDriver_core.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libWebDriver_core.a; path = "../../../out/DerivedData/wd_test/Build/Products/Default-iphonesimulator/libWebDriver_core.a"; sourceTree = "<group>"; };
@@ -74,12 +74,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16B7307E17D5E8A000D60850 /* libwd.a in Frameworks */,
 				16E8BAD817D4A0C2005594FD /* libchromium_base.a in Frameworks */,
 				16E8BAD917D4A0C2005594FD /* libtest_widgets.a in Frameworks */,
 				16E8BADA17D4A0C2005594FD /* libWebDriver_core.a in Frameworks */,
 				16E8BADB17D4A0C2005594FD /* libWebDriver_extension_qt_base.a in Frameworks */,
 				1627473017D47528000D26ED /* libqios.a in Frameworks */,
-				1627472617D47466000D26ED /* libwd.a in Frameworks */,
 				1627471C17D4743D000D26ED /* libQt5Core.a in Frameworks */,
 				1627471D17D4743D000D26ED /* libQt5Gui.a in Frameworks */,
 				1627471E17D4743D000D26ED /* libQt5Multimedia.a in Frameworks */,
@@ -123,13 +123,13 @@
 		162745DC17D47310000D26ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				16B7307D17D5E8A000D60850 /* libwd.a */,
 				16E8BAD417D4A0C2005594FD /* libchromium_base.a */,
 				16E8BAD517D4A0C2005594FD /* libtest_widgets.a */,
 				16E8BAD617D4A0C2005594FD /* libWebDriver_core.a */,
 				16E8BAD717D4A0C2005594FD /* libWebDriver_extension_qt_base.a */,
 				1627472F17D47528000D26ED /* libqios.a */,
 				1627471317D4743D000D26ED /* libQt5Core.a */,
-				1627472517D47466000D26ED /* libwd.a */,
 				1627471417D4743D000D26ED /* libQt5Gui.a */,
 				1627471517D4743D000D26ED /* libQt5Multimedia.a */,
 				1627471617D4743D000D26ED /* libQt5MultimediaWidgets.a */,
@@ -309,10 +309,9 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib\"",
-					"\"$(SRCROOT)/../wd/release\"",
-					"\"$(SRCROOT)/../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator\"",
 					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms\"",
 					"\"$(SRCROOT)/../../../out/DerivedData/wd_test/Build/Products/Default-iphonesimulator\"",
+					"\"$(SRCROOT)/../build-wd-Qt4iOS2-Release\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -332,10 +331,9 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib\"",
-					"\"$(SRCROOT)/../wd/release\"",
-					"\"$(SRCROOT)/../../../out/DerivedData/wd/Build/Products/Default-iphonesimulator\"",
 					"\"/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/plugins/platforms\"",
 					"\"$(SRCROOT)/../../../out/DerivedData/wd_test/Build/Products/Default-iphonesimulator\"",
+					"\"$(SRCROOT)/../build-wd-Qt4iOS2-Release\"",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";

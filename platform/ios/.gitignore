@@ -23,7 +23,7 @@ build/
 # Backup files
 *~.nib
 
-DerivedData/*
+DerivedData/
+build*/
 
-release/
 
