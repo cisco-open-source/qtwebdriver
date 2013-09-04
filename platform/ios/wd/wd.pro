@@ -45,9 +45,15 @@ HEADERS += \
 INCLUDEPATH += ../../../inc
 INCLUDEPATH += ../../../mocs
 
-
-ios: include($$[QT_HOST_DATA/get]/mkspecs/common/ios/qiosapp.conf)
-
 FORMS += \
     ../../../src/Test/ElementSelectingTest.ui \
     ../../../src/Test/ClickScrollingTest.ui
+
+
+DESTDIR = build
+OBJECTS_DIR = build
+MOC_DIR = build
+
+ios: include($$[QT_HOST_DATA/get]/mkspecs/common/ios/qiosapp.conf)
+
+

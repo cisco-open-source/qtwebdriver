@@ -1,0 +1,1 @@
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app/Contents/MacOS/iPhone\ Simulator -SimulateApplication /Users/build/GIT/wd_ios/platform/ios/wd_test/build/Debug-iphonesimulator/wd_test.app/wd_test

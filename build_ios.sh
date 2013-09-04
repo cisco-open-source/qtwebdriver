@@ -1,11 +1,23 @@
+#!/bin/sh
+
+export QT_DIR=/Developer/Qt4iOS/qt-everywhere-ios-5.1.0
+export PATH=$QT_DIR/bin:$PATH
 
 python generate_wdversion.py
 
-#export GYP_DEFINES="OS=ios"
-#export GYP_GENERATOR_FLAGS="xcode_project_version=3.2"
-
-#export GYP_DEFINES="SDK_ROOT=/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.0.sdk"
-
 gyp --depth . -G output_dir=. -D platform=desktop -D mode=debug -f xcode -D OS=ios --generator-output=out/ wd.gyp
-#gyp --depth . -G output_dir=. -D platform=desktop -D mode=release -D OS=linux --generator-output=out/ wd.gyp
-#xcodebuild -project out/wd.xcodeproj -arch i386 -sdk iphonesimulator
+
+if [ "$1" == "-all" ]
+then
+
+xcodebuild -project out/wd_test.xcodeproj -target test_ios_WD -arch i386 -sdk iphonesimulator clean build
+
+cd ./platform/ios/wd
+qmake wd.pro -r -spec unsupported/macx-iossimulator-clang CONFIG+=x86
+make -release	
+	
+cd ../wd_test	
+
+xcodebuild -project wd_test.xcodeproj -alltargets -arch i386 -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO VALID_ARCHS="armv7 i386" clean build
+
+fi
