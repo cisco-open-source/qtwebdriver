@@ -9,6 +9,7 @@
 
 //#include "base/command_line.h"
 //#include "base/format_macros.h"
+#include "base/file_util.h"
 #include "base/json/json_reader.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/string_split.h"
@@ -60,15 +61,15 @@ int Server::Configure(const CommandLine &options) {
         std::cerr << "Init failure: can't parse config file, skip options in config." << std::endl;
     }
 
-    ret_val = InitMongooseOptions();
-    if (ret_val) {
-        std::cerr << "Init failure: can't init mongoose options." << std::endl;
-        return ret_val;
-    }
-
     ret_val = InitLogging();
     if (ret_val) {
         std::cerr << "Init failure: can't init logging." << std::endl;
+        return ret_val;
+    }
+
+    ret_val = InitMongooseOptions();
+    if (ret_val) {
+        std::cerr << "Init failure: can't init mongoose options." << std::endl;
         return ret_val;
     }
 
@@ -559,7 +560,7 @@ ListValue* Server::ListCommandSupportedMethods(const Command& command) {
 
 int Server::InitMongooseOptions() {
     std::string port = "9517";
-    std::string root;
+    std::string root = "./web";
     int http_threads = 4;
 
     if (options_->HasSwitch(webdriver::Switches::kPort))
@@ -572,7 +573,7 @@ int Server::InitMongooseOptions() {
     if (options_->HasSwitch(webdriver::Switches::kHttpThread)) {
         if (!base::StringToInt(options_->GetSwitchValueASCII(webdriver::Switches::kHttpThread),
                            &http_threads)) {
-            std::cerr << "'http-threads' option must be an integer";
+            GlobalLogger::Log(kSevereLogLevel, "'http-threads' option must be an integer");
             return 1;
         }
     }
@@ -584,6 +585,10 @@ int Server::InitMongooseOptions() {
     if (!root.empty()) {
         mg_options_.push_back("document_root");
         mg_options_.push_back(root);
+
+        if (!file_util::PathExists(FilePath(root))) {
+            GlobalLogger::Log(kSevereLogLevel, "Root '" + root + "' does not exist!");
+        }
     }
     mg_options_.push_back("extra_mime_types");
     mg_options_.push_back(".xhtml=application/xhtml+xml");
