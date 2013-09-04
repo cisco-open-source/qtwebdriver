@@ -11,7 +11,7 @@ then
   platform="desktop"
 fi
 
-output_gen=`readlink -f ${output_gen}`
+output_gen=`readlink -m ${output_gen}`
 base_output_gen=`dirname ${output_gen}`
 
 if [ -z $platform ];
