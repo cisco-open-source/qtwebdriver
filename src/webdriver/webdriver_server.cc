@@ -586,7 +586,7 @@ int Server::InitMongooseOptions() {
         mg_options_.push_back("document_root");
         mg_options_.push_back(root);
 
-        if (!file_util::PathExists(FilePath(root))) {
+        if (!file_util::PathExists(FilePath::FromUTF8Unsafe(root))) {
             GlobalLogger::Log(kSevereLogLevel, "Root '" + root + "' does not exist!");
         }
     }
