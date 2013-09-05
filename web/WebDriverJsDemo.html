@@ -256,6 +256,7 @@
       }
 
       WebDriverJsDemo.prototype.visualizerAssignEventHandlers = function() {
+        var self = this;
         var win = this.visualizationWin;
 
         win.document.onkeypress = function(event) {
@@ -263,10 +264,10 @@
 
           if (event.target.hasAttribute('elementId')) {
             var elementId = event.target.getAttribute('elementId');
-            var element = new webdriver.WebElement(wd.driver, elementId);
+            var element = new webdriver.WebElement(self.driver, elementId);
             element.sendKeys(key);
           } else {
-            wd.driver.actions().sendKeys(key).perform();
+            self.driver.actions().sendKeys(key).perform();
           }
 
           return true;
@@ -279,10 +280,10 @@
 
           if (event.target.hasAttribute('elementId')) {
             var elementId = event.target.getAttribute('elementId');
-            var element = new webdriver.WebElement(wd.driver, elementId);
+            var element = new webdriver.WebElement(self.driver, elementId);
             element.sendKeys(key);
           } else {
-            wd.driver.actions().sendKeys(key).perform();
+            self.driver.actions().sendKeys(key).perform();
           }
 
           return true;
@@ -291,27 +292,25 @@
         win.document.onclick = function(event) {
           if (event.target.hasAttribute('elementId')) {
             var elementId = event.target.getAttribute('elementId');
-            var element = new webdriver.WebElement(wd.driver, elementId);
+            var element = new webdriver.WebElement(self.driver, elementId);
             element.click();
             return false;
           }
 
-          //wd.driver.findElement(event.target).click();
-          //wd.driver.actions().click(event.target).perform();
           var hostSize = {width: win.innerWidth, height: win.innerHeight};
 
-          wd.driver.manage().window().getSize().then(function(targetSize) {
-            var targetDoc = wd.driver.findElement(webdriver.By.xpath('/html'));
+          self.driver.manage().window().getSize().then(function(targetSize) {
+            var targetDoc = self.driver.findElement(webdriver.By.xpath('/html'));
             var x = Math.floor(event.clientX * targetSize.width / hostSize.width);
             var y = Math.floor(event.clientY * targetSize.height / hostSize.height);
-            return wd.driver.actions().
+            return self.driver.actions().
               mouseMove(targetDoc, {x: x, y: y}).
               click(event.button).
               perform();
           }).then(function() {
-            return wd.driver.visualizerShowPoint();
+            return self.driver.visualizerShowPoint();
           }).then(function() {
-//            wd.updateSource();
+//            self.updateSource();
           });
 
           return false;
