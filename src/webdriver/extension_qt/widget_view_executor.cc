@@ -1026,7 +1026,7 @@ void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId &element, double
         *error = new Error(kInvalidElementState);
         return;
     }
-    *position = player->position()*1.0;
+    *position = player->position()/1000.0;
 #else
     NOT_SUPPORTED_IMPL
 #endif

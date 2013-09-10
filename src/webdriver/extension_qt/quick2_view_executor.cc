@@ -447,6 +447,7 @@ void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::st
         return;
 
     QVariant propertyValue = pItem->property(key.c_str());
+
     Value* val = NULL;
 
     if (propertyValue.isValid()) {
@@ -813,6 +814,180 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
 
     scoped_ptr<Value> ret_value(val);
     *value = static_cast<Value*>(ret_value.release());
+}
+
+void Quick2ViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState *state, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    base::Value* playbackState = NULL;
+    GetAttribute(element, "playbackState", &playbackState, error);
+
+    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+        return;
+    }
+
+    int playbackStateInt;
+    playbackState->GetAsInteger(&playbackStateInt);
+
+    *state = (PlayerState)playbackStateInt;
+}
+
+void Quick2ViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState state, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    bool isMethodCalled = false;
+    switch(state){
+        case Stopped: isMethodCalled = QMetaObject::invokeMethod(pItem, "stop"); break;
+        case Playing: isMethodCalled = QMetaObject::invokeMethod(pItem, "play"); break;
+        case Paused: isMethodCalled = QMetaObject::invokeMethod(pItem, "pause"); break;
+    }
+
+    if(!isMethodCalled){
+        (*error) = new Error(kUnknownError,
+                         std::string("Error while executing comand: There is no such member or the parameters did not match"));
+    }
+}
+
+void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *volume, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    base::Value* volumeValue = NULL;
+    GetAttribute(element, "volume", &volumeValue, error);
+
+    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+        return;
+    }
+
+    int volumeInt;
+    volumeValue->GetAsInteger(&volumeInt);
+
+    *volume = volumeInt/100.0;
+}
+
+void Quick2ViewCmdExecutor::SetPlayerVolume(const ElementId &element, double volume, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QVariant volumeVariant(volume);
+    bool isPropertyAssigned = pItem->setProperty("volume", volumeVariant);
+
+    if(!isPropertyAssigned){
+        (*error) = new Error(kUnknownError,
+                         std::string("Error while executing comand: There is no such member or the parameters did not match"));
+    }
+}
+
+void Quick2ViewCmdExecutor::GetPlayingPosition(const ElementId &element, double *position, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    base::Value* positionValue = NULL;
+    GetAttribute(element, "position", &positionValue, error);
+
+    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+        return;
+    }
+
+    int positionInt;
+    positionValue->GetAsInteger(&positionInt);
+
+    *position = positionInt/1000.0;
+}
+
+void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double position, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QVariant positionVariant((int)(position * 1000));
+    bool isPropertyAssigned = pItem->setProperty("position", positionVariant);
+
+    if(!isPropertyAssigned){
+        (*error) = new Error(kUnknownError,
+                         std::string("Error while executing comand: There is no such member or the parameters did not match"));
+    }
+}
+
+void Quick2ViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QVariant muteVariant(mute);
+    bool isPropertyAssigned = pItem->setProperty("muted", muteVariant);
+
+    if(!isPropertyAssigned){
+        (*error) = new Error(kUnknownError,
+                         std::string("Error while executing comand: There is no such member or the parameters did not match"));
+    }
+}
+
+void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    base::Value* muteValue = NULL;
+    GetAttribute(element, "muted", &muteValue, error);
+
+    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+        return;
+    }
+
+    muteValue->GetAsBoolean(mute);
 }
 
 QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
