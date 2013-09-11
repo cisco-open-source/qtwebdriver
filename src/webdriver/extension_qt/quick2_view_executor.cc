@@ -882,10 +882,7 @@ void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *vo
         return;
     }
 
-    int volumeInt;
-    volumeValue->GetAsInteger(&volumeInt);
-
-    *volume = volumeInt/100.0;
+    volumeValue->GetAsDouble(volume);
 }
 
 void Quick2ViewCmdExecutor::SetPlayerVolume(const ElementId &element, double volume, Error **error)

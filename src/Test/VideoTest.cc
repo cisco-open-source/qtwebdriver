@@ -10,8 +10,6 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
     videoWidget = new QVideoWidget;
     videoWidget->setObjectName("videoPlayer");
 
-    mediaPlayer->setVideoOutput(this->videoWidget);
-
     playButton = new QPushButton;
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     playButton->setEnabled(false);
@@ -55,6 +53,8 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
     }
     QSize resolution = mediaPlayer->media().canonicalResource().resolution();
     this->setGeometry(0,0, resolution.width(), resolution.height());
+
+    mediaPlayer->setVideoOutput(this->videoWidget);
 }
 
 VideoTestWidget::~VideoTestWidget()
