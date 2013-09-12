@@ -53,7 +53,7 @@
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
-	'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
+        'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
         'src/third_party/pugixml/pugixml.cpp'
       ],
 
@@ -97,6 +97,7 @@
         } , {
 
           'sources': [
+            'src/webdriver/extension_qt/declarative_item_view_handle.cc',
             'src/webdriver/extension_qt/qml_view_creator.cc',
             'src/webdriver/extension_qt/qml_view_enumerator.cc',
             'src/webdriver/extension_qt/qml_view_executor.cc',
