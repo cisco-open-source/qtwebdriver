@@ -5,6 +5,7 @@
 #include "q_key_converter.h"
 #include "extension_qt/widget_view_handle.h"
 #include "widget_view_util.h"
+#include "common_util.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
 
@@ -73,7 +74,7 @@ void QViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
     if (NULL == view)
         return;
 
-    *bounds = ConvertQRectToRect(view->geometry());
+    *bounds = QCommonUtil::ConvertQRectToRect(view->geometry());
 }
     
 void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
@@ -86,7 +87,7 @@ void QViewCmdExecutor::SetBounds(const Rect& bounds, Error** error) {
         return;
     }
 
-    view->setGeometry(ConvertRectToQRect(bounds));
+    view->setGeometry(QCommonUtil::ConvertRectToQRect(bounds));
 }
 
 void QViewCmdExecutor::Maximize(Error** error) {
@@ -369,42 +370,6 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
     else
         *orientation = "LANDSCAPE";
 #endif
-}
-
-Rect QViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {
-    return Rect(rect.x(), rect.y(), rect.width(), rect.height());
-}
-
-QRect QViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
-    QRect resultRect;
-    resultRect.setX(rect.x());
-    resultRect.setY(rect.y());
-    resultRect.setWidth(rect.width());
-    resultRect.setHeight(rect.height());
-
-    return resultRect;
-}
-
-QPoint QViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
-    QPoint resultPoint;
-    resultPoint.setX(p.x());
-    resultPoint.setY(p.y());
-
-    return resultPoint;
-}
-
-Qt::MouseButton QViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseButton button) {
-    Qt::MouseButton result = Qt::NoButton;
-
-    switch(button)
-    {
-        case kLeftButton: result = Qt::LeftButton; break;
-        case kMiddleButton: result = Qt::MidButton; break;
-        case kRightButton: result = Qt::RightButton; break;
-        default: result = Qt::NoButton;
-    }
-
-    return result;
 }
 
 } // namespace webdriver     

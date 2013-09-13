@@ -8,6 +8,7 @@
 #include "webdriver_session.h"
 #include "webdriver_view_factory.h"
 #include "webdriver_util.h"
+#include "common_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
@@ -191,7 +192,7 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
     QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
@@ -213,7 +214,7 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
@@ -229,7 +230,7 @@ void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
     QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
@@ -245,10 +246,10 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
-    Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
+    Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
 
     QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
     pressEvent->setScenePos(scenePoint);
@@ -276,7 +277,7 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     Point prev_pos = session_->get_mouse_position();
     prev_pos.Offset(x_offset, y_offset);
 
-	QPoint point = ConvertPointToQPoint(prev_pos);
+	QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
     QPointF scenePoint(point.x(), point.y());
 
     if (!view->sceneRect().contains(scenePoint)) {

@@ -8,6 +8,7 @@
 #include "extension_qt/web_view_executor.h"
 #include "webdriver_session.h"
 #include "webdriver_util.h"
+#include "common_util.h"
 
 namespace webdriver {
 
@@ -313,7 +314,7 @@ void QWebViewVisualizerShowPointCommand::Execute(Error** error) {
     }
 
     Point pos = session_->get_mouse_position();
-    QPoint point = executor_->ConvertPointToQPoint(pos);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(pos);
     mark->move(point);
 
     mark->show();

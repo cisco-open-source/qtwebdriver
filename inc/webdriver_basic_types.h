@@ -13,6 +13,13 @@ class Value;
 
 namespace webdriver {
 
+/// @enum MouseButton button codes
+enum MouseButton {
+    kLeftButton = 0,
+    kMiddleButton = 1,
+    kRightButton = 2
+};    
+
 class Point {
 public:
     Point();

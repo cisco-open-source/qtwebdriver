@@ -6,6 +6,7 @@
 #include "extension_qt/declarative_item_view_handle.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
+#include "web_view_util.h"
 
 #include <QtCore/QDebug>
 
@@ -73,7 +74,11 @@ QDeclarativeWebView* QmlWebViewCmdExecutor::getView(const ViewId& viewId, Error*
 }
 
 void QmlWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
-    // TODO:
+    QDeclarativeWebView* pWebView = getView(view_id_, error);
+    if (NULL == pWebView)
+        return;
+    
+    *can = QWebViewUtil::isUrlSupported(pWebView->page(), url, error);
 }
 
 void QmlWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
@@ -382,42 +387,6 @@ void QmlWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
 
 void QmlWebViewCmdExecutor::GetOrientation(std::string *orientation, Error **error) {
     // TODO:
-}
-
-Rect QmlWebViewCmdExecutor::ConvertQRectToRect(const QRect &rect) {
-    return Rect(rect.x(), rect.y(), rect.width(), rect.height());
-}
-
-QRect QmlWebViewCmdExecutor::ConvertRectToQRect(const Rect &rect) {
-    QRect resultRect;
-    resultRect.setX(rect.x());
-    resultRect.setY(rect.y());
-    resultRect.setWidth(rect.width());
-    resultRect.setHeight(rect.height());
-
-    return resultRect;
-}
-
-QPoint QmlWebViewCmdExecutor::ConvertPointToQPoint(const Point &p) {
-    QPoint resultPoint;
-    resultPoint.setX(p.x());
-    resultPoint.setY(p.y());
-
-    return resultPoint;
-}
-
-Qt::MouseButton QmlWebViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseButton button) {
-    Qt::MouseButton result = Qt::NoButton;
-
-    switch(button)
-    {
-        case kLeftButton: result = Qt::LeftButton; break;
-        case kMiddleButton: result = Qt::MidButton; break;
-        case kRightButton: result = Qt::RightButton; break;
-        default: result = Qt::NoButton;
-    }
-
-    return result;
 }
 
 } // namespace webdriver     

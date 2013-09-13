@@ -33,6 +33,7 @@
         'src/webdriver/extension_qt/q_key_converter.cc',
         'src/webdriver/extension_qt/q_session_lifecycle_actions.cc',
         'src/webdriver/extension_qt/widget_view_util.cc',
+        'src/webdriver/extension_qt/common_util.cc',
         'src/webdriver/extension_qt/widget_view_handle.cc',
         'src/webdriver/extension_qt/widget_element_handle.cc',
         'src/webdriver/extension_qt/q_view_executor.cc',

@@ -124,10 +124,6 @@ public:
 
 protected:
     QDeclarativeWebView* getView(const ViewId& viewId, Error** error);
-    Rect ConvertQRectToRect(const QRect &rect);
-    QRect ConvertRectToQRect(const Rect &rect);
-    QPoint ConvertPointToQPoint(const Point &p);
-    Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QTouchDevice touchDevice;
