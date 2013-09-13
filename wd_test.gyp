@@ -261,6 +261,7 @@
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
         'wd_ext_qt.gyp:WebDriver_extension_qt_web',
         'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_web',
         'test_widgets',
       ],
 

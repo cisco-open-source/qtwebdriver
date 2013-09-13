@@ -48,16 +48,20 @@
 
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-// headers for Quick2 extension
-#include "extension_qt/quick2_view_creator.h"
-#include "extension_qt/quick2_view_executor.h"
-#include "extension_qt/quick2_view_enumerator.h"
+    // headers for Quick2 extension
+    #include "extension_qt/quick2_view_creator.h"
+    #include "extension_qt/quick2_view_executor.h"
+    #include "extension_qt/quick2_view_enumerator.h"
 #else
-#include <QtDeclarative/QDeclarativeView>
-// headers for Quick1 extension
-#include "extension_qt/qml_view_creator.h"
-#include "extension_qt/qml_view_executor.h"
-#include "extension_qt/qml_view_enumerator.h"
+    #include <QtDeclarative/QDeclarativeView>
+    // headers for Quick1 extension
+    #include "extension_qt/qml_view_creator.h"
+    #include "extension_qt/qml_view_executor.h"
+    #include "extension_qt/qml_view_enumerator.h"
+        #if (WD_TEST_ENABLE_WEB_VIEW == 1)
+            #include "extension_qt/qdeclarativewebview.h"
+            #include "extension_qt/qml_web_view_enumerator.h"
+        #endif
 #endif
 #endif //OS_IOS
 
@@ -86,6 +90,8 @@
 void setQtSettings();
 void PrintVersion();
 void PrintHelp();
+void InitVNCClient();
+void InitUInputClient();
 
 int main(int argc, char *argv[])
 {
@@ -95,7 +101,7 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
 #endif
-    
+
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
 
     webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
@@ -157,6 +163,16 @@ int main(int argc, char *argv[])
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
+    
+    #if (WD_TEST_ENABLE_WEB_VIEW == 1)
+    qmlRegisterType<QDeclarativeWebSettings>();
+    qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 0, "CiscoWebView");
+    qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
+    qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
+    qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());    
+    #endif
+
 #endif    
 #endif //OS_IOS
     
@@ -203,43 +219,8 @@ int main(int argc, char *argv[])
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
-    // start VNC module
-    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
-    if (cmdLine.HasSwitch(webdriver::Switches::kVNCLogin))
-    {
-        QString address = "127.0.0.1";
-        QString login = "anonymous";
-        QString *password = new QString();
-        QString port = "5900";
-
-        QString loginInfo = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCLogin).c_str();
-        VNCClient::SplitVncLoginParameters(loginInfo, &login, password, &address, &port);
-
-        VNCClient *client = VNCClient::getInstance();
-        if (!client->isReady())
-        {
-            if (password->isEmpty())
-                client->Init(address, port.toInt());
-            else
-                client->Init(address, port.toInt(), password);
-        }
-
-        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
-    }
-
-    // start user input device
-#ifdef OS_LINUX
-    if (cmdLine.HasSwitch(webdriver::Switches::kUserInputDevice))
-    {
-        UInputManager *manager = UInputManager::getInstance();
-        if (!manager->isReady())
-        {
-            manager->registerUinputDevice();
-        }
-
-        WDEventDispatcher::getInstance()->add(new UInputEventDispatcher(manager));
-    }
-#endif // OS_LINUX
+    InitVNCClient();
+    InitUInputClient();
 
     int startError = wd_server->Start();
     if (startError)
@@ -268,6 +249,49 @@ void setQtSettings() {
     QWebSettings::globalSettings()->setOfflineStoragePath("./web/html5");
     QWebSettings::globalSettings()->setOfflineWebApplicationCachePath("./web/html5");
 #endif    
+}
+
+void InitVNCClient() {
+    // start VNC module
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+    if (cmdLine.HasSwitch(webdriver::Switches::kVNCLogin))
+    {
+        QString address = "127.0.0.1";
+        QString login = "anonymous";
+        QString *password = new QString();
+        QString port = "5900";
+
+        QString loginInfo = cmdLine.GetSwitchValueASCII(webdriver::Switches::kVNCLogin).c_str();
+        VNCClient::SplitVncLoginParameters(loginInfo, &login, password, &address, &port);
+
+        VNCClient *client = VNCClient::getInstance();
+        if (!client->isReady())
+        {
+            if (password->isEmpty())
+                client->Init(address, port.toInt());
+            else
+                client->Init(address, port.toInt(), password);
+        }
+
+        WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
+    }
+}
+
+void InitUInputClient() {
+    // start user input device
+#ifdef OS_LINUX
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+    if (cmdLine.HasSwitch(webdriver::Switches::kUserInputDevice))
+    {
+        UInputManager *manager = UInputManager::getInstance();
+        if (!manager->isReady())
+        {
+            manager->registerUinputDevice();
+        }
+
+        WDEventDispatcher::getInstance()->add(new UInputEventDispatcher(manager));
+    }
+#endif // OS_LINUX
 }
 
 void PrintVersion() {
