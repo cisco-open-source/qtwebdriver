@@ -222,7 +222,7 @@ void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
         *error = new Error(kNoSuchWindow);
         return;
     }
-    *can = QWebViewUtil::isUrlSupported(pWebView, url, error);
+    *can = QWebViewUtil::isUrlSupported(pWebView->page(), url, error);
 }
 
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
