@@ -61,6 +61,7 @@
         #if (WD_TEST_ENABLE_WEB_VIEW == 1)
             #include "extension_qt/qdeclarativewebview.h"
             #include "extension_qt/qml_web_view_enumerator.h"
+            #include "extension_qt/qml_web_view_executor.h"
         #endif
 #endif
 #endif //OS_IOS
@@ -171,6 +172,7 @@ int main(int argc, char *argv[])
     qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
     qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());    
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
 #endif    

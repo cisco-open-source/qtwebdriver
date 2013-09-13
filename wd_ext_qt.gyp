@@ -124,7 +124,7 @@
             'src/webdriver/extension_qt/declarative_item_view_handle.cc',
             'src/webdriver/extension_qt/qdeclarativewebview.cc',
             'src/webdriver/extension_qt/qml_web_view_enumerator.cc',
-            #'src/webdriver/extension_qt/qml_web_view_executor.cc',
+            'src/webdriver/extension_qt/qml_web_view_executor.cc',
             'inc/extension_qt/qdeclarativewebview.h',
             '<(INTERMEDIATE_DIR)/moc_qdeclarativewebview.cc',
           ],
