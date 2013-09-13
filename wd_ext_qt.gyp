@@ -118,6 +118,7 @@
 
           'sources': [
             # TODO: Quick2 support
+            'src/webdriver/dummy.cc',
           ],
         } , {
 
