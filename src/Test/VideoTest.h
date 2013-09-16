@@ -6,6 +6,8 @@
 #include <QtMultimedia/QMediaPlayer>
 #include <QtNetwork/QNetworkRequest>
 
+#include "TestVariables.h"
+
 class VideoTestWidget;
 class QAbstractButton;
 class QMediaPlayer;
