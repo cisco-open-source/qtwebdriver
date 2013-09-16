@@ -16,6 +16,10 @@
 
 #include <iostream>
 
+#include "TestVariables.h"
+std::string tests::testDataFolder;
+
+
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -201,6 +205,18 @@ int main(int argc, char *argv[])
     if (cmd_line.HasSwitch("version")) {
       PrintVersion();
       return 0;
+    }
+
+    // check if --test_data_folder CL argument is present
+    std::string testDataFolderSwitch = "test_data_folder";
+    if (cmd_line.HasSwitch(testDataFolderSwitch)) {
+        std::cout << "HasSwitch"<<std::endl;
+      tests::testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
+      std::cout << "HasSwitch "<< tests::testDataFolder << std::endl;
+    } else {
+        std::cout << "Hasn'tSwitch"<<std::endl;
+        tests::testDataFolder = "./";
+        std::cout << "Hasn'tSwitch"<<std::endl;
     }
 
 #if defined(OS_WIN)
