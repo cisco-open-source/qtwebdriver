@@ -7,10 +7,10 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
     this->setMinimumSize(400, 400);
     this->setMaximumSize(800, 800);
     mediaPlayer = new QMediaPlayer(NULL, QMediaPlayer::VideoSurface);
-    videoWidget = new QVideoWidget;
+    videoWidget = new QVideoWidget();
     videoWidget->setObjectName("videoPlayer");
 
-    playButton = new QPushButton;
+    playButton = new QPushButton();
     playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     playButton->setEnabled(false);
     connect(playButton, SIGNAL(clicked()), this, SLOT(play()));
@@ -32,27 +32,33 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
 
     QWidget *centralWidget = new QWidget();
     this->setCentralWidget(centralWidget);
-    QVBoxLayout *centralWidgetLayout = new QVBoxLayout;
+    QVBoxLayout *centralWidgetLayout = new QVBoxLayout();
     centralWidget->setLayout(centralWidgetLayout);
 
     centralWidgetLayout->addWidget(videoWidget);
-    QHBoxLayout *controlsLayout = new QHBoxLayout;
+    QHBoxLayout *controlsLayout = new QHBoxLayout();
     centralWidgetLayout->addLayout(controlsLayout);
     controlsLayout->addWidget(playButton);
     controlsLayout->addWidget(positionSlider);
     controlsLayout->addWidget(volumeSlider);
 
-    QString fileName = QDir::currentPath() + "/TestData/TestVideo.ogv";
+    QString videoPath(tests::testDataFolder.c_str());
+    if(!videoPath.isEmpty()){
+        if(!videoPath.endsWith("/"))
+            videoPath.append("/");
+        videoPath += "TestVideo.ogv";
+    }
 
-    if (!fileName.isEmpty()) {
-        mediaPlayer->setMedia(QUrl::fromLocalFile(fileName));
+    QUrl videoUrl = QUrl::fromLocalFile(videoPath);
+    if (!videoUrl.isEmpty() && videoUrl.isValid()) {
+        mediaPlayer->setMedia(videoUrl);
         durationChanged(mediaPlayer->duration());
         positionChanged(mediaPlayer->position());
         volumeChanged(mediaPlayer->volume());
         playButton->setEnabled(true);
+        QSize resolution = mediaPlayer->media().canonicalResource().resolution();
+        this->setGeometry(0,0, resolution.width(), resolution.height());
     }
-    QSize resolution = mediaPlayer->media().canonicalResource().resolution();
-    this->setGeometry(0,0, resolution.width(), resolution.height());
 
     mediaPlayer->setVideoOutput(this->videoWidget);
 }
