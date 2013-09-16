@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
     }
 
 #if defined(OS_WIN)
-#if (QT_VERSION == QT_VERSION_CHECK(5, 1, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     system("qtenv2.bat vsvars");
 #else  //QT_VERSION
     system("qtvars.bat vsvars");
