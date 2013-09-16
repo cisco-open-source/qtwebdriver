@@ -1,6 +1,13 @@
 #include "qwebkit_proxy.h"
 
+
 #include <QtWebKit/QWebPage>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebFrame>
+#else
+#include <QtWebKit/QWebFrame>
+#endif
+
 #include <QtWebKit/QWebFrame>
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
