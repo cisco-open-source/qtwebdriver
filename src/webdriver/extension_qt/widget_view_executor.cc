@@ -7,6 +7,7 @@
 #include "webdriver_session.h"
 #include "webdriver_view_factory.h"
 #include "webdriver_util.h"
+#include "common_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
@@ -249,7 +250,7 @@ void QWidgetViewCmdExecutor::MouseDoubleClick(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -271,7 +272,7 @@ void QWidgetViewCmdExecutor::MouseButtonUp(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -290,7 +291,7 @@ void QWidgetViewCmdExecutor::MouseButtonDown(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -309,7 +310,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -319,7 +320,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
         receiverWidget = view;
     }
 
-    Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
+    Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
 
@@ -339,7 +340,7 @@ void QWidgetViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, E
     Point prev_pos = session_->get_mouse_position();
     prev_pos.Offset(x_offset, y_offset);
 
-	QPoint point = ConvertPointToQPoint(prev_pos);
+	QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -368,7 +369,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, c
     Point location = Point(pos.x(), pos.y());
     location.Offset(x_offset, y_offset);
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -396,7 +397,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, Error** error) 
     QPoint pos = pWidget->mapTo(view, QPoint(0, 0));
     Point location = Point(pos.x()+pWidget->width()/2, pos.y()+pWidget->height()/2);
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);

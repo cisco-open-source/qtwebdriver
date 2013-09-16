@@ -10,6 +10,7 @@
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
 #include "webdriver_util.h"
+#include "common_util.h"
 #include "q_key_converter.h"
 #include "webdriver_server.h"
 
@@ -222,7 +223,7 @@ void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
         *error = new Error(kNoSuchWindow);
         return;
     }
-    *can = QWebViewUtil::isUrlSupported(pWebView, url, error);
+    *can = QWebViewUtil::isUrlSupported(pWebView->page(), url, error);
 }
 
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
@@ -431,7 +432,7 @@ void QWebViewCmdExecutor::MouseDoubleClick(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
@@ -445,7 +446,7 @@ void QWebViewCmdExecutor::MouseButtonUp(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, releaseEvent);
@@ -456,7 +457,7 @@ void QWebViewCmdExecutor::MouseButtonDown(Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::sendEvent(view, pressEvent);
@@ -467,9 +468,9 @@ void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
-    Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
+    Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
 
@@ -489,7 +490,7 @@ void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     Point prev_pos = session_->get_mouse_position();
     prev_pos.Offset(x_offset, y_offset);
 
-    QPoint point = ConvertPointToQPoint(prev_pos);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, moveEvent);
@@ -509,7 +510,7 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
 
     location.Offset(x_offset, y_offset);
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, moveEvent);
@@ -537,7 +538,7 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
 
     location.Offset(size.width() / 2, size.height() / 2);
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view, moveEvent);
@@ -1347,7 +1348,7 @@ void QWebViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
     if (*error)
         return;
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     QList<QTouchEvent::TouchPoint> points;
     QTouchEvent::TouchPoint touchPoint(1);
@@ -1398,7 +1399,7 @@ void QWebViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **err
     if (*error)
         return;
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
     view->setZoomFactor(2/view->zoomFactor());
     view->page()->mainFrame()->scroll(point.x(), point.y());
@@ -1410,7 +1411,7 @@ void QWebViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error)
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(Point(x, y));
+    QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
     QList<QTouchEvent::TouchPoint> points;
     QTouchEvent::TouchPoint touchPoint(1);
@@ -1434,7 +1435,7 @@ void QWebViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error)
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(Point(x, y));
+    QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
     QList<QTouchEvent::TouchPoint> points;
     QTouchEvent::TouchPoint touchPoint(1);
@@ -1459,7 +1460,7 @@ void QWebViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error)
     if (NULL == view)
         return;
 
-    QPoint point = ConvertPointToQPoint(Point(x, y));
+    QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
     QList<QTouchEvent::TouchPoint> points;
     QTouchEvent::TouchPoint touchPoint(1);
@@ -1489,7 +1490,7 @@ void QWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error
     if (*error)
         return;
 
-    QPoint point = ConvertPointToQPoint(location);
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
 //    QList<QTouchEvent::TouchPoint> points;
 //    QTouchEvent::TouchPoint touchPoint(1);

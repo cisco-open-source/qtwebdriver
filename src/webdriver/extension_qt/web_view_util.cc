@@ -9,8 +9,7 @@
 
 namespace webdriver {
 
-bool QWebViewUtil::isUrlSupported(QWebView* pWebView, const std::string& url, Error **error) {
-    QWebPage* pWebPage = pWebView->page();
+bool QWebViewUtil::isUrlSupported(QWebPage* pWebPage, const std::string& url, Error **error) {
     if (NULL == pWebPage) {
         //*error = new Error(kBadRequest);
         GlobalLogger::Log(kWarningLogLevel, " Invalid QWebPage* ");

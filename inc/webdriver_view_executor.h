@@ -45,6 +45,7 @@ webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new 
 #include "base/string16.h"
 #include "webdriver_view_id.h"
 #include "webdriver_element_id.h"
+#include "webdriver_basic_types.h"
 
 namespace base {
 class Value;    
@@ -57,13 +58,6 @@ class Error;
 class Rect;
 class Point;
 class Size;
-
-/// @enum MouseButton button codes
-enum MouseButton {
-    kLeftButton = 0,
-    kMiddleButton = 1,
-    kRightButton = 2
-};
 
 /// @enum StorageType storage types
 enum StorageType {

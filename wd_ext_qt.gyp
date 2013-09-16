@@ -33,6 +33,7 @@
         'src/webdriver/extension_qt/q_key_converter.cc',
         'src/webdriver/extension_qt/q_session_lifecycle_actions.cc',
         'src/webdriver/extension_qt/widget_view_util.cc',
+        'src/webdriver/extension_qt/common_util.cc',
         'src/webdriver/extension_qt/widget_view_handle.cc',
         'src/webdriver/extension_qt/widget_element_handle.cc',
         'src/webdriver/extension_qt/q_view_executor.cc',
@@ -53,7 +54,7 @@
         'src/vnc/vncserverparameters.cc',
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
-	'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
+        'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
         'src/third_party/pugixml/pugixml.cpp'
       ],
 
@@ -107,6 +108,32 @@
       ], # conditions
 
     } , {
+      'target_name': 'WebDriver_extension_qt_quick_web',
+      'type': 'static_library',
+      'standalone_static_library': 1,
+
+      'conditions': [
+      
+        ['<(QT5) == 1', {
+
+          'sources': [
+            # TODO: Quick2 support
+            'src/webdriver/dummy.cc',
+          ],
+        } , {
+
+          'sources': [
+            'src/webdriver/extension_qt/declarative_item_view_handle.cc',
+            'src/webdriver/extension_qt/qdeclarativewebview.cc',
+            'src/webdriver/extension_qt/qml_web_view_enumerator.cc',
+            'src/webdriver/extension_qt/qml_web_view_executor.cc',
+            'inc/extension_qt/qdeclarativewebview.h',
+            '<(INTERMEDIATE_DIR)/moc_qdeclarativewebview.cc',
+          ],
+        } ],
+
+      ], # conditions
+    } , {
       'target_name': 'WebDriver_extension_qt_base_shared',
       'type': 'shared_library',
 
@@ -132,6 +159,15 @@
 
       'dependencies': [
         'WebDriver_extension_qt_quick',
+      ],
+    } , {
+      'target_name': 'WebDriver_extension_qt_quick_web_shared',
+      'type': 'shared_library',
+
+      'product_name': 'WebDriver_extension_qt_quick_web',
+
+      'dependencies': [
+        'WebDriver_extension_qt_quick_web',
       ],
     }
   ],
