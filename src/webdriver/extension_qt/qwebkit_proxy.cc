@@ -1165,9 +1165,8 @@ Error* QWebkitProxy::ExecuteScriptAndParse(QWebFrame* frame,
     }
 
     scoped_ptr<Value> value(unscoped_value);
-    std::string error_msg;
     if (!parser->Parse(value.get())) {
-        error_msg = base::StringPrintf("%s returned invalid value: %s",
+        std::string error_msg = base::StringPrintf("%s returned invalid value: %s",
             script_name.c_str(), JsonStringify(value.get()).c_str());
         return new Error(kUnknownError, error_msg);
     }

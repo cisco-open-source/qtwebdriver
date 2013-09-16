@@ -19,38 +19,46 @@ QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExec
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     // Convert DOM tree to valid XML.
     const char* kSource =
-        "function() {\n"
-        "  var elements = document.getElementsByTagName('*');\n"
-        "  for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {\n"
-        "    var element = elements[elementIndex];\n"
-        "    if (element.tagName.toLowerCase() == 'script')\n"
-        "      element.innerHTML = '';\n"
-        "    if (element.hasAttribute('\"'))\n"
-        "      element.removeAttribute('\"');\n"
+        "var elements = document.getElementsByTagName('*');\n"
+        "for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {\n"
+        "  var element = elements[elementIndex];\n"
+        "  if (element.tagName.toLowerCase() == 'script')\n"
+        "    element.innerHTML = '';\n"
+        "  if (element.hasAttribute('\"'))\n"
+        "    element.removeAttribute('\"');\n"
         "\n"
-        "    var childNodes = element.childNodes;\n"
-        "    for (var childIndex = 0; childIndex < childNodes.length; childIndex++) {\n"
-        "      var child = childNodes[childIndex];\n"
-        "      if (child.nodeType == Node.TEXT_NODE) {\n"
-        "        child.nodeValue = child.nodeValue.replace(/&/g, '&amp;');\n"
-        "      }\n"
+        "  var childNodes = element.childNodes;\n"
+        "  for (var childIndex = 0; childIndex < childNodes.length; childIndex++) {\n"
+        "    var child = childNodes[childIndex];\n"
+        "    if (child.nodeType == Node.TEXT_NODE) {\n"
+        "      child.nodeValue = child.nodeValue.replace(/&/g, '&amp;');\n"
         "    }\n"
         "  }\n"
+        "}\n"
         "\n"
-        "  var xhtml = document.implementation.createDocument();\n"
-        "  xhtml = xhtml.importNode(document.documentElement, true);\n"
-        "\n"
-        "  return new XMLSerializer().serializeToString(xhtml);\n"
-        "}";
+        "var xhtml = document.implementation.createDocument();\n"
+        "xhtml = xhtml.importNode(document.documentElement, true);\n"
+        "return new XMLSerializer().serializeToString(xhtml);";
 
-        // TODO: use executor->webkitProxy->ExecuteScript()
-/*    *error = executor_->ExecuteScriptAndParse(
-                executor_->GetFrame(view_, session_->current_frame()),
+    Value* unscoped_value = NULL;
+    executor_->ExecuteScript(
                 kSource,
-                "getSource",
                 new ListValue(),
-                CreateDirectValueParser(source));
-*/
+                &unscoped_value,
+                error);
+    if (*error) {
+        (*error)->AddDetails("getSource execution failed");
+        return;
+    }
+
+    scoped_ptr<Value> value(unscoped_value);
+    const ValueParser* parser = CreateDirectValueParser(source);
+    if (!parser->Parse(value.get())) {
+        std::string error_msg = base::StringPrintf("getSource returned invalid value: %s",
+            JsonStringify(value.get()).c_str());
+        *error = new Error(kUnknownError, error_msg);
+        return;
+    }
 
     session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
