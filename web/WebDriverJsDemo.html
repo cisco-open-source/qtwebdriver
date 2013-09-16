@@ -42,6 +42,39 @@
         }
       }
 
+      function getXPath(node, path) {
+        path = path || [];
+        if(node.parentNode) {
+          path = getXPath(node.parentNode, path);
+        }
+
+        if(node.previousSibling) {
+          var count = 1;
+          var sibling = node.previousSibling
+          do {
+            if(sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {count++;}
+            sibling = sibling.previousSibling;
+          } while(sibling);
+          if(count == 1) {count = null;}
+        } else if(node.nextSibling) {
+          var sibling = node.nextSibling;
+          do {
+            if(sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {
+              var count = 1;
+              sibling = null;
+            } else {
+              var count = null;
+              sibling = sibling.previousSibling;
+            }
+          } while(sibling);
+        }
+
+        if(node.nodeType == 1) {
+          path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
+        }
+        return path;
+      }
+
       webdriver.WebDriver.prototype.visualizerGetSource = function() {
         webdriver.http.Executor.COMMAND_MAP_['visualizerGetSource'] = {
           method: 'GET', path: '/session/:sessionId/-cisco-visualizer_source'};
@@ -297,17 +330,14 @@
             return false;
           }
 
-          var hostSize = {width: win.innerWidth, height: win.innerHeight};
-
-          self.driver.manage().window().getSize().then(function(targetSize) {
-            var targetDoc = self.driver.findElement(webdriver.By.xpath('/html'));
-            var x = Math.floor(event.clientX * targetSize.width / hostSize.width);
-            var y = Math.floor(event.clientY * targetSize.height / hostSize.height);
-            return self.driver.actions().
-              mouseMove(targetDoc, {x: x, y: y}).
-              click(event.button).
-              perform();
-          }).then(function() {
+          var xpath = getXPath(event.target);
+          xpath = '/' + xpath.join('/');
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            click(event.button).
+            perform().
+          then(function() {
             return self.driver.visualizerShowPoint();
           }).then(function() {
 //            self.updateSource();
