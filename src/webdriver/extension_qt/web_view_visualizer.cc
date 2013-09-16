@@ -37,8 +37,14 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "}\n"
         "\n"
         "var xhtml = document.implementation.createDocument();\n"
+        "var dt = '';\n"
+        "if (document.childNodes[0].nodeType == Node.DOCUMENT_TYPE_NODE) {\n"
+        "  dt = document.childNodes[0];\n"
+        "  dt = new XMLSerializer().serializeToString(dt);\n"
+        "}\n"
         "xhtml = xhtml.importNode(document.documentElement, true);\n"
-        "return new XMLSerializer().serializeToString(xhtml);";
+        "xhtml = new XMLSerializer().serializeToString(xhtml);\n"
+        "return dt + xhtml;";
 
     Value* unscoped_value = NULL;
     executor_->ExecuteScript(
