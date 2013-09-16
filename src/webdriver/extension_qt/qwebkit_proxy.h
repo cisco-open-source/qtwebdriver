@@ -6,6 +6,7 @@
 #include <map>
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QVariant>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKit/QWebHistory>
@@ -25,6 +26,7 @@ class Value;
 }
 
 class QWebPage;
+class QWebFrame;
 
 namespace webdriver {
 

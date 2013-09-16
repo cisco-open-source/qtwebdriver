@@ -1,6 +1,11 @@
 #include "qwebkit_proxy.h"
 
 #include <QtWebKit/QWebPage>
+#include <QtWebKit/QWebFrame>
+#include <QtCore/QEventLoop>
+#include <QtCore/QTimer>
+#include <QtNetwork/QNetworkCookie>
+#include <QtNetwork/QNetworkCookieJar>
 
 #include "base/stringprintf.h"
 #include "base/string_number_conversions.h"
