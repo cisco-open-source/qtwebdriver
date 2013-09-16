@@ -20,6 +20,19 @@ enum MouseButton {
     kRightButton = 2
 };    
 
+/// @enum StorageType storage types
+enum StorageType {
+    kLocalStorageType = 0,
+    kSessionStorageType
+};
+
+///@enum PlayerState possible states
+enum PlayerState{
+    Stopped = 0,
+    Playing = 1,
+    Paused = 2
+};
+
 class Point {
 public:
     Point();

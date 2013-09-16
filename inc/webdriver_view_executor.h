@@ -59,20 +59,6 @@ class Rect;
 class Point;
 class Size;
 
-/// @enum StorageType storage types
-enum StorageType {
-    kLocalStorageType = 0,
-    kSessionStorageType
-};
-
-///@enum PlayerState possible states
-enum PlayerState{
-    Stopped = 0,
-    Playing = 1,
-    Paused = 2
-};
-
-
 /// base class for custom view's executors
 class ViewCmdExecutor{
 public:

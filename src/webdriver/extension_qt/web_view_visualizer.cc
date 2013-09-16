@@ -43,12 +43,14 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "  return new XMLSerializer().serializeToString(xhtml);\n"
         "}";
 
-    *error = executor_->ExecuteScriptAndParse(
+        // TODO: use executor->webkitProxy->ExecuteScript()
+/*    *error = executor_->ExecuteScriptAndParse(
                 executor_->GetFrame(view_, session_->current_frame()),
                 kSource,
                 "getSource",
                 new ListValue(),
                 CreateDirectValueParser(source));
+*/
 
     session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
