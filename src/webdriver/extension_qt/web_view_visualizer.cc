@@ -19,7 +19,8 @@ QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExec
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     // Convert DOM tree to valid XML.
     const char* kSource =
-        "var elements = document.getElementsByTagName('*');\n"
+        "var root = document.documentElement.cloneNode(true);\n"
+        "var elements = root.getElementsByTagName('*');\n"
         "for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {\n"
         "  var element = elements[elementIndex];\n"
         "  if (element.tagName.toLowerCase() == 'script')\n"
@@ -42,7 +43,7 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "  dt = document.childNodes[0];\n"
         "  dt = new XMLSerializer().serializeToString(dt);\n"
         "}\n"
-        "xhtml = xhtml.importNode(document.documentElement, true);\n"
+        "xhtml = xhtml.importNode(root, true);\n"
         "xhtml = new XMLSerializer().serializeToString(xhtml);\n"
         "return dt + xhtml;";
 
