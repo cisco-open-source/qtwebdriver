@@ -4,8 +4,6 @@
 #include "extension_qt/q_view_executor.h"
 #include "webdriver_logging.h"
 
-#include <QtCore/QtGlobal>
-
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKitWidgets/QWebView>
 #include <QtWebKit/QWebHistory>
@@ -19,88 +17,7 @@ namespace webdriver {
 
 class FramePath;
 class ValueParser;
-
-class QPageLoader : public QObject {
-    Q_OBJECT
-public:
-    explicit QPageLoader(QWebView* view) :
-                QObject(NULL) {webView = view; is_loading = false;}
-
-    void loadPage(QUrl url);
-    void reloadPage();
-    bool isLoading() {return is_loading;}
-    
-signals:
-    void loaded();
-    
-public slots:
-    void pageLoadStarted();
-    void pageLoadFinished();
-private:
-    bool is_loading;
-    QWebView* webView;
-    
-};
-
-//Notify automation module about end of execution of async script
-class JSNotifier : public QObject
-{
-    Q_OBJECT
-
-public:
-    JSNotifier();
-    QVariant getResult();
-    bool IsCompleted();
-
-
-public slots:
-    void setResult(QVariant result);
-
-signals:
-    void completed();
-
-private:
-    QVariant res;
-    bool isCompleted;
-};
-
-class JSLogger : public QObject
-{
-    Q_OBJECT
-
-public:
-    JSLogger();
-    base::ListValue* getLog();
-    void SetMinLogLevel(LogLevel level);
-
-public slots:
-    void log(QVariant message);
-    void warn(QVariant message);
-    void error(QVariant message);
-
-private:
-    InMemoryLog browserLog;
-    Logger browserLogger;
-};
-
-class BrowserLogHandler : public QObject
-{
-    Q_OBJECT
-
-public:
-    BrowserLogHandler(QObject* parent);
-    base::ListValue* getLog();
-    void SetMinLogLevel(LogLevel level);
-    void loadConsoleJS(const QWebView* view);
-    void loadJSLogObject(QWebFrame *frame);
-
-public slots:
-    void loadJSLogObject();
-    void loadConsoleJS();
-
-private:
-    JSLogger jslogger;
-};
+class QWebkitProxy;
 
 class QWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
@@ -203,97 +120,11 @@ public:
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
-	QWebFrame* FindFrameByPath(QWebFrame* parent, const FramePath &frame_path);
-	QWebFrame* GetFrame(QWebView* view, const FramePath& frame_path);
-	Error* ExecuteScriptAndParse(QWebFrame* frame,
-                                const std::string& anonymous_func_script,
-                                const std::string& script_name,
-                                const base::ListValue* args,
-                                const ValueParser* parser);
-	Error* ExecuteAsyncScript(QWebFrame* frame,
-                            const std::string& script,
-                            const base::ListValue* const args,
-                            base::Value** value);
-	Error* ExecuteScript(QWebFrame* frame,
-                        const std::string& script,
-                        const base::ListValue* const args,
-                        base::Value** value);
-	Error* ExecuteScriptAndParseValue(QWebFrame* frame,
-                                    const std::string& script,
-                                    base::Value** script_result, bool isAsync);
-	Error* ExecuteScriptImpl(QWebFrame* frame,
-                               const std::string &script,
-                               std::string *result,
-                               bool isAsync);
-
-	Error* FindElementsHelper(QWebFrame* frame,
-                            const ElementId& root_element,
-                            const std::string& locator,
-                            const std::string& query,
-                            bool find_one,
-                            std::vector<ElementId>* elements);
-
-	Error* ExecuteFindElementScriptAndParse(
-    			QWebFrame* frame,
-    			const ElementId& root_element,
-    			const std::string& locator,
-    			const std::string& query,
-    			bool find_one,
-    			std::vector<ElementId>* elements);
-
-	Error* GetElementRegionInViewHelper(
-		    	QWebFrame* frame,
-		    	const ElementId& element,
-		    	const Rect& region,
-		    	bool center,
-		    	bool verify_clickable_at_middle,
-		    	Point* location);
-
-	Error* GetElementRegionInView(
-				QWebView* view,
-		    	const ElementId& element,
-		    	const Rect& region,
-		    	bool center,
-		    	bool verify_clickable_at_middle,
-		    	Point* location);
-
-	Error* VerifyElementIsClickable(
-			    QWebFrame* frame,
-			    const ElementId& element,
-			    const Point& location);
-
-	Error* GetElementBorder(QWebFrame* frame,
-                                const ElementId& element,
-                                int* border_left,
-                                int* border_top);
-
-	Error* GetElementEffectiveStyle(
-		    	QWebFrame* frame,
-		    	const ElementId& element,
-		    	const std::string& prop,
-		    	std::string* value);
-
-	QWebFrame* FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path);
-
-	void AddIdToCurrentFrame(QWebView* view, const FramePath &frame_path);
-
-	Error* SwitchToFrameWithJavaScriptLocatedFrame(
-								QWebView* view,
-								QWebFrame* frame,
-    							const std::string& script,
-    							base::ListValue* args);
-
-	Error* GetElementFirstClientRect(QWebFrame* frame,
-                                    const ElementId& element,
-                                    Rect* rect);
-
-	Error* GetClickableLocation(QWebView* view, const ElementId& element, Point* location);
-
-	Error* ToggleOptionElement(const ElementId& element);
-
-    void AddBrowserLoggerToView(QWebView* view);
 
 private:
+    QWebkitProxy* webkitProxy_;
+    QWebView* view_;
+
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
     friend class QWebViewVisualizerSourceCommand;
     friend class QWebViewVisualizerShowPointCommand;
