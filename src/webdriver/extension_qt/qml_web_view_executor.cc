@@ -436,19 +436,27 @@ void QmlWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **err
 }
 
 void QmlWebViewCmdExecutor::TouchScroll(const int &xoffset, const int &yoffset, Error **error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    view_->page()->mainFrame()->scroll(xoffset, yoffset);
 }
 
 void QmlWebViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    view_->page()->mainFrame()->scroll(-xoffset, -yoffset);
 }
 
 void QmlWebViewCmdExecutor::TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    view_->page()->mainFrame()->scroll(xSpeed*3, ySpeed*3);
 }
 
 void QmlWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    view_->page()->mainFrame()->scroll(-xoffset*(speed+1), -yoffset*(speed+1));
 }
 
 void QmlWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **error) {
@@ -457,49 +465,49 @@ void QmlWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **
     *error = webkitProxy_->GetBrowserLog(browserLog);
 }
 
-void QmlWebViewCmdExecutor::GetPlayerState(const ElementId& element, PlayerState*, Error**) {
+void QmlWebViewCmdExecutor::GetPlayerState(const ElementId& element, PlayerState* state, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->GetPlayerState(element, state);
 }
 
-void QmlWebViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState, Error**) {
+void QmlWebViewCmdExecutor::SetPlayerState(const ElementId& element, PlayerState state, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->SetPlayerState(element, state);
 }
 
-void QmlWebViewCmdExecutor::GetPlayerVolume(const ElementId& element, double*, Error**) {
+void QmlWebViewCmdExecutor::GetPlayerVolume(const ElementId& element, double* volume, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->GetPlayerVolume(element, volume);
 }
 
-void QmlWebViewCmdExecutor::SetPlayerVolume(const ElementId& element, double, Error**) {
+void QmlWebViewCmdExecutor::SetPlayerVolume(const ElementId& element, double volume, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->SetPlayerVolume(element, volume);
 }
 
-void QmlWebViewCmdExecutor::GetPlayingPosition(const ElementId& element, double*, Error**) {
+void QmlWebViewCmdExecutor::GetPlayingPosition(const ElementId& element, double* position, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->GetPlayingPosition(element, position);
 }
 
-void QmlWebViewCmdExecutor::SetPlayingPosition(const ElementId& element, double, Error**) {
+void QmlWebViewCmdExecutor::SetPlayingPosition(const ElementId& element, double position, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->SetPlayingPosition(element, position);
 }
 
-void QmlWebViewCmdExecutor::SetMute(const ElementId& element, bool, Error**) {
+void QmlWebViewCmdExecutor::SetMute(const ElementId& element, bool mute, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->SetMute(element, mute);
 }
 
-void QmlWebViewCmdExecutor::GetMute(const ElementId& element, bool*, Error**) {
+void QmlWebViewCmdExecutor::GetMute(const ElementId& element, bool* mute, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     *error = webkitProxy_->GetMute(element, mute);
