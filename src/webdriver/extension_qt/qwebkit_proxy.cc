@@ -907,26 +907,25 @@ Error* QWebkitProxy::GetBrowserLog(base::ListValue** browserLog) {
 }
 
 Error* QWebkitProxy::GetPlayerState(const ElementId& element, PlayerState *state) {
-	// TODO:
-/*	
-	bool isPaused = false;
-    base::Value* isPausedValue = base::Value::CreateBooleanValue(isPaused);
+    bool isPaused;
+    base::Value* isPausedValue = NULL;
     Error* error = GetAttribute(element, std::string("paused"), &isPausedValue);
+    scoped_ptr<base::Value> scoped_isPausedValue(isPausedValue);
     if (error)
-    	return error;
+        return error;
 
     isPaused = !isPausedValue->IsType(base::Value::TYPE_NULL);
-    delete isPausedValue;
 
     if(!isPaused){
         *state = Playing;
     } else {
         std::string currentTimeString;
-        base::Value *currentTimeValue = base::Value::CreateStringValue(currentTimeString);
+        base::Value *currentTimeValue;
         error = GetAttribute(element, std::string("currentTime"), &currentTimeValue);
+        scoped_ptr<base::Value> scoped_currentTimeValue(currentTimeValue);
         if (error)
+            return error;
         currentTimeValue->GetAsString(&currentTimeString);
-        delete currentTimeValue;
         double currentTime = 0;
         base::StringToDouble(currentTimeString, &currentTime);
         if(currentTime == 0){
@@ -935,12 +934,12 @@ Error* QWebkitProxy::GetPlayerState(const ElementId& element, PlayerState *state
             *state = Paused;
         }
     }
-*/    
+
     return NULL;
 }
 
 Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState state) {
-	Value* value = NULL;
+    Value* value = NULL;
 	Error* error = NULL;
     switch(state){
     case Playing:
@@ -961,6 +960,7 @@ Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState 
                         CreateDirectValueParser(&value));
             break;
     }
+    scoped_ptr<Value> scoped_value(value);
     if (state == Stopped){
         error = SetPlayingPosition(element, 0.0);
     }
@@ -968,74 +968,82 @@ Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState 
     return error;
 }
 
-Error* QWebkitProxy::GetPlayerVolume(const ElementId& element, double *level) {
-	// TODO:
-/*
-	base::Value* volumeValue = base::Value::CreateDoubleValue(*volume);
-    GetAttribute(element, std::string("volume"), &volumeValue, error);
+Error* QWebkitProxy::GetPlayerVolume(const ElementId& element, double *volumeLevel) {
+    base::Value* volumeValue = NULL;
+    Error* error = GetAttribute(element, std::string("volume"), &volumeValue);
+    scoped_ptr<base::Value> scoped_volume_value(volumeValue);
+    if(error)
+        return error;
     std::string volumeString;
     volumeValue->GetAsString(&volumeString);
-    base::StringToDouble(volumeString,volume);
-    delete volumeValue;
-*/
+    base::StringToDouble(volumeString, volumeLevel);
+
     return NULL;
 }
 
 Error* QWebkitProxy::SetPlayerVolume(const ElementId& element, const double level) {
 	Value* value = NULL;
-	// TODO: memory leak with value? Use regular ExecuteScript without parse value?
-    return ExecuteScriptAndParse(
+
+    Error* error = ExecuteScriptAndParse(
                         GetFrame(page_, session_->current_frame()),
                         "function(elem, level) { elem.volume = level; }",
                         "setVolume",
                         CreateListValueFrom(element, level),
                         CreateDirectValueParser(&value));
+    scoped_ptr<Value> scoped_value(value);
+    return error;
 }
 
 Error* QWebkitProxy::GetPlayingPosition(const ElementId& element, double* reletivePos) {
-	// TODO:
-	/*
-	base::Value* volumeValue = base::Value::CreateDoubleValue(*position);
-    GetAttribute(element, std::string("currentTime"), &volumeValue, error);
-    std::string volumeString;
-    volumeValue->GetAsString(&volumeString);
-    base::StringToDouble(volumeString,position);
-    delete volumeValue;
-    */
-	return NULL;
+    base::Value* positionValue = NULL;
+    Error* error = GetAttribute(element, std::string("currentTime"), &positionValue);
+    scoped_ptr<base::Value> scoped_position_value(positionValue);
+    if(error)
+        return error;
+    std::string positionString;
+    positionValue->GetAsString(&positionString);
+    base::StringToDouble(positionString, reletivePos);
+
+    return NULL;
 }
 
 Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double reletivePos) {
 	Value* value = NULL;
-	// TODO: memory leak with value? Use regular ExecuteScript without parse value?
-    return ExecuteScriptAndParse(
+
+    Error* error = ExecuteScriptAndParse(
                 GetFrame(page_, session_->current_frame()),
                 "function(elem, time) { elem.currentTime = time; }",
                 "setVolume",
                 CreateListValueFrom(element, reletivePos),
                 CreateDirectValueParser(&value));
+    scoped_ptr<Value> scoped_value(value);
+
+    return error;
 }
 
 Error* QWebkitProxy::SetMute(const ElementId& element, bool mute) {
 	Value* value = NULL;
-	// TODO: memory leak with value? Use regular ExecuteScript without parse value?
-    return ExecuteScriptAndParse(
+
+    Error* error = ExecuteScriptAndParse(
                         GetFrame(page_, session_->current_frame()),
                         "function(elem, mute) { elem.muted = mute; }",
                         "setVolume",
                         CreateListValueFrom(element, mute),
                 CreateDirectValueParser(&value));
+    scoped_ptr<Value> scoped_value(value);
+
+    return error;
 }
 
 Error* QWebkitProxy::GetMute(const ElementId& element, bool* mute) {
-	// TODO:
-	/*
-	base::Value* isMutedValue = base::Value::CreateBooleanValue(mute);
-    GetAttribute(element, std::string("muted"), &isMutedValue, error);
+    base::Value* isMutedValue = NULL;
+    Error* error = GetAttribute(element, std::string("muted"), &isMutedValue);
+    scoped_ptr<Value> scoped_value(isMutedValue);
+    if(error)
+        return error;
     *mute = !isMutedValue->IsType(base::Value::TYPE_NULL);
-    delete isMutedValue;
-	*/
-	return NULL;
+
+    return NULL;
 }
 
 QWebFrame* QWebkitProxy::GetFrame(QWebPage* page, const FramePath& frame_path) {
