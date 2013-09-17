@@ -36,6 +36,8 @@ std::string tests::testDataFolder;
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
 
+#include "WindowWithDeclarativeViewTest.h"
+
 // Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -130,6 +132,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+    widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
 
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -245,7 +248,6 @@ int main(int argc, char *argv[])
         return startError;
 
     setQtSettings();
-
     return app.exec();
 }
 
