@@ -13,6 +13,8 @@
 
 namespace webdriver {
 
+class QWebkitProxy;    
+
 class QmlWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
     static const ViewType QML_WEB_VIEW_TYPE; 
@@ -130,6 +132,9 @@ protected:
 #endif
 
 private:
+    QWebkitProxy* webkitProxy_;
+    QDeclarativeWebView* view_;
+
     DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutor);
 };
 
