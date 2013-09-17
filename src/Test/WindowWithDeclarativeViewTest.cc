@@ -37,7 +37,12 @@ WindowWithDeclarativeViewTestWidget::WindowWithDeclarativeViewTestWidget(QWidget
     QVBoxLayout *vbl = new QVBoxLayout(this);
     vbl->addLayout(hbl);
     vbl->addWidget(pLabel);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget *container = QWidget::createWindowContainer(pView);
+    vbl->addWidget(container);
+#else
     vbl->addWidget(pView);
+#endif
     this->setLayout(vbl);
 }
 
