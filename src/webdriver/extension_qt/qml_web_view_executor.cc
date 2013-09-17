@@ -195,19 +195,73 @@ void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 }
 
 void QmlWebViewCmdExecutor::MouseDoubleClick(Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
+    dbClckEvent->setScenePos(scenePoint);
+    dbClckEvent->setButton(Qt::LeftButton);
+    dbClckEvent->setButtons(Qt::LeftButton);
+
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
+
+    QApplication::postEvent(container_->scene(), dbClckEvent);
+    QApplication::postEvent(container_->scene(), releaseEvent);
 }
 
 void QmlWebViewCmdExecutor::MouseButtonUp(Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(Qt::LeftButton);
+    releaseEvent->setButtons(Qt::NoButton);
+
+    QApplication::postEvent(container_->scene(), releaseEvent);
 }
 
 void QmlWebViewCmdExecutor::MouseButtonDown(Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+    pressEvent->setScenePos(scenePoint);
+    pressEvent->setButton(Qt::LeftButton);
+    pressEvent->setButtons(Qt::LeftButton);
+
+    QApplication::postEvent(container_->scene(), pressEvent);
 }
 
 void QmlWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
+
+    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
+    pressEvent->setScenePos(scenePoint);
+    pressEvent->setButton(mouseButton);
+    pressEvent->setButtons(mouseButton);
+
+    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
+    releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setButton(mouseButton);
+    releaseEvent->setButtons(Qt::NoButton);
+
+    QApplication::postEvent(container_->scene(), pressEvent);
+    QApplication::postEvent(container_->scene(), releaseEvent);
 }
 
 void QmlWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
