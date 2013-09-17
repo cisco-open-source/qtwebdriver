@@ -11,6 +11,8 @@
 
 #include <QtCore/QDebug>
 
+class QDeclarativeView;
+
 namespace webdriver {
 
 class QWebkitProxy;    
@@ -134,6 +136,7 @@ protected:
 private:
     QWebkitProxy* webkitProxy_;
     QDeclarativeWebView* view_;
+    QDeclarativeView* container_;
 
     DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutor);
 };

@@ -1,20 +1,25 @@
 #include "extension_qt/qml_web_view_executor.h"
 
+#include "base/stringprintf.h"
+
 #include "webdriver_logging.h"
 #include "webdriver_session.h"
 #include "q_key_converter.h"
 #include "extension_qt/declarative_item_view_handle.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
+#include "common_util.h"
 #include "web_view_util.h"
 #include "qwebkit_proxy.h"
 
 #include <QtCore/QDebug>
+#include <QtGui/QStyleOptionGraphicsItem>
+#include <QtGui/QApplication>
 
 namespace webdriver {
 
 #define CHECK_VIEW_EXISTANCE    \
-    if (NULL == view_) { \
+    if ((NULL == view_) || (NULL == container_)) { \
         session_->logger().Log(kWarningLogLevel, "checkView - no such qml web view("+view_id_.id()+")"); \
         *error = new Error(kNoSuchWindow); \
         return; \
@@ -32,6 +37,18 @@ static QDeclarativeWebView* _getDeclarativeWebView(Session* session, const ViewI
         return NULL;
 
     return qobject_cast<QDeclarativeWebView*>(qViewHandle->get());
+}
+
+static QDeclarativeView* _getDeclarativeView(Session* session, const ViewId& viewId) {
+    ViewHandle* viewHandle =  session->GetViewHandle(viewId);
+    if (NULL == viewHandle) 
+        return NULL;
+
+    QDeclarativeItemViewHandle* qViewHandle = dynamic_cast<QDeclarativeItemViewHandle*>(viewHandle);
+    if (NULL == qViewHandle)
+        return NULL;
+
+    return qobject_cast<QDeclarativeView*>(qViewHandle->getContainer());
 }
 
 QmlWebViewCmdExecutorCreator::QmlWebViewCmdExecutorCreator()
@@ -64,6 +81,7 @@ QmlWebViewCmdExecutor::QmlWebViewCmdExecutor(Session* session, ViewId viewId)
     : ViewCmdExecutor(session, viewId) {
 
     view_ = _getDeclarativeWebView(session, viewId);
+    container_ = _getDeclarativeView(session, viewId);
     webkitProxy_ = new QWebkitProxy(session, (view_)?view_->page():NULL);
 }
 
@@ -112,7 +130,36 @@ void QmlWebViewCmdExecutor::GetBounds(Rect *bounds, Error **error) {
 }
     
 void QmlWebViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+    
+    QImage image(view_->boundingRect().size().toSize(), QImage::Format_RGB32);
+    image.fill(QColor(0, 0, 0).rgb());
+    QPainter painter(&image);
+    QStyleOptionGraphicsItem styleOption;
+    qobject_cast<QGraphicsObject*>(view_)->paint(&painter, &styleOption);
+    painter.end();
+
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+#if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");
 }
 
 void QmlWebViewCmdExecutor::GoForward(Error** error) {
@@ -164,19 +211,111 @@ void QmlWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 }
 
 void QmlWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    Point prev_pos = session_->get_mouse_position();
+    prev_pos.Offset(x_offset, y_offset);
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(container_->scene(), moveEvent);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)scenePoint.x(),
+                            (int)scenePoint.y()));
+
+    session_->set_mouse_position(prev_pos);
 }
 
 void QmlWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    location.Offset(x_offset, y_offset);
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(container_->scene(), moveEvent);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)scenePoint.x(),
+                            (int)scenePoint.y()));
+
+    session_->set_mouse_position(location);
 }
 
 void QmlWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+
+    // element is specified, calculate the coordinate.
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+    
+    // calculate the half of the element size and translate by it.
+    Size size;
+    *error = webkitProxy_->GetElementSize(element, &size);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(location);
+    QPointF scenePoint = view_->mapToScene(point.x(), point.y());
+
+    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
+    moveEvent->setScenePos(scenePoint);
+    QApplication::postEvent(container_->scene(), moveEvent);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
+                            (int)scenePoint.x(),
+                            (int)scenePoint.y()));
+    
+    session_->set_mouse_position(location);
 }
 
 void QmlWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    std::string tag_name;
+    *error = webkitProxy_->GetElementTagName(element, &tag_name);
+    if (*error)
+        return;
+
+    if (tag_name == "option") {
+        bool can_be_toggled;
+        *error = webkitProxy_->IsElementCanBeToggled(element, &can_be_toggled);
+        if (*error)
+            return;
+
+        if (can_be_toggled) {
+            *error = webkitProxy_->ToggleOptionElement(element);
+        } else {
+            *error = webkitProxy_->SetOptionElementSelected(element, true);
+        }
+    } else {
+        Point location;
+
+        *error = webkitProxy_->GetClickableLocation(element, &location);
+        if (!(*error)) {
+            session_->logger().Log(kFineLogLevel,
+                base::StringPrintf("ClickElement at pos (%f, %f).", location.x(), location.y()));
+            session_->set_mouse_position(location);
+            MouseClick(kLeftButton, error);
+        }
+    }
 }
 
 void QmlWebViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {

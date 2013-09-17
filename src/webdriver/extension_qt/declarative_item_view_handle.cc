@@ -3,16 +3,16 @@
 namespace webdriver {
 
 QDeclarativeItemViewHandle::QDeclarativeItemViewHandle() 
-	: view_((QDeclarativeItem*)NULL) { }
+	: view_(NULL), container_(NULL) { }
 
-QDeclarativeItemViewHandle::QDeclarativeItemViewHandle(QDeclarativeItem* view) 
-	: view_(view) { }
+QDeclarativeItemViewHandle::QDeclarativeItemViewHandle(QDeclarativeItem* view, QDeclarativeView* container) 
+	: view_(view), container_(container) { }
 
 bool QDeclarativeItemViewHandle::equals(const ViewHandle* other) const {
 	const QDeclarativeItemViewHandle* toCompare = dynamic_cast<const QDeclarativeItemViewHandle*>(other);
 	if (NULL == toCompare) return false;
 
-	return view_ == toCompare->view_;
+	return (view_ == toCompare->view_)&&(container_ == toCompare->container_);
 }
 
 } // namespace webdriver
