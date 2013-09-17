@@ -130,6 +130,9 @@ protected:
 #endif
 
 private:
+    QWebkitProxy* webkitProxy_;
+    QDeclarativeWebView* view_;
+
     DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutor);
 };
 
