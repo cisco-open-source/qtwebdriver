@@ -36,7 +36,9 @@ std::string tests::testDataFolder;
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
+#endif
 
 // Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
 #ifndef OS_IOS
@@ -132,7 +134,9 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
+#endif
 
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -178,7 +182,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
     qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
     qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());    
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
