@@ -174,6 +174,8 @@ public:
     virtual Error* SetPlayerVolume(const ElementId& element, const double level);
     virtual Error* GetPlayingPosition(const ElementId& element, double* reletivePos);
     virtual Error* SetPlayingPosition(const ElementId& element, const double reletivePos);
+    virtual Error* GetPlaybackSpeed(const ElementId& element, double* speed);
+    virtual Error* SetPlaybackSpeed(const ElementId& element, const double speed);
     virtual Error* SetMute(const ElementId& element, bool mute);
     virtual Error* GetMute(const ElementId& element, bool* mute);
 

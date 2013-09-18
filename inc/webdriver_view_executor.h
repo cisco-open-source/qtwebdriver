@@ -161,6 +161,8 @@ public:
     virtual void SetPlayingPosition(const ElementId& element, const double reletivePos, Error** error) = 0;
     virtual void SetMute(const ElementId& element, bool, Error**) = 0;
     virtual void GetMute(const ElementId& element, bool*, Error**) = 0;
+    virtual void SetPlaybackSpeed(const ElementId& element, double, Error**) = 0;
+    virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**) = 0;
     virtual void SetOrientation(const std::string &orientation, Error **error) = 0;
     virtual void GetOrientation(std::string *orientation, Error **error) = 0;
 

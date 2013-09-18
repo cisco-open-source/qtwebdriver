@@ -794,7 +794,21 @@ void QWebViewCmdExecutor::SetPlayingPosition(const ElementId& element, double po
 {
     CHECK_VIEW_EXISTANCE
 
-    *error = webkitProxy_->SetPlayingPosition(element, position);
+            *error = webkitProxy_->SetPlayingPosition(element, position);
+}
+
+void QWebViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->SetPlaybackSpeed(element, speed);
+}
+
+void QWebViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+            *error = webkitProxy_->GetPlaybackSpeed(element, speed);
 }
 
 void QWebViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
@@ -824,5 +838,7 @@ void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
     QWebViewVisualizerShowPointCommand command(this, session_, view_);
     command.Execute(error);
 }
+
+
 
 } //namespace webdriver 
