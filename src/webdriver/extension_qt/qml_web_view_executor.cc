@@ -190,8 +190,6 @@ void QmlWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
 void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
-
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
     int modifiers = Qt::NoModifier;
@@ -207,25 +205,11 @@ void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
         return;
     }
 
-    // set focus to element
-    view_->setFocus(true);
-    if (!view_->hasFocus()) {
-        // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
-
-        *error = new Error(kInvalidElementState);
-        return;
-    }
-
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(container_, &(*it));
+        qApp->sendEvent(view_->page(), &(*it));
         ++it;
     }
-
-    // restore old focus
-    if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -270,27 +254,11 @@ void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
         return;
     }
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
-
-    // set focus to element
-    view_->setFocus(true);
-    if (!view_->hasFocus()) {
-        // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
-
-        *error = new Error(kInvalidElementState);
-        return;
-    }
-
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(container_, &(*it));
+        qApp->sendEvent(view_->page(), &(*it));
         ++it;
     }
-
-    // restore old focus
-    if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::MouseDoubleClick(Error** error) {
