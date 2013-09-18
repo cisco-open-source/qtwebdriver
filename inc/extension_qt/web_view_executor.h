@@ -112,6 +112,8 @@ public:
     virtual void SetPlayerVolume(const ElementId& element, double, Error**);
     virtual void GetPlayingPosition(const ElementId& element, double*, Error**);
     virtual void SetPlayingPosition(const ElementId& element, double, Error**);
+    virtual void SetPlaybackSpeed(const ElementId& element, double, Error**);
+    virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**);
     virtual void SetMute(const ElementId& element, bool, Error**);
     virtual void GetMute(const ElementId& element, bool*, Error**);
 

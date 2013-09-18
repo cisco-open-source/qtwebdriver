@@ -1117,6 +1117,62 @@ void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error
 #endif
 }
 
+void QWidgetViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
+{
+#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    player->setPlaybackRate(speed);
+#else
+    NOT_SUPPORTED_IMPL
+#endif
+}
+
+void QWidgetViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
+{
+#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QWidget* pWidget = getElement(element, error);
+    if (NULL == pWidget)
+        return;
+
+    QVideoWidget* videoWidget = dynamic_cast<QVideoWidget*>(pWidget);
+    if(NULL == videoWidget){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    QMediaPlayer *player = dynamic_cast<QMediaPlayer*>(videoWidget->mediaObject());
+    if(NULL == player){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+    *speed = player->playbackRate();
+#else
+    NOT_SUPPORTED_IMPL
+        #endif
+}
+
 bool QWidgetViewCmdExecutor::MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
         if (query == widget->metaObject()->className())

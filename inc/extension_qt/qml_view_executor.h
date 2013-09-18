@@ -99,6 +99,8 @@ public:
     virtual void SetPlayingPosition(const ElementId& element, double, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetMute(const ElementId& element, bool, Error**error) NOT_SUPPORTED_IMPL;
     virtual void GetMute(const ElementId& element, bool*, Error**error) NOT_SUPPORTED_IMPL;
+    virtual void SetPlaybackSpeed(const ElementId& element, double, Error**) NOT_SUPPORTED_IMPL;;
+    virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**) NOT_SUPPORTED_IMPL;;
     virtual void VisualizerSource(std::string* source, Error** error) NOT_SUPPORTED_IMPL;
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
 

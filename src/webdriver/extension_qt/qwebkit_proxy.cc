@@ -1021,6 +1021,35 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
     return error;
 }
 
+Error *QWebkitProxy::GetPlaybackSpeed(const ElementId &element, double *speed)
+{
+    base::Value* speedValue = NULL;
+    Error* error = GetAttribute(element, std::string("currentTime"), &speedValue);
+    scoped_ptr<base::Value> scoped_position_value(speedValue);
+    if(error)
+        return error;
+    std::string speedString;
+    speedValue->GetAsString(&speedString);
+    base::StringToDouble(speedString, speed);
+
+    return NULL;
+}
+
+Error *QWebkitProxy::SetPlaybackSpeed(const ElementId &element, const double speed)
+{
+    Value* value = NULL;
+
+    Error* error = ExecuteScriptAndParse(
+                GetFrame(page_, session_->current_frame()),
+                "function(elem, speed) { elem.playbackRate = speed; }",
+                "setPlaybackRate",
+                CreateListValueFrom(element, speed),
+                CreateDirectValueParser(&value));
+    scoped_ptr<Value> scoped_value(value);
+
+    return error;
+}
+
 Error* QWebkitProxy::SetMute(const ElementId& element, bool mute) {
 	Value* value = NULL;
 

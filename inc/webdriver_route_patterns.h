@@ -97,6 +97,7 @@ public:
     static const char kCiscoPlayerVolume[];
     static const char kCiscoPlayingPosition[];
     static const char kCiscoPlayerMute[];
+    static const char kCiscoPlayerPlayingSpeed[];
     static const char kVisualizerSource[];
     static const char kVisualizerShowPoint[];
 

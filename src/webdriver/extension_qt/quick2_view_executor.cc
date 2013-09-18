@@ -987,6 +987,46 @@ void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error 
     muteValue->GetAsBoolean(mute);
 }
 
+void Quick2ViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QVariant speedVariant(speed);
+    bool isPropertyAssigned = pItem->setProperty("playbackRate", speedVariant);
+
+    if(!isPropertyAssigned){
+        (*error) = new Error(kUnknownError,
+                         std::string("Error while executing comand: There is no such member or the parameters did not match"));
+    }
+}
+
+void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+
+    base::Value* positionValue = NULL;
+    GetAttribute(element, "playbackRate", &positionValue, error);
+
+    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+        return;
+    }
+
+    positionValue->GetAsDouble(speed);
+}
+
 QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
     QQuickItem* pFocusItem = view->activeFocusItem();
     if (NULL != pFocusItem) return pFocusItem;

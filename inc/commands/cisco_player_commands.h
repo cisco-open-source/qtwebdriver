@@ -83,6 +83,23 @@ private:
     DISALLOW_COPY_AND_ASSIGN(CISCO_MuteCommand);
 };
 
+
+class CISCO_PlaybackSpeedCommand : public ElementCommand
+{
+public:
+    CISCO_PlaybackSpeedCommand(const std::vector<std::string>& path_segments,
+                        const base::DictionaryValue* parameters);
+    virtual ~CISCO_PlaybackSpeedCommand();
+
+    virtual bool DoesGet() const OVERRIDE;
+    virtual bool DoesPost() const OVERRIDE;
+    virtual void ExecuteGet(Response* const response) OVERRIDE;
+    virtual void ExecutePost(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(CISCO_PlaybackSpeedCommand);
+};
+
 }
 
 #endif // CISCO_VOLUMECOMMAND_H
