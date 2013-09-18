@@ -288,14 +288,14 @@ bool CISCO_PlaybackSpeedCommand::DoesPost() const
 
 void CISCO_PlaybackSpeedCommand::ExecuteGet(Response * const response)
 {
-    bool mute;
+    double speed;
     Error* error = NULL;
 
     session_->RunSessionTask(base::Bind(
-            &ViewCmdExecutor::GetMute,
+            &ViewCmdExecutor::GetPlaybackSpeed,
             base::Unretained(executor_.get()),
             element,
-            &mute,
+            &speed,
             &error));
 
     if (error) {
@@ -303,26 +303,26 @@ void CISCO_PlaybackSpeedCommand::ExecuteGet(Response * const response)
         return;
     }
 
-    Value* value = Value::CreateBooleanValue(mute);
+    Value* value = Value::CreateBooleanValue(speed);
     response->SetValue(value);
 }
 
 void CISCO_PlaybackSpeedCommand::ExecutePost(Response * const response)
 {
-    bool mute;
-    if (!GetBooleanParameter("mute", &mute)) {
+    double speed;
+    if (!GetDoubleParameter("speed", &speed)) {
         response->SetError(new Error(
-            kBadRequest, "'mute' is missing or invalid"));
+            kBadRequest, "'speed' is missing or invalid"));
         return;
     }
 
     Error* error = NULL;
 
     session_->RunSessionTask(base::Bind(
-            &ViewCmdExecutor::SetMute,
+            &ViewCmdExecutor::SetPlaybackSpeed,
             base::Unretained(executor_.get()),
             element,
-            mute,
+            speed,
             &error));
 
     if (error)
