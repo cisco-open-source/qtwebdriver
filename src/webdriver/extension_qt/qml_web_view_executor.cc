@@ -192,7 +192,7 @@ void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
 
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
-    int modifiers = Qt::NoModifier;
+    int modifiers = session_->get_sticky_modifiers();
 
     if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
                                session_->logger(),
