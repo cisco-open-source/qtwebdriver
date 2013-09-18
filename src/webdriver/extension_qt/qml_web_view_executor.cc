@@ -187,11 +187,109 @@ void QmlWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
 }
 
 void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
+
+    std::string err_msg;
+    std::vector<QKeyEvent> key_events;
+    int modifiers = Qt::NoModifier;
+
+    if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
+                               session_->logger(),
+                               true,
+                               &modifiers,
+                               &key_events,
+                               &err_msg)) {
+        session_->logger().Log(kSevereLogLevel, "SendKeys - cant convert keys:"+err_msg);
+        *error = new Error(kUnknownError, "SendKeys - cant convert keys:"+err_msg);
+        return;
+    }
+
+    // set focus to element
+    view_->setFocus(true);
+    if (!view_->hasFocus()) {
+        // restore old focus
+        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
+
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    std::vector<QKeyEvent>::iterator it = key_events.begin();
+    while (it != key_events.end()) {
+        qApp->sendEvent(container_, &(*it));
+        ++it;
+    }
+
+    // restore old focus
+    if (NULL != pFocusItem)
+        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
-    // TODO:
+    CHECK_VIEW_EXISTANCE
+
+    bool is_displayed = false;
+    *error = webkitProxy_->IsElementDisplayed(element, true, &is_displayed);
+    if (*error)
+        return;
+    
+    if (!is_displayed) {
+        *error = new Error(kElementNotVisible);
+        return;
+    }
+
+    bool is_enabled = false;
+    *error = webkitProxy_->IsElementEnabled(element, &is_enabled);
+    if (*error)
+        return;
+    
+    if (!is_enabled) {
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    *error = webkitProxy_->SetActiveElement(element);
+    if (*error)
+        return;
+
+    std::string err_msg;
+    std::vector<QKeyEvent> key_events;
+    int modifiers = Qt::NoModifier;
+
+    if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
+                               session_->logger(),
+                               true,
+                               &modifiers,
+                               &key_events,
+                               &err_msg)) {
+        session_->logger().Log(kSevereLogLevel, "ElementSendKeys - cant convert keys:"+err_msg);
+        *error = new Error(kUnknownError, "ElementSendKeys - cant convert keys:"+err_msg);
+        return;
+    }
+
+    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
+
+    // set focus to element
+    view_->setFocus(true);
+    if (!view_->hasFocus()) {
+        // restore old focus
+        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
+
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
+    std::vector<QKeyEvent>::iterator it = key_events.begin();
+    while (it != key_events.end()) {
+        qApp->sendEvent(container_, &(*it));
+        ++it;
+    }
+
+    // restore old focus
+    if (NULL != pFocusItem)
+        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::MouseDoubleClick(Error** error) {
