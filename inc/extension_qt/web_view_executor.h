@@ -124,7 +124,7 @@ protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
 
 private:
-    QWebkitProxy* webkitProxy_;
+    scoped_ptr<QWebkitProxy> webkitProxy_;
     QWebView* view_;
 
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);

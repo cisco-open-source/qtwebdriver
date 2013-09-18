@@ -238,6 +238,9 @@
         'src/Test/RestyledLabel.cc',
         'src/Test/DragableWidget.cc',
         'src/Test/BasicMouseInterfaceTest.cc',
+        'src/Test/WindowWithDeclarativeViewTest.cc',
+        'src/Test/WindowWithDeclarativeViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
       ],
       'conditions': [
         # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949

@@ -31,7 +31,7 @@ void QmlWebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
             foreach(QDeclarativeItem *child, childs) {
                 if (isWebView(child)) {
                     // found
-                    ViewHandlePtr handle(new QDeclarativeItemViewHandle(child));
+                    ViewHandlePtr handle(new QDeclarativeItemViewHandle(child, pView));
                     ViewId viewId = session->GetViewForHandle(handle);
                     if (!viewId.is_valid()) {
                         if (session->AddNewView(handle, &viewId))  {

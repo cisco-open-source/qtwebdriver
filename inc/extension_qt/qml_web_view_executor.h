@@ -5,13 +5,18 @@
 #include <vector>
 #include <map>
 
+#include "base/memory/scoped_ptr.h"
 #include "webdriver_view_executor.h"
 #include "webdriver_error.h"
 #include "extension_qt/qdeclarativewebview.h"
 
 #include <QtCore/QDebug>
 
+class QDeclarativeView;
+
 namespace webdriver {
+
+class QWebkitProxy;    
 
 class QmlWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
@@ -132,6 +137,10 @@ protected:
 #endif
 
 private:
+    scoped_ptr<QWebkitProxy> webkitProxy_;
+    QDeclarativeWebView* view_;
+    QDeclarativeView* container_;
+
     DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutor);
 };
 
