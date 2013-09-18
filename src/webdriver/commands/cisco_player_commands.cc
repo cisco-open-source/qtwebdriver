@@ -265,4 +265,68 @@ void CISCO_MuteCommand::ExecutePost(Response * const response)
         response->SetError(error);
 }
 
+CISCO_PlaybackSpeedCommand::CISCO_PlaybackSpeedCommand(
+        const std::vector<std::string> &path_segments,
+        const base::DictionaryValue *parameters)
+        : ElementCommand(path_segments, parameters)
+{
+}
+
+CISCO_PlaybackSpeedCommand::~CISCO_PlaybackSpeedCommand()
+{
+}
+
+bool CISCO_PlaybackSpeedCommand::DoesGet() const
+{
+    return true;
+}
+
+bool CISCO_PlaybackSpeedCommand::DoesPost() const
+{
+    return true;
+}
+
+void CISCO_PlaybackSpeedCommand::ExecuteGet(Response * const response)
+{
+    double speed;
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetPlaybackSpeed,
+            base::Unretained(executor_.get()),
+            element,
+            &speed,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+
+    Value* value = Value::CreateBooleanValue(speed);
+    response->SetValue(value);
+}
+
+void CISCO_PlaybackSpeedCommand::ExecutePost(Response * const response)
+{
+    double speed;
+    if (!GetDoubleParameter("speed", &speed)) {
+        response->SetError(new Error(
+            kBadRequest, "'speed' is missing or invalid"));
+        return;
+    }
+
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::SetPlaybackSpeed,
+            base::Unretained(executor_.get()),
+            element,
+            speed,
+            &error));
+
+    if (error)
+        response->SetError(error);
+}
+
 }

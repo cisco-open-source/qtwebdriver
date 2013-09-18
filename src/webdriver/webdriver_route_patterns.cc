@@ -174,6 +174,7 @@ const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/
 const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
 const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
 const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/-CISCO-player-element/mute";
+const char CommandRoutes::kCiscoPlayerPlayingSpeed[]    = "/session/*/element/*/-CISCO-player-element/speed";
 const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
 const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
 

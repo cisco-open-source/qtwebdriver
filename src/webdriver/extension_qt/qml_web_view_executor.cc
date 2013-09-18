@@ -190,15 +190,13 @@ void QmlWebViewCmdExecutor::GetSource(std::string* source, Error** error) {
 void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
-
     std::string err_msg;
     std::vector<QKeyEvent> key_events;
-    int modifiers = Qt::NoModifier;
+    int modifiers = session_->get_sticky_modifiers();
 
     if (!QKeyConverter::ConvertKeysToWebKeyEvents(keys,
                                session_->logger(),
-                               true,
+                               false,
                                &modifiers,
                                &key_events,
                                &err_msg)) {
@@ -207,25 +205,17 @@ void QmlWebViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
         return;
     }
 
-    // set focus to element
-    view_->setFocus(true);
-    if (!view_->hasFocus()) {
-        // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
-
-        *error = new Error(kInvalidElementState);
-        return;
-    }
+    session_->set_sticky_modifiers(modifiers);
 
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(container_, &(*it));
+
+        bool consumed = WDEventDispatcher::getInstance()->dispatch(&(*it));
+
+        if (!consumed)
+            qApp->sendEvent(view_->page(), &(*it));
         ++it;
     }
-
-    // restore old focus
-    if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
@@ -270,27 +260,11 @@ void QmlWebViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
         return;
     }
 
-    QDeclarativeItem* pFocusItem = qobject_cast<QDeclarativeItem*>(container_->scene()->focusItem());
-
-    // set focus to element
-    view_->setFocus(true);
-    if (!view_->hasFocus()) {
-        // restore old focus
-        if (NULL != pFocusItem) pFocusItem->setFocus(true);        
-
-        *error = new Error(kInvalidElementState);
-        return;
-    }
-
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(container_, &(*it));
+        qApp->sendEvent(view_->page(), &(*it));
         ++it;
     }
-
-    // restore old focus
-    if (NULL != pFocusItem)
-        pFocusItem->setFocus(true);
 }
 
 void QmlWebViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -769,7 +743,21 @@ void QmlWebViewCmdExecutor::SetMute(const ElementId& element, bool mute, Error**
 void QmlWebViewCmdExecutor::GetMute(const ElementId& element, bool* mute, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    *error = webkitProxy_->GetMute(element, mute);
+            *error = webkitProxy_->GetMute(element, mute);
+}
+
+void QmlWebViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->SetPlaybackSpeed(element, speed);
+}
+
+void QmlWebViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->GetPlaybackSpeed(element, speed);
 }
 
 void QmlWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {

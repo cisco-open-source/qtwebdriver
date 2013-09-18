@@ -146,6 +146,8 @@ public:
     virtual void SetPlayingPosition(const ElementId& element, double, Error**error);
     virtual void SetMute(const ElementId& element, bool, Error**error);
     virtual void GetMute(const ElementId& element, bool*, Error**error);
+    virtual void SetPlaybackSpeed(const ElementId& element, double, Error**);
+    virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**);
     virtual void VisualizerSource(std::string* source, Error** error);
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
 

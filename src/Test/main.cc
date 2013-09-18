@@ -217,14 +217,11 @@ int main(int argc, char *argv[])
     // check if --test_data_folder CL argument is present
     std::string testDataFolderSwitch = "test_data_folder";
     if (cmd_line.HasSwitch(testDataFolderSwitch)) {
-        std::cout << "HasSwitch"<<std::endl;
       tests::testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
-      std::cout << "HasSwitch "<< tests::testDataFolder << std::endl;
     } else {
-        std::cout << "Hasn'tSwitch"<<std::endl;
         tests::testDataFolder = "./";
-        std::cout << "Hasn'tSwitch"<<std::endl;
     }
+    std::cout << "Using "<< tests::testDataFolder << " as test data folder" << std::endl;
 
 #if defined(OS_WIN)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -236,6 +233,7 @@ int main(int argc, char *argv[])
 
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
     if (0 != wd_server->Configure(cmd_line)) {
+        std::cout << "Error while configuring WD server, exiting..." << std::endl;
         return 1;
     }
 
@@ -248,8 +246,10 @@ int main(int argc, char *argv[])
     InitUInputClient();
 
     int startError = wd_server->Start();
-    if (startError)
+    if (startError){
+        std::cout << "Error while starting server, errorCode " << startError << endl;
         return startError;
+    }
 
     setQtSettings();
     return app.exec();
