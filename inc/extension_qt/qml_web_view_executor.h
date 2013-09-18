@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 
+#include "base/memory/scoped_ptr.h"
 #include "webdriver_view_executor.h"
 #include "webdriver_error.h"
 #include "extension_qt/qdeclarativewebview.h"
@@ -134,7 +135,7 @@ protected:
 #endif
 
 private:
-    QWebkitProxy* webkitProxy_;
+    scoped_ptr<QWebkitProxy> webkitProxy_;
     QDeclarativeWebView* view_;
     QDeclarativeView* container_;
 

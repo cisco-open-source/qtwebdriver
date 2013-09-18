@@ -39,7 +39,8 @@ namespace webdriver {
         session_->logger().Log(kWarningLogLevel, "checkView - no such web view("+view_id_.id()+")"); \
         *error = new Error(kNoSuchWindow); \
         return; \
-    } 
+    } \
+    webkitProxy_.reset(new QWebkitProxy(session_, (view_)?view_->page():NULL));
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
@@ -73,7 +74,7 @@ QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
     : QViewCmdExecutor(session, viewId) {
 
     view_ = QWebViewUtil::getWebView(session_, viewId);
-    webkitProxy_ = new QWebkitProxy(session_, (view_)?view_->page():NULL);
+    //webkitProxy_.reset(new QWebkitProxy(session_, (view_)?view_->page():NULL));
 }
 
 QWebViewCmdExecutor::~QWebViewCmdExecutor() {}
