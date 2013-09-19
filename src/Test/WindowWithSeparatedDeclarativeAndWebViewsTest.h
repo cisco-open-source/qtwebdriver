@@ -3,9 +3,6 @@
 
 #include "CommonQtTestHeaders.h"
 
-#include <QtWebKit/QWebView>
-#include <QtDeclarative/QDeclarativeView>
-
 class WindowWithSeparatedDeclarativeAndWebViewsTestWidget : public QWidget
 {
     Q_OBJECT
