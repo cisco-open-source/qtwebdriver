@@ -314,6 +314,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<CISCO_VolumeCommand>            (CommandRoutes::kCiscoPlayerVolume);
     Add<CISCO_SeekCommand>              (CommandRoutes::kCiscoPlayingPosition);
     Add<CISCO_MuteCommand>              (CommandRoutes::kCiscoPlayerMute);
+    Add<CISCO_PlaybackSpeedCommand>     (CommandRoutes::kCiscoPlayerPlayingSpeed);
     Add<VisualizerSourceCommand>        (CommandRoutes::kVisualizerSource);
     Add<VisualizerShowPointCommand>     (CommandRoutes::kVisualizerShowPoint);
 

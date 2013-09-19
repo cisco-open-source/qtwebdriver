@@ -1012,8 +1012,8 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
 
     Error* error = ExecuteScriptAndParse(
                 GetFrame(page_, session_->current_frame()),
-                "function(elem, time) { elem.currentTime = time; }",
-                "setVolume",
+                "function(elem, time) { elem. = false; elem.currentTime = time; }",
+                "setPosition",
                 CreateListValueFrom(element, reletivePos),
                 CreateDirectValueParser(&value));
     scoped_ptr<Value> scoped_value(value);
@@ -1024,7 +1024,7 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
 Error *QWebkitProxy::GetPlaybackSpeed(const ElementId &element, double *speed)
 {
     base::Value* speedValue = NULL;
-    Error* error = GetAttribute(element, std::string("currentTime"), &speedValue);
+    Error* error = GetAttribute(element, std::string("playbackRate"), &speedValue);
     scoped_ptr<base::Value> scoped_position_value(speedValue);
     if(error)
         return error;

@@ -303,7 +303,7 @@ void CISCO_PlaybackSpeedCommand::ExecuteGet(Response * const response)
         return;
     }
 
-    Value* value = Value::CreateBooleanValue(speed);
+    Value* value = Value::CreateDoubleValue(speed);
     response->SetValue(value);
 }
 
