@@ -16,19 +16,10 @@ WindowWithDeclarativeViewTestWidget::WindowWithDeclarativeViewTestWidget(QWidget
     pLabel->setObjectName("labelStatus");
     pLabel->setVisible(true);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    pView = new QQuickView();
-#else
     pView = new QDeclarativeView();
-#endif
-
     pView->setObjectName("declarativeView");
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    connect(pView, SIGNAL(statusChanged(QQuickView::Status)), this, SLOT(displayStatus()));
-#else
     connect(pView, SIGNAL(statusChanged(QDeclarativeView::Status)), this, SLOT(displayStatus()));
-#endif
 
     QHBoxLayout* hbl = new QHBoxLayout();
     hbl->addWidget(pLineEdit);
@@ -37,12 +28,9 @@ WindowWithDeclarativeViewTestWidget::WindowWithDeclarativeViewTestWidget(QWidget
     QVBoxLayout *vbl = new QVBoxLayout(this);
     vbl->addLayout(hbl);
     vbl->addWidget(pLabel);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QWidget *container = QWidget::createWindowContainer(pView);
-    vbl->addWidget(container);
-#else
+
     vbl->addWidget(pView);
-#endif
+
     this->setLayout(vbl);
 }
 
@@ -54,17 +42,13 @@ void WindowWithDeclarativeViewTestWidget::loadQML() {
 }
 
 void WindowWithDeclarativeViewTestWidget::displayStatus() {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    if (pView->status() == QQuickView::Ready)
-#else
-    if (pView->status() == QDeclarativeView::Ready)
-#endif
-        pLabel->setText("Loading successfully");
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    if (pView->status() == QQuickView::Error)
-#else
-    if (pView->status() == QDeclarativeView::Error)
-#endif
+    if (pView->status() == QDeclarativeView::Ready) {
+        pLabel->setText("Loading successfully");
+        return;
+    }
+
+    if (pView->status() == QDeclarativeView::Error) {
         pLabel->setText("Error");
+    }
 }
