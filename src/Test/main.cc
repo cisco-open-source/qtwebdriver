@@ -37,6 +37,7 @@ std::string tests::testDataFolder;
 #include "BasicMouseInterfaceTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
 #include "WindowWithDeclarativeViewTest.h"
 #endif
 
@@ -154,6 +155,9 @@ int main(int argc, char *argv[])
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
     widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
+#endif
 #endif
 
 #ifndef OS_IOS 
