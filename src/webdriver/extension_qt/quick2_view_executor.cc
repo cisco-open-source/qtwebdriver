@@ -826,11 +826,23 @@ void Quick2ViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState
     if (NULL == pItem)
         return;
 
-
     base::Value* playbackState = NULL;
-    GetAttribute(element, "playbackState", &playbackState, error);
+    QVariant propertyValue = pItem->property("playbackState");
 
-    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+    if (propertyValue.isValid()) {
+        // convert QVariant to base::Value
+        switch (propertyValue.type()) {
+        case QVariant::Int:
+            playbackState = Value::CreateIntegerValue(propertyValue.toInt());
+            break;
+        default:
+            session_->logger().Log(kWarningLogLevel, "wrong property type");
+            *error = new Error(kInvalidElementState);
+            return;
+        }
+    } else {
+        session_->logger().Log(kWarningLogLevel, "property not found.");
+        *error = new Error(kInvalidElementState);
         return;
     }
 
