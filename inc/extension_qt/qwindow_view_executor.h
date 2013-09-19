@@ -10,7 +10,8 @@
 #include "webdriver_error.h"
 
 #include <QtCore/QDebug>
-#include <QtGui/QTouchDevice>   
+#include <QtGui/QTouchEvent>
+#include <QtGui/QTouchDevice>
 #include <QtGui/QWindow>
 
 namespace webdriver {
@@ -43,10 +44,12 @@ protected:
     QRect ConvertRectToQRect(const Rect &rect);
     QPoint ConvertPointToQPoint(const Point &p);
     Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
-
-    QTouchDevice touchDevice;
+    QTouchEvent::TouchPoint createTouchPoint(Qt::TouchPointState state, QPointF &point, QVector2D velocity = QVector2D());
+    QTouchEvent* createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point, QVector2D velocity = QVector2D());
+    QTouchEvent* createTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, const QList<QTouchEvent::TouchPoint> &touchPoints);
 
 private:
+    QTouchDevice touchDevice;
     DISALLOW_COPY_AND_ASSIGN(QWindowViewCmdExecutor);
 };
 

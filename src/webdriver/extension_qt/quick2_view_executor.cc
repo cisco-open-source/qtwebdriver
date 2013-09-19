@@ -19,9 +19,11 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
+#include <QtCore/QTimer>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlExpression>
 #include <QtQml/QQmlEngine>
+#include <QtGui/QStyleHints>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -1025,6 +1027,269 @@ void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *s
     }
 
     positionValue->GetAsDouble(speed);
+}
+
+void Quick2ViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+
+    QGuiApplication::postEvent(view, touchBeginEvent);
+    QGuiApplication::postEvent(view, touchEndEvent);
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+    QTouchEvent *touchBeginEvent2 = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+    QTouchEvent *touchEndEvent2 = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+
+    QGuiApplication::postEvent(view, touchBeginEvent);
+    QGuiApplication::postEvent(view, touchEndEvent);
+    QGuiApplication::postEvent(view, touchBeginEvent2);
+    QGuiApplication::postEvent(view, touchEndEvent2);
+
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPointF point = ConvertPointToQPoint(Point(x, y));
+
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPointF point = ConvertPointToQPoint(Point(x, y));
+
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+
+    QGuiApplication::postEvent(view, touchEndEvent);
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPointF point = ConvertPointToQPoint(Point(x, y));
+
+    QTouchEvent *touchMoveEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point);
+
+    QGuiApplication::postEvent(view, touchMoveEvent);
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QEventLoop loop;
+    QTimer::singleShot(1000, &loop, SLOT(quit()));
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    loop.exec();
+
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+    QGuiApplication::postEvent(view, touchEndEvent);
+
+    QGuiApplication::processEvents();
+
+}
+
+void Quick2ViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size sizel;
+    GetElementSize(element, &sizel, error);
+    if (*error)
+        return;
+
+    location.Offset(sizel.width() / 2, sizel.height() / 2);
+
+    QPointF startPoint = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    startPoint = pItem->mapToScene(startPoint);
+
+    Point offset(xoffset, yoffset);
+    QPointF offsetPoint = ConvertPointToQPoint(offset);
+    int stepCount = 20;
+    int timeBetweenEvent = 30;
+    QEventLoop loop;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF touchPoint(startPoint.x()+offsetPoint.x()*i/stepCount, startPoint.y()+offsetPoint.y()*i/stepCount);
+
+        QTouchEvent *touchEvent;
+        if (i == 0)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, touchPoint);
+        else if (i == stepCount)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, touchPoint);
+        else
+            touchEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, touchPoint);
+
+
+        QGuiApplication::postEvent(view, touchEvent);
+        QTimer::singleShot(timeBetweenEvent, &loop, SLOT(quit()));
+        loop.exec();
+    }
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+    QPointF startPoint = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    startPoint = pItem->mapToScene(startPoint);
+
+    QPointF offsetPoint = ConvertPointToQPoint(Point(xoffset, yoffset));
+
+    QEventLoop loop;
+
+    //some magic numbers
+    int stepCount = 20;
+    int timeBetweenEvent = 30/(speed+1);
+
+    QVector2D velocity(xoffset*1000/(stepCount*timeBetweenEvent), yoffset*1000/(stepCount*timeBetweenEvent));
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF touchPoint(startPoint.x()+offsetPoint.x()*i/stepCount, startPoint.y()+offsetPoint.y()*i/stepCount);
+
+        QTouchEvent *touchEvent;
+        if (i == 0)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, touchPoint, velocity);
+        else if (i == stepCount)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, touchPoint, velocity);
+        else
+            touchEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, touchPoint, velocity);
+
+        QGuiApplication::postEvent(view, touchEvent);
+        QTimer::singleShot(timeBetweenEvent, &loop, SLOT(quit()));
+        loop.exec();
+        if (i == stepCount)
+        {
+            QPointF touchPoint(startPoint);
+            touchEvent = createSimpleTouchEvent(QEvent::TouchCancel, Qt::TouchPointPressed, touchPoint);
+            QGuiApplication::postEvent(view, touchEvent);
+        }
+    }
+    QGuiApplication::processEvents();
 }
 
 QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
