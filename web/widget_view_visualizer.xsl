@@ -84,6 +84,15 @@
       <xsl:value-of select="@plainText"/>
     </textarea>
   </xsl:template>
+  <xsl:template match="QWebView">
+    <iframe>
+      <xsl:copy-of select="@elementId"/>
+      <xsl:call-template name="style"/>
+      <xsl:attribute name="src">
+        <xsl:value-of select="@url"/>
+      </xsl:attribute>
+    </iframe>
+  </xsl:template>
 
   <xsl:template name="style">
     <xsl:attribute name="style">
