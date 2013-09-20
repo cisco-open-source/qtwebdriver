@@ -11,12 +11,14 @@
   </xsl:template>
 
   <xsl:template match="QCheckBox">
-    <input type="checkbox">
-      <xsl:copy-of select="@elementId"/>
-      <xsl:call-template name="style"/>
-    </input>
     <span>
-      <xsl:value-of select="@text"/>
+      <xsl:call-template name="style"/>
+      <input type="checkbox">
+        <xsl:copy-of select="@elementId"/>
+      </input>
+      <span>
+        <xsl:value-of select="@text"/>
+      </span>
     </span>
   </xsl:template>
   <xsl:template match="QLabel">
@@ -47,6 +49,21 @@
       </xsl:attribute>
     </input>
   </xsl:template>
+  <xsl:template match="QRadioButton">
+    <span>
+      <xsl:call-template name="style"/>
+      <input type="radio">
+        <xsl:copy-of select="@elementId"/>
+        <xsl:attribute name="name">
+          <xsl:text>parent:</xsl:text>
+          <xsl:value-of select="../@elementId"/>
+        </xsl:attribute>
+      </input>
+      <span>
+        <xsl:value-of select="@text"/>
+      </span>
+    </span>
+  </xsl:template>
   <xsl:template match="QScrollArea">
     <div>
       <xsl:copy-of select="@elementId"/>
@@ -74,7 +91,10 @@
         <xsl:text>height: </xsl:text><xsl:value-of select="@height"/><xsl:text>;</xsl:text>
       </xsl:if>
       <xsl:if test="@visible = 'false'">
-        <xsl:text>visibility: hidden;</xsl:text>
+        <xsl:text>display: none;</xsl:text>
+      </xsl:if>
+      <xsl:if test="@styleSheet">
+        <xsl:value-of select="@styleSheet"/><xsl:text>;</xsl:text>
       </xsl:if>
     </xsl:attribute>
   </xsl:template>

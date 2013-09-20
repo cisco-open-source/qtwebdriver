@@ -327,7 +327,7 @@
             var elementId = event.target.getAttribute('elementId');
             var element = new webdriver.WebElement(self.driver, elementId);
             element.click();
-            return false;
+            return true;
           }
 
           var xpath = getXPath(event.target);
