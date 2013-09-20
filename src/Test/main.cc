@@ -37,7 +37,6 @@ std::string tests::testDataFolder;
 #include "BasicMouseInterfaceTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-#include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
 #include "WindowWithDeclarativeViewTest.h"
 #endif
 
@@ -82,6 +81,9 @@ std::string tests::testDataFolder;
 #include "extension_qt/qwebviewext.h"
 #include "WindowWithEmbeddedViewTest.h"
 #include "WidgetAndWebViewTest.h"
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
+#endif
 #endif
 
 #include "extension_qt/q_view_runner.h"

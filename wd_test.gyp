@@ -241,9 +241,6 @@
         'src/Test/WindowWithDeclarativeViewTest.cc',
         'src/Test/WindowWithDeclarativeViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
-        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
-        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
-        '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
       ],
       'conditions': [
         # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
@@ -282,6 +279,9 @@
         'src/Test/WidgetAndWebViewTest.cc',
         'src/Test/WidgetAndWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WidgetAndWebViewTest.cc',
+        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
+        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
+        '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
       ],
 
       'conditions': [
