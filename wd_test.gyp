@@ -279,9 +279,6 @@
         'src/Test/WidgetAndWebViewTest.cc',
         'src/Test/WidgetAndWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WidgetAndWebViewTest.cc',
-        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
-        'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
-        '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
       ],
 
       'conditions': [
@@ -306,6 +303,13 @@
             } ],
           ],
         }, {
+          # else QT4
+          'sources' : [
+            'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
+            'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
+            '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
+          ],
+
           'conditions': [
             ['OS=="linux"', {
               'libraries': ['-lQtWebKit',],
