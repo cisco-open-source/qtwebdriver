@@ -14,8 +14,10 @@
     <input type="checkbox">
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
-      <xsl:value-of select="@text"/>
     </input>
+    <span>
+      <xsl:value-of select="@text"/>
+    </span>
   </xsl:template>
   <xsl:template match="QLabel">
     <span>
@@ -40,7 +42,9 @@
     <input type="submit">
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
-      <xsl:attribute name="value" select="@text"/>
+      <xsl:attribute name="value">
+        <xsl:value-of select="@text"/>
+      </xsl:attribute>
     </input>
   </xsl:template>
   <xsl:template match="QScrollArea">
@@ -64,13 +68,13 @@
   <xsl:template name="style">
     <xsl:attribute name="style">
       <xsl:if test="@width">
-        width: <xsl:value-of select="@width"/>;
+        <xsl:text>width: </xsl:text><xsl:value-of select="@width"/><xsl:text>;</xsl:text>
       </xsl:if>
       <xsl:if test="@height">
-        height: <xsl:value-of select="@height"/>;
+        <xsl:text>height: </xsl:text><xsl:value-of select="@height"/><xsl:text>;</xsl:text>
       </xsl:if>
       <xsl:if test="@visible = 'false'">
-        visibility: hidden;
+        <xsl:text>visibility: hidden;</xsl:text>
       </xsl:if>
     </xsl:attribute>
   </xsl:template>
