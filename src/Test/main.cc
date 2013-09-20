@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
     int startError = wd_server->Start();
     if (startError){
-        std::cout << "Error while starting server, errorCode " << startError << endl;
+        std::cout << "Error while starting server, errorCode " << startError << std::endl;
         return startError;
     }
 

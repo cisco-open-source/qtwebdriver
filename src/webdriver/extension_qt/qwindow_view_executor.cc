@@ -9,6 +9,7 @@
 
 #include <QtCore/QDebug>
 #include <QtGui/QGuiApplication>
+#include <QtCore/QDateTime>
 #ifdef OS_ANDROID
     #include <qpa/qplatformnativeinterface.h>
     #include <jni.h> 
@@ -18,6 +19,7 @@ namespace webdriver {
 
 QWindowViewCmdExecutor::QWindowViewCmdExecutor(Session* session, ViewId viewId)
     : ViewCmdExecutor(session, viewId) {
+     touchDevice.setCapabilities(QTouchDevice::Velocity);
 }
 
 QWindowViewCmdExecutor::~QWindowViewCmdExecutor() {
@@ -281,6 +283,42 @@ Qt::MouseButton QWindowViewCmdExecutor::ConvertMouseButtonToQtMouseButton(MouseB
     }
 
     return result;
+}
+
+QTouchEvent::TouchPoint QWindowViewCmdExecutor::createTouchPoint(Qt::TouchPointState state, QPointF &point, QVector2D velocity)
+{
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(state);
+    touchPoint.setPressure(1);
+
+    touchPoint.setVelocity(velocity);
+    return touchPoint;
+}
+
+QTouchEvent* QWindowViewCmdExecutor::createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point, QVector2D velocity)
+{
+    QList<QTouchEvent::TouchPoint> points;
+    Qt::TouchPointState touchPointState;
+    if (touchPointStates & Qt::TouchPointPressed)
+        touchPointState = Qt::TouchPointPressed;
+    else if (touchPointStates & Qt::TouchPointReleased)
+        touchPointState = Qt::TouchPointReleased;
+    else {
+        touchPointState = Qt::TouchPointMoved;
+    }
+    QTouchEvent::TouchPoint touchPoint = createTouchPoint(touchPointState, point, velocity);
+    points.append(touchPoint);
+    return createTouchEvent(eventType, touchPointStates, points);
+}
+
+QTouchEvent* QWindowViewCmdExecutor::createTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, const QList<QTouchEvent::TouchPoint> &touchPoints)
+{
+    QTouchEvent *touchEvent = new QTouchEvent(eventType, &touchDevice, Qt::NoModifier, touchPointStates, touchPoints);
+    QDateTime current = QDateTime::currentDateTime();
+    ulong timestame = current.toMSecsSinceEpoch() & (((qint64)1<<(sizeof(ulong)*8))-1);
+    touchEvent->setTimestamp(timestame);
+    return touchEvent;
 }
 
 } // namespace webdriver     
