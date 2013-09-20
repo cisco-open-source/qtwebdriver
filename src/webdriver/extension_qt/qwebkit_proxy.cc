@@ -1012,7 +1012,7 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
 
     Error* error = ExecuteScriptAndParse(
                 GetFrame(page_, session_->current_frame()),
-                "function(elem, time) { elem. = false; elem.currentTime = time; }",
+                "function(elem, time) { elem.currentTime = time; }",
                 "setPosition",
                 CreateListValueFrom(element, reletivePos),
                 CreateDirectValueParser(&value));
