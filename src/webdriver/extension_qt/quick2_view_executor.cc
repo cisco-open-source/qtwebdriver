@@ -892,7 +892,7 @@ void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *vo
     base::Value* volumeValue = NULL;
     GetAttribute(element, "volume", &volumeValue, error);
 
-    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+    if( *error){
         return;
     }
 
@@ -932,7 +932,7 @@ void Quick2ViewCmdExecutor::GetPlayingPosition(const ElementId &element, double 
     base::Value* positionValue = NULL;
     GetAttribute(element, "position", &positionValue, error);
 
-    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+    if( *error){
         return;
     }
 
@@ -955,10 +955,13 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
 
     double currentPosition = 0;
     GetPlayingPosition(element, &currentPosition, error);
-    if(error)
+    if(*error)
         return;
+
     int positionOffset = (int)((position - currentPosition) * 1000);
-    bool isMethodCalled = QMetaObject::invokeMethod(pItem,"seek", Q_ARG(int, positionOffset));
+    QVariant var(positionOffset);
+    bool isMethodCalled = QMetaObject::invokeMethod(pItem, "seek",
+                                                    Q_ARG(QVariant, var));
 
     if(!isMethodCalled){
         (*error) = new Error(kUnknownError,
@@ -999,7 +1002,7 @@ void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error 
     base::Value* muteValue = NULL;
     GetAttribute(element, "muted", &muteValue, error);
 
-    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+    if( *error){
         return;
     }
 
@@ -1039,7 +1042,7 @@ void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *s
     base::Value* positionValue = NULL;
     GetAttribute(element, "playbackRate", &positionValue, error);
 
-    if( error != NULL && *error != NULL && (*error)->code() != kSuccess){
+    if( *error){
         return;
     }
 
