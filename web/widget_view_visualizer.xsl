@@ -15,6 +15,9 @@
       <xsl:call-template name="style"/>
       <input type="checkbox">
         <xsl:copy-of select="@elementId"/>
+        <xsl:if test="@checked = 'true'">
+          <xsl:attribute name="checked"/>
+        </xsl:if>
       </input>
       <span>
         <xsl:value-of select="@text"/>
@@ -71,7 +74,7 @@
       <xsl:apply-templates/>
     </div>
   </xsl:template>
-  <xsl:template match="QPlainTextEdit">
+  <xsl:template match="QTextEdit|QPlainTextEdit">
     <textarea>
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
