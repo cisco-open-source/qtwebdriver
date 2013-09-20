@@ -952,10 +952,15 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
     if (NULL == pItem)
         return;
 
-    QVariant positionVariant((int)(position * 1000));
-    bool isPropertyAssigned = pItem->setProperty("position", positionVariant);
 
-    if(!isPropertyAssigned){
+    double currentPosition = 0;
+    GetPlayingPosition(element, &currentPosition, error);
+    if(error)
+        return;
+    int positionOffset = (int)((position - currentPosition) * 1000);
+    bool isMethodCalled = QMetaObject::invokeMethod(pItem,"seek", Q_ARG(int, positionOffset));
+
+    if(!isMethodCalled){
         (*error) = new Error(kUnknownError,
                          std::string("Error while executing comand: There is no such member or the parameters did not match"));
     }

@@ -11,11 +11,18 @@
   </xsl:template>
 
   <xsl:template match="QCheckBox">
-    <input type="checkbox">
-      <xsl:copy-of select="@elementId"/>
+    <span>
       <xsl:call-template name="style"/>
-      <xsl:value-of select="@text"/>
-    </input>
+      <input type="checkbox">
+        <xsl:copy-of select="@elementId"/>
+        <xsl:if test="@checked = 'true'">
+          <xsl:attribute name="checked"/>
+        </xsl:if>
+      </input>
+      <span>
+        <xsl:value-of select="@text"/>
+      </span>
+    </span>
   </xsl:template>
   <xsl:template match="QLabel">
     <span>
@@ -40,8 +47,25 @@
     <input type="submit">
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
-      <xsl:attribute name="value" select="@text"/>
+      <xsl:attribute name="value">
+        <xsl:value-of select="@text"/>
+      </xsl:attribute>
     </input>
+  </xsl:template>
+  <xsl:template match="QRadioButton">
+    <span>
+      <xsl:call-template name="style"/>
+      <input type="radio">
+        <xsl:copy-of select="@elementId"/>
+        <xsl:attribute name="name">
+          <xsl:text>parent:</xsl:text>
+          <xsl:value-of select="../@elementId"/>
+        </xsl:attribute>
+      </input>
+      <span>
+        <xsl:value-of select="@text"/>
+      </span>
+    </span>
   </xsl:template>
   <xsl:template match="QScrollArea">
     <div>
@@ -50,7 +74,7 @@
       <xsl:apply-templates/>
     </div>
   </xsl:template>
-  <xsl:template match="QPlainTextEdit">
+  <xsl:template match="QTextEdit|QPlainTextEdit">
     <textarea>
       <xsl:copy-of select="@elementId"/>
       <xsl:call-template name="style"/>
@@ -60,17 +84,29 @@
       <xsl:value-of select="@plainText"/>
     </textarea>
   </xsl:template>
+  <xsl:template match="QWebView">
+    <iframe>
+      <xsl:copy-of select="@elementId"/>
+      <xsl:call-template name="style"/>
+      <xsl:attribute name="src">
+        <xsl:value-of select="@url"/>
+      </xsl:attribute>
+    </iframe>
+  </xsl:template>
 
   <xsl:template name="style">
     <xsl:attribute name="style">
       <xsl:if test="@width">
-        width: <xsl:value-of select="@width"/>;
+        <xsl:text>width: </xsl:text><xsl:value-of select="@width"/><xsl:text>;</xsl:text>
       </xsl:if>
       <xsl:if test="@height">
-        height: <xsl:value-of select="@height"/>;
+        <xsl:text>height: </xsl:text><xsl:value-of select="@height"/><xsl:text>;</xsl:text>
       </xsl:if>
       <xsl:if test="@visible = 'false'">
-        visibility: hidden;
+        <xsl:text>display: none;</xsl:text>
+      </xsl:if>
+      <xsl:if test="@styleSheet">
+        <xsl:value-of select="@styleSheet"/><xsl:text>;</xsl:text>
       </xsl:if>
     </xsl:attribute>
   </xsl:template>
