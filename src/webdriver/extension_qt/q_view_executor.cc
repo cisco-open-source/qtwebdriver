@@ -15,6 +15,7 @@
 #include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
+#include <QtCore/QDateTime>
 #ifdef OS_ANDROID
     #include <qpa/qplatformnativeinterface.h>
     #include <jni.h> 
@@ -370,6 +371,44 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
     else
         *orientation = "LANDSCAPE";
 #endif
+}
+
+QTouchEvent::TouchPoint QViewCmdExecutor::createTouchPoint(Qt::TouchPointState state, QPointF &point)
+{
+    QTouchEvent::TouchPoint touchPoint(1);
+    touchPoint.setPos(point);
+    touchPoint.setState(state);
+    touchPoint.setPressure(1);
+    return touchPoint;
+}
+
+QTouchEvent* QViewCmdExecutor::createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF point)
+{
+    QList<QTouchEvent::TouchPoint> points;
+    Qt::TouchPointState touchPointState;
+    if (touchPointStates & Qt::TouchPointPressed)
+        touchPointState = Qt::TouchPointPressed;
+    else if (touchPointStates & Qt::TouchPointReleased)
+        touchPointState = Qt::TouchPointReleased;
+    else {
+        touchPointState = Qt::TouchPointMoved;
+    }
+    QTouchEvent::TouchPoint touchPoint = createTouchPoint(touchPointState, point);
+    points.append(touchPoint);
+    return createTouchEvent(eventType, touchPointStates, points);
+}
+
+QTouchEvent* QViewCmdExecutor::createTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, const QList<QTouchEvent::TouchPoint> &touchPoints)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QTouchEvent *touchEvent = new QTouchEvent(eventType, &touchDevice, Qt::NoModifier, touchPointStates, touchPoints);
+    QDateTime current = QDateTime::currentDateTime();
+    ulong timestame = current.toMSecsSinceEpoch() & (((qint64)1<<(sizeof(ulong)*8))-1);
+    touchEvent->setTimestamp(timestame);
+#else
+    QTouchEvent *touchEvent = new QTouchEvent(eventType, QTouchEvent::TouchScreen, Qt::NoModifier, touchPointStates, touchPoints);
+#endif
+    return touchEvent;
 }
 
 } // namespace webdriver     

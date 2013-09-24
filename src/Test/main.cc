@@ -35,6 +35,7 @@ std::string tests::testDataFolder;
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
+#include "TouchTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
@@ -137,6 +138,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+    widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
 #endif

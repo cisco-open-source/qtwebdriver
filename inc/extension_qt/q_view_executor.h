@@ -13,10 +13,11 @@
 #include <QtCore/QDebug>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
-#include <QtGui/QTouchDevice>   
+#include <QtGui/QTouchDevice>
 #else
 #include <QtGui/QWidget>
 #endif
+#include <QtGui/QTouchEvent>
 
 namespace webdriver {
 
@@ -48,7 +49,9 @@ public:
 
 protected:
     QWidget* getView(const ViewId& viewId, Error** error);
-
+    QTouchEvent::TouchPoint createTouchPoint(Qt::TouchPointState state, QPointF &point);
+    QTouchEvent* createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF point);
+    QTouchEvent* createTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, const QList<QTouchEvent::TouchPoint> &touchPoints);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
   QTouchDevice touchDevice;
 #endif
