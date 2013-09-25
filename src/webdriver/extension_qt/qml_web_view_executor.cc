@@ -644,54 +644,6 @@ void QmlWebViewCmdExecutor::GetStorageSize(StorageType type, int* size, Error** 
     *error = webkitProxy_->GetStorageSize(type, size);
 }
 
-void QmlWebViewCmdExecutor::TouchClick(const ElementId& element, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error) {
-    // TODO:
-}
-
-void QmlWebViewCmdExecutor::TouchScroll(const int &xoffset, const int &yoffset, Error **error) {
-    CHECK_VIEW_EXISTANCE
-
-    view_->page()->mainFrame()->scroll(xoffset, yoffset);
-}
-
-void QmlWebViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) {
-    CHECK_VIEW_EXISTANCE
-
-    view_->page()->mainFrame()->scroll(-xoffset, -yoffset);
-}
-
-void QmlWebViewCmdExecutor::TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) {
-    CHECK_VIEW_EXISTANCE
-
-    view_->page()->mainFrame()->scroll(xSpeed*3, ySpeed*3);
-}
-
-void QmlWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) {
-    CHECK_VIEW_EXISTANCE
-
-    view_->page()->mainFrame()->scroll(-xoffset*(speed+1), -yoffset*(speed+1));
-}
-
 void QmlWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **error) {
     CHECK_VIEW_EXISTANCE
 
