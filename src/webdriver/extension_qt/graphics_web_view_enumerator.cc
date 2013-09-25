@@ -18,7 +18,7 @@
 
 namespace webdriver {
 
-void GraphicsQmlWebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>* views) const {
+void GraphicsWebViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>* views) const {
     session->logger().Log(kInfoLogLevel, ">>>>> QGraphicsWebView enumerate");
 
     foreach(QWidget* pWidget, qApp->allWidgets()) {
@@ -36,7 +36,7 @@ void GraphicsQmlWebViewEnumeratorImpl::EnumerateViews(Session* session, std::set
                     if (!viewId.is_valid()) {
                         if (session->AddNewView(handle, &viewId))  {
                             session->logger().Log(kInfoLogLevel,
-                                "GraphicsQmlWebViewEnumerator found new view("+viewId.id()+")");
+                                "GraphicsWebViewEnumerator found new view("+viewId.id()+")");
                         }
                     }
                     if (viewId.is_valid()) {

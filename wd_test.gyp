@@ -279,6 +279,9 @@
         'src/Test/WidgetAndWebViewTest.cc',
         'src/Test/WidgetAndWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WidgetAndWebViewTest.cc',
+        'src/Test/GraphicsWebViewTest.cc',
+        'src/Test/GraphicsWebViewTest.h',
+        '<(INTERMEDIATE_DIR)/moc_GraphicsWebViewTest.cc',
       ],
 
       'conditions': [

@@ -10,7 +10,7 @@
 namespace webdriver {
 
 /// class for QDeclarativeWebView enumerator
-class GraphicsQmlWebViewEnumeratorImpl : public AbstractViewEnumeratorImpl {
+class GraphicsWebViewEnumeratorImpl : public AbstractViewEnumeratorImpl {
 public:
 	virtual void EnumerateViews(Session* session, std::set<ViewId>* views) const;
 };
