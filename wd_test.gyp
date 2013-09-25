@@ -241,6 +241,7 @@
         'src/Test/WindowWithDeclarativeViewTest.cc',
         'src/Test/WindowWithDeclarativeViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
+        'src/Test/TouchTest.cc',
       ],
       'conditions': [
         # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949

@@ -576,31 +576,8 @@ void QWebViewCmdExecutor::TouchClick(const ElementId& element, Error **error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    QList<QTouchEvent::TouchPoint> points;
-    QTouchEvent::TouchPoint touchPoint(1);
-    touchPoint.setPos(point);
-    touchPoint.setScreenPos(view_->mapToGlobal(point));
-    touchPoint.setStartScreenPos(view_->mapToGlobal(point));
-    touchPoint.setState(Qt::TouchPointPressed);
-    touchPoint.setPressure(1);
-    points.append(touchPoint);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
-#else
-    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-#endif
-    points.clear();
-    touchPoint.setPos(point);
-    touchPoint.setScreenPos(view_->mapToGlobal(point));
-    touchPoint.setStartScreenPos(view_->mapToGlobal(point));
-    touchPoint.setState(Qt::TouchPointReleased);
-    touchPoint.setPressure(1);
-    points.append(touchPoint);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
-#else
-    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
-#endif
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, QPointF(point));
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, QPointF(point));
 
     QApplication::postEvent(view_, touchBeginEvent);
     QApplication::postEvent(view_, touchEndEvent);
@@ -632,18 +609,7 @@ void QWebViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
-    QList<QTouchEvent::TouchPoint> points;
-    QTouchEvent::TouchPoint touchPoint(1);
-    touchPoint.setPos(point);
-    touchPoint.setState(Qt::TouchPointPressed);
-    touchPoint.setPressure(1);
-    points.append(touchPoint);
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, &touchDevice, Qt::NoModifier, Qt::TouchPointPressed, points);
-#else
-    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-#endif
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
 
     QApplication::postEvent(view_, touchBeginEvent);
 }
@@ -653,18 +619,7 @@ void QWebViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
-    QList<QTouchEvent::TouchPoint> points;
-    QTouchEvent::TouchPoint touchPoint(1);
-    touchPoint.setPos(point);
-    touchPoint.setState(Qt::TouchPointPressed);
-    touchPoint.setPressure(1);
-    points.append(touchPoint);
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, &touchDevice, Qt::NoModifier, Qt::TouchPointReleased, points);
-#else
-    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
-#endif
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
 
     QApplication::postEvent(view_, touchEndEvent);
 }
@@ -674,18 +629,7 @@ void QWebViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error) {
         
     QPoint point = QCommonUtil::ConvertPointToQPoint(Point(x, y));
 
-    QList<QTouchEvent::TouchPoint> points;
-    QTouchEvent::TouchPoint touchPoint(1);
-    touchPoint.setPos(point);
-    touchPoint.setState(Qt::TouchPointMoved);
-    touchPoint.setPressure(1);
-    points.append(touchPoint);
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, &touchDevice, Qt::NoModifier, Qt::TouchPointMoved, points);
-#else
-    QTouchEvent *touchMoveEvent = new QTouchEvent(QEvent::TouchUpdate, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointMoved, points);
-#endif
+    QTouchEvent *touchMoveEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point);
 
     QApplication::postEvent(view_, touchMoveEvent);
 }
@@ -699,30 +643,6 @@ void QWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error
         return;
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
-
-//    QList<QTouchEvent::TouchPoint> points;
-//    QTouchEvent::TouchPoint touchPoint(1);
-//    touchPoint.setPos(point);
-//    touchPoint.setScreenPos(view_->mapToGlobal(point));
-//    touchPoint.setStartScreenPos(view_->mapToGlobal(point));
-//    touchPoint.setState(Qt::TouchPointPressed);
-//    touchPoint.setPressure(1);
-//    points.append(touchPoint);
-//    QTouchEvent *touchBeginEvent = new QTouchEvent(QEvent::TouchBegin, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointPressed, points);
-
-//    points.clear();
-//    touchPoint.setPos(point);
-//    touchPoint.setScreenPos(view_->mapToGlobal(point));
-//    touchPoint.setStartScreenPos(view_->mapToGlobal(point));
-//    touchPoint.setState(Qt::TouchPointReleased);
-//    touchPoint.setPressure(1);
-//    points.append(touchPoint);
-//    QTouchEvent *touchEndEvent = new QTouchEvent(QEvent::TouchEnd, QTouchEvent::TouchScreen, Qt::NoModifier, Qt::TouchPointReleased, points);
-
-//    QTimer::singleShot(1000, &loop, SLOT(quit()));
-//    QApplication::postEvent(view_, touchBeginEvent);
-//    loop.exec(QEventLoop::ExcludeUserInputEvents);
-//    QApplication::postEvent(view_, touchEndEvent);
 
     QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Other, point, view_->mapToGlobal(point));
     qApp->postEvent(view_, contextEvent);
