@@ -35,6 +35,7 @@ std::string tests::testDataFolder;
 #include "StaleElementReferenceTest.h"
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
+#include "TouchTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
@@ -79,6 +80,9 @@ std::string tests::testDataFolder;
 #include "extension_qt/web_view_executor.h"
 #include "extension_qt/web_view_enumerator.h"
 #include "extension_qt/qwebviewext.h"
+#include "extension_qt/graphics_web_view_executor.h"
+#include "extension_qt/graphics_web_view_enumerator.h"
+#include "GraphicsWebViewTest.h"
 #include "WindowWithEmbeddedViewTest.h"
 #include "WidgetAndWebViewTest.h"
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
@@ -137,6 +141,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+    widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
 #endif
@@ -155,8 +160,16 @@ int main(int argc, char *argv[])
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
+
+    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::GraphicsWebViewEnumeratorImpl());
+
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::GraphicsWebViewCmdExecutorCreator());
+
+    widgetCreator->RegisterViewClass<GraphicsWebViewTestWindows>("GraphicsWebViewTestWindows");
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
     widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
+
+
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
 #endif

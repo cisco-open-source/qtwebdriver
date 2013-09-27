@@ -1,5 +1,5 @@
-#ifndef WEBDRIVER_QML_WEB_VIEW_EXECUTOR_H
-#define WEBDRIVER_QML_WEB_VIEW_EXECUTOR_H
+#ifndef WEBDRIVER_GRAPHICS_WEB_VIEW_EXECUTOR_H
+#define WEBDRIVER_GRAPHICS_WEB_VIEW_EXECUTOR_H
 
 #include <string>
 #include <vector>
@@ -8,36 +8,35 @@
 #include "base/memory/scoped_ptr.h"
 #include "webdriver_view_executor.h"
 #include "webdriver_error.h"
-#include "extension_qt/qdeclarativewebview.h"
 
 #include <QtCore/QDebug>
 
-class QDeclarativeView;
+class QGraphicsWebView;
 
 namespace webdriver {
 
 class QWebkitProxy;    
 
-class QmlWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
+class GraphicsWebViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
-    static const ViewType QML_WEB_VIEW_TYPE; 
+    static const ViewType GRAPHICS_WEB_VIEW_TYPE; 
 
-    QmlWebViewCmdExecutorCreator();
-    virtual ~QmlWebViewCmdExecutorCreator();
+    GraphicsWebViewCmdExecutorCreator();
+    virtual ~GraphicsWebViewCmdExecutorCreator();
 
     virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const;
 private:
 
-    DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutorCreator);
+    DISALLOW_COPY_AND_ASSIGN(GraphicsWebViewCmdExecutorCreator);
 };      
 
 #define NOT_SUPPORTED_IMPL      {*error = new Error(kCommandNotSupported, "Current view doesnt support this command.");}
 
-class QmlWebViewCmdExecutor : public ViewCmdExecutor {
+class GraphicsWebViewCmdExecutor : public ViewCmdExecutor {
 public:
-    explicit QmlWebViewCmdExecutor(Session* session, ViewId viewId);
-    virtual ~QmlWebViewCmdExecutor();
+    explicit GraphicsWebViewCmdExecutor(Session* session, ViewId viewId);
+    virtual ~GraphicsWebViewCmdExecutor();
 
     virtual void CanHandleUrl(const std::string& url, bool* can, Error **error);
     virtual void GetTitle(std::string* title, Error **error);
@@ -130,20 +129,15 @@ public:
     virtual void GetOrientation(std::string *orientation, Error **error);
 
 protected:
-    QDeclarativeWebView* getView(const ViewId& viewId, Error** error);
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    QTouchDevice touchDevice;
-#endif
+    QGraphicsWebView* getView(const ViewId& viewId, Error** error);
 
 private:
     scoped_ptr<QWebkitProxy> webkitProxy_;
-    QDeclarativeWebView* view_;
-    QDeclarativeView* container_;
+    QGraphicsWebView* view_;
 
-    DISALLOW_COPY_AND_ASSIGN(QmlWebViewCmdExecutor);
+    DISALLOW_COPY_AND_ASSIGN(GraphicsWebViewCmdExecutor);
 };
 
 }  // namespace webdriver
 
-#endif  // WEBDRIVER_QML_WEB_VIEW_EXECUTOR_H
+#endif  // WEBDRIVER_GRAPHICS_WEB_VIEW_EXECUTOR_H
