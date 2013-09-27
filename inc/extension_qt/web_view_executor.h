@@ -120,6 +120,9 @@ public:
     virtual void VisualizerSource(std::string* source, Error** error);
     virtual void VisualizerShowPoint(Error** error);
 
+    virtual void SetOnline(bool, Error** error);
+    virtual void IsOnline(bool*, Error** error);
+
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
 

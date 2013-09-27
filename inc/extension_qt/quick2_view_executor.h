@@ -108,6 +108,9 @@ public:
     virtual void VisualizerSource(std::string* source, Error** error) NOT_SUPPORTED_IMPL;
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
 
+    virtual void SetOnline(bool, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
+
 protected:
     QQuickView* getView(const ViewId& viewId, Error** error);
     typedef QHash<QString, QQuickItem*> XMLElementMap;    

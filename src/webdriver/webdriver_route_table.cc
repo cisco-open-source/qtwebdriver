@@ -39,6 +39,7 @@
 #include "commands/touch_commands.h"
 #include "commands/orientation_command.h"
 #include "commands/visualizer_commands.h"
+#include "commands/browser_connection_command.h"
 #include "webdriver_logging.h"
 #include "base/string_split.h"
 
@@ -288,6 +289,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<ExecuteCommand>                 (CommandRoutes::kExecuteScript);
     Add<ExecuteAsyncScriptCommand>      (CommandRoutes::kExecuteAsyncScript);
     Add<AppCacheStatusCommand>          (CommandRoutes::kGetAppCache);
+    Add<BrowserConnectionCommand>       (CommandRoutes::kBrowserConnection);
     Add<AlertTextCommand>               (CommandRoutes::kAlertText);
     Add<AcceptAlertCommand>             (CommandRoutes::kAcceptAlert);
     Add<DismissAlertCommand>            (CommandRoutes::kDismissAlert);

@@ -31,7 +31,6 @@
 #include <QtGui/QApplication>
 #endif
 class QNetworkCookie;
-
 namespace webdriver {
 
 #define CHECK_VIEW_EXISTANCE    \
@@ -839,6 +838,24 @@ void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
     command.Execute(error);
 }
 
+void QWebViewCmdExecutor::SetOnline(bool online, Error** error) {
+    QNetworkAccessManager *manager = view_->page()->networkAccessManager();
+
+    if (online){
+        manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
+    } else {
+        manager->setNetworkAccessible(QNetworkAccessManager::NotAccessible);
+    }
+}
+
+void QWebViewCmdExecutor::IsOnline(bool* online, Error** error) {
+    QNetworkAccessManager *manager = view_->page()->networkAccessManager();
+    if (manager->networkAccessible() == QNetworkAccessManager::NotAccessible) {
+        *online = false;
+    } else {
+        *online = true;
+    }
+}
 
 
 } //namespace webdriver 

@@ -169,6 +169,9 @@ public:
     virtual void VisualizerSource(std::string* source, Error** error) = 0;
     virtual void VisualizerShowPoint(Error** error) = 0;
 
+    virtual void IsOnline(bool *online,Error **error) = 0;
+    virtual void SetOnline(bool online, Error **error) = 0;
+
 protected:
     Session* session_;
     ViewId view_id_;

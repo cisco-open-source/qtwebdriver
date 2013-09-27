@@ -71,6 +71,7 @@ public:
     static const char kExecuteScript[];
     static const char kExecuteAsyncScript[];
     static const char kGetAppCache[];
+    static const char kBrowserConnection[];
     static const char kAlertText[];
     static const char kAcceptAlert[];
     static const char kDismissAlert[];

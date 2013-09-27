@@ -62,6 +62,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kExecuteScript);
 		standardCommandRoutes.insert(kExecuteAsyncScript);
 		standardCommandRoutes.insert(kGetAppCache);
+		standardCommandRoutes.insert(kBrowserConnection);
 		standardCommandRoutes.insert(kAlertText);
 		standardCommandRoutes.insert(kAcceptAlert);
 		standardCommandRoutes.insert(kDismissAlert);
@@ -148,6 +149,7 @@ const char CommandRoutes::kUrlCmd[] 					= "/session/*/url";
 const char CommandRoutes::kExecuteScript[] 				= "/session/*/execute";
 const char CommandRoutes::kExecuteAsyncScript[] 		= "/session/*/execute_async";
 const char CommandRoutes::kGetAppCache[] 				= "/session/*/application_cache/status";
+const char CommandRoutes::kBrowserConnection[]			= "/session/*/browser_connection";
 const char CommandRoutes::kAlertText[] 					= "/session/*/alert_text";
 const char CommandRoutes::kAcceptAlert[] 				= "/session/*/accept_alert";
 const char CommandRoutes::kDismissAlert[] 				= "/session/*/dismiss_alert";

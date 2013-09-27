@@ -78,7 +78,7 @@ bool Session::InitActualCapabilities() {
     capabilities_.caps->SetBoolean(Capabilities::kDatabaseEnabled, false);
     capabilities_.caps->SetBoolean(Capabilities::kLocationContextEnabled, false);
     capabilities_.caps->SetBoolean(Capabilities::kApplicationCacheEnabled, true);
-    capabilities_.caps->SetBoolean(Capabilities::kBrowserConnectionEnabled, false);
+    capabilities_.caps->SetBoolean(Capabilities::kBrowserConnectionEnabled, true);
     capabilities_.caps->SetBoolean(Capabilities::kCssSelectorsEnabled, true);
     capabilities_.caps->SetBoolean(Capabilities::kWebStorageEnabled, true);
     capabilities_.caps->SetBoolean(Capabilities::kRotatable, false);
