@@ -119,9 +119,13 @@ void QQmlXmlSerializer::addWidget(QDeclarativeItem* item) {
     writer_.writeAttribute("elementId", elementKey);
 
     if (dumpAll_) {
+        QStringList writtenAttributes;
         for (int propertyIndex = 0; propertyIndex < item->metaObject()->propertyCount(); propertyIndex++) {
             const QMetaProperty& property = item->metaObject()->property(propertyIndex);
-            writer_.writeAttribute(property.name(), property.read(item).toString());
+            if (!writtenAttributes.contains(property.name())) {
+                writer_.writeAttribute(property.name(), property.read(item).toString());
+                writtenAttributes.append(property.name());
+            }
         }
     }
 
