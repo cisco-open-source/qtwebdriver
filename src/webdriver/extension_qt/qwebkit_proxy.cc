@@ -1076,6 +1076,7 @@ Error* QWebkitProxy::GetMute(const ElementId& element, bool* mute) {
 }
 
 Error* QWebkitProxy::SetOnline(bool online) {
+#ifndef QT_NO_BEARERMANAGEMENT
     QNetworkAccessManager *manager = page_->networkAccessManager();
 
     if (online){
@@ -1083,16 +1084,21 @@ Error* QWebkitProxy::SetOnline(bool online) {
     } else {
         manager->setNetworkAccessible(QNetworkAccessManager::NotAccessible);
     }
+#endif //QT_NO_BEARERMANAGEMENT
+
     return NULL;
 }
 
 Error* QWebkitProxy::IsOnline(bool* online) {
+#ifndef QT_NO_BEARERMANAGEMENT
     QNetworkAccessManager *manager = page_->networkAccessManager();
     if (manager->networkAccessible() == QNetworkAccessManager::NotAccessible) {
         *online = false;
     } else {
         *online = true;
     }
+#endif //QT_NO_BEARERMANAGEMENT
+
     return NULL;
 }
 
