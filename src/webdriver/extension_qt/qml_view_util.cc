@@ -118,6 +118,13 @@ void QQmlXmlSerializer::addWidget(QDeclarativeItem* item) {
     elementsMap_.insert(elementKey, QPointer<QDeclarativeItem>(item));
     writer_.writeAttribute("elementId", elementKey);
 
+    if (dumpAll_) {
+        for (int propertyIndex = 0; propertyIndex < item->metaObject()->propertyCount(); propertyIndex++) {
+            const QMetaProperty& property = item->metaObject()->property(propertyIndex);
+            writer_.writeAttribute(property.name(), property.read(item).toString());
+        }
+    }
+
     QList<QObject*> childs = item->children();
     foreach(QObject *child, childs) {
         QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);

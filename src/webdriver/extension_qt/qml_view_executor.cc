@@ -775,7 +775,26 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
 
 void QQmlViewCmdExecutor::VisualizerSource(std::string* source, Error** error)
 {
-    GetSource(source, error);
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QDeclarativeItem* parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());
+    if (NULL == parentItem) {
+        session_->logger().Log(kInfoLogLevel, "no root element found.");
+        *error = new Error(kUnknownError, "no root element found.");
+        return;
+    }
+
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+    buff.open(QIODevice::ReadWrite);
+
+    QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
+    serializer.createXml(parentItem);
+    *source = byteArray.data();
+
     session_->logger().Log(kInfoLogLevel, "VisualizerSource:");
     session_->logger().Log(kInfoLogLevel, *source);
 }
