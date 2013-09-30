@@ -16,6 +16,7 @@
     <script src="base64-arraybuffer.js"></script>
     <script src="FileSaver.js"></script>
     <script>
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
       if (!String.prototype.startsWith) {
         Object.defineProperty(String.prototype, 'startsWith', {
           enumerable: false,
@@ -24,6 +25,19 @@
           value: function (searchString, position) {
             position = position || 0;
             return this.indexOf(searchString, position) === position;
+          }
+        });
+      }
+      if (!String.prototype.endsWith) {
+        Object.defineProperty(String.prototype, 'endsWith', {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: function (searchString, position) {
+            position = position || this.length;
+            position = position - searchString.length;
+            var lastIndex = this.lastIndexOf(searchString);
+            return lastIndex !== -1 && lastIndex === position;
           }
         });
       }
@@ -159,6 +173,30 @@
         }
       }
 
+      function VisualizerXsltProcessors() {
+        this.widget = this._create('widget_view_visualizer.xsl');
+        this.qml = this._create('qml_view_visualizer.xsl');
+      }
+
+      VisualizerXsltProcessors.prototype.get = function(webPage) {
+        if (webPage.startsWith('qtwidget://'))
+          return this.widget;
+        if (webPage.endsWith('.qml'))
+          return this.qml;
+      }
+
+      VisualizerXsltProcessors.prototype._create = function(name) {
+        var stylesheet = loadFile(name);
+        stylesheet = (new DOMParser()).parseFromString(stylesheet, 'application/xml');
+        var processor = new XSLTProcessor();
+        try {
+          processor.importStylesheet(stylesheet);
+          return processor;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
       function WebDriverJsDemo() {
       }
 
@@ -186,7 +224,7 @@
 
           this.driver.getSession().then(function(session) {
             self.setSession(session.getId());
-            self._constructXsltProcessor();
+            self.xsltProcessors = new VisualizerXsltProcessors();
           });
         }
 
@@ -196,17 +234,6 @@
 
           this.webPage = webPage;
           localStorage.webPage = webPage;
-        }
-      }
-
-      WebDriverJsDemo.prototype._constructXsltProcessor = function() {
-        var stylesheet = loadFile(this.webDriverUrlPort + '/widget_view_visualizer.xsl');
-        stylesheet = (new DOMParser()).parseFromString(stylesheet, 'application/xml');
-        this.xsltProcessor = new XSLTProcessor();
-        try {
-          this.xsltProcessor.importStylesheet(stylesheet);
-        } catch (err) {
-          console.log(err);
         }
       }
 
@@ -348,7 +375,7 @@
       }
 
       WebDriverJsDemo.prototype.showVisualizationWindow = function(source, size) {
-        var isQt = this.webPage.startsWith('qtwidget://');
+        var isQt = this.webPage.startsWith('qtwidget://') || this.webPage.endsWith('.qml');
         var isWinOpened = this.isVisualizerOpened();
 
         if (!isQt && isWinOpened) {
@@ -361,8 +388,9 @@
           this.openVisualizationWindow(size);
 
         if (isQt) {
+          var xsltProcessor = this.xsltProcessors.get(this.webPage);
           var receivedDoc = (new DOMParser()).parseFromString(source, 'application/xml');
-          receivedDoc = this.xsltProcessor.transformToDocument(receivedDoc);
+          receivedDoc = xsltProcessor.transformToDocument(receivedDoc);
           var visualizerDoc = this.visualizationWin.document;
           visualizerDoc.replaceChild(receivedDoc.documentElement, visualizerDoc.documentElement);
         } else {
