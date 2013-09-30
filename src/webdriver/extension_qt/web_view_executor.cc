@@ -759,22 +759,15 @@ void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
 }
 
 void QWebViewCmdExecutor::SetOnline(bool online, Error** error) {
-    QNetworkAccessManager *manager = view_->page()->networkAccessManager();
+    CHECK_VIEW_EXISTANCE
 
-    if (online){
-        manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
-    } else {
-        manager->setNetworkAccessible(QNetworkAccessManager::NotAccessible);
-    }
+    *error = webkitProxy_->SetOnline(online);
 }
 
 void QWebViewCmdExecutor::IsOnline(bool* online, Error** error) {
-    QNetworkAccessManager *manager = view_->page()->networkAccessManager();
-    if (manager->networkAccessible() == QNetworkAccessManager::NotAccessible) {
-        *online = false;
-    } else {
-        *online = true;
-    }
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->IsOnline(online);
 }
 
 

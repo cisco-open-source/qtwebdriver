@@ -128,8 +128,8 @@ public:
     virtual void AcceptOrDismissAlert(bool accept, Error** error) NOT_SUPPORTED_IMPL;
     virtual void SetOrientation(const std::string &orientation, Error **error) NOT_SUPPORTED_IMPL;
     virtual void GetOrientation(std::string *orientation, Error **error);
-    virtual void SetOnline(bool, Error** error) NOT_SUPPORTED_IMPL;
-    virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void SetOnline(bool, Error** error);
+    virtual void IsOnline(bool*, Error** error);
 
 protected:
     QDeclarativeWebView* getView(const ViewId& viewId, Error** error);

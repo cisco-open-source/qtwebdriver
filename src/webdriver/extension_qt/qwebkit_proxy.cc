@@ -1075,6 +1075,27 @@ Error* QWebkitProxy::GetMute(const ElementId& element, bool* mute) {
     return NULL;
 }
 
+Error* QWebkitProxy::SetOnline(bool online) {
+    QNetworkAccessManager *manager = page_->networkAccessManager();
+
+    if (online){
+        manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
+    } else {
+        manager->setNetworkAccessible(QNetworkAccessManager::NotAccessible);
+    }
+    return NULL;
+}
+
+Error* QWebkitProxy::IsOnline(bool* online) {
+    QNetworkAccessManager *manager = page_->networkAccessManager();
+    if (manager->networkAccessible() == QNetworkAccessManager::NotAccessible) {
+        *online = false;
+    } else {
+        *online = true;
+    }
+    return NULL;
+}
+
 QWebFrame* QWebkitProxy::GetFrame(QWebPage* page, const FramePath& frame_path) {
     QWebFrame* frame = FindFrameByPath(page->mainFrame(), frame_path);
     if (frame == NULL)

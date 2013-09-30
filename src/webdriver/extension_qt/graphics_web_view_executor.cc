@@ -716,4 +716,17 @@ void GraphicsWebViewCmdExecutor::GetOrientation(std::string *orientation, Error 
     // TODO:
 }
 
+void GraphicsWebViewCmdExecutor::SetOnline(bool online, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->SetOnline(online);
+}
+
+void GraphicsWebViewCmdExecutor::IsOnline(bool* online, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->IsOnline(online);
+}
+
+
 } // namespace webdriver     

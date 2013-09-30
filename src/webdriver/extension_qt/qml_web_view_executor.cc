@@ -724,4 +724,16 @@ void QmlWebViewCmdExecutor::GetOrientation(std::string *orientation, Error **err
     // TODO:
 }
 
+void QmlWebViewCmdExecutor::SetOnline(bool online, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->SetOnline(online);
+}
+
+void QmlWebViewCmdExecutor::IsOnline(bool* online, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    *error = webkitProxy_->IsOnline(online);
+}
+
 } // namespace webdriver     

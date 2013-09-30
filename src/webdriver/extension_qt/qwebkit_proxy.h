@@ -178,6 +178,8 @@ public:
     virtual Error* SetPlaybackSpeed(const ElementId& element, const double speed);
     virtual Error* SetMute(const ElementId& element, bool mute);
     virtual Error* GetMute(const ElementId& element, bool* mute);
+    virtual Error* SetOnline(bool online);
+    virtual Error* IsOnline(bool* online);
 
 protected:
     Session* session_;
