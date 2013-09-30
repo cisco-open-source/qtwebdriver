@@ -2,7 +2,6 @@
 #define BROWSER_CONNECTION_COMMAND_H
 
 #include "commands/webdriver_command.h"
-#include <QtNetwork/QNetworkAccessManager>
 
 namespace webdriver {
 class Response;
