@@ -1,10 +1,12 @@
 #include "qml_view_util.h"
 #include "webdriver_session.h"
 #include "webdriver_error.h"
+#include "webdriver_util.h"
 #include "q_content_type_resolver.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QFileInfo>
+#include <QtDeclarative/QDeclarativeItem>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "extension_qt/qwindow_view_handle.h"
@@ -13,7 +15,6 @@
 #include "extension_qt/widget_view_handle.h"
 #include <QtDeclarative/QDeclarativeView>
 #endif
-
 
 namespace webdriver {
 
@@ -54,6 +55,12 @@ bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {
     return false;
 }
 
+void QQmlViewUtil::removeInternalSuffixes(QString& str) {
+    str.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+")));
+    str.remove(QRegExp(QLatin1String("_QML_\\d+")));
+    if (str.startsWith(QLatin1String("QDeclarative"))) str = str.mid(12);
+}
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
     ViewHandle* viewHandle =  session->GetViewHandle(viewId);
@@ -92,5 +99,34 @@ QDeclarativeView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewI
 }
 #endif
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+void QQmlXmlSerializer::addWidget(QDeclarativeItem* item) {
+    if (NULL == item) {
+        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
+        return;
+    }
+
+    QString className(item->metaObject()->className());
+    QQmlViewUtil::removeInternalSuffixes(className);
+
+    writer_.writeStartElement(className);
+
+    if (!item->objectName().isEmpty())
+        writer_.writeAttribute("id", item->objectName());
+
+    QString elementKey = GenerateRandomID().c_str();
+    elementsMap_.insert(elementKey, QPointer<QDeclarativeItem>(item));
+    writer_.writeAttribute("elementId", elementKey);
+
+    QList<QObject*> childs = item->children();
+    foreach(QObject *child, childs) {
+        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
+        if (childItem)
+            addWidget(childItem);
+    }
+
+    writer_.writeEndElement();
+}
+#endif
 
 } // namespace webdriver

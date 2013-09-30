@@ -10,10 +10,12 @@
 #include <QtGui/QWidget>
 #endif
 
+#include "common_util.h"
+#include "webdriver_view_id.h"
+
 namespace webdriver {
 
 class Session;	
-class ViewId;
 
 class QWidgetViewUtil {
 public:
@@ -28,6 +30,27 @@ private:
     ~QWidgetViewUtil(){}
 };
 
+class QWidgetXmlSerializer : public QViewXmlSerializer<QWidget> {
+public:
+    QWidgetXmlSerializer(QIODevice* buff)
+        : QViewXmlSerializer(buff)
+    {}
+
+    void setViewId(ViewId viewId) {
+        viewId_ = viewId;
+    }
+
+    void setSupportedClasses(const QStringList& classes) {
+        supportedClasses_ = classes;
+    }
+
+private:
+    virtual void addWidget(QWidget* widget);
+    QString getElementName(const QObject* object) const;
+
+    ViewId viewId_;
+    QStringList supportedClasses_;
+};
 
 }  // namespace webdriver
 

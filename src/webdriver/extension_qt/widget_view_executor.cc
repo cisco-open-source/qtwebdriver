@@ -6,7 +6,6 @@
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
 #include "webdriver_view_factory.h"
-#include "webdriver_util.h"
 #include "common_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element_handle.h"
@@ -18,7 +17,6 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
-#include <QtCore/QMetaProperty>
 #include <QtCore/QTimer>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QApplication>
@@ -59,79 +57,6 @@
 #include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
-
-QWidgetXmlSerializer::QWidgetXmlSerializer(QIODevice* buff)
-    : session_(NULL), dumpAll_(false)
-{
-    writer_.setDevice(buff);
-    writer_.setAutoFormatting(true);
-}
-
-void QWidgetXmlSerializer::createXml(QWidget* widget) {
-    writer_.writeStartDocument();
-    if (!stylesheet_.isEmpty()) {
-        writer_.writeProcessingInstruction("xml-stylesheet", "href=\"" + stylesheet_ + "\"");
-    }
-    addWidget(widget);
-    writer_.writeEndDocument();
-}
-
-void QWidgetXmlSerializer::addWidget(QWidget* widget) {
-    QString elementName = getElementName(widget);
-    writer_.writeStartElement(elementName);
-
-    if (dumpAll_) {
-        for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
-            const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
-            writer_.writeAttribute(property.name(), property.read(widget).toString());
-        }
-    }
-
-    if (!widget->objectName().isEmpty())
-        writer_.writeAttribute("id", widget->objectName());
-
-    if (!widget->windowTitle().isEmpty())
-        writer_.writeAttribute("name", widget->windowTitle());
-
-    QString elementKey;
-    if (session_) {
-        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
-        if (!elementId.is_valid())
-            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
-        elementKey = QString::fromStdString(elementId.id());
-    } else {
-        elementKey = GenerateRandomID().c_str();
-    }
-    elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
-    writer_.writeAttribute("elementId", elementKey);
-
-    writer_.writeAttribute("className", widget->metaObject()->className());
-
-    QList<QObject*> childs = widget->children();
-    foreach(QObject* child, childs) {
-        QWidget* childWgt = qobject_cast<QWidget*>(child);
-        if (childWgt)
-            addWidget(childWgt);
-    }
-
-    writer_.writeEndElement();
-}
-
-QString QWidgetXmlSerializer::getElementName(const QObject* object) const {
-    QString elementName = object->metaObject()->className();
-    if (supportedClasses_.empty())
-        return elementName;
-
-    const QMetaObject* metaObject = object->metaObject();
-    while (!supportedClasses_.contains(metaObject->className()) &&
-           metaObject->superClass() != NULL) {
-        metaObject = metaObject->superClass();
-    }
-    if (supportedClasses_.contains(metaObject->className()))
-        elementName = metaObject->className();
-
-    return elementName;
-}
 
 const ViewType QWidgetViewCmdExecutorCreator::WIDGET_VIEW_TYPE = 0x13f6;    
 
@@ -1518,7 +1443,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
-                    const XMLElementMap& elementsMap = serializer.getElementsMap();
+                    const QWidgetXmlSerializer::XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);

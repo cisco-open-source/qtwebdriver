@@ -3,59 +3,7 @@
 
 #include "extension_qt/q_view_executor.h"
 
-#include <QtCore/QDebug>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtCore/QXmlStreamWriter>
-#else
-#include <QtXml/QXmlStreamWriter>
-#endif
-
 namespace webdriver {
-
-class QWidgetXmlSerializer {
-public:
-    typedef QHash<QString, QWidget*> XMLElementMap;
-
-    QWidgetXmlSerializer(QIODevice* buff);
-
-    void createXml(QWidget* widget);
-
-    const XMLElementMap& getElementsMap() {
-        return elementsMap_;
-    }
-
-    void setSession(Session* session) {
-        session_ = session;
-    }
-
-    void setViewId(ViewId viewId) {
-        viewId_ = viewId;
-    }
-
-    void setDumpAll(bool dumpAll) {
-        dumpAll_ = dumpAll;
-    }
-
-    void setSupportedClasses(const QStringList& classes) {
-        supportedClasses_ = classes;
-    }
-
-    void setStylesheet(const QString& stylesheet) {
-        stylesheet_ = stylesheet;
-    }
-
-private:
-    void addWidget(QWidget* widget);
-    QString getElementName(const QObject* object) const;
-
-    QXmlStreamWriter writer_;
-    XMLElementMap elementsMap_;
-    Session* session_;
-    ViewId viewId_;
-    bool dumpAll_;
-    QStringList supportedClasses_;
-    QString stylesheet_;
-};
 
 class QWidgetViewCmdExecutorCreator : public ViewCmdExecutorCreator  {
 public:
@@ -158,8 +106,6 @@ public:
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
-    typedef QHash<QString, QWidget*> XMLElementMap;    
-
     QWidget* getElement(const ElementId &element, Error** error);
     bool MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);

@@ -8,8 +8,8 @@
 #include <QtCore/QProcess>
 #endif
 #include "base/file_util.h"
-#include "extension_qt/widget_view_executor.h"
 #include "webdriver_session.h"
+#include "widget_view_util.h"
 
 namespace webdriver {
 
