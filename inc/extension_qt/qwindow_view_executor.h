@@ -45,7 +45,9 @@ protected:
     QPoint ConvertPointToQPoint(const Point &p);
     Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
     QTouchEvent::TouchPoint createTouchPoint(Qt::TouchPointState state, QPointF &point, QVector2D velocity = QVector2D());
+    QTouchEvent::TouchPoint createTouchPointWithId(Qt::TouchPointState state, QPointF &point, int id);
     QTouchEvent* createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point, QVector2D velocity = QVector2D());
+    QTouchEvent* create2PointTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point1, QPointF &point2);
     QTouchEvent* createTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, const QList<QTouchEvent::TouchPoint> &touchPoints);
 
 private:

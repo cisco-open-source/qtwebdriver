@@ -171,6 +171,9 @@ public:
 
     virtual void IsOnline(bool *online,Error **error) = 0;
     virtual void SetOnline(bool online, Error **error) = 0;
+	
+	virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error **error) = 0;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error **error) = 0;
 
 protected:
     Session* session_;

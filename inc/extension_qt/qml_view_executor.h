@@ -103,6 +103,8 @@ public:
     virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;;
     virtual void VisualizerSource(std::string* source, Error** error) NOT_SUPPORTED_IMPL;
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error** error) NOT_SUPPORTED_IMPL;
 
     virtual void SetOnline(bool, Error** error) NOT_SUPPORTED_IMPL;
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;

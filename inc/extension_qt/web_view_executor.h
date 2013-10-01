@@ -122,6 +122,9 @@ public:
 
     virtual void SetOnline(bool, Error** error);
     virtual void IsOnline(bool*, Error** error);
+	
+	virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
