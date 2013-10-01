@@ -24,6 +24,7 @@
 #include <QtQml/QQmlExpression>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QStyleHints>
+#include <QtCore/QtMath>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -1082,6 +1083,7 @@ void Quick2ViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
     QGuiApplication::processEvents();
 }
 
+
 void Quick2ViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error)
 {
     QQuickView* view = getView(view_id_, error);
@@ -1309,6 +1311,130 @@ void Quick2ViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoff
             QGuiApplication::postEvent(view, touchEvent);
         }
     }
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &angle, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QPointF startPoint(point.x(), point.y());
+
+    float dx = qApp->styleHints()->startDragDistance();
+    float dy = qApp->styleHints()->startDragDistance();
+
+    float degree = angle;
+    float rad = qDegreesToRadians(degree);
+
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint);
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF point1(point.x() - dx*cos(rad*i/stepCount), point.y() - dy*sin(rad*i/stepCount));
+        QPointF point2(point.x() + dx*cos(rad*i/stepCount), point.y() + dy*sin(rad*i/stepCount));
+
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
+        QGuiApplication::postEvent(view, touchMoveEvent);
+
+        if (stepCount == i)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point1, point2);
+            QGuiApplication::postEvent(view, touchEndEvent);
+        }
+    }
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double &scale, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QPointF startPoint(point.x(), point.y());
+
+    float dx;
+
+    if (scale >= 1)
+        dx = scale*qApp->styleHints()->startDragDistance();
+    else
+        dx = (1-scale)*qApp->styleHints()->startDragDistance();
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint);
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 1; i <= stepCount; ++i)
+    {
+        QPointF point1(startPoint);
+        QPointF point2(startPoint);
+        if (i == 1)
+        {
+            //need to trigger PinchStart event
+            point1.setX(startPoint.x() + qApp->styleHints()->startDragDistance());
+        }
+        else
+        {
+            if (scale > 1)
+                point1.setX(startPoint.x() + dx*i/stepCount);
+            else
+                point1.setX(startPoint.x() + qApp->styleHints()->startDragDistance() - dx*i/stepCount);
+        }
+
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point2, point1);
+        QGuiApplication::postEvent(view, touchMoveEvent);
+
+        if (i == stepCount)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point2, point1);
+            QGuiApplication::postEvent(view, touchEndEvent);
+        }
+    }
+
     QGuiApplication::processEvents();
 }
 

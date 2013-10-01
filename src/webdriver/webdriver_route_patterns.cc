@@ -179,5 +179,7 @@ const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/
 const char CommandRoutes::kCiscoPlayerPlayingSpeed[]    = "/session/*/element/*/-CISCO-player-element/speed";
 const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
 const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
+const char CommandRoutes::kTouchPinchZoom[]             = "/session/*/touch/-cisco-pinch-zoom";
+const char CommandRoutes::kTouchPinchRotate[]           = "/session/*/touch/-cisco-pinch-rotate";
 
 } // namespace webdriver

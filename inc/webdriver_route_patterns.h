@@ -101,6 +101,8 @@ public:
     static const char kCiscoPlayerPlayingSpeed[];
     static const char kVisualizerSource[];
     static const char kVisualizerShowPoint[];
+    static const char kTouchPinchZoom[];
+    static const char kTouchPinchRotate[];
 
 private:
     static std::set<std::string> standardCommandRoutes;
