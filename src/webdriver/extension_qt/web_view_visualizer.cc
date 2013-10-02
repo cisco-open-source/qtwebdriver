@@ -128,7 +128,7 @@ void QWebViewVisualizerSourceCommand::AssemblePage(QDomElement element) const {
 
     // Recursively walk DOM tree
     QDomNodeList children = element.childNodes();
-    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+    for (unsigned int childIndex = 0; childIndex < children.length(); childIndex++) {
         QDomNode child = children.at(childIndex);
         if (child.nodeType() == QDomNode::ElementNode) {
             QDomElement childElement = child.toElement();
@@ -222,7 +222,7 @@ void QWebViewVisualizerSourceCommand::RemoveScripts(QDomElement element) const {
     std::vector<QDomNode> scripts;
 
     QDomNodeList children = element.childNodes();
-    for (int childIndex = 0; childIndex < children.length(); childIndex++) {
+    for (unsigned int childIndex = 0; childIndex < children.length(); childIndex++) {
         QDomNode child = children.at(childIndex);
         if (child.nodeType() == QDomNode::ElementNode) {
             QDomElement childElement = child.toElement();

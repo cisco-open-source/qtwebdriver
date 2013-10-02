@@ -45,6 +45,7 @@ public:
     virtual void SetBounds(const Rect& bounds, Error** error) NOT_SUPPORTED_IMPL;
     virtual void Maximize(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetScreenShot(std::string* png, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GoForward(Error** error);
     virtual void GoBack(Error** error);
     virtual void Reload(Error** error);

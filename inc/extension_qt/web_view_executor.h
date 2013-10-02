@@ -48,6 +48,7 @@ public:
     virtual void Reload(Error** error);
     virtual void GetSource(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) NOT_SUPPORTED_IMPL;
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);

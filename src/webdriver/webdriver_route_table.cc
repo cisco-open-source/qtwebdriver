@@ -253,6 +253,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<BackCommand>                    (CommandRoutes::kGoBack);
     Add<RefreshCommand>                 (CommandRoutes::kRefresh);
     Add<ScreenshotCommand>              (CommandRoutes::kScreenshot);
+    Add<ElementScreenshotCommand>       (CommandRoutes::kElementScreenshot);
     Add<KeysCommand>                    (CommandRoutes::kSendKeys);
     Add<MoveAndClickCommand>            (CommandRoutes::kClickElement);
     Add<HoverCommand>                   (CommandRoutes::kHoverOverElement);

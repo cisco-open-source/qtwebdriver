@@ -75,6 +75,7 @@ public:
     virtual void GoBack(Error** error) = 0;
     virtual void Reload(Error** error) = 0;
     virtual void GetScreenShot(std::string* png, Error** error) = 0;
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) = 0;
     virtual void GetSource(std::string* source, Error** error) = 0;
     virtual void SendKeys(const string16& keys, Error** error) = 0;
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;

@@ -17,6 +17,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 #include <QtGui/QApplication>
+#include <QtGui/QStyleOptionGraphicsItem>
 
 #include <QtDeclarative/QDeclarativeExpression>
 #include <QtDeclarative/QDeclarativeEngine>
@@ -185,6 +186,45 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
     // restore old focus
     if (NULL != pFocusItem)
         pFocusItem->setFocus(true);
+}
+
+void QQmlViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QImage image(pItem->boundingRect().size().toSize(), QImage::Format_RGB32);
+    image.fill(QColor(0, 0, 0).rgb());
+    QPainter painter(&image);
+    QStyleOptionGraphicsItem styleOption;
+    qobject_cast<QGraphicsObject*>(pItem)->paint(&painter, &styleOption);
+    painter.end();
+
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+#if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");
 }
 
 void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {

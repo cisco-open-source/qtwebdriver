@@ -26,6 +26,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kGoBack);
 		standardCommandRoutes.insert(kRefresh);
 		standardCommandRoutes.insert(kScreenshot);
+		standardCommandRoutes.insert(kElementScreenshot);
 		standardCommandRoutes.insert(kSendKeys);
 		standardCommandRoutes.insert(kClickElement);
 		standardCommandRoutes.insert(kHoverOverElement);
@@ -113,6 +114,7 @@ const char CommandRoutes::kGoForward[] 					= "/session/*/forward";
 const char CommandRoutes::kGoBack[] 					= "/session/*/back";
 const char CommandRoutes::kRefresh[] 					= "/session/*/refresh";
 const char CommandRoutes::kScreenshot[] 				= "/session/*/screenshot";
+const char CommandRoutes::kElementScreenshot[] 			= "/session/*/element/*/screenshot";
 const char CommandRoutes::kSendKeys[] 					= "/session/*/keys";
 const char CommandRoutes::kClickElement[] 				= "/session/*/element/*/click";
 const char CommandRoutes::kHoverOverElement[] 			= "/session/*/element/*/hover";
