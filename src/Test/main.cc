@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
     qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
     qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
+    //webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
+    //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
 #endif    
