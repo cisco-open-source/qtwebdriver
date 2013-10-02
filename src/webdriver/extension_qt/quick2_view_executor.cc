@@ -764,6 +764,45 @@ void Quick2ViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
         *error = new Error(kUnknownError, "Could not read screenshot file");
 }
 
+void Quick2ViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QImage grabbed = view->grabWindow();
+    QPointF scenePos = pItem->mapToScene(QPointF(0,0));
+    QRectF rf(scenePos.x(), scenePos.y(), pItem->width(), pItem->height());        
+    rf = rf.intersected(QRectF(0, 0, grabbed.width(), grabbed.height()));
+
+    QImage image = grabbed.copy(rf.toAlignedRect());
+
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+    #if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");       
+}
+
 void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
     QQuickView* view = getView(view_id_, error);
     if (NULL == view)
