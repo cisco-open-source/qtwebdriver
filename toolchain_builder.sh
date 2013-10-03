@@ -126,9 +126,9 @@ function SetPlatformVariable
 			;;
 	
 		GNUARM)
-			export CC=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-gcc
-			export CXX=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-g++
-			export LINK=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-g++
+			export CC=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-gcc
+			export CXX=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-g++
+			export LINK=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-g++
 			export QT_DIR=${GNUARM_QT_DIR}
 			;;
 		
