@@ -35,6 +35,10 @@ VOO_QT_DIR=/home/jenkins/jobs/BUILD_MVM_All/workspace/build/TAMIAS/WEBKITQT48/ci
 ARMV7_TOOLCHAIN_DIR=/opt/softs/compilers/st/arm/LINUX_4.6.3_112/armv7
 
 
+ARM_GNU_TOOLCHAIN_DIR=/opt/softs/toolchains/ARM_GNU
+ARM_GNU_QT_DIR=/opt/android/Qt5.1/5.1.0/android_armv7
+
+
 ARM_ANGSTROM_TOOLCHAIN_DIR=/opt/softs/compilers/st/arm/LINUX_4.6.3_112/arm-angstrom
 ARM_ANGSTROM_QT_DIR=/opt/android/Qt5.1/5.1.0/android_armv7
 
@@ -122,7 +126,14 @@ function SetPlatformVariable
 			export LINK=${ARM_ANGSTROM_TOOLCHAIN_DIR}/bin/arm-angstrom-linux-gnueabi-g++
 			export QT_DIR=${ARM_ANGSTROM_QT_DIR}
 			;;
-
+	
+		ARM_GNU)
+			export CC=${ARM_GNU_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-gcc
+			export CXX=${ARM_GNU_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-g++
+			export LINK=${ARM_GNU_TOOLCHAIN_DIR}/bin/arm-none-linux-gnueabi-g++
+			export QT_DIR=${ARM_GNU_QT_DIR}
+			;;
+		
 	esac
 }
 
@@ -140,7 +151,7 @@ fi
 if [ "$TARGET_LIST" = "all" ]
 then
 	echo "TARGET = all"
-	TARGET_LIST="desktop BCM CHANALD NEWCO REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOO ARMV7 ARM_ANGSTROM"
+	TARGET_LIST="desktop BCM CHANALD NEWCO REF ST40_CC14_0_1 ST40_CC15_0_0 UPCH VOO ARMV7 ARM_ANGSTROM ARM_GNU"
 fi
 
 if [ -z "$MODE_LIST" ]
@@ -154,7 +165,7 @@ then
 	OUTDIR=`pwd`
 fi
 
-SUPPORTED_TARGETS="desktop,BCM,CHANALD,NEWCO,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO,ARMV7,ARM_ANGSTROM"
+SUPPORTED_TARGETS="desktop,BCM,CHANALD,NEWCO,REF,ST40_CC14_0_1,ST40_CC15_0_0,UPCH,VOO,ARMV7,ARM_ANGSTROM,ARM_GNU"
 SUPPORTED_MODES="release_dbg,release"
 
 for TmpTarget in $TARGET_LIST
@@ -178,7 +189,7 @@ do
 		echo "*************************************************"
 		SetPlatformVariable $TmpTarget
 		rm -f wd.gypi
-		cp wd.gypi.${TmpTarget} wd.gypi
+		cp platform/wd.gypi.${TmpTarget} wd.gypi
 		if [ ! -f wd.gypi ]
 		then
     		echo "Create default wd.gypi"
