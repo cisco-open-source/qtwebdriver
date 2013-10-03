@@ -34,6 +34,7 @@ VOO_QT_DIR=/home/jenkins/jobs/BUILD_MVM_All/workspace/build/TAMIAS/WEBKITQT48/ci
 
 ARMV7_TOOLCHAIN_DIR=/opt/softs/compilers/st/arm/LINUX_4.6.3_112/armv7
 
+GNUARM_TOOLCHAIN_DIR=/opt/softs/toolchains/ARM
 GNUARM_QT_DIR=/opt/android/Qt5.1/5.1.0/android_armv7
 
 ARM_ANGSTROM_TOOLCHAIN_DIR=/opt/softs/compilers/st/arm/LINUX_4.6.3_112/arm-angstrom
@@ -125,9 +126,9 @@ function SetPlatformVariable
 			;;
 	
 		GNUARM)
-			export CC=arm-linux-gnu-gcc
-			export CXX=arm-linux-gnu-cpp
-			export LINK=arm-linux-gnu-cpp
+			export CC=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-gcc
+			export CXX=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-g++
+			export LINK=${GNUARM_TOOLCHAIN_DIR}/bin/arm-none-eabi-g++
 			export QT_DIR=${GNUARM_QT_DIR}
 			;;
 		
