@@ -40,7 +40,7 @@ class QQmlXmlSerializer : public QViewXmlSerializer<QDeclarativeItem>
 {
 public:
     QQmlXmlSerializer(QIODevice* buff)
-        : QViewXmlSerializer(buff)
+        : QViewXmlSerializer<QDeclarativeItem>(buff)
     {}
 
 protected:

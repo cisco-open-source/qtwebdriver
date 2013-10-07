@@ -26,14 +26,14 @@ public:
 
 private:
 	static const char url_protocol[];
-	QWidgetViewUtil() {};
-    ~QWidgetViewUtil(){}
+    QWidgetViewUtil() {}
+    ~QWidgetViewUtil() {}
 };
 
 class QWidgetXmlSerializer : public QViewXmlSerializer<QWidget> {
 public:
     QWidgetXmlSerializer(QIODevice* buff)
-        : QViewXmlSerializer(buff)
+        : QViewXmlSerializer<QWidget>(buff)
     {}
 
     void setViewId(ViewId viewId) {
