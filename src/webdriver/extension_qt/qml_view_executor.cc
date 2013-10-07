@@ -829,6 +829,7 @@ void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const st
     buff.open(QIODevice::ReadWrite);
 
     QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
     serializer.createXml(parent);
 
     buff.seek(0);

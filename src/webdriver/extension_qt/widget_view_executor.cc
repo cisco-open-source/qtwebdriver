@@ -1416,6 +1416,7 @@ void QWidgetViewCmdExecutor::FindNativeElementsByXpath(QWidget* parent, const st
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
     QWidgetXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
     serializer.createXml(parent);
 
     buff.seek(0);
