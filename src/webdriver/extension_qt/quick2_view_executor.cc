@@ -30,15 +30,6 @@
 
 namespace webdriver {
 
-#if 1 
-#define REMOVE_INTERNAL_SUFIXES(qstr)   \
-        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
-        if (qstr.startsWith(QLatin1String("QQuick"))) qstr = qstr.mid(6);
-#else
-#define REMOVE_INTERNAL_SUFIXES(qstr)
-#endif            
-
 const ViewType Quick2ViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
 Quick2ViewCmdExecutorCreator::Quick2ViewCmdExecutorCreator()
@@ -122,16 +113,12 @@ void Quick2ViewCmdExecutor::GetSource(std::string* source, Error** error) {
         return;
     }
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
 
-    createUIXML(parentItem, &buff, elementsMap, error);
-
-    if (*error)
-        return;
-
+    QQmlXmlSerializer serializer(&buff);
+    serializer.createXml(parentItem);
     *source = byteArray.data();
 }
 
@@ -599,7 +586,7 @@ void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::str
         return;
 
     QString className(pItem->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     *tag_name = className.toStdString();
 }
@@ -1503,7 +1490,7 @@ QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
 
 bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query) {
     QString className(item->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     if (locator == LocatorType::kClassName) {
         if (query == className.toStdString())
@@ -1528,12 +1515,11 @@ bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::str
 void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
-
     buff.open(QIODevice::ReadWrite);
-    XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error);
-    if (*error)
-        return;
+
+    QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
+    serializer.createXml(parent);
 
     buff.seek(0);
 
@@ -1560,6 +1546,7 @@ void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::s
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
+                    const QQmlXmlSerializer::XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
@@ -1590,55 +1577,5 @@ void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::s
 
     buff.close();
 }
-
-void Quick2ViewCmdExecutor::createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
-    
-    QXmlStreamWriter* writer = new QXmlStreamWriter();
-
-    writer->setDevice(buff);
-    writer->setAutoFormatting(true);
-    writer->writeStartDocument();
-
-    addItemToXML(parent, elementsMap, writer);
-
-    writer->writeEndDocument();
-
-    delete writer;
-}
-
-void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
-    if (NULL == parent) {
-        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
-        return;
-    }
-
-    QString className(parent->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
-    
-    writer->writeStartElement(className);
-
-    if (!parent->objectName().isEmpty())
-        writer->writeAttribute("id", parent->objectName());
-
-    writer->writeAttribute("x", QString::number(parent->x()));
-    writer->writeAttribute("y", QString::number(parent->y()));
-    writer->writeAttribute("width", QString::number(parent->width()));
-    writer->writeAttribute("height", QString::number(parent->height()));
-    writer->writeAttribute("activeFocus", QString(parent->hasActiveFocus()?"true":"false"));
-    writer->writeAttribute("focus", QString(parent->hasFocus()?"true":"false"));
-
-
-    QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
-    writer->writeAttribute("elementId", elementKey);
-
-    QList<QQuickItem*> childs = parent->childItems();
-    foreach(QQuickItem *child, childs) {
-        if (child) addItemToXML(child, elementsMap, writer);
-    }
-
-    writer->writeEndElement();
-}
-
 
 } //namespace webdriver 

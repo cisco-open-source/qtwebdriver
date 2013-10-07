@@ -10,10 +10,11 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 class QWindow;
 class QQuickView;
+#include <QtQuick/QQuickItem>
 #else
 class QDeclarativeView;
+#include <QtDeclarative/QDeclarativeItem>
 #endif
-class QDeclarativeItem;
 
 namespace webdriver {
 
@@ -45,6 +46,17 @@ public:
 
 protected:
     virtual void addWidget(QDeclarativeItem* item);
+};
+#else
+class QQmlXmlSerializer : public QViewXmlSerializer<QQuickItem>
+{
+public:
+    QQmlXmlSerializer(QIODevice* buff)
+        : QViewXmlSerializer<QQuickItem>(buff)
+    {}
+
+protected:
+    virtual void addWidget(QQuickItem* item);
 };
 #endif
 
