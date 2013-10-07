@@ -439,6 +439,13 @@ void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::stri
         return;
 
     QVariant propertyValue = pItem->property(key.c_str());
+
+    // substituate "id" with "objectName"
+    QString idName("id");
+    if (0 == idName.compare(key.c_str(), Qt::CaseInsensitive)) {
+        propertyValue = pItem->property("objectName");
+    }
+    
     Value* val = NULL;
 
     if (propertyValue.isValid()) {
