@@ -33,7 +33,6 @@
 #include "webdriver_view_enumerator.h"
 #include "webdriver_view_executor.h"
 
-
 namespace webdriver {
 
 Server::Server()
@@ -79,6 +78,13 @@ int Server::Configure(const CommandLine &options) {
     std::string driver_info = "*** Webdriver ****\nVersion:    "+ VersionInfo::Name() + "-" + VersionInfo::Version() +
                             "\nBuild Time: "+ VersionInfo::BuildDateTime() ;
     GlobalLogger::Log(kInfoLogLevel, driver_info);
+
+    if (options.HasSwitch(webdriver::Switches::kWhiteList))
+    {
+        FilePath xmlPath(options_->GetSwitchValueNative(webdriver::Switches::kWhiteList));
+        accessValidor.setWhiteList(xmlPath);
+    }
+
 
     // set default route table
     routeTable_.reset(new DefaultRouteTable());
@@ -425,6 +431,14 @@ bool Server::ParseRequestInfo(const struct mg_request_info* const request_info,
     uri = uri.substr(url_base_.length());
 
     base::SplitString(uri, '/', path_segments);
+
+    if (!accessValidor.isAllowed(request_info->remote_ip, uri, *method))
+    {
+        response->SetError(new Error(
+                               kUnknownCommand,
+                               "Command was restricted by whitelist"));
+        return false;
+    }
 
     if (*method == "POST") {
         std::string json;
