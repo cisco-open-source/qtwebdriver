@@ -828,15 +828,15 @@ void QWebViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **
 void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerSourceCommand command(this, session_, view_);
-    command.Execute(source, error);
+//    QWebViewVisualizerSourceCommand command(this, session_, view_);
+//    command.Execute(source, error);
 }
 
 void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerShowPointCommand command(this, session_, view_);
-    command.Execute(error);
+//    QWebViewVisualizerShowPointCommand command(this, session_, view_);
+//    command.Execute(error);
 }
 
 
