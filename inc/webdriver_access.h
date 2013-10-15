@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include "base/file_util.h"
 
 namespace webdriver {
@@ -14,7 +15,8 @@ struct AccessCommandTable
 };
 
 struct AccessRule {
-    long host_ip;
+    long hostIp;
+    bool isGeneralRule; //for all ip
     bool allowed;
     std::vector<AccessCommandTable> commandList;
 };
@@ -29,7 +31,7 @@ public:
 
 private:
     bool convertIpString(const char *str_ip, long *int_ip);
-    std::vector<AccessRule> accessList;
+    std::list<AccessRule> accessList;
 };
 
 }  // namespace webdriver

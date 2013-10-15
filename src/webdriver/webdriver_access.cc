@@ -16,10 +16,10 @@ bool AccessValidator::isAllowed(const long &remote_ip, const std::string &url, c
     if (accessList.empty())
         return true;
     bool result = false;
-    for (std::vector<AccessRule>::iterator it = accessList.begin(); it != accessList.end(); ++it)
+    for (std::list<AccessRule>::iterator it = accessList.begin(); it != accessList.end(); ++it)
     {
         AccessRule host = *it;
-        if (host.host_ip == remote_ip)
+        if ((host.hostIp == remote_ip) || (host.isGeneralRule))
         {
             if (!host.allowed) {
                 for (std::vector<AccessCommandTable>::iterator it = host.commandList.begin(); it != host.commandList.end(); ++it) {
@@ -68,13 +68,20 @@ void AccessValidator::setWhiteList(FilePath &xmlPath)
                     pugi::xml_attribute atr = xnode.attribute("ip");
 
                     AccessRule rule;
-                    if (!convertIpString(atr.value(), &rule.host_ip)) {
-                        std::string error_descr = "WhiteList: "+ std::string(atr.value()) + " is not a valid ip address";
-                        GlobalLogger::Log(kWarningLogLevel, error_descr);
-                        continue;
+                    rule.isGeneralRule = false;
+                    rule.allowed = true;
+
+                    if (!convertIpString(atr.value(), &rule.hostIp)) {
+                        if (!strcmp(atr.value(), "*")) {
+                            rule.isGeneralRule = true;
+                        } else {
+                            std::string error_descr = "WhiteList: "+ std::string(atr.value()) + " is not a valid ip address";
+                            GlobalLogger::Log(kWarningLogLevel, error_descr);
+                            continue;
+                        }
+
                     }
 
-                    rule.allowed = true;
                     pugi::xpath_query query_nodes("./deny");
                     pugi::xpath_node_set deny_nodes = query_nodes.evaluate_node_set(xnode);
                     if ( (NULL == query_nodes.result().error) &&
@@ -110,8 +117,8 @@ void AccessValidator::setWhiteList(FilePath &xmlPath)
                             }
                         }
                     }
-
-                    accessList.push_back(rule);
+                    // if we have wildcard put this rule in the end
+                    rule.isGeneralRule ? accessList.push_back(rule) : accessList.push_front(rule);
                 }
             } else {
                 std::string error_descr = "WhiteList: Cant evaluate XPath to node set: ";

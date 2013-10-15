@@ -435,8 +435,8 @@ bool Server::ParseRequestInfo(const struct mg_request_info* const request_info,
     if (!accessValidor.isAllowed(request_info->remote_ip, uri, *method))
     {
         response->SetError(new Error(
-                               kUnknownCommand,
-                               "Command was restricted by whitelist"));
+                               kUnknownError,
+                               "Command is forbidden for this origin"));
         return false;
     }
 
