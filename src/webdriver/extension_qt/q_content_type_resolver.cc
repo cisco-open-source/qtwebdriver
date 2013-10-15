@@ -10,6 +10,9 @@
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtCore/QMimeDatabase>
 #include <QtCore/QMimeType>
+#else
+#include "third_party/mimetypes-qt4/include/QMimeDatabase"
+#include "third_party/mimetypes-qt4/include/QMimeType"
 #endif
 
 namespace webdriver {
@@ -69,16 +72,11 @@ Error* QContentTypeResolver::resolveContentType(const std::string& url, std::str
         }
     } else {
         // non http schemes
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         QMimeDatabase mimeDatabase;
         QMimeType mimeType;
         mimeType = mimeDatabase.mimeTypeForUrl(contentUrl);
 
         qmimetype = mimeType.name();
-#else
-        // TODO: implement for qt4
-#endif    
-
     }
 
     mimetype = qmimetype.toStdString();
