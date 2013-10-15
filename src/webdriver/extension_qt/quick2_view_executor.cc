@@ -985,14 +985,7 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
     if (NULL == pItem)
         return;
 
-
-    double currentPosition = 0;
-    GetPlayingPosition(element, &currentPosition, error);
-    if(*error)
-        return;
-
-    int positionOffset = (int)((position - currentPosition) * 1000);
-    QVariant var(positionOffset);
+    QVariant var((int)((position) * 1000));
     bool isMethodCalled = QMetaObject::invokeMethod(pItem, "seek",
                                                     Q_ARG(QVariant, var));
 
