@@ -7,6 +7,11 @@
 
 #include <QtNetwork/QNetworkReply>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtCore/QMimeDatabase>
+#include <QtCore/QMimeType>
+#endif
+
 namespace webdriver {
 
 QContentTypeResolver::QContentTypeResolver(QNetworkAccessManager *pmanager)
@@ -15,51 +20,71 @@ QContentTypeResolver::QContentTypeResolver(QNetworkAccessManager *pmanager)
 QContentTypeResolver::~QContentTypeResolver() {}
 
 Error* QContentTypeResolver::resolveContentType(const std::string& url, std::string& mimetype) {
-    QEventLoop loop;
-    QObject::connect(manager_, SIGNAL(finished(QNetworkReply*)),
-            &loop,SLOT(quit()));
+    QUrl contentUrl(QString::fromStdString(url));
+    QString scheme = contentUrl.scheme();
+    QString qmimetype;
+    Error* error = NULL;
 
-    Error *error = NULL;
-    QNetworkRequest request;
-    request.setUrl(QUrl(QString::fromStdString(url)));
-    QNetworkReply *reply = manager_->head(request);
-    if (NULL == reply) {
-        error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : invalid Request ");
-        return error;
-    }
+    if ( (0 == scheme.compare("http", Qt::CaseInsensitive)) ||
+         (0 == scheme.compare("https", Qt::CaseInsensitive)) ) {
 
-    if(reply->isRunning()) {
-        loop.exec();
-    }
+        QEventLoop loop;
+        QObject::connect(manager_, SIGNAL(finished(QNetworkReply*)),
+                &loop,SLOT(quit()));
 
-    QNetworkReply::NetworkError err = reply->error();
-    if (err) {
-        error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : NetworkError : " + QString::number(err).toStdString());
-        return error;
-    }
+        QNetworkRequest request;
+        request.setUrl(contentUrl);
 
-    QVariant contentMimeType  = reply->header(QNetworkRequest::ContentTypeHeader);
-    if (!contentMimeType.isValid()) {
-        error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType invalid ");
-        return error;
-    }
+        QNetworkReply *reply = manager_->head(request);
+        if (NULL == reply) {
+            GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : invalid Request ");
+            return new Error(kBadRequest);
+        }
 
-    QString qmimetype = contentMimeType.toString();
-    int index = qmimetype.indexOf(";");
-    if (index != -1) {
-        qmimetype.remove(index, qmimetype.length()-index);
-    }
+        if(reply->isRunning()) {
+            loop.exec();
+        }
 
-    if (qmimetype.isEmpty()) {
-        error = new Error(kBadRequest);
-        GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType is empty ");
-        return error;
+        QNetworkReply::NetworkError err = reply->error();
+        if (err) {
+            GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : NetworkError : " + QString::number(err).toStdString());
+            return new Error(kBadRequest);
+        }
+
+        QVariant contentMimeType  = reply->header(QNetworkRequest::ContentTypeHeader);
+        if (!contentMimeType.isValid()) {
+            GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType invalid ");
+            return new Error(kBadRequest);
+        }
+
+        qmimetype = contentMimeType.toString();
+        int index = qmimetype.indexOf(";");
+        if (index != -1) {
+            qmimetype.remove(index, qmimetype.length()-index);
+        }
+
+        if (qmimetype.isEmpty()) {
+            GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : ContentMimeType is empty ");
+            return new Error(kBadRequest);
+        }
+    } else {
+        // non http schemes
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        QMimeDatabase mimeDatabase;
+        QMimeType mimeType;
+        mimeType = mimeDatabase.mimeTypeForUrl(contentUrl);
+
+        qmimetype = mimeType.name();
+#else
+        // TODO: implement for qt4
+#endif    
+
     }
 
     mimetype = qmimetype.toStdString();
+
+    GlobalLogger::Log(kInfoLogLevel, "QContentTypeResolver::resolveContentType() : content type: " + mimetype);
+
     return error;
 }
 
