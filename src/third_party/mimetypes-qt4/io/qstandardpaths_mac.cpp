@@ -41,6 +41,7 @@
 
 #include "qstandardpaths.h"
 #include <QtCore/qdir.h>
+#include <QtCore/QVarLengthArray>
 //#include <private/qcore_mac_p.h>
 
 #ifndef QT_BOOTSTRAPPED
@@ -48,6 +49,7 @@
 #endif
 
 #include <ApplicationServices/ApplicationServices.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 QT_BEGIN_NAMESPACE
 
