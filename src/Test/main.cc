@@ -368,7 +368,9 @@ void PrintHelp() {
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
                 << "version                           Print version information to stdout and exit"   << std::endl
                 << "vnc-login      127.0.0.1:5900     VNC server login parameters"                    << std::endl
-                << "                                  Fomat: login:password@ip:port"                  << std::endl;
+                << "                                  Fomat: login:password@ip:port"                  << std::endl
+                << "uinput         false              If option set, user input device"               << std::endl
+                << "                                  will be registered in system"                   << std::endl;
 }
 
 
