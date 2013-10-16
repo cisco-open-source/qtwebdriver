@@ -40,11 +40,10 @@
 ****************************************************************************/
 
 #include "qstandardpaths.h"
-#include <qdir.h>
-#include <private/qcore_mac_p.h>
+#include <QtCore/qdir.h>
 
 #ifndef QT_BOOTSTRAPPED
-#include <qcoreapplication.h>
+#include <QtCore/qcoreapplication.h>
 #endif
 
 #include <ApplicationServices/ApplicationServices.h>

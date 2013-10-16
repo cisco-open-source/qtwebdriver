@@ -41,12 +41,11 @@
 
 #include "qstandardpaths.h"
 
-#include <qdir.h>
-#include <private/qsystemlibrary_p.h>
-#include <qstringlist.h>
+#include <QtCore/qdir.h>
+#include <QtCore/qstringlist.h>
 
 #ifndef QT_BOOTSTRAPPED
-#include <qcoreapplication.h>
+#include <QtCore/qcoreapplication.h>
 #endif
 
 #include <qt_windows.h>
