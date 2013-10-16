@@ -445,7 +445,7 @@ ElementId Session::GetElementIdForHandle(const ViewId& viewId, const ElementHand
         return ElementId();
 
     const ElementsMap& elements = viewIt->second;
-    for (ElementsMap::const_iterator elementIt = elements.begin(); elementIt != elements.end(); elementIt++) {
+    for (ElementsMap::const_iterator elementIt = elements.begin(); elementIt != elements.end(); ++elementIt) {
         if (elementIt->second->equals(handle)) {
             return ElementId(elementIt->first);
         }

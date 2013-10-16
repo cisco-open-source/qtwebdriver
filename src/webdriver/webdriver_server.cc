@@ -173,7 +173,7 @@ int Server::Stop(bool force) {
 
     GlobalLogger::Log(kInfoLogLevel, "Server::Stop().");
 
-    if ((false == force) && (sessions.size() > 0)) {
+    if ((false == force) && (!sessions.empty())) {
         GlobalLogger::Log(kInfoLogLevel, "Server::Stop() force = false, still sessions are active, failed.");        
         return 1;
     }

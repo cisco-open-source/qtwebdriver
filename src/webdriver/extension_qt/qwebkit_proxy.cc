@@ -377,8 +377,7 @@ Error* QWebkitProxy::IsElementCanBeToggled(const ElementId& element, bool* can_b
 
 Error* QWebkitProxy::ToggleOptionElement(const ElementId& element) {
     bool is_selected;
-    Error* error = NULL;
-    error = IsOptionElementSelected(element, &is_selected);
+    Error* error = IsOptionElementSelected(element, &is_selected);
     if (error)
         return error;
 
@@ -433,9 +432,8 @@ Error* QWebkitProxy::GetElementCssProperty(const ElementId& element, const std::
 }
 
 Error* QWebkitProxy::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element) {
-	Error* error = NULL;
 	std::vector<ElementId> elements;
-    error = FindElementsHelper(
+    Error* error = FindElementsHelper(
                 GetFrame(page_, session_->current_frame()),
                 root_element, locator, query, true, &elements);
     if (!error)
@@ -1324,7 +1322,7 @@ Error* QWebkitProxy::FindElementsHelper(QWebFrame* frame,
         if (error)
             return error;
 
-        if (temp_elements.size() > 0u) {
+        if (!temp_elements.empty()) {
             elements->swap(temp_elements);
             break;
         }
@@ -1617,10 +1615,9 @@ Error* QWebkitProxy::GetElementFirstClientRect(QWebFrame* frame,
 
 Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* location) {
     bool is_displayed = false;
-    Error* error = NULL;
-    error = IsElementDisplayed(element,
-                 true /* ignore_opacity */,
-                 &is_displayed);
+    Error* error = IsElementDisplayed(element,
+                        true /* ignore_opacity */,
+                        &is_displayed);
     if (error)
         return error;
     if (!is_displayed)
