@@ -5,6 +5,7 @@
 
 class CoordinatesTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     CoordinatesTestWidget();
     virtual ~CoordinatesTestWidget();
