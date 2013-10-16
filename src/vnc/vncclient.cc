@@ -315,7 +315,7 @@ bool VNCClient::establishProtocolVersion(QByteArray &data)
     int major = (int)version[MAJOR_INDEX] - 0x30;
     int minor = (int)version[MINOR_INDEX] - 0x30;
 
-    if (3 != major && (3 != minor || 7 != minor || 8 != minor))
+    if (3 != major && (3 != minor && 7 != minor && 8 != minor))
     {
         char version[] = {(char)(major+0x30), (char)(minor+0x30)};
         _logger->Log(kWarningLogLevel, base::Time::Now(), std::string("Bad protocol version: ") + std::string(version));
@@ -359,7 +359,6 @@ bool VNCClient::establishSecurity(QByteArray& data)
                     _communicationError = true;
                     _socket->close();
                     return false;
-                    break;
                 }
                 case None:
                 {
@@ -382,7 +381,6 @@ bool VNCClient::establishSecurity(QByteArray& data)
                     _securityEstablished = true;
                     _establishedSecurity = VNCAuthentication;
                     return true;
-                    break;
                 }
                 case RA2: break;
                 case RA2ne: break;
@@ -406,7 +404,6 @@ bool VNCClient::establishSecurity(QByteArray& data)
                 _communicationError = true;
                 _socket->close();
                 return false;
-                break;
             }
             case None:
             {
