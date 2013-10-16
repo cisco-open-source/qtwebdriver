@@ -79,6 +79,13 @@ public:
     /// if parameter specified, user input device enabled
     static const char kUserInputDevice[];
 
+    /// \page page_webdriver_switches WD Server switches
+    /// - <b>config</b><br>
+    /// The path to whitelist file (e.g. whitelist.xml) in
+    /// XML format with specified list of IP with allowed/disallowed
+    /// commands for each of them
+    static const char kWhiteList[];
+
 };
 
 }  // namespace webdriver

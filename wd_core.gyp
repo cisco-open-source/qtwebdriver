@@ -58,6 +58,7 @@
         'src/webdriver/frame_path.cc',
         'src/webdriver/http_response.cc',
         'src/webdriver/value_conversion_traits.cc',
+        'src/webdriver/webdriver_access.cc',
         'src/webdriver/webdriver_basic_types.cc',
         'src/webdriver/webdriver_capabilities_parser.cc',
         'src/webdriver/webdriver_element_id.cc',
@@ -78,6 +79,7 @@
         'src/webdriver/url_command_wrapper.cc',
         'src/webdriver/versioninfo.cc',
         'src/webdriver/webdriver_version.cc',
+        'src/third_party/pugixml/pugixml.cpp'
       ],
 
       'conditions': [

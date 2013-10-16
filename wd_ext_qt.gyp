@@ -55,7 +55,6 @@
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
         'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
-        'src/third_party/pugixml/pugixml.cpp'
       ],
 
       'conditions': [

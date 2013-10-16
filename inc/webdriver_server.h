@@ -61,6 +61,7 @@ For all options please refer:
 #include "base/command_line.h"
 #include "base/memory/singleton.h"
 #include "base/values.h"
+#include "webdriver_access.h"
 
 struct mg_context;
 struct mg_connection;
@@ -127,6 +128,7 @@ private:
     std::string url_base_;
     struct mg_context* mg_ctx_;
     State state_;
+    AccessValidator accessValidor;
 
     void DispatchCommand(const std::string& matched_route,
                          Command* command_ptr,
