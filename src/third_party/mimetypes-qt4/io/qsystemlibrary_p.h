@@ -45,7 +45,7 @@
 #include <QtCore/qglobal.h>
 #ifdef Q_OS_WIN
 #  include <QtCore/qstring.h>
-#  include <qt_windows.h>
+#  include <QtCore/qt_windows.h>
 
 QT_BEGIN_NAMESPACE
 
