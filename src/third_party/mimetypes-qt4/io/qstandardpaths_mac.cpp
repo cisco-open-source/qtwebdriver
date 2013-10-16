@@ -41,6 +41,7 @@
 
 #include "qstandardpaths.h"
 #include <QtCore/qdir.h>
+//#include <private/qcore_mac_p.h>
 
 #ifndef QT_BOOTSTRAPPED
 #include <QtCore/qcoreapplication.h>
@@ -186,6 +187,20 @@ QStringList QStandardPaths::standardLocations(StandardLocation type)
     return dirs;
 }
 
+QString _toQString(CFStringRef str)
+{
+    if(!str)
+        return QString();
+    CFIndex length = CFStringGetLength(str);
+    const UniChar *chars = CFStringGetCharactersPtr(str);
+    if (chars)
+        return QString(reinterpret_cast<const QChar *>(chars), length);
+
+    QVarLengthArray<UniChar> buffer(length);
+    CFStringGetCharacters(str, CFRangeMake(0, length), buffer.data());
+    return QString(reinterpret_cast<const QChar *>(buffer.constData()), length);
+}
+
 #ifndef QT_BOOTSTRAPPED
 QString QStandardPaths::displayName(StandardLocation type)
 {
@@ -197,12 +212,12 @@ QString QStandardPaths::displayName(StandardLocation type)
     if (err)
         return QString();
 
-    QCFString displayName;
+    CFString displayName;
     err = LSCopyDisplayNameForRef(&ref, &displayName);
     if (err)
         return QString();
 
-    return static_cast<QString>(displayName);
+    return _toQString(displayName);
 }
 #endif
 
