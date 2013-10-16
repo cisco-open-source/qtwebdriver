@@ -42,6 +42,7 @@
 #include "qstandardpaths.h"
 
 #include <QtCore/qdir.h>
+#include "qsystemlibrary_p.h"
 #include <QtCore/qstringlist.h>
 
 #ifndef QT_BOOTSTRAPPED
