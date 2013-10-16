@@ -27,6 +27,7 @@
 
 class TextHandlingTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     TextHandlingTestWidget();
     ~TextHandlingTestWidget();

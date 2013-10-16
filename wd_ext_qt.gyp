@@ -55,8 +55,16 @@
         'src/webdriver/extension_qt/vnc_event_dispatcher.cc',
         'src/webdriver/extension_qt/wd_event_dispatcher.cc',
         'src/webdriver/extension_qt/uinput_event_dispatcher.cc',
-        'src/third_party/pugixml/pugixml.cpp'
       ],
+
+      'conditions': [
+      
+        ['<(QT5) == 0', {
+          'dependencies': [
+            'src/third_party/mimetypes-qt4/mimetypes-qt4.gyp:mimetypes-qt4',
+          ],
+        } ]
+      ], # conditions
 
     }, {
       'target_name': 'WebDriver_extension_qt_web',
@@ -82,6 +90,7 @@
         '<(INTERMEDIATE_DIR)/moc_qwebkit_proxy.cc',
         'src/third_party/webdriver/atoms.cc',
       ],
+
     } , {
       'target_name': 'WebDriver_extension_qt_quick',
       'type': 'static_library',

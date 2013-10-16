@@ -5,6 +5,7 @@
 
 class RestyledLabel : public QLabel
 {
+    Q_OBJECT
 public:
     RestyledLabel(const QString &text, QWidget *parent);
 };

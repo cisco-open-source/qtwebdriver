@@ -26,4 +26,6 @@ const char Switches::kVNCLogin[] = "vnc-login";
 
 const char Switches::kUserInputDevice[] = "uinput";
 
+const char Switches::kWhiteList[] = "white-list";
+
 }  // namespace webdriver

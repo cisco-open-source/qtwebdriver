@@ -6,6 +6,7 @@
 
 class DragableWidget : public QWidget
 {
+    Q_OBJECT
 public:
     DragableWidget(QWidget *parent = 0);
     void setDraggingReportsDestination(QLabel* destination);
