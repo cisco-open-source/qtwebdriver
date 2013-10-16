@@ -48,7 +48,7 @@
 #include <QtCore/qcoreapplication.h>
 #endif
 
-#include <qt_windows.h>
+#include <QtCore/qt_windows.h>
 #include <shlobj.h>
 #if !defined(Q_OS_WINCE)
 #  include <intshcut.h>

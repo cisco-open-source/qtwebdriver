@@ -76,7 +76,7 @@ QMimeProviderBase::QMimeProviderBase(QMimeDatabasePrivate *db)
 {
 }
 
-Q_CORE_EXPORT int qmime_secondsBetweenChecks = 5; // exported for the unit test
+int qmime_secondsBetweenChecks = 5;
 
 bool QMimeProviderBase::shouldCheck()
 {
