@@ -41,15 +41,13 @@
 
 #include "qstandardpaths.h"
 #include <QtCore/qdir.h>
-#include <QtCore/QVarLengthArray>
-//#include <private/qcore_mac_p.h>
+
 
 #ifndef QT_BOOTSTRAPPED
 #include <QtCore/qcoreapplication.h>
 #endif
 
 #include <ApplicationServices/ApplicationServices.h>
-#include <CoreFoundation/CoreFoundation.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -188,39 +186,5 @@ QStringList QStandardPaths::standardLocations(StandardLocation type)
     dirs.prepend(localDir);
     return dirs;
 }
-
-QString _toQString(CFStringRef str)
-{
-    if(!str)
-        return QString();
-    CFIndex length = CFStringGetLength(str);
-    const UniChar *chars = CFStringGetCharactersPtr(str);
-    if (chars)
-        return QString(reinterpret_cast<const QChar *>(chars), length);
-
-    QVarLengthArray<UniChar> buffer(length);
-    CFStringGetCharacters(str, CFRangeMake(0, length), buffer.data());
-    return QString(reinterpret_cast<const QChar *>(buffer.constData()), length);
-}
-
-#ifndef QT_BOOTSTRAPPED
-QString QStandardPaths::displayName(StandardLocation type)
-{
-    if (QStandardPaths::HomeLocation == type)
-        return QCoreApplication::translate("QStandardPaths", "Home");
-
-    FSRef ref;
-    OSErr err = FSFindFolder(kOnAppropriateDisk, translateLocation(type), false, &ref);
-    if (err)
-        return QString();
-
-    CFString displayName;
-    err = LSCopyDisplayNameForRef(&ref, &displayName);
-    if (err)
-        return QString();
-
-    return _toQString(displayName);
-}
-#endif
 
 QT_END_NAMESPACE
