@@ -31,9 +31,7 @@ bool SessionWithID::DoesDelete() const {
 }
 
 void SessionWithID::ExecuteGet(Response* const response) {
-    DictionaryValue *temp_value = new DictionaryValue();
-
-    temp_value = session_->capabilities().caps->DeepCopy();
+    DictionaryValue *temp_value = session_->capabilities().caps->DeepCopy();
 
     response->SetValue(temp_value);
 }
