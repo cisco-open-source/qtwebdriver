@@ -821,14 +821,6 @@ void QWidgetViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Er
         return;
     }
 
-    // close old widget, destroy children correctly
-    QList<QWidget*> childs = view->findChildren<QWidget*>();
-    foreach(QWidget *child, childs)
-    {
-        child->setAttribute(Qt::WA_DeleteOnClose, true);
-        child->close();
-    }
-
     view->close();
 
     // map viewId to new widget
