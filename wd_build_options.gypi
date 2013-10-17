@@ -89,6 +89,13 @@
          '_UNICODE',
          '_WINSOCKAPI_',
       ],	
+
+      'msvs_settings': {
+        'VCCLCompilerTool': {
+          'TreatWChar_tAsBuiltInType': 'false',
+        },
+      },
+
     } ],
 
     [ 'OS == "mac" or OS == "ios"', {
