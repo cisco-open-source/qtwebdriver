@@ -80,10 +80,12 @@ public:
     static const char kUserInputDevice[];
 
     /// \page page_webdriver_switches WD Server switches
-    /// - <b>config</b><br>
+    /// - <b>white-list</b><br>
     /// The path to whitelist file (e.g. whitelist.xml) in
-    /// XML format with specified list of IP with allowed/disallowed
-    /// commands for each of them
+    /// XML format with specified list of IP with allowed/denied
+    /// commands for each of them. For more information please refer:
+    ///\ref page_whitelist
+
     static const char kWhiteList[];
 
 };
