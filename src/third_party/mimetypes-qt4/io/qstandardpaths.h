@@ -49,7 +49,7 @@ QT_BEGIN_NAMESPACE
 
 #ifndef QT_NO_STANDARDPATHS
 
-class Q_CORE_EXPORT QStandardPaths
+class QStandardPaths
 {
 public:
     // Do not re-order, must match QDesktopServices

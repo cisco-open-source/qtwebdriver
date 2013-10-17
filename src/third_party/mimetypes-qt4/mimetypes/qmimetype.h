@@ -51,7 +51,7 @@ class QMimeTypePrivate;
 class QFileinfo;
 class QStringList;
 
-class Q_CORE_EXPORT QMimeType
+class QMimeType
 {
 public:
     QMimeType();
