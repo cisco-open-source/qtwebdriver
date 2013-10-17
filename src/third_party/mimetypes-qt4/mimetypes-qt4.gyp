@@ -46,7 +46,7 @@
         } ],
 
         [ 'OS == "win"', {
-          'sources': [ 'io/qstandardpaths_win.cpp' ],
+          'sources': [ 'io/qstandardpaths_win.cpp', 'qsystemlibrary.cpp' ],
         } ],
 
         [ 'OS == "mac" or OS=="ios"', {
