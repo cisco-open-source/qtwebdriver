@@ -96,7 +96,7 @@ public:
         return QSystemLibrary(libraryName).resolve(symbol);
     }
 
-    static Q_CORE_EXPORT HINSTANCE load(const wchar_t *lpFileName, bool onlySystemDirectory = true);
+    static HINSTANCE load(const wchar_t *lpFileName, bool onlySystemDirectory = true);
 private:
     HINSTANCE m_handle;
     QString m_libraryName;
