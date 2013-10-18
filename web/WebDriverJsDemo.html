@@ -91,7 +91,7 @@
 
       webdriver.WebDriver.prototype.visualizerGetSource = function() {
         webdriver.http.Executor.COMMAND_MAP_['visualizerGetSource'] = {
-          method: 'GET', path: '/session/:sessionId/-cisco-visualizer_source'};
+          method: 'GET', path: '/session/:sessionId/-cisco-visualizer-source'};
         return this.schedule(
           new webdriver.Command('visualizerGetSource'),
           'WebDriver.visualizerGetSource()');
@@ -99,7 +99,7 @@
 
       webdriver.WebDriver.prototype.visualizerShowPoint = function() {
         webdriver.http.Executor.COMMAND_MAP_['visualizerShowPoint'] = {
-          method: 'GET', path: '/session/:sessionId/-cisco-visualizer_show_point'};
+          method: 'GET', path: '/session/:sessionId/-cisco-visualizer-show-point'};
         return this.schedule(
           new webdriver.Command('visualizerShowPoint'),
           'WebDriver.visualizerShowPoint()');
