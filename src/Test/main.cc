@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     }
 
     webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
-    const char shutdownCommandRoute[] = "/-CISCO-shutdown";
+    const char shutdownCommandRoute[] = "/-cisco-shutdown";
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
