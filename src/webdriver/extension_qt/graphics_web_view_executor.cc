@@ -70,7 +70,11 @@ bool GraphicsWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId v
     }
 
     return false;
-}    
+}
+
+std::string GraphicsWebViewCmdExecutorCreator::GetViewTypeName() const {
+    return "graphicsWebView";
+}
 
 GraphicsWebViewCmdExecutor::GraphicsWebViewCmdExecutor(Session* session, ViewId viewId)
     : ViewCmdExecutor(session, viewId) {

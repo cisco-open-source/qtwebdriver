@@ -78,6 +78,10 @@ bool QmlWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId
     return false;
 }    
 
+std::string QmlWebViewCmdExecutorCreator::GetViewTypeName() const {
+    return "qmlweb";
+}
+
 QmlWebViewCmdExecutor::QmlWebViewCmdExecutor(Session* session, ViewId viewId)
     : ViewCmdExecutor(session, viewId) {
 

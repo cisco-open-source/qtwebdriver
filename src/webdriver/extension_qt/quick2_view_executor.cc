@@ -65,6 +65,10 @@ bool Quick2ViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId
     return false;
 }
 
+std::string Quick2ViewCmdExecutorCreator::GetViewTypeName() const {
+    return "qml2";
+}
+
 Quick2ViewCmdExecutor::Quick2ViewCmdExecutor(Session* session, ViewId viewId)
 	: QWindowViewCmdExecutor(session, viewId) {
 }

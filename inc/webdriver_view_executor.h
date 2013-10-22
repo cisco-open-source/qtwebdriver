@@ -198,6 +198,10 @@ public:
     /// @param[out] viewType returned type of view
     /// @return true - if there is executor for such view
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const = 0;
+
+    /// @return supported view type for current executor
+    virtual std::string GetViewTypeName() const = 0;
+
 private:
 
     DISALLOW_COPY_AND_ASSIGN(ViewCmdExecutorCreator);
