@@ -59,6 +59,8 @@
 #include <algorithm>
 #include <functional>
 
+inline void initMimetypesResource() { Q_INIT_RESOURCE(mimetypes); }
+
 QT_BEGIN_NAMESPACE
 
 Q_GLOBAL_STATIC(QMimeDatabasePrivate, staticQMimeDatabase)
@@ -71,6 +73,7 @@ QMimeDatabasePrivate *QMimeDatabasePrivate::instance()
 QMimeDatabasePrivate::QMimeDatabasePrivate()
     : m_provider(0), m_defaultMimeType(QLatin1String("application/octet-stream"))
 {
+    initMimetypesResource();
 }
 
 QMimeDatabasePrivate::~QMimeDatabasePrivate()
