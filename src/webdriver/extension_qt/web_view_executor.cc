@@ -69,6 +69,10 @@ bool QWebViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, 
     return false;
 }
 
+std::string QWebViewCmdExecutorCreator::GetViewTypeName() const {
+    return "html";
+}
+
 QWebViewCmdExecutor::QWebViewCmdExecutor(Session* session, ViewId viewId)
     : QViewCmdExecutor(session, viewId) {
 

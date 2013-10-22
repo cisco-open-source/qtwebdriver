@@ -27,6 +27,9 @@ private:
 
     Error* ParseAndApplyProxySettings(const base::DictionaryValue* proxy_dict);
 
+    bool AddActualQtVersion();
+    Error* CheckRequiredQtVersion(const base::DictionaryValue *capabilities_dict);
+
     DISALLOW_COPY_AND_ASSIGN(QSessionLifeCycleActions);
 };
 

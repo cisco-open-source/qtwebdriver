@@ -3,8 +3,12 @@
 #include "extension_qt/vnc_event_dispatcher.h"
 #include "webdriver_switches.h"
 #include "webdriver_server.h"
+#include "webdriver_view_executor.h"
+#include "webdriver_error.h"
 
 #include "q_proxy_parser.h"
+#include "common_util.h"
+#include "base/string_util.h"
 
 namespace webdriver {
 
@@ -33,6 +37,14 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 		session_->logger().Log(kInfoLogLevel, "no proxy settings requsted.");
 	}
 
+    AddActualQtVersion();
+    if (required_capabilities_dict)
+        error = CheckRequiredQtVersion(required_capabilities_dict);
+    if (error) {
+        session_->logger().Log(kWarningLogLevel, "qt version doesn't match...");
+        return error;
+    }
+
 	return error;
 }
 
@@ -58,6 +70,39 @@ Error* QSessionLifeCycleActions::ParseAndApplyProxySettings(const base::Dictiona
     saved_proxy_ = QNetworkProxy::applicationProxy();
     restore_proxy_ = true;
     QNetworkProxy::setApplicationProxy(proxy);
+
+    return NULL;
+}
+
+bool QSessionLifeCycleActions::AddActualQtVersion() {
+    base::DictionaryValue *hybrid;
+    session_->capabilities().caps->GetDictionary(Capabilities::kHybrid, &hybrid);
+    hybrid->SetString("qtVersion", QCommonUtil::GetQtVersion());
+
+    return true;
+}
+
+Error* QSessionLifeCycleActions::CheckRequiredQtVersion(const base::DictionaryValue *capabilities_dict) {
+    const base::DictionaryValue *required_hybrid_caps;
+    base::DictionaryValue *actual_hybrid_caps;
+
+    if (capabilities_dict->GetDictionary(Capabilities::kHybrid, &required_hybrid_caps)) {
+        if (!session_->capabilities().caps->GetDictionary(Capabilities::kHybrid, &actual_hybrid_caps)) {
+            return new Error(kUnknownError);
+        }
+        std::string required_qtVersion;
+        std::string actual_qtVersion;
+        if (required_hybrid_caps->GetString("qtVersion", &required_qtVersion)) {
+            if (!actual_hybrid_caps->GetString("qtVersion", &actual_qtVersion)) {
+                return new Error(kUnknownError);
+            }
+            if (StringToUpperASCII(required_qtVersion).compare("ANY")
+                    && required_qtVersion.compare("") && required_qtVersion.compare("*")) {
+                if(required_qtVersion.at(0) != actual_qtVersion.at(0))
+                    return new Error(kUnknownError);
+            }
+        }
+    }
 
     return NULL;
 }

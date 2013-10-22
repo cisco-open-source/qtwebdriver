@@ -202,6 +202,10 @@ public:
     /// @param[out] viewType returned type of view
     /// @return true - if there is executor for such view
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const = 0;
+
+    /// @return supported view type for current executor
+    virtual std::string GetViewTypeName() const = 0;
+
 private:
 
     DISALLOW_COPY_AND_ASSIGN(ViewCmdExecutorCreator);
@@ -241,10 +245,15 @@ public:
     /// @param creator pointer to custom creator. No need to delete object
     void AddViewCmdExecutorCreator(ViewCmdExecutorCreator* creator);
 
+    typedef std::vector<std::string> SupportedViewTypesList;
+    /// @return pointer to vector supported view types
+    const SupportedViewTypesList& getSupportedViewTypesList() const;
+
 private:
     typedef ViewCmdExecutorCreator* ViewCmdExecutorCreatorPtr;
     typedef std::vector<ViewCmdExecutorCreatorPtr> CreatorsList;
     CreatorsList creators_;
+    SupportedViewTypesList typeslist_;
 
     ViewCmdExecutorFactory();
     ~ViewCmdExecutorFactory(){}

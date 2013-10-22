@@ -14,6 +14,8 @@ public:
 
     virtual ViewCmdExecutor* CreateExecutor(Session* session, ViewId viewId) const;
     virtual bool CanHandleView(Session* session, ViewId viewId, ViewType* viewType = NULL) const;
+    virtual std::string GetViewTypeName() const;
+
 private:
 
     DISALLOW_COPY_AND_ASSIGN(QWidgetViewCmdExecutorCreator);
