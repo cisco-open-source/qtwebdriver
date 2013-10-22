@@ -22,6 +22,7 @@ public:
     static QRect ConvertRectToQRect(const Rect &rect);
     static QPoint ConvertPointToQPoint(const Point &p);
     static Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
+    static std::string GetQtVersion();
 
 private:
 	QCommonUtil() {};

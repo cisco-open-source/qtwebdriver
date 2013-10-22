@@ -38,5 +38,8 @@ Qt::MouseButton QCommonUtil::ConvertMouseButtonToQtMouseButton(MouseButton butto
     return result;
 }
 
+std::string QCommonUtil::GetQtVersion() {
+    return QT_VERSION_STR;
+}
 
 } // namespace webdriver
