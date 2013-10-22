@@ -6,12 +6,9 @@
     'WD_CONFIG_QUICK%': '1',
     'WD_BUILD_MONGOOSE%': '0',
 
-#    'QT_BIN_PATH%': '/usr/lib/qt4/bin',
-#    'QT_INC_PATH%': '/usr/include',
-#    'QT_LIB_PATH%': '/usr/lib',
-    'QT_BIN_PATH': '/home/nataliia/Qt5.1.0/5.1.0/gcc/bin',
-    'QT_INC_PATH': '/home/nataliia/Qt5.1.0/5.1.0/gcc/include',
-    'QT_LIB_PATH': '/home/nataliia/Qt5.1.0/5.1.0/gcc/lib',
+    'QT_BIN_PATH%': '/usr/lib/qt4/bin',
+    'QT_INC_PATH%': '/usr/include',
+    'QT_LIB_PATH%': '/usr/lib',
     'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
 
     'conditions': [
