@@ -70,6 +70,7 @@ public:
     virtual void NavigateToURL(const std::string& url, bool sync, Error** error);
     virtual void GetURL(std::string* url, Error** error);
     virtual void GetScreenShot(std::string* png, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error);
     virtual void ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error);
     virtual void ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetAppCacheStatus(int* status, Error** error) NOT_SUPPORTED_IMPL;
@@ -109,6 +110,8 @@ public:
     virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**);
     virtual void VisualizerSource(std::string* source, Error** error) NOT_SUPPORTED_IMPL;
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error** error);
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error** error);
 
     virtual void SetOnline(bool, Error** error) NOT_SUPPORTED_IMPL;
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
@@ -122,8 +125,6 @@ protected:
     bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
-    void createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
-    void addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(Quick2ViewCmdExecutor);

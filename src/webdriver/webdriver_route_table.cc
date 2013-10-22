@@ -253,6 +253,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<BackCommand>                    (CommandRoutes::kGoBack);
     Add<RefreshCommand>                 (CommandRoutes::kRefresh);
     Add<ScreenshotCommand>              (CommandRoutes::kScreenshot);
+    Add<ElementScreenshotCommand>       (CommandRoutes::kElementScreenshot);
     Add<KeysCommand>                    (CommandRoutes::kSendKeys);
     Add<MoveAndClickCommand>            (CommandRoutes::kClickElement);
     Add<HoverCommand>                   (CommandRoutes::kHoverOverElement);
@@ -319,6 +320,8 @@ DefaultRouteTable::DefaultRouteTable()
     Add<CISCO_PlaybackSpeedCommand>     (CommandRoutes::kCiscoPlayerPlayingSpeed);
     Add<VisualizerSourceCommand>        (CommandRoutes::kVisualizerSource);
     Add<VisualizerShowPointCommand>     (CommandRoutes::kVisualizerShowPoint);
+    Add<TouchPinchZoomCommand>          (CommandRoutes::kTouchPinchZoom);
+    Add<TouchPinchRotateCommand>        (CommandRoutes::kTouchPinchRotate);
 
 }
 

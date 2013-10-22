@@ -296,6 +296,16 @@ QTouchEvent::TouchPoint QWindowViewCmdExecutor::createTouchPoint(Qt::TouchPointS
     return touchPoint;
 }
 
+QTouchEvent::TouchPoint QWindowViewCmdExecutor::createTouchPointWithId(Qt::TouchPointState state, QPointF &point, int id)
+{
+    QTouchEvent::TouchPoint touchPoint(id);
+    touchPoint.setPos(point);
+    touchPoint.setState(state);
+    touchPoint.setPressure(1);
+
+    return touchPoint;
+}
+
 QTouchEvent* QWindowViewCmdExecutor::createSimpleTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point, QVector2D velocity)
 {
     QList<QTouchEvent::TouchPoint> points;
@@ -309,6 +319,24 @@ QTouchEvent* QWindowViewCmdExecutor::createSimpleTouchEvent(QEvent::Type eventTy
     }
     QTouchEvent::TouchPoint touchPoint = createTouchPoint(touchPointState, point, velocity);
     points.append(touchPoint);
+    return createTouchEvent(eventType, touchPointStates, points);
+}
+
+QTouchEvent* QWindowViewCmdExecutor::create2PointTouchEvent(QEvent::Type eventType, Qt::TouchPointStates touchPointStates, QPointF &point1, QPointF &point2)
+{
+    QList<QTouchEvent::TouchPoint> points;
+    Qt::TouchPointState touchPointState;
+    if (touchPointStates & Qt::TouchPointPressed)
+        touchPointState = Qt::TouchPointPressed;
+    else if (touchPointStates & Qt::TouchPointReleased)
+        touchPointState = Qt::TouchPointReleased;
+    else {
+        touchPointState = Qt::TouchPointMoved;
+    }
+    QTouchEvent::TouchPoint touchPoint1 = createTouchPointWithId(touchPointState, point1, 0);
+    QTouchEvent::TouchPoint touchPoint2 = createTouchPointWithId(touchPointState, point2, 1);
+    points.append(touchPoint1);
+    points.append(touchPoint2);
     return createTouchEvent(eventType, touchPointStates, points);
 }
 

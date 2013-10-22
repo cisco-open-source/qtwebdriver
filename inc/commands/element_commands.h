@@ -257,6 +257,19 @@ private:
     DISALLOW_COPY_AND_ASSIGN(ElementTextCommand);
 };
 
+class ElementScreenshotCommand : public ElementCommand {
+public:
+    ElementScreenshotCommand(const std::vector<std::string>& path_segments,
+                          const base::DictionaryValue* parameters);
+    virtual ~ElementScreenshotCommand();
+
+    virtual bool DoesGet() const OVERRIDE;
+    virtual void ExecuteGet(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(ElementScreenshotCommand);
+};
+
 }  // namespace webdriver
 
 #endif  // WEBDRIVER_COMMANDS_WEBELEMENT_COMMANDS_H_

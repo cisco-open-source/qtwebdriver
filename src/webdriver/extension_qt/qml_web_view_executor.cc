@@ -699,7 +699,7 @@ void QmlWebViewCmdExecutor::SetMute(const ElementId& element, bool mute, Error**
 void QmlWebViewCmdExecutor::GetMute(const ElementId& element, bool* mute, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-            *error = webkitProxy_->GetMute(element, mute);
+    *error = webkitProxy_->GetMute(element, mute);
 }
 
 void QmlWebViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)

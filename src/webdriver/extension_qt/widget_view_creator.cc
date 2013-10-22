@@ -41,9 +41,9 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
 
     if (NULL != handle) {
         QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
-        std::string objClassName(widget->metaObject()->className());
 
         if (NULL != widget) {
+            std::string objClassName(widget->metaObject()->className());
             QEventLoop loop;
             QRepaintEventFilter filter(widget);
             QCheckPagePaint painter;

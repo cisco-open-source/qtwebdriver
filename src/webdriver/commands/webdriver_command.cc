@@ -19,6 +19,7 @@
 #include "webdriver_session_manager.h"
 #include "webdriver_util.h"
 #include "webdriver_view_executor.h"
+#include "webdriver_view_enumerator.h"
 
 namespace webdriver {
 
@@ -51,6 +52,23 @@ bool WebDriverCommand::Init(Response* const response) {
     if (parameters_)
         message += " with params " + JsonStringifyForDisplay(parameters_.GetRawPointer());
     session_->logger().Log(kFineLogLevel, message);
+
+    // terminate session if no views found
+    std::vector<ViewId> views;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewEnumerator::EnumerateViews,
+            session_,
+            &views));
+
+    if (views.empty()) {
+        // Session manages its own lifetime, so do not call delete.
+        session_->Terminate();
+
+        response->SetError(
+            new Error(kSessionNotFound, "Session not found: " + session_id_));
+        return false;   
+    }
 
     if (ShouldRunPreAndPostCommandHandlers()) {
         Error* error = session_->BeforeExecuteCommand();

@@ -46,6 +46,7 @@ struct Capabilities {
     static const char kPlatform[];
     static const char kJavascriptEnabled[];
     static const char kTakesScreenshot[];
+    static const char kTakesElementScreenshot[];
     static const char kHandlesAlerts[];
     static const char kDatabaseEnabled[];
     static const char kLocationContextEnabled[];

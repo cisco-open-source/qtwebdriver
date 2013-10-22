@@ -7,7 +7,6 @@
 #include "value_conversion_util.h"
 #include "webdriver_session.h"
 #include "webdriver_view_factory.h"
-#include "webdriver_util.h"
 #include "common_util.h"
 #include "q_key_converter.h"
 #include "extension_qt/widget_element_handle.h"
@@ -17,6 +16,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
 #include <QtGui/QApplication>
+#include <QtGui/QStyleOptionGraphicsItem>
 
 #include <QtDeclarative/QDeclarativeExpression>
 #include <QtDeclarative/QDeclarativeEngine>
@@ -24,15 +24,6 @@
 #include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
-
-#if 1 
-#define REMOVE_INTERNAL_SUFIXES(qstr)   \
-        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
-        if (qstr.startsWith(QLatin1String("QDeclarative"))) qstr = qstr.mid(12);
-#else
-#define REMOVE_INTERNAL_SUFIXES(qstr)
-#endif            
 
 const ViewType QQmlViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
@@ -121,16 +112,12 @@ void QQmlViewCmdExecutor::GetSource(std::string* source, Error** error) {
         return;
     }
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
 
-    createUIXML(parentItem, &buff, elementsMap, error);
-
-    if (*error)
-        return;
-
+    QQmlXmlSerializer serializer(&buff);
+    serializer.createXml(parentItem);
     *source = byteArray.data();
 }
 
@@ -189,6 +176,45 @@ void QQmlViewCmdExecutor::SendKeys(const ElementId& element, const string16& key
     // restore old focus
     if (NULL != pFocusItem)
         pFocusItem->setFocus(true);
+}
+
+void QQmlViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QDeclarativeItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QImage image(pItem->boundingRect().size().toSize(), QImage::Format_RGB32);
+    image.fill(QColor(0, 0, 0).rgb());
+    QPainter painter(&image);
+    QStyleOptionGraphicsItem styleOption;
+    qobject_cast<QGraphicsObject*>(pItem)->paint(&painter, &styleOption);
+    painter.end();
+
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+#if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");
 }
 
 void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
@@ -403,6 +429,13 @@ void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::stri
         return;
 
     QVariant propertyValue = pItem->property(key.c_str());
+
+    // substituate "id" with "objectName"
+    QString idName("id");
+    if (0 == idName.compare(key.c_str(), Qt::CaseInsensitive)) {
+        propertyValue = pItem->property("objectName");
+    }
+    
     Value* val = NULL;
 
     if (propertyValue.isValid()) {
@@ -546,7 +579,7 @@ void QQmlViewCmdExecutor::GetElementTagName(const ElementId& element, std::strin
         return;
 
     QString className(pItem->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     *tag_name = className.toStdString();
 }
@@ -744,9 +777,35 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
     *value = static_cast<Value*>(ret_value.release());
 }
 
+void QQmlViewCmdExecutor::VisualizerSource(std::string* source, Error** error)
+{
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QDeclarativeItem* parentItem = qobject_cast<QDeclarativeItem*>(view->rootObject());
+    if (NULL == parentItem) {
+        session_->logger().Log(kInfoLogLevel, "no root element found.");
+        *error = new Error(kUnknownError, "no root element found.");
+        return;
+    }
+
+    QByteArray byteArray;
+    QBuffer buff(&byteArray);
+    buff.open(QIODevice::ReadWrite);
+
+    QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
+    serializer.createXml(parentItem);
+    *source = byteArray.data();
+
+    session_->logger().Log(kInfoLogLevel, "VisualizerSource:");
+    session_->logger().Log(kInfoLogLevel, *source);
+}
+
 bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query) {
     QString className(item->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     if (locator == LocatorType::kClassName) {
         if (query == className.toStdString())
@@ -771,12 +830,11 @@ bool QQmlViewCmdExecutor::FilterElement(const QDeclarativeItem* item, const std:
 void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
-
     buff.open(QIODevice::ReadWrite);
-    XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error);
-    if (*error)
-        return;
+
+    QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
+    serializer.createXml(parent);
 
     buff.seek(0);
 
@@ -803,6 +861,7 @@ void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const st
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
+                    const QQmlXmlSerializer::XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
@@ -833,49 +892,5 @@ void QQmlViewCmdExecutor::FindElementsByXpath(QDeclarativeItem* parent, const st
 
     buff.close();
 }
-
-void QQmlViewCmdExecutor::createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
-    
-    QXmlStreamWriter* writer = new QXmlStreamWriter();
-
-    writer->setDevice(buff);
-    writer->setAutoFormatting(true);
-    writer->writeStartDocument();
-
-    addItemToXML(parent, elementsMap, writer);
-
-    writer->writeEndDocument();
-
-    delete writer;
-}
-
-void QQmlViewCmdExecutor::addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
-    if (NULL == parent) {
-        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
-        return;
-    }
-
-    QString className(parent->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
-    
-    writer->writeStartElement(className);
-
-    if (!parent->objectName().isEmpty())
-        writer->writeAttribute("id", parent->objectName());
-
-    QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QDeclarativeItem>(parent));
-    writer->writeAttribute("elementId", elementKey);
-
-    QList<QObject*> childs = parent->children();
-    foreach(QObject *child, childs) {
-        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
-        if (childItem)
-            addItemToXML(childItem, elementsMap, writer);
-    }
-
-    writer->writeEndElement();
-}
-
 
 } //namespace webdriver 

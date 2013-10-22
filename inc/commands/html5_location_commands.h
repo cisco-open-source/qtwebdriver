@@ -1,3 +1,7 @@
+// Copyright (c) 2012 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #ifndef WEBDRIVER_COMMANDS_HTML5_LOCATION_COMMANDS_H_
 #define WEBDRIVER_COMMANDS_HTML5_LOCATION_COMMANDS_H_
 

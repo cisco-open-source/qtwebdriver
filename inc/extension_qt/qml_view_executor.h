@@ -38,6 +38,7 @@ public:
     virtual void Reload(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetSource(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error);
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);
@@ -103,21 +104,20 @@ public:
     virtual void GetMute(const ElementId& element, bool*, Error**error) NOT_SUPPORTED_IMPL;
     virtual void SetPlaybackSpeed(const ElementId& element, double, Error**error) NOT_SUPPORTED_IMPL;;
     virtual void GetPlaybackSpeed(const ElementId& element, double*, Error**error) NOT_SUPPORTED_IMPL;;
-    virtual void VisualizerSource(std::string* source, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void VisualizerSource(std::string* source, Error** error);
     virtual void VisualizerShowPoint(Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error** error) NOT_SUPPORTED_IMPL;
 
     virtual void SetOnline(bool, Error** error) NOT_SUPPORTED_IMPL;
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
     QDeclarativeView* getView(const ViewId& viewId, Error** error);
-    typedef QHash<QString, QDeclarativeItem*> XMLElementMap;    
 
     QDeclarativeItem* getElement(const ElementId &element, Error** error);
     bool FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
-    void createUIXML(QDeclarativeItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error);
-    void addItemToXML(QDeclarativeItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QQmlViewCmdExecutor);

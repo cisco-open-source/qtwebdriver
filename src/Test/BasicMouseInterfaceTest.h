@@ -5,6 +5,7 @@
 
 class BasicMouseInterfaceTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     explicit BasicMouseInterfaceTestWidget(QWidget *parent = 0);
     

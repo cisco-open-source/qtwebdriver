@@ -50,6 +50,7 @@ public:
     virtual void Reload(Error** error);
     virtual void GetSource(std::string* source, Error** error);
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) NOT_SUPPORTED_IMPL;
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);
@@ -124,6 +125,9 @@ public:
 
     virtual void SetOnline(bool, Error** error);
     virtual void IsOnline(bool*, Error** error);
+	
+	virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
 	QWebView* getView(const ViewId& viewId, Error** error);

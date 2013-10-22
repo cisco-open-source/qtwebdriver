@@ -24,6 +24,7 @@ const char Capabilities::kVersion[]                     = "version";
 const char Capabilities::kPlatform[]                    = "platform";
 const char Capabilities::kJavascriptEnabled[]           = "javascriptEnabled";
 const char Capabilities::kTakesScreenshot[]             = "takesScreenshot";
+const char Capabilities::kTakesElementScreenshot[]             = "takesElementScreenshot";
 const char Capabilities::kHandlesAlerts[]               = "handlesAlerts";
 const char Capabilities::kDatabaseEnabled[]             = "databaseEnabled";
 const char Capabilities::kLocationContextEnabled[]      = "locationContextEnabled";

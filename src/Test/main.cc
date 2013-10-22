@@ -201,8 +201,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
     qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
     qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
-    webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
+    //webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
+    //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
 #endif    
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     }
 
     webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
-    const char shutdownCommandRoute[] = "/-CISCO-shutdown";
+    const char shutdownCommandRoute[] = "/-cisco-shutdown";
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
@@ -368,7 +368,10 @@ void PrintHelp() {
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
                 << "version                           Print version information to stdout and exit"   << std::endl
                 << "vnc-login      127.0.0.1:5900     VNC server login parameters"                    << std::endl
-                << "                                  Fomat: login:password@ip:port"                  << std::endl;
+                << "                                  Fomat: login:password@ip:port"                  << std::endl
+                << "uinput         false              If option set, user input device"               << std::endl
+                << "                                  will be registered in system"                   << std::endl
+                << "test_data      ./                 Specifies where to look for test specific data" << std::endl;
 }
 
 

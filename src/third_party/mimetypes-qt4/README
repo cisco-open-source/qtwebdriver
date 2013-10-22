@@ -1,0 +1,4 @@
+This is mimetypes-qt4 library.
+This library is a backport of the Qt 5 mimetypes api to Qt 4.
+The git reference is http://qt.gitorious.org/qt/qtbase.
+The license to apply is the same as the original Qt code.

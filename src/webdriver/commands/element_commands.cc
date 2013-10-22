@@ -4,6 +4,7 @@
 
 #include "commands/element_commands.h"
 
+#include "base/base64.h"
 #include "base/file_util.h"
 #include "base/format_macros.h"
 #include "base/memory/scoped_ptr.h"
@@ -561,6 +562,47 @@ void ElementTextCommand::ExecuteGet(Response* const response) {
         return;
     }
     response->SetValue(Value::CreateStringValue(element_text));
+}
+
+///////////////////// ElementScreenshotCommand ////////////////////
+
+ElementScreenshotCommand::ElementScreenshotCommand(
+    const std::vector<std::string>& path_segments,
+    const DictionaryValue* parameters)
+    : ElementCommand(path_segments, parameters) {}
+
+ElementScreenshotCommand::~ElementScreenshotCommand() {}
+
+bool ElementScreenshotCommand::DoesGet() const {
+    return true;
+}
+
+void ElementScreenshotCommand::ExecuteGet(Response* const response) {
+    std::string raw_bytes;
+
+    Error* error = NULL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::GetElementScreenShot,
+            base::Unretained(executor_.get()),
+            element,
+            &raw_bytes,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+
+    // Convert the raw binary data to base 64 encoding for webdriver.
+    std::string base64_screenshot;
+    if (!base::Base64Encode(raw_bytes, &base64_screenshot)) {
+        response->SetError(new Error(
+            kUnknownError, "Encoding the PNG to base64 format failed"));
+        return;
+    }
+
+    response->SetValue(new StringValue(base64_screenshot));
 }
 
 }  // namespace webdriver

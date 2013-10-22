@@ -5,6 +5,7 @@
 
 class FindingTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     FindingTestWidget();
     virtual ~FindingTestWidget();

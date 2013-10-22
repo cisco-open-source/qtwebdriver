@@ -5,6 +5,7 @@
 
 class TouchTestWidget : public QWidget
 {
+    Q_OBJECT
 public:
     explicit TouchTestWidget(QWidget *parent = 0);
 

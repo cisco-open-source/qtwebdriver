@@ -333,6 +333,74 @@ void TouchFlickCommand::ExecutePost(Response *const response)
 
 }
 
+TouchPinchRotateCommand::TouchPinchRotateCommand(const std::vector<std::string>& path_segments,
+                           const DictionaryValue* const parameters)
+    : TouchCommand(path_segments, parameters) {
+}
+
+TouchPinchRotateCommand::~TouchPinchRotateCommand() {}
+
+void TouchPinchRotateCommand::ExecutePost(Response* const response) {
+    Error* error = NULL;;
+    std::string element_name;
+    int angle;
+
+    if (!GetStringParameter("element", &element_name) || !GetIntegerParameter("angle", &angle))
+    {
+        response->SetError(new Error(
+            kBadRequest, "Invalid command arguments"));
+    }
+
+    ElementId element = ElementId(element_name);
+
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::TouchPinchRotate,
+            base::Unretained(executor_.get()),
+            element,
+            angle,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+}
+
+TouchPinchZoomCommand::TouchPinchZoomCommand(const std::vector<std::string>& path_segments,
+                           const DictionaryValue* const parameters)
+    : TouchCommand(path_segments, parameters) {
+}
+
+TouchPinchZoomCommand::~TouchPinchZoomCommand() {}
+
+void TouchPinchZoomCommand::ExecutePost(Response* const response) {
+    Error* error = NULL;;
+    std::string element_name;
+    double scale;
+
+    if (!GetStringParameter("element", &element_name) || !GetDoubleParameter("scale", &scale))
+    {
+        response->SetError(new Error(
+            kBadRequest, "Invalid command arguments"));
+    }
+
+    ElementId element = ElementId(element_name);
+
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::TouchPinchZoom,
+            base::Unretained(executor_.get()),
+            element,
+            scale,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+}
+
 
 }
 

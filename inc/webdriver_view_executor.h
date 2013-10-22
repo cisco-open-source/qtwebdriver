@@ -75,6 +75,7 @@ public:
     virtual void GoBack(Error** error) = 0;
     virtual void Reload(Error** error) = 0;
     virtual void GetScreenShot(std::string* png, Error** error) = 0;
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) = 0;
     virtual void GetSource(std::string* source, Error** error) = 0;
     virtual void SendKeys(const string16& keys, Error** error) = 0;
     virtual void SendKeys(const ElementId& element, const string16& keys, Error** error) = 0;
@@ -171,6 +172,9 @@ public:
 
     virtual void IsOnline(bool *online,Error **error) = 0;
     virtual void SetOnline(bool online, Error **error) = 0;
+	
+	virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error **error) = 0;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error **error) = 0;
 
 protected:
     Session* session_;

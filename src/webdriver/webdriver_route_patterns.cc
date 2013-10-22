@@ -26,6 +26,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kGoBack);
 		standardCommandRoutes.insert(kRefresh);
 		standardCommandRoutes.insert(kScreenshot);
+		standardCommandRoutes.insert(kElementScreenshot);
 		standardCommandRoutes.insert(kSendKeys);
 		standardCommandRoutes.insert(kClickElement);
 		standardCommandRoutes.insert(kHoverOverElement);
@@ -113,6 +114,7 @@ const char CommandRoutes::kGoForward[] 					= "/session/*/forward";
 const char CommandRoutes::kGoBack[] 					= "/session/*/back";
 const char CommandRoutes::kRefresh[] 					= "/session/*/refresh";
 const char CommandRoutes::kScreenshot[] 				= "/session/*/screenshot";
+const char CommandRoutes::kElementScreenshot[] 			= "/session/*/element/*/screenshot";
 const char CommandRoutes::kSendKeys[] 					= "/session/*/keys";
 const char CommandRoutes::kClickElement[] 				= "/session/*/element/*/click";
 const char CommandRoutes::kHoverOverElement[] 			= "/session/*/element/*/hover";
@@ -172,12 +174,14 @@ const char CommandRoutes::kTouchLongClick[]  			= "/session/*/touch/longclick";
 const char CommandRoutes::kTouchFlick[]					= "/session/*/touch/flick";
 const char CommandRoutes::kOrientation[]				= "/session/*/orientation";
 const char CommandRoutes::kXdrpc[]						= "/xdrpc";
-const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-CISCO-player-element/state";
-const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-CISCO-player-element/volume";
-const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-CISCO-player-element/seek";
-const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/-CISCO-player-element/mute";
-const char CommandRoutes::kCiscoPlayerPlayingSpeed[]    = "/session/*/element/*/-CISCO-player-element/speed";
+const char CommandRoutes::kCiscoPlayerState[]           = "/session/*/element/*/-cisco-player-element/state";
+const char CommandRoutes::kCiscoPlayerVolume[]          = "/session/*/element/*/-cisco-player-element/volume";
+const char CommandRoutes::kCiscoPlayingPosition[]       = "/session/*/element/*/-cisco-player-element/seek";
+const char CommandRoutes::kCiscoPlayerMute[]            = "/session/*/element/*/-cisco-player-element/mute";
+const char CommandRoutes::kCiscoPlayerPlayingSpeed[]    = "/session/*/element/*/-cisco-player-element/speed";
 const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
 const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
+const char CommandRoutes::kTouchPinchZoom[]             = "/session/*/touch/-cisco-pinch-zoom";
+const char CommandRoutes::kTouchPinchRotate[]           = "/session/*/touch/-cisco-pinch-rotate";
 
 } // namespace webdriver

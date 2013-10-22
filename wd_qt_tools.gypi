@@ -16,5 +16,12 @@
     'outputs': [ '<(RULE_INPUT_DIRNAME)/moc_<(RULE_INPUT_ROOT).cc' ],
     'action': [ 'python', 'do_if_modified.py','<(QT_BIN_PATH)/moc', '<(RULE_INPUT_PATH)', '<(INTERMEDIATE_DIR)/moc_<(RULE_INPUT_ROOT).cc' ],
     'message': 'Generating <(RULE_INPUT_ROOT).cc.',
+  },
+  {
+    'rule_name': 'generate_rcc',
+    'extension': 'qrc',
+    'outputs': [ '<(RULE_INPUT_DIRNAME)/rcc_<(RULE_INPUT_ROOT).cc' ],
+    'action': [ '<(QT_BIN_PATH)/rcc', '<(RULE_INPUT_PATH)', '-name', '<(RULE_INPUT_ROOT)', '-o', '<(INTERMEDIATE_DIR)/rcc_<(RULE_INPUT_ROOT).cc' ],
+    'message': 'Generating <(RULE_INPUT_ROOT).cc.',
   } ],
 }

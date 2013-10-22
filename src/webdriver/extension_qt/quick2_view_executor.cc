@@ -24,19 +24,11 @@
 #include <QtQml/QQmlExpression>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QStyleHints>
+#include <QtCore/QtMath>
 
 #include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
-
-#if 1 
-#define REMOVE_INTERNAL_SUFIXES(qstr)   \
-        qstr.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+"))); \
-        qstr.remove(QRegExp(QLatin1String("_QML_\\d+"))); \
-        if (qstr.startsWith(QLatin1String("QQuick"))) qstr = qstr.mid(6);
-#else
-#define REMOVE_INTERNAL_SUFIXES(qstr)
-#endif            
 
 const ViewType Quick2ViewCmdExecutorCreator::QML_VIEW_TYPE = 0x13f6;    
 
@@ -125,16 +117,12 @@ void Quick2ViewCmdExecutor::GetSource(std::string* source, Error** error) {
         return;
     }
 
-    XMLElementMap elementsMap;
     QByteArray byteArray;
     QBuffer buff(&byteArray);
     buff.open(QIODevice::ReadWrite);
 
-    createUIXML(parentItem, &buff, elementsMap, error);
-
-    if (*error)
-        return;
-
+    QQmlXmlSerializer serializer(&buff);
+    serializer.createXml(parentItem);
     *source = byteArray.data();
 }
 
@@ -454,6 +442,12 @@ void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::st
 
     QVariant propertyValue = pItem->property(key.c_str());
 
+    // substituate "id" with "objectName"
+    QString idName("id");
+    if (0 == idName.compare(key.c_str(), Qt::CaseInsensitive)) {
+        propertyValue = pItem->property("objectName");
+    }
+
     Value* val = NULL;
 
     if (propertyValue.isValid()) {
@@ -596,7 +590,7 @@ void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::str
         return;
 
     QString className(pItem->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     *tag_name = className.toStdString();
 }
@@ -765,6 +759,45 @@ void Quick2ViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
 
     if (!file_util::ReadFileToString(path, png))
         *error = new Error(kUnknownError, "Could not read screenshot file");
+}
+
+void Quick2ViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QQuickItem* pItem = getElement(element, error);
+    if (NULL == pItem)
+        return;
+
+    QImage grabbed = view->grabWindow();
+    QPointF scenePos = pItem->mapToScene(QPointF(0,0));
+    QRectF rf(scenePos.x(), scenePos.y(), pItem->width(), pItem->height());        
+    rf = rf.intersected(QRectF(0, 0, grabbed.width(), grabbed.height()));
+
+    QImage image = grabbed.copy(rf.toAlignedRect());
+
+    const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
+    FilePath path = session_->temp_dir().Append(kPngFileName);;
+
+    #if defined(OS_WIN)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
+#elif defined(OS_POSIX)
+    session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.value());
+#endif
+
+#if defined(OS_POSIX)
+    if (!image.save(path.value().c_str())) 
+#elif defined(OS_WIN)
+    if (!image.save(QString::fromUtf16((ushort*)path.value().c_str())))
+#endif // OS_WIN
+    {
+        *error = new Error(kUnknownError, "screenshot was not captured");
+        return;
+    }
+
+    if (!file_util::ReadFileToString(path, png))
+        *error = new Error(kUnknownError, "Could not read screenshot file");       
 }
 
 void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
@@ -956,14 +989,7 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
     if (NULL == pItem)
         return;
 
-
-    double currentPosition = 0;
-    GetPlayingPosition(element, &currentPosition, error);
-    if(*error)
-        return;
-
-    int positionOffset = (int)((position - currentPosition) * 1000);
-    QVariant var(positionOffset);
+    QVariant var((int)((position) * 1000));
     bool isMethodCalled = QMetaObject::invokeMethod(pItem, "seek",
                                                     Q_ARG(QVariant, var));
 
@@ -1085,6 +1111,7 @@ void Quick2ViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
 
     QGuiApplication::processEvents();
 }
+
 
 void Quick2ViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error)
 {
@@ -1316,6 +1343,130 @@ void Quick2ViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoff
     QGuiApplication::processEvents();
 }
 
+void Quick2ViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &angle, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QPointF startPoint(point.x(), point.y());
+
+    float dx = qApp->styleHints()->startDragDistance();
+    float dy = qApp->styleHints()->startDragDistance();
+
+    float degree = angle;
+    float rad = qDegreesToRadians(degree);
+
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint);
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF point1(point.x() - dx*cos(rad*i/stepCount), point.y() - dy*sin(rad*i/stepCount));
+        QPointF point2(point.x() + dx*cos(rad*i/stepCount), point.y() + dy*sin(rad*i/stepCount));
+
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
+        QGuiApplication::postEvent(view, touchMoveEvent);
+
+        if (stepCount == i)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point1, point2);
+            QGuiApplication::postEvent(view, touchEndEvent);
+        }
+    }
+
+    QGuiApplication::processEvents();
+}
+
+void Quick2ViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double &scale, Error **error)
+{
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    Point location(0,0);
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = ConvertPointToQPoint(location);
+
+    QQuickItem* pItem = getElement(element, error);
+    if (*error)
+        return;
+
+    point = pItem->mapToScene(point);
+
+    QPointF startPoint(point.x(), point.y());
+
+    float dx;
+
+    if (scale >= 1)
+        dx = scale*qApp->styleHints()->startDragDistance();
+    else
+        dx = (1-scale)*qApp->styleHints()->startDragDistance();
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint);
+    QGuiApplication::postEvent(view, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 1; i <= stepCount; ++i)
+    {
+        QPointF point1(startPoint);
+        QPointF point2(startPoint);
+        if (i == 1)
+        {
+            //need to trigger PinchStart event
+            point1.setX(startPoint.x() + qApp->styleHints()->startDragDistance());
+        }
+        else
+        {
+            if (scale > 1)
+                point1.setX(startPoint.x() + dx*i/stepCount);
+            else
+                point1.setX(startPoint.x() + qApp->styleHints()->startDragDistance() - dx*i/stepCount);
+        }
+
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point2, point1);
+        QGuiApplication::postEvent(view, touchMoveEvent);
+
+        if (i == stepCount)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point2, point1);
+            QGuiApplication::postEvent(view, touchEndEvent);
+        }
+    }
+
+    QGuiApplication::processEvents();
+}
+
 QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
     QQuickItem* pFocusItem = view->activeFocusItem();
     if (NULL != pFocusItem) return pFocusItem;
@@ -1336,7 +1487,7 @@ QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
 
 bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query) {
     QString className(item->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
+    QQmlViewUtil::removeInternalSuffixes(className);
 
     if (locator == LocatorType::kClassName) {
         if (query == className.toStdString())
@@ -1361,12 +1512,11 @@ bool Quick2ViewCmdExecutor::FilterElement(const QQuickItem* item, const std::str
 void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error) {
     QByteArray byteArray;
     QBuffer buff(&byteArray);
-
     buff.open(QIODevice::ReadWrite);
-    XMLElementMap elementsMap;
-    createUIXML(parent, &buff, elementsMap, error);
-    if (*error)
-        return;
+
+    QQmlXmlSerializer serializer(&buff);
+    serializer.setDumpAll(true);
+    serializer.createXml(parent);
 
     buff.seek(0);
 
@@ -1393,6 +1543,7 @@ void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::s
                 QString elemId(node.node().attribute("elementId").value());
 
                 if (!elemId.isEmpty()) {
+                    const QQmlXmlSerializer::XMLElementMap& elementsMap = serializer.getElementsMap();
                     if (elementsMap.contains(elemId)) {
                         ElementId elm;
                         session_->AddElement(view_id_, new QElementHandle(elementsMap[elemId]), &elm);
@@ -1423,55 +1574,5 @@ void Quick2ViewCmdExecutor::FindElementsByXpath(QQuickItem* parent, const std::s
 
     buff.close();
 }
-
-void Quick2ViewCmdExecutor::createUIXML(QQuickItem *parent, QIODevice* buff, XMLElementMap& elementsMap, Error** error) {
-    
-    QXmlStreamWriter* writer = new QXmlStreamWriter();
-
-    writer->setDevice(buff);
-    writer->setAutoFormatting(true);
-    writer->writeStartDocument();
-
-    addItemToXML(parent, elementsMap, writer);
-
-    writer->writeEndDocument();
-
-    delete writer;
-}
-
-void Quick2ViewCmdExecutor::addItemToXML(QQuickItem* parent, XMLElementMap& elementsMap, QXmlStreamWriter* writer) {
-    if (NULL == parent) {
-        session_->logger().Log(kWarningLogLevel, "parent item is NULL.");
-        return;
-    }
-
-    QString className(parent->metaObject()->className());
-    REMOVE_INTERNAL_SUFIXES(className);
-    
-    writer->writeStartElement(className);
-
-    if (!parent->objectName().isEmpty())
-        writer->writeAttribute("id", parent->objectName());
-
-    writer->writeAttribute("x", QString::number(parent->x()));
-    writer->writeAttribute("y", QString::number(parent->y()));
-    writer->writeAttribute("width", QString::number(parent->width()));
-    writer->writeAttribute("height", QString::number(parent->height()));
-    writer->writeAttribute("activeFocus", QString(parent->hasActiveFocus()?"true":"false"));
-    writer->writeAttribute("focus", QString(parent->hasFocus()?"true":"false"));
-
-
-    QString elementKey = GenerateRandomID().c_str();
-    elementsMap.insert(elementKey, QPointer<QQuickItem>(parent));
-    writer->writeAttribute("elementId", elementKey);
-
-    QList<QQuickItem*> childs = parent->childItems();
-    foreach(QQuickItem *child, childs) {
-        if (child) addItemToXML(child, elementsMap, writer);
-    }
-
-    writer->writeEndElement();
-}
-
 
 } //namespace webdriver 

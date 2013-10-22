@@ -1,8 +1,10 @@
 #include "widget_view_util.h"
-
 #include "webdriver_session.h"
-
+#include "webdriver_util.h"
+#include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
+
+#include <QtCore/QMetaProperty>
 
 namespace webdriver {
 
@@ -42,5 +44,61 @@ QWidget* QWidgetViewUtil::getView(Session* session, const ViewId& viewId) {
     return qViewHandle->get();
 }
 
+void QWidgetXmlSerializer::addWidget(QWidget* widget) {
+    QString elementName = getElementName(widget);
+    writer_.writeStartElement(elementName);
+
+    if (dumpAll_) {
+        for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
+            const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
+            writer_.writeAttribute(property.name(), property.read(widget).toString());
+        }
+    }
+
+    if (!widget->objectName().isEmpty())
+        writer_.writeAttribute("id", widget->objectName());
+
+    if (!widget->windowTitle().isEmpty())
+        writer_.writeAttribute("name", widget->windowTitle());
+
+    QString elementKey;
+    if (session_) {
+        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
+        if (!elementId.is_valid())
+            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+        elementKey = QString::fromStdString(elementId.id());
+    } else {
+        elementKey = GenerateRandomID().c_str();
+    }
+    elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
+    writer_.writeAttribute("elementId", elementKey);
+
+    writer_.writeAttribute("className", widget->metaObject()->className());
+
+    QList<QObject*> childs = widget->children();
+    foreach(QObject* child, childs) {
+        QWidget* childWgt = qobject_cast<QWidget*>(child);
+        if (childWgt)
+            addWidget(childWgt);
+    }
+
+    writer_.writeEndElement();
+}
+
+QString QWidgetXmlSerializer::getElementName(const QObject* object) const {
+    QString elementName = object->metaObject()->className();
+    if (supportedClasses_.empty())
+        return elementName;
+
+    const QMetaObject* metaObject = object->metaObject();
+    while (!supportedClasses_.contains(metaObject->className()) &&
+           metaObject->superClass() != NULL) {
+        metaObject = metaObject->superClass();
+    }
+    if (supportedClasses_.contains(metaObject->className()))
+        elementName = metaObject->className();
+
+    return elementName;
+}
 
 } // namespace webdriver

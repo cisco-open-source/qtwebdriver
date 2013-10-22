@@ -47,6 +47,7 @@ public:
     virtual void SetBounds(const Rect& bounds, Error** error) NOT_SUPPORTED_IMPL;
     virtual void Maximize(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetScreenShot(std::string* png, Error** error);
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) NOT_SUPPORTED_IMPL;
     virtual void GoForward(Error** error);
     virtual void GoBack(Error** error);
     virtual void Reload(Error** error);
@@ -131,6 +132,8 @@ public:
     virtual void GetOrientation(std::string *orientation, Error **error);
     virtual void SetOnline(bool, Error** error);
     virtual void IsOnline(bool*, Error** error);
+    virtual void TouchPinchZoom(const ElementId &element, const double &scale, Error **error) NOT_SUPPORTED_IMPL;
+    virtual void TouchPinchRotate(const ElementId &element, const int &angle, Error **error) NOT_SUPPORTED_IMPL;
 
 protected:
     QGraphicsWebView* getView(const ViewId& viewId, Error** error);

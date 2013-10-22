@@ -35,6 +35,7 @@ public:
     static const char kGoBack[];
     static const char kRefresh[];
     static const char kScreenshot[];
+    static const char kElementScreenshot[];
     static const char kSendKeys[];
     static const char kClickElement[];
     static const char kHoverOverElement[];
@@ -101,6 +102,8 @@ public:
     static const char kCiscoPlayerPlayingSpeed[];
     static const char kVisualizerSource[];
     static const char kVisualizerShowPoint[];
+    static const char kTouchPinchZoom[];
+    static const char kTouchPinchRotate[];
 
 private:
     static std::set<std::string> standardCommandRoutes;

@@ -139,6 +139,32 @@ private:
     DISALLOW_COPY_AND_ASSIGN(TouchFlickCommand);
 };
 
+/// Rotate element using pinch rotate fingers motion events.
+class TouchPinchRotateCommand : public TouchCommand {
+public:
+    TouchPinchRotateCommand(const std::vector<std::string>& path_segments,
+           const base::DictionaryValue* const parameters);
+    virtual ~TouchPinchRotateCommand();
+
+    virtual void ExecutePost(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(TouchPinchRotateCommand);
+};
+
+/// Rotate element using pinch zoom fingers motion events.
+class TouchPinchZoomCommand : public TouchCommand {
+public:
+    TouchPinchZoomCommand(const std::vector<std::string>& path_segments,
+           const base::DictionaryValue* const parameters);
+    virtual ~TouchPinchZoomCommand();
+
+    virtual void ExecutePost(Response* const response) OVERRIDE;
+
+private:
+    DISALLOW_COPY_AND_ASSIGN(TouchPinchZoomCommand);
+};
+
 }  // namespace webdriver
 
 #endif // TOUCH_COMMANDS_H
