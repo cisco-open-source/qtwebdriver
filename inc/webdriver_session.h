@@ -52,6 +52,7 @@ session's create or session's terminate.
 #include "base/scoped_temp_dir.h"
 #include "base/string16.h"
 #include "base/threading/thread.h"
+#include "base/values.h"
 #include "frame_path.h"
 #include "webdriver_basic_types.h"
 #include "webdriver_view_id.h"
@@ -217,6 +218,7 @@ private:
     bool CheckRequiredCapabilities(const base::DictionaryValue* capabilities_dict);
     bool CheckRequiredBrowser(const base::DictionaryValue* capabilities_dict);
     bool CheckRequiredPlatform(const base::DictionaryValue* capabilities_dict);
+    bool CheckRequiredViewType(const base::DictionaryValue* capabilities_dict);
     bool CheckRequiredCapabilityBoolean(const base::DictionaryValue* capabilities_dict, const std::string& cap_name);
 
     void RunClosureOnSessionThread(

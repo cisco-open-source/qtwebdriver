@@ -29,6 +29,7 @@
 #include "webdriver_session_manager.h"
 #include "webdriver_view_runner.h"
 #include "webdriver_util.h"
+#include "webdriver_view_executor.h"
 
 #if !defined(OS_WIN)
 #include <sys/types.h>
@@ -85,6 +86,14 @@ bool Session::InitActualCapabilities() {
     capabilities_.caps->SetBoolean(Capabilities::kAcceptSslCerts, false);
     capabilities_.caps->SetBoolean(Capabilities::kNativeEvents, true);
 
+    ViewCmdExecutorFactory* executorFactory = ViewCmdExecutorFactory::GetInstance();
+    const ViewCmdExecutorFactory::SupportedViewTypesList typesList = executorFactory->getSupportedViewTypesList();
+    base::DictionaryValue *hybrid = new base::DictionaryValue;
+    ViewCmdExecutorFactory::SupportedViewTypesList::const_iterator iter = typesList.begin();
+    for (; iter != typesList.end(); iter++) {
+        hybrid->SetBoolean(*iter, true);
+    }
+    capabilities_.caps->Set(Capabilities::kHybrid, hybrid);
     return true;
 }
 
@@ -93,6 +102,9 @@ bool Session::CheckRequiredCapabilities(const base::DictionaryValue* capabilitie
         return false;
 
     if (!CheckRequiredBrowser(capabilities_dict))
+        return false;
+
+    if(!CheckRequiredViewType(capabilities_dict))
         return false;
 
     if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kJavascriptEnabled))
@@ -162,6 +174,35 @@ bool Session::CheckRequiredPlatform(const base::DictionaryValue* capabilities_di
             logger_.Log(kWarningLogLevel,
                 "check failed - required platform("+required_platform+"), actual platform("+actual_platform+").");
             return false;
+        }
+    }
+
+    return true;
+}
+
+bool Session::CheckRequiredViewType(const base::DictionaryValue *capabilities_dict) {
+
+    const base::DictionaryValue *required_hybrid_caps;
+    base::DictionaryValue *actual_hybrid_caps;
+
+    if (capabilities_dict->GetDictionary(Capabilities::kHybrid, &required_hybrid_caps)) {
+        if (!capabilities_.caps->GetDictionary(Capabilities::kHybrid, &actual_hybrid_caps)) {
+            return false;
+        }
+        base::DictionaryValue::key_iterator key_iter = required_hybrid_caps->begin_keys();
+        for (; key_iter != required_hybrid_caps->end_keys(); ++key_iter) {
+            bool actual_value;
+            bool required_value;
+            if (required_hybrid_caps->GetBoolean(*key_iter, &required_value)) {
+                if (!actual_hybrid_caps->GetBoolean(*key_iter, &actual_value)) {
+                    logger_.Log(kWarningLogLevel, "check failed - view type doesn't set as bool..");
+                    return false;
+                }
+                if (required_value != actual_value) {
+                    logger_.Log(kWarningLogLevel, "check failed - view type doesn't match...");
+                    return false;
+                }
+            }
         }
     }
 

@@ -61,6 +61,7 @@ struct Capabilities {
     static const char kLoadAsync[];
     static const char kBrowserStartWindow[];
     static const char kBrowserClass[];
+    static const char kHybrid[];
     /// desired size, as a string (e.g. - "600, 600") for start window
     static const char kWindowSize[];
     /// desired position, as a string (e.g. - "80, 60") for start window
