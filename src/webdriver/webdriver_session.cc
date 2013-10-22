@@ -138,7 +138,7 @@ bool Session::CheckRequiredBrowser(const base::DictionaryValue* capabilities_dic
     if (capabilities_dict->GetString(Capabilities::kBrowserName, &required_browser)) {
         capabilities_.caps->GetString(Capabilities::kBrowserName, &actual_browser);
 
-        if (actual_browser != required_browser) {
+        if (StringToLowerASCII(actual_browser) != StringToLowerASCII(required_browser)) {
             logger_.Log(kWarningLogLevel,
                 "check failed - required browser("+required_browser+"), actual browser("+actual_browser+").");
             return false;
@@ -155,10 +155,10 @@ bool Session::CheckRequiredPlatform(const base::DictionaryValue* capabilities_di
     if (capabilities_dict->GetString(Capabilities::kPlatform, &required_platform)) {
         capabilities_.caps->GetString(Capabilities::kPlatform, &actual_platform);
 
-        if (required_platform == "ANY")
+        if (StringToUpperASCII(required_platform) == "ANY")
             return true;
 
-        if (actual_platform != required_platform) {
+        if (StringToLowerASCII(actual_platform) != StringToLowerASCII(required_platform)) {
             logger_.Log(kWarningLogLevel,
                 "check failed - required platform("+required_platform+"), actual platform("+actual_platform+").");
             return false;
