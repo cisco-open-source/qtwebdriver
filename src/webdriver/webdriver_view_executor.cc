@@ -1,7 +1,6 @@
 #include "webdriver_view_executor.h"
 
 #include "webdriver_session.h"
-
 namespace webdriver {
 
 ViewCmdExecutor::ViewCmdExecutor(Session* session, ViewId viewId)
@@ -26,7 +25,12 @@ ViewCmdExecutorFactory* ViewCmdExecutorFactory::GetInstance() {
 void ViewCmdExecutorFactory::AddViewCmdExecutorCreator(ViewCmdExecutorCreator* creator) {
 	if (NULL != creator) {
 		creators_.push_back(creator);
+        typeslist_.push_back(creator->GetViewTypeName());
 	}
+}
+
+const ViewCmdExecutorFactory::SupportedViewTypesList& ViewCmdExecutorFactory::getSupportedViewTypesList() const {
+    return typeslist_;
 }
 
 ViewCmdExecutor* ViewCmdExecutorFactory::CreateExecutor(Session* session) const {

@@ -23,6 +23,7 @@
 #include "webdriver_util.h"
 #include "frame_path.h"
 #include "value_conversion_util.h"
+#include "webdriver_logging.h"
 
 #include "third_party/webdriver/atoms.h"
 
@@ -1076,15 +1077,16 @@ Error* QWebkitProxy::GetMute(const ElementId& element, bool* mute) {
 Error* QWebkitProxy::SetOnline(bool online) {
 #ifndef QT_NO_BEARERMANAGEMENT
     QNetworkAccessManager *manager = page_->networkAccessManager();
-
     if (online){
         manager->setNetworkAccessible(QNetworkAccessManager::Accessible);
     } else {
         manager->setNetworkAccessible(QNetworkAccessManager::NotAccessible);
     }
-#endif //QT_NO_BEARERMANAGEMENT
-
     return NULL;
+#else
+    session_->logger().Log(kWarningLogLevel, "In QWebkitProxy::SetOnline() defined QT_NO_BEARERMANAGEMENT");
+    return new Error(kCommandNotSupported, "Can't change online mode");
+#endif //QT_NO_BEARERMANAGEMENT
 }
 
 Error* QWebkitProxy::IsOnline(bool* online) {
@@ -1095,9 +1097,11 @@ Error* QWebkitProxy::IsOnline(bool* online) {
     } else {
         *online = true;
     }
-#endif //QT_NO_BEARERMANAGEMENT
-
     return NULL;
+#else
+    session_->logger().Log(kWarningLogLevel, "In QWebkitProxy::IsOnline() defined QT_NO_BEARERMANAGEMENT");
+    return new Error(kCommandNotSupported, "Can't check online mode");
+#endif //QT_NO_BEARERMANAGEMENT
 }
 
 QWebFrame* QWebkitProxy::GetFrame(QWebPage* page, const FramePath& frame_path) {

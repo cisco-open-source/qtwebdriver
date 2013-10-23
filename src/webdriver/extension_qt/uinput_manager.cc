@@ -39,7 +39,7 @@ bool UInputManager::registerUinputDevice()
 {
     struct uinput_user_dev uidev;
 
-    _deviceDescriptor = open("/dev/uinput", O_WRONLY | O_NONBLOCK | O_CREAT | O_NDELAY);
+    _deviceDescriptor = open("/dev/uinput", O_WRONLY | O_NONBLOCK | O_CREAT | O_NDELAY, S_IREAD | S_IWRITE);
     _logger->Log(kInfoLogLevel, std::string("#### Device descriptor: ") + QString::number(_deviceDescriptor).toStdString());
 
     if (0 > _deviceDescriptor)

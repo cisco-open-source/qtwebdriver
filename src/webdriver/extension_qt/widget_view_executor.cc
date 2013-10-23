@@ -85,6 +85,10 @@ bool QWidgetViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewI
     return false;
 }
 
+std::string QWidgetViewCmdExecutorCreator::GetViewTypeName() const {
+    return "widget";
+}
+
 QWidgetViewCmdExecutor::QWidgetViewCmdExecutor(Session* session, ViewId viewId)
 	: QViewCmdExecutor(session, viewId) {
 }

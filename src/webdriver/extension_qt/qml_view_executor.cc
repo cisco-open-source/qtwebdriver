@@ -52,6 +52,10 @@ bool QQmlViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, 
     return false;
 }
 
+std::string QQmlViewCmdExecutorCreator::GetViewTypeName() const {
+    return "qml";
+}
+
 QQmlViewCmdExecutor::QQmlViewCmdExecutor(Session* session, ViewId viewId)
 	: QViewCmdExecutor(session, viewId) {
 }
