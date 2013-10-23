@@ -76,6 +76,7 @@ bool Session::InitActualCapabilities() {
     capabilities_.caps->SetBoolean(Capabilities::kJavascriptEnabled, true);
     capabilities_.caps->SetBoolean(Capabilities::kTakesScreenshot, true);
     capabilities_.caps->SetBoolean(Capabilities::kTakesElementScreenshot, true);
+    capabilities_.caps->SetBoolean(Capabilities::kRemotePlayerEnabled, true);
     capabilities_.caps->SetBoolean(Capabilities::kHandlesAlerts, true);
     capabilities_.caps->SetBoolean(Capabilities::kDatabaseEnabled, false);
     capabilities_.caps->SetBoolean(Capabilities::kLocationContextEnabled, false);
@@ -115,6 +116,9 @@ bool Session::CheckRequiredCapabilities(const base::DictionaryValue* capabilitie
         return false;
 
     if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kTakesElementScreenshot))
+        return false;
+
+    if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kRemotePlayerEnabled))
         return false;
 
     if (!CheckRequiredCapabilityBoolean(capabilities_dict, Capabilities::kHandlesAlerts))
