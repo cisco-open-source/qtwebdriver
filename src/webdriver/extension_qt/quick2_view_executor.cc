@@ -861,6 +861,16 @@ void Quick2ViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState
     if (NULL == view)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
@@ -901,6 +911,15 @@ void Quick2ViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     bool isMethodCalled = false;
     switch(state){
@@ -925,6 +944,15 @@ void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *vo
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     base::Value* volumeValue = NULL;
     GetAttribute(element, "volume", &volumeValue, error);
@@ -946,6 +974,16 @@ void Quick2ViewCmdExecutor::SetPlayerVolume(const ElementId &element, double vol
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     QVariant volumeVariant(volume);
     bool isPropertyAssigned = pItem->setProperty("volume", volumeVariant);
 
@@ -965,6 +1003,15 @@ void Quick2ViewCmdExecutor::GetPlayingPosition(const ElementId &element, double 
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     base::Value* positionValue = NULL;
     GetAttribute(element, "position", &positionValue, error);
@@ -989,6 +1036,16 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     QVariant var((int)((position) * 1000));
     bool isMethodCalled = QMetaObject::invokeMethod(pItem, "seek",
                                                     Q_ARG(QVariant, var));
@@ -1009,6 +1066,16 @@ void Quick2ViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error *
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
+
     QVariant muteVariant(mute);
     bool isPropertyAssigned = pItem->setProperty("muted", muteVariant);
 
@@ -1028,10 +1095,17 @@ void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error 
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     base::Value* muteValue = NULL;
     GetAttribute(element, "muted", &muteValue, error);
-
     if( *error){
         return;
     }
@@ -1048,6 +1122,16 @@ void Quick2ViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double sp
     QQuickItem* pItem = getElement(element, error);
     if (NULL == pItem)
         return;
+
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     QVariant speedVariant(speed);
     bool isPropertyAssigned = pItem->setProperty("playbackRate", speedVariant);
@@ -1068,6 +1152,15 @@ void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *s
     if (NULL == pItem)
         return;
 
+    std::string tagName;
+    GetElementTagName(element, &tagName, error);
+    if(*error)
+        return;
+
+    if(tagName != "video" && tagName != "Video"){
+        *error = new Error(kInvalidElementState);
+        return;
+    }
 
     base::Value* positionValue = NULL;
     GetAttribute(element, "playbackRate", &positionValue, error);
