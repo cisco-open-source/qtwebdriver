@@ -130,7 +130,7 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
             return false;
         }
         bool hasCustomPrefix = false;
-        for ( uint i = 0; i < url_segments.size(); i++ )
+        for (size_t i = 0; i < url_segments.size(); ++i)
         {
             hasCustomPrefix = CheckCustomPrefix(url_segments[i]);
             if (hasCustomPrefix)
