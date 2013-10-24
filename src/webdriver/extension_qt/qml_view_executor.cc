@@ -450,11 +450,12 @@ void QQmlViewCmdExecutor::GetAttribute(const ElementId& element, const std::stri
         case QVariant::Double:
             val = Value::CreateDoubleValue(propertyValue.toDouble());
             break;
-        case QVariant::String:
-            val = Value::CreateStringValue(propertyValue.toString().toStdString());
-            break;
         default:
-            session_->logger().Log(kWarningLogLevel, "cant handle proprty type.");
+            if (propertyValue.canConvert<QString>()) {
+                val = Value::CreateStringValue(propertyValue.toString().toStdString());    
+            } else {
+                session_->logger().Log(kWarningLogLevel, "cant handle proprty type.");
+            }
         }
     } else {
         session_->logger().Log(kWarningLogLevel, "property not found.");

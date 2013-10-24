@@ -54,6 +54,7 @@ std::string tests::testDataFolder;
 #include "versioninfo.h"
 #include "webdriver_route_table.h"
 #include "shutdown_command.h"
+#include "webdriver_route_patterns.h"
 
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -259,6 +260,7 @@ int main(int argc, char *argv[])
     webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
     const char shutdownCommandRoute[] = "/-cisco-shutdown";
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
+    routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(webdriver::CommandRoutes::kShutdown);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
     InitVNCClient();
