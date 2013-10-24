@@ -89,6 +89,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
         standardCommandRoutes.insert(kCiscoPlayerState);
         standardCommandRoutes.insert(kCiscoPlayerVolume);
         standardCommandRoutes.insert(kCiscoPlayingPosition);
+        standardCommandRoutes.insert(kShutdown);
 	}
 
 	// check if paatern is presence in set
@@ -183,5 +184,6 @@ const char CommandRoutes::kVisualizerSource[]           = "/session/*/-cisco-vis
 const char CommandRoutes::kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
 const char CommandRoutes::kTouchPinchZoom[]             = "/session/*/touch/-cisco-pinch-zoom";
 const char CommandRoutes::kTouchPinchRotate[]           = "/session/*/touch/-cisco-pinch-rotate";
+const char CommandRoutes::kShutdown[]                   = "/shutdown";
 
 } // namespace webdriver

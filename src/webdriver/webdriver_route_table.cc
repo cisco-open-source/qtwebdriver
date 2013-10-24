@@ -120,7 +120,7 @@ CommandCreatorPtr RouteTable::GetRouteForURL(const std::string& url, std::string
 bool RouteTable::AddRoute(const std::string& uri_pattern,
                           const CommandCreatorPtr& creator) {
     // custom command check
-    if (false){//!CommandRoutes::IsStandardRoute(uri_pattern)) {
+    if (!CommandRoutes::IsStandardRoute(uri_pattern)) {
         std::vector<std::string> url_segments;
         base::SplitString(uri_pattern, '/', &url_segments);
 
@@ -129,17 +129,16 @@ bool RouteTable::AddRoute(const std::string& uri_pattern,
             GlobalLogger::Log(kWarningLogLevel, "Custom commands too short");
             return false;
         }
-        if (url_segments.size() >= 2
-                && url_segments[0].empty() && url_segments[1] != "session") {
-            if (!CheckCustomPrefix(url_segments[1]))
-                return false;
-        } else  if (url_segments.size() < 4 || !url_segments[0].empty()
-                    || url_segments[1] != "session" || url_segments[2] != "*") {
-            GlobalLogger::Log(kWarningLogLevel, "Invalid custom commands");
+        bool hasCustomPrefix = false;
+        for ( uint i = 0; i < url_segments.size(); i++ )
+        {
+            hasCustomPrefix = CheckCustomPrefix(url_segments[i]);
+            if (hasCustomPrefix)
+                break;
+        }
+        if (!hasCustomPrefix) {
+            GlobalLogger::Log(kWarningLogLevel, "Comand " + uri_pattern +" has no valid custom prefix");
             return false;
-        } else {
-            if (!CheckCustomPrefix(url_segments[3]))
-                return false;
         }
     }
     std::vector<webdriver::internal::RouteDetails>::iterator route;
@@ -175,8 +174,6 @@ bool RouteTable::CheckCustomPrefix(const std::string& prefix) {
     if (prefix_segments.size() < 3 || !prefix_segments[0].empty() || prefix_segments[2].empty()
             || prefix_segments[1].empty() || !std::isalpha(prefix_segments[1].at(0))) {
 #endif //OS_WIN
-
-        GlobalLogger::Log(kWarningLogLevel, "Custom prefix invalid");
         return false;
     }
     return true;
