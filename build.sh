@@ -16,7 +16,7 @@ base_output_gen=`dirname ${output_gen}`
 
 if [ -z $platform ];
 then
-  platforms="desktop flip"
+  platforms="desktop"
 else
   platforms=$platform
 fi
