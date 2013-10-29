@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 rel. 3 (http://www.altova.com) by Salima Khelifi (NDS Technologies France) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="hosts">
+		<xs:annotation>
+			<xs:documentation>whitelist</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="host" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence minOccurs="0">
+							<xs:choice maxOccurs="unbounded">
+								<xs:element name="allow" type="permission"/>
+								<xs:element name="deny" type="permission"/>
+							</xs:choice>
+						</xs:sequence>
+						<xs:attribute name="ip" type="xs:token"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="permission">
+		<xs:annotation>
+			<xs:documentation>allow or deny</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="url" type="xs:token" use="required"/>
+		<xs:attribute name="method" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:token">
+					<xs:enumeration value="POST"/>
+					<xs:enumeration value="GET"/>
+					<xs:enumeration value="DELETE"/>
+					<xs:enumeration value="*"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

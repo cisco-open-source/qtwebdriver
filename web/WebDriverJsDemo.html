@@ -1,0 +1,552 @@
+<html>
+  <head>
+    <style type="text/css">
+      .unitLabel {
+        font-size: small;
+      }
+
+      .commandBlock {
+        margin-top: 20px;
+        border-style: solid;
+        border-width: thin;
+        border-color: gray;
+      }
+    </style>
+    <script src="webdriver.js"></script>
+    <script src="base64-arraybuffer.js"></script>
+    <script src="FileSaver.js"></script>
+    <script>
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
+      if (!String.prototype.startsWith) {
+        Object.defineProperty(String.prototype, 'startsWith', {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: function (searchString, position) {
+            position = position || 0;
+            return this.indexOf(searchString, position) === position;
+          }
+        });
+      }
+      if (!String.prototype.endsWith) {
+        Object.defineProperty(String.prototype, 'endsWith', {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: function (searchString, position) {
+            position = position || this.length;
+            position = position - searchString.length;
+            var lastIndex = this.lastIndexOf(searchString);
+            return lastIndex !== -1 && lastIndex === position;
+          }
+        });
+      }
+
+      function loadFile(url) {
+        var req = new XMLHttpRequest();
+        req.open('GET', url, false);
+        try {
+          req.send();
+          return req.responseText;
+        } catch (err) {
+          var message = 'Error at "' + err.filename + '" message "' + err.message +
+            '" name "' + err.name + '" result 0x' + Number(err.result).toString(16);
+          console.log(message);
+          return message;
+        }
+      }
+
+      function getXPath(node, path) {
+        path = path || [];
+        if(node.parentNode) {
+          path = getXPath(node.parentNode, path);
+        }
+
+        if(node.previousSibling) {
+          var count = 1;
+          var sibling = node.previousSibling
+          do {
+            if(sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {count++;}
+            sibling = sibling.previousSibling;
+          } while(sibling);
+          if(count == 1) {count = null;}
+        } else if(node.nextSibling) {
+          var sibling = node.nextSibling;
+          do {
+            if(sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {
+              var count = 1;
+              sibling = null;
+            } else {
+              var count = null;
+              sibling = sibling.previousSibling;
+            }
+          } while(sibling);
+        }
+
+        if(node.nodeType == 1) {
+          path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
+        }
+        return path;
+      }
+
+      webdriver.WebDriver.prototype.visualizerGetSource = function() {
+        webdriver.http.Executor.COMMAND_MAP_['visualizerGetSource'] = {
+          method: 'GET', path: '/session/:sessionId/-cisco-visualizer_source'};
+        return this.schedule(
+          new webdriver.Command('visualizerGetSource'),
+          'WebDriver.visualizerGetSource()');
+      }
+
+      webdriver.WebDriver.prototype.visualizerShowPoint = function() {
+        webdriver.http.Executor.COMMAND_MAP_['visualizerShowPoint'] = {
+          method: 'GET', path: '/session/:sessionId/-cisco-visualizer_show_point'};
+        return this.schedule(
+          new webdriver.Command('visualizerShowPoint'),
+          'WebDriver.visualizerShowPoint()');
+      }
+
+      var Util = function() {}
+      Util.WebDriverKeyFromJs = function(keyCode) {
+        switch (keyCode) {
+          case  8: return webdriver.Key.BACK_SPACE;
+          case  9: return webdriver.Key.TAB;
+          case 13: return webdriver.Key.ENTER;
+          case 16: return webdriver.Key.SHIFT;
+          case 17: return webdriver.Key.CONTROL;
+          case 18: return webdriver.Key.ALT;
+          case 19: return webdriver.Key.PAUSE;
+          //case 20: return ; //  caps lock
+          case 27: return webdriver.Key.ESCAPE;
+          case 33: return webdriver.Key.PAGE_UP;
+          case 34: return webdriver.Key.PAGE_DOWN;
+          case 35: return webdriver.Key.END;
+          case 36: return webdriver.Key.HOME;
+          case 37: return webdriver.Key.ARROW_LEFT;
+          case 38: return webdriver.Key.ARROW_UP;
+          case 39: return webdriver.Key.ARROW_RIGHT;
+          case 40: return webdriver.Key.ARROW_DOWN;
+          case 45: return webdriver.Key.INSERT;
+          case 46: return webdriver.Key.DELETE;
+          //case 91: return ; // left window
+          //case 92: return ; // right window
+          //case 93: return ; // select key
+          case 96: return webdriver.Key.NUMPAD0;
+          case 97: return webdriver.Key.NUMPAD1;
+          case 98: return webdriver.Key.NUMPAD2;
+          case 99: return webdriver.Key.NUMPAD3;
+          case 100: return webdriver.Key.NUMPAD4;
+          case 101: return webdriver.Key.NUMPAD5;
+          case 102: return webdriver.Key.NUMPAD6;
+          case 103: return webdriver.Key.NUMPAD7;
+          case 104: return webdriver.Key.NUMPAD8;
+          case 105: return webdriver.Key.NUMPAD9;
+          case 106: return webdriver.Key.MULTIPLY;
+          case 107: return webdriver.Key.ADD;
+          case 109: return webdriver.Key.SUBTRACT;
+          case 110: return webdriver.Key.DECIMAL; // decimal point
+          case 111: return webdriver.Key.DIVIDE;
+          case 112: return webdriver.Key.F1;
+          case 113: return webdriver.Key.F2;
+          case 114: return webdriver.Key.F3;
+          case 115: return webdriver.Key.F4;
+          case 116: return webdriver.Key.F5;
+          case 117: return webdriver.Key.F6;
+          case 118: return webdriver.Key.F7;
+          case 119: return webdriver.Key.F8;
+          case 120: return webdriver.Key.F9;
+          case 121: return webdriver.Key.F10;
+          case 122: return webdriver.Key.F11;
+          case 123: return webdriver.Key.F12;
+          //case 144: return ; // num lock
+          //case 145: return ; // scroll lock
+          case 186: return webdriver.Key.SEMICOLON;
+          case 187: return webdriver.Key.EQUALS;
+          //case 188: return ; // comma
+          //case 189: return ; // dash
+          //case 190: return .; // period
+          //case 191: return /; // forward slash
+          //case 192: return `; // grave accent
+          //case 219: return [; // open bracket
+          //case 220: return \\; // back slash
+          //case 221: return ]; // close bracket
+          //case 222: return '; // single quote
+        }
+      }
+
+      function VisualizerXsltProcessors() {
+        this.widget = this._create('widget_view_visualizer.xsl');
+        this.qml = this._create('qml_view_visualizer.xsl');
+      }
+
+      VisualizerXsltProcessors.prototype.get = function(webPage) {
+        if (webPage.startsWith('qtwidget://'))
+          return this.widget;
+        if (webPage.endsWith('.qml'))
+          return this.qml;
+      }
+
+      VisualizerXsltProcessors.prototype._create = function(name) {
+        var stylesheet = loadFile(name);
+        stylesheet = (new DOMParser()).parseFromString(stylesheet, 'application/xml');
+        var processor = new XSLTProcessor();
+        try {
+          processor.importStylesheet(stylesheet);
+          return processor;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      function WebDriverJsDemo() {
+      }
+
+      WebDriverJsDemo.prototype._constructWebDriver = function() {
+        var self = this;
+        var webDriverUrlPort = document.getElementsByName('webDriverUrlPort')[0].value;
+        var webDriverSession = document.getElementsByName('webDriverSession')[0].value;
+        var webPage = document.getElementsByName('webPage')[0].value;
+
+        if (this.webDriverUrlPort == webDriverUrlPort &&
+            this.webDriverSession == webDriverSession &&
+            this.webPage == webPage)
+          return;
+
+        if (this.webDriverUrlPort != webDriverUrlPort ||
+            this.webDriverSession != webDriverSession) {
+          this.driver = new webdriver.Builder().
+            usingServer(webDriverUrlPort).
+            usingSession(webDriverSession).
+            withCapabilities({'browserName': 'qtwebkit'}).
+            build();
+
+          this.webDriverUrlPort = webDriverUrlPort;
+          localStorage.webDriverUrlPort = this.webDriverUrlPort;
+
+          this.driver.getSession().then(function(session) {
+            self.setSession(session.getId());
+            self.xsltProcessors = new VisualizerXsltProcessors();
+          });
+        }
+
+        if (this.webPage != webPage) {
+          this.driver.get(webPage);
+          this.element = null;
+
+          this.webPage = webPage;
+          localStorage.webPage = webPage;
+        }
+      }
+
+      WebDriverJsDemo.prototype.get = function() {
+        this.webPage = null;
+        this._constructWebDriver();
+      }
+
+      WebDriverJsDemo.prototype.source = function() {
+        this._constructWebDriver();
+        this.updateSource();
+      }
+
+      WebDriverJsDemo.prototype.screenshot = function() {
+        this._constructWebDriver();
+        this.driver.takeScreenshot().then(function(data) {
+          data = base64_arraybuffer.decode(data);
+          data = new Blob([data], {type: 'image/png'});
+          saveAs(data, 'screenshot.png');
+        })
+      }
+
+      WebDriverJsDemo.prototype.findElementById = function() {
+        this._constructWebDriver();
+        var name = document.getElementsByName('elementId')[0].value;
+        this.element = this.driver.findElement(webdriver.By.id(name));
+      }
+
+      WebDriverJsDemo.prototype.findElementByName = function() {
+        this._constructWebDriver();
+        var name = document.getElementsByName('elementName')[0].value;
+        this.element = this.driver.findElement(webdriver.By.name(name));
+      }
+
+      WebDriverJsDemo.prototype.findElementByTagName = function() {
+        this._constructWebDriver();
+        var name = document.getElementsByName('elementTagName')[0].value;
+        this.element = this.driver.findElement(webdriver.By.tagName(name));
+      }
+
+      WebDriverJsDemo.prototype.sendKeys = function(key) {
+        this._constructWebDriver();
+        if (this.element) {
+          this.element.sendKeys(key);
+        } else {
+          this.driver.actions().sendKeys(key).perform();
+        }
+      }
+
+      WebDriverJsDemo.prototype.click = function() {
+        this._constructWebDriver();
+        this.element.click();
+      }
+
+      WebDriverJsDemo.prototype.setWindowSize = function() {
+        this._constructWebDriver();
+        var width = document.getElementsByName('windowSizeWidth')[0].value;
+        var height = document.getElementsByName('windowSizeHeight')[0].value;
+        width = parseInt(width);
+        height = parseInt(height);
+        this.driver.manage().window().setSize(width, height);
+      }
+
+      WebDriverJsDemo.prototype.updateSource = function() {
+        var self = this;
+        this.driver.visualizerGetSource().then(function(source) {
+          self.driver.manage().window().getSize().then(function(targetSize) {
+            self.showVisualizationWindow(source, targetSize);
+          });
+        });
+      }
+
+      WebDriverJsDemo.prototype.isVisualizerOpened = function() {
+        return this.visualizationWin && !this.visualizationWin.closed && this.visualizationWin.innerHeight > 0;
+      }
+
+      WebDriverJsDemo.prototype.openVisualizationWindow = function(size) {
+        var winParams = 'width=' + size.width + ',height=' + size.height;
+        this.visualizationWin = window.open('', '', winParams);
+      }
+
+      WebDriverJsDemo.prototype.visualizerAssignEventHandlers = function() {
+        var self = this;
+        var win = this.visualizationWin;
+
+        win.document.onkeypress = function(event) {
+          var key = String.fromCharCode(event.charCode);
+
+          if (event.target.hasAttribute('elementId')) {
+            var elementId = event.target.getAttribute('elementId');
+            var element = new webdriver.WebElement(self.driver, elementId);
+            element.sendKeys(key);
+          } else {
+            self.driver.actions().sendKeys(key).perform();
+          }
+
+          return true;
+        }
+
+        win.document.onkeyup = function(event) {
+          var key = Util.WebDriverKeyFromJs(event.keyCode);
+          if (!key)
+            return true;
+
+          if (event.target.hasAttribute('elementId')) {
+            var elementId = event.target.getAttribute('elementId');
+            var element = new webdriver.WebElement(self.driver, elementId);
+            element.sendKeys(key);
+          } else {
+            self.driver.actions().sendKeys(key).perform();
+          }
+
+          return true;
+        }
+
+        win.document.onclick = function(event) {
+          if (event.target.hasAttribute('elementId')) {
+            var elementId = event.target.getAttribute('elementId');
+            var element = new webdriver.WebElement(self.driver, elementId);
+            element.click();
+            return true;
+          }
+
+          var xpath = getXPath(event.target);
+          xpath = '/' + xpath.join('/');
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            click(event.button).
+            perform().
+          then(function() {
+            return self.driver.visualizerShowPoint();
+          }).then(function() {
+//            self.updateSource();
+          });
+
+          return false;
+        }
+      }
+
+      WebDriverJsDemo.prototype.showVisualizationWindow = function(source, size) {
+        var isQt = this.webPage.startsWith('qtwidget://') || this.webPage.endsWith('.qml');
+        var isWinOpened = this.isVisualizerOpened();
+
+        if (!isQt && isWinOpened) {
+          this.visualizationWin.document.documentElement.innerHTML = source;
+          this.visualizationWin.resizeTo(size.width, size.height);
+          return;
+        }
+
+        if (!isWinOpened)
+          this.openVisualizationWindow(size);
+
+        if (isQt) {
+          var xsltProcessor = this.xsltProcessors.get(this.webPage);
+          var receivedDoc = (new DOMParser()).parseFromString(source, 'application/xml');
+          receivedDoc = xsltProcessor.transformToDocument(receivedDoc);
+          var visualizerDoc = this.visualizationWin.document;
+          visualizerDoc.replaceChild(receivedDoc.documentElement, visualizerDoc.documentElement);
+        } else {
+          var visualizerDoc = this.visualizationWin.document;
+          visualizerDoc.write(source);
+        }
+
+        this.visualizerAssignEventHandlers();
+      }
+
+      WebDriverJsDemo.prototype.quit = function() {
+        if (!this.driver)
+          return;
+
+        this.driver.quit();
+        this.setSession('');
+        this.webDriverUrlPort = null;
+        this.webPage = null;
+      }
+
+      WebDriverJsDemo.prototype.setSession = function(sessionId) {
+        this.webDriverSession = sessionId;
+        document.getElementsByName('webDriverSession')[0].value = sessionId;
+        localStorage.webDriverSession = sessionId;
+      }
+
+      function init() {
+        if (localStorage.webDriverUrlPort) {
+          var input = document.getElementsByName('webDriverUrlPort')[0];
+          input.value = localStorage.webDriverUrlPort;
+        }
+
+        if (localStorage.webDriverUrlPort &&
+            localStorage.webDriverSession) {
+          var driver = new webdriver.Builder().
+            usingServer(localStorage.webDriverUrlPort).
+            usingSession(localStorage.webDriverSession).
+            withCapabilities({'browserName': 'qtwebkit'}).
+            build();
+
+          driver.getSession().then(function(session) {
+            if (session.getId()) {
+              var input = document.getElementsByName('webDriverSession')[0];
+              input.value = session.getId();
+            }
+          });
+        }
+
+        if (localStorage.webPage) {
+          var input = document.getElementsByName('webPage')[0];
+          input.value = localStorage.webPage;
+        }
+      }
+
+      var wd = new WebDriverJsDemo();
+    </script>
+  </head>
+  <body onload="init()">
+    <table border="0">
+      <tr>
+        <td>WebDriver url and port</td>
+        <td>
+          <input name="webDriverUrlPort" type="text"/>
+        </td>
+      </tr>
+      <tr>
+        <td>Session</td>
+        <td>
+          <input name="webDriverSession" type="text"/>
+        </td>
+      <tr>
+        <td>Web page</td>
+        <td>
+          <input name="webPage" type="text"/>
+          <input type="button" value="GET" onclick="wd.get()"/>
+          <input type="button" value="Source" onclick="wd.source()"/>
+          <input type="button" value="Screenshot" onclick="wd.screenshot()"/>
+        </td>
+      </tr>
+    </table>
+
+    <div class="commandBlock">
+      <div>
+        <input type="submit" value="Find element" onclick="wd.findElementById()">
+        by id
+        <input name="elementId" type="text"/>
+      </div>
+      <div>
+        <input type="submit" value="Find element" onclick="wd.findElementByName()">
+        by name
+        <input name="elementName" type="text"/>
+      </div>
+      <div>
+        <input type="submit" value="Find element" onclick="wd.findElementByTagName()">
+        by tag name
+        <input name="elementTagName" type="text"/>
+      </div>
+    </div>
+
+    <div class="commandBlock">
+      <div style="position: absolute;">Key down:</div>
+      <div style="margin-left: 80px;">
+        <div>
+          <input type="submit" value="ESC" onclick="wd.sendKeys(webdriver.Key.ESCAPE)"/>
+          <input type="submit" value="Q" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="W" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="E" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="R" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="T" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="Y" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="U" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="I" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="O" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="P" onclick="wd.sendKeys(this.value)"/>
+        </div>
+        <div>
+          <input type="submit" value="A" onclick="wd.sendKeys(this.value)" style="margin-left: 53px;"/>
+          <input type="submit" value="S" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="D" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="F" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="G" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="H" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="J" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="K" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="L" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="Enter" onclick="wd.sendKeys(webdriver.Key.ENTER)"/>
+        </div>
+        <div>
+          <input type="submit" value="Z" onclick="wd.sendKeys(this.value)" style="margin-left: 53px;"/>
+          <input type="submit" value="X" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="C" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="V" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="B" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="N" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="M" onclick="wd.sendKeys(this.value)"/>
+          <input type="submit" value="&#8657;" onclick="wd.sendKeys(webdriver.Key.UP)" style="margin-left: 45px;"/>
+        </div>
+        <div>
+          <input type="submit" value=" " onclick="wd.sendKeys(this.value)" style="width: 100px; margin-left: 100px;"/>
+          <input type="submit" value="&#8656;" onclick="wd.sendKeys(webdriver.Key.LEFT)" style="margin-left: 91px;"/>
+          <input type="submit" value="&#8659;" onclick="wd.sendKeys(webdriver.Key.DOWN)"/>
+          <input type="submit" value="&#8658;" onclick="wd.sendKeys(webdriver.Key.RIGHT)"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="commandBlock">
+      <input type="submit" value="Set window size" onclick="wd.setWindowSize()"/>
+      <input name="windowSizeWidth" type="text" style="width: 50px"/>
+      <span class="unitLabel">px</span> width and
+      <input name="windowSizeHeight" type="text" style="width: 50px"/>
+      <span class="unitLabel">px</span> height.
+    </div>
+
+    <div style="margin-top: 20px">
+      <input type="submit" value="Quit" onclick="wd.quit()"/>
+    </div>
+  </body>
+</html>

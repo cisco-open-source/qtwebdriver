@@ -1,0 +1,15 @@
+Minumum Requirements
+---------------------
+* Qt Mac OS X install: 
+Download QT sources from 
+http://download.qt-project.org/official_releases/qt/5.1/5.1.0/single/qt-everywhere-opensource-src-5.1.0.tar.gz
+Untar and build sources for 32bit architecture
+> configure -release -fast -opensource -confirm-license -platform macx-clang-32 -no-framework
+> make
+> make install
+See more details here
+http://qt-project.org/doc/qt-4.8/install-mac.html
+
+Setup:
+------
+In command prompt run WebDriver or WebDriver_noWebkit
