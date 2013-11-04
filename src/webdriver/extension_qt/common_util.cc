@@ -42,4 +42,26 @@ std::string QCommonUtil::GetQtVersion() {
     return QT_VERSION_STR;
 }
 
+QString StringUtil::trimmed(const QString& str, const QString& symbols) {
+    int start = 0;
+    while (start < str.length() && symbols.contains(str.at(start))) {
+        start++;
+    }
+
+    int end = str.length() - 1;
+    while (end >= 0 && symbols.contains(str.at(end))) {
+        end--;
+    }
+
+    return str.mid(start, end + 1 - start);
+}
+
+/// Return substring of str1 before last occurence of str2
+QString StringUtil::substringBeforeLast(const QString& str1, const QString& str2) {
+    int position = str1.lastIndexOf(str2);
+    if (position == -1)
+        return str1;
+    return str1.left(position);
+}
+
 } // namespace webdriver

@@ -35,6 +35,15 @@ private:
     ~QCommonUtil() {}
 };
 
+class StringUtil {
+public:
+    /// Trim chars in 'symbols' argument from start and end of 'str'
+    static QString trimmed(const QString& str, const QString& symbols);
+
+    /// Return substring of str1 before last occurence of str2
+    static QString substringBeforeLast(const QString& str1, const QString& str2);
+};
+
 template <class Widget>
 class QViewXmlSerializer {
 public:

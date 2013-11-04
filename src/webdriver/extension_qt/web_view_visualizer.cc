@@ -70,31 +70,36 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
     session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
 
-    QSharedPointer<QDomDocument> document = ParseXml(QString::fromStdString(*source), error);
+    QSharedPointer<pugi::xml_document> document = ParseXml(QString::fromStdString(*source), error);
     if (!document)
         return;
 
-    QDomElement documentElement = document->documentElement();
+    pugi::xml_node documentElement = document->document_element();
     AssemblePage(documentElement);
 
-    *source = document->toString().toStdString();
+    std::stringstream sourceStream;
+    document->save(sourceStream);
+    *source = sourceStream.str();
 
     session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] after transform:");
     session_->logger().Log(kInfoLogLevel, *source);
 }
 
-QSharedPointer<QDomDocument> QWebViewVisualizerSourceCommand::ParseXml(const QString& input, Error** error) {
+QSharedPointer<pugi::xml_document> QWebViewVisualizerSourceCommand::ParseXml(const QString& input, Error** error) {
     if (*error) throw std::invalid_argument("error");
 
-    QString errorMsg;
-    int errorLine = 0, errorColumn = 0;
-    QSharedPointer<QDomDocument> document(new QDomDocument());
-    bool retval = document->setContent(input, &errorMsg, &errorLine, &errorColumn);
-    if (!retval) {
+    QSharedPointer<pugi::xml_document> document(new pugi::xml_document());
+    QByteArray buffer = input.toUtf8();
+    pugi::xml_parse_result result = document->load_buffer(buffer.data(), buffer.size(), pugi::parse_default, pugi::encoding_utf8);
+
+    if (!result)
+    {
         std::string details = base::StringPrintf(
-                    "ParseXml failed with error message '%s' at line %d column %d", errorMsg.toStdString().c_str(), errorLine, errorColumn);
+            "pugi::xml_document::load_buffer failed with error message '%s' at offset %d",
+            result.description(), result.offset);
+        session_->logger().Log(kSevereLogLevel, details);
         *error = new Error(kInternalServerError, details);
-        return QSharedPointer<QDomDocument>();
+        return QSharedPointer<pugi::xml_document>();
     }
 
     return document;
@@ -104,91 +109,93 @@ void QWebViewVisualizerSourceCommand::UnescapeXml(QString& input) {
     input.replace("&amp;", "&");
 }
 
-void QWebViewVisualizerSourceCommand::AssemblePage(QDomElement element) const {
-    if (element.tagName() == "img") {
+void QWebViewVisualizerSourceCommand::AssemblePage(pugi::xml_node element) const {
+    if (std::string(element.name()) == std::string("img")) {
         AssembleImg(element);
     }
-    if (element.tagName() == "link") {
+    if (std::string(element.name()) == std::string("link")) {
         AssembleLink(element);
     }
-    if (element.tagName() == "style") {
+    if (std::string(element.name()) == std::string("style")) {
         AssembleStyle(element);
     }
 
-    if (element.hasAttribute("style")) {
-        AssembleStyle(element.attributeNode("style"));
+    if (!element.attribute("style").empty()) {
+        AssembleStyle(element.attribute("style"));
     }
 
     RemoveScripts(element);
 
     // Chrome does like empty tags like <textarea/>
-    if (element.tagName() != "br" &&
-        element.childNodes().length() == 0)
-        element.appendChild(element.ownerDocument().createTextNode(" "));
+    if (std::string(element.name()) != std::string("br") &&
+        isEmpty(element.children())) {
+        element.append_child(pugi::node_pcdata);
+    }
 
     // Recursively walk DOM tree
-    QDomNodeList children = element.childNodes();
-    for (unsigned int childIndex = 0; childIndex < children.length(); childIndex++) {
-        QDomNode child = children.at(childIndex);
-        if (child.nodeType() == QDomNode::ElementNode) {
-            QDomElement childElement = child.toElement();
-            AssemblePage(childElement);
-        }
+    for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
+        if (childIt->type() == pugi::node_element)
+            AssemblePage(*childIt);
     }
 }
 
-void QWebViewVisualizerSourceCommand::AssembleLink(QDomElement element) const {
-    QString rel = element.attribute("rel");
-    QString type = element.attribute("type");
+void QWebViewVisualizerSourceCommand::AssembleLink(pugi::xml_node element) const {
+    QString rel = QString::fromUtf8(element.attribute("rel").value());
+    QString type = QString::fromUtf8(element.attribute("type").value());
     if (rel != "stylesheet" && type != "text/css")
         return;
 
-    QString href = element.attribute("href");
+    QString href = QString::fromUtf8(element.attribute("href").value());
     UnescapeXml(href);
     QString url = AbsoluteUrl(href);
     QByteArray file;
     QString contentType;
     Download(url, &file, &contentType);
 
-    QDomElement style = element.ownerDocument().createElement("style");
-    if (!type.isEmpty())
-        style.setAttribute("type", type);
-    else if (!contentType.isEmpty())
-        style.setAttribute("type", contentType.split(';')[0]);
+    pugi::xml_node parent = element.parent();
+    parent.remove_child(element);
 
     if (!file.isEmpty()) {
-        style.appendChild(style.ownerDocument().createTextNode(file));
-        element.parentNode().replaceChild(style, element);
-    } else {
-        element.parentNode().removeChild(element);
+        pugi::xml_node style = parent.append_child("style");
+        if (!type.isEmpty()) {
+            style.append_attribute("type").set_value(type.toUtf8().data());
+        } else if (!contentType.isEmpty()) {
+            QString type = contentType.split(';')[0];
+            style.append_attribute("type").set_value(type.toUtf8().data());
+        }
+        style.append_child(pugi::node_pcdata).set_value(file.data());
     }
 }
 
 // Convert <img> tag 'src' attribute to base64
-void QWebViewVisualizerSourceCommand::AssembleImg(QDomElement element) const {
-    QString url = element.attribute("src");
+void QWebViewVisualizerSourceCommand::AssembleImg(pugi::xml_node element) const {
+    QString url = QString::fromUtf8(element.attribute("src").value());
     if (!url.startsWith(DATA_PROTOCOL)) {
-        element.setAttribute("src", DownloadAndEncode(url));
+        QString value = DownloadAndEncode(url);
+        element.attribute("src").set_value(value.toUtf8().data());
     }
 
-    if (element.hasAttribute("srcset"))
-        element.removeAttribute("srcset");
+    if (element.attribute("srcset"))
+        element.remove_attribute("srcset");
 }
 
-void QWebViewVisualizerSourceCommand::AssembleStyle(QDomElement element) const {
-    QString type = element.attribute("type");
-    if (type.length() != 0 && type != "text/css")
+void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_node element) const {
+    pugi::xml_attribute type = element.attribute("type");
+    if (type.empty() != 0 &&
+        std::string(type.value()) != "text/css") {
         return;
+    }
 
-    QString value = element.text();
+    QString value = QString::fromUtf8(element.text().as_string());
     value = AssembleStyle(value);
-    element.firstChild().toText().setData(value);
+    clearChildren(element);
+    element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
 }
 
-void QWebViewVisualizerSourceCommand::AssembleStyle(QDomAttr attribute) const {
+void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_attribute attribute) const {
     QString value = attribute.value();
     value = AssembleStyle(value);
-    attribute.setValue(value);
+    attribute.set_value(value.toUtf8().data());
 }
 
 QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) const {
@@ -201,7 +208,7 @@ QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) con
         result += value.mid(lastMatchEnd, newMatchStart - lastMatchEnd);
 
         QString url = regex.cap(1);
-        url = trimmed(url, " \t'\"");
+        url = StringUtil::trimmed(url, " \t'\"");
 
         if (!url.startsWith(DATA_PROTOCOL))
             url = DownloadAndEncode(url);
@@ -218,22 +225,18 @@ QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) con
 }
 
 // Remove <script> tags
-void QWebViewVisualizerSourceCommand::RemoveScripts(QDomElement element) const {
-    std::vector<QDomNode> scripts;
+void QWebViewVisualizerSourceCommand::RemoveScripts(pugi::xml_node element) const {
+    std::vector<pugi::xml_node> scripts;
 
-    QDomNodeList children = element.childNodes();
-    for (unsigned int childIndex = 0; childIndex < children.length(); childIndex++) {
-        QDomNode child = children.at(childIndex);
-        if (child.nodeType() == QDomNode::ElementNode) {
-            QDomElement childElement = child.toElement();
-            if (childElement.tagName() == "script") {
-                scripts.push_back(childElement);
-            }
+    for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
+        if (childIt->type() == pugi::node_element &&
+            std::string(childIt->name()) == "script") {
+            scripts.push_back(*childIt);
         }
     }
 
-    for (std::vector<QDomNode>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
-        element.removeChild(*it);
+    for (std::vector<pugi::xml_node>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
+        element.remove_child(*it);
     }
 }
 
@@ -241,12 +244,33 @@ QString QWebViewVisualizerSourceCommand::AbsoluteUrl(const QString& url) const {
     if (url.contains("://"))
         return url;
 
-    if (url.startsWith("//"))
-        return view_->url().scheme() + ":" + url;
-    else if (url.startsWith('/'))
-        return view_->url().scheme() + "://" + view_->url().host() + url;
-    else
-        return view_->url().scheme() + "://" + view_->url().host() + view_->url().path() + url;
+    QString absoluteUrl;
+    if (url.startsWith("//")) {
+        absoluteUrl += view_->url().scheme();
+        absoluteUrl += ":";
+        absoluteUrl += url;
+    } else if (url.startsWith('/')) {
+        absoluteUrl += view_->url().scheme();
+        absoluteUrl += "://";
+        absoluteUrl += view_->url().host();
+        if (view_->url().port() != -1) {
+            absoluteUrl += ":";
+            absoluteUrl += QString::number(view_->url().port());
+        }
+        absoluteUrl += url;
+    } else {
+        absoluteUrl += view_->url().scheme();
+        absoluteUrl += "://";
+        absoluteUrl += view_->url().host();
+        if (view_->url().port() != -1) {
+            absoluteUrl += ":";
+            absoluteUrl += QString::number(view_->url().port());
+        }
+        absoluteUrl += StringUtil::substringBeforeLast(view_->url().path(), "/");
+        absoluteUrl += "/";
+        absoluteUrl += url;
+    }
+    return absoluteUrl;
 }
 
 void QWebViewVisualizerSourceCommand::Download(const QString& url, QByteArray* buffer, QString* contentType) const {
@@ -273,21 +297,21 @@ QString QWebViewVisualizerSourceCommand::DownloadAndEncode(const QString& url) c
     return "data:" + contentType + ";base64," + base64;
 }
 
-QString QWebViewVisualizerSourceCommand::trimmed(const QString& str, const QString& symbols) {
-    int start = 0;
-    while (start < str.length() && symbols.contains(str.at(start))) {
-        start++;
-    }
-
-    int end = str.length() - 1;
-    while (end >= 0 && symbols.contains(str.at(end))) {
-        end--;
-    }
-
-    return str.mid(start, end + 1 - start);
+void QWebViewVisualizerSourceCommand::DownloadFinished() {
 }
 
-void QWebViewVisualizerSourceCommand::DownloadFinished() {
+bool QWebViewVisualizerSourceCommand::isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
+    return range.begin() == range.end();
+}
+
+void QWebViewVisualizerSourceCommand::clearChildren(pugi::xml_node element) {
+    std::vector<pugi::xml_node> children;
+    for (pugi::xml_node_iterator it = element.children().begin(); it != element.children().end(); it++) {
+        children.push_back(*it);
+    }
+    for (std::vector<pugi::xml_node>::iterator it = children.begin(); it != children.end(); it++) {
+        element.remove_child(*it);
+    }
 }
 
 const char QWebViewVisualizerSourceCommand::DATA_PROTOCOL[] = "data:";
