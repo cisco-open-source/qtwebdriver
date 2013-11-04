@@ -15,6 +15,7 @@
     <script src="webdriver.js"></script>
     <script src="base64-arraybuffer.js"></script>
     <script src="FileSaver.js"></script>
+    <script src="hammer.min.js"></script>
     <script>
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith
       if (!String.prototype.startsWith) {
@@ -103,6 +104,16 @@
         return this.schedule(
           new webdriver.Command('visualizerShowPoint'),
           'WebDriver.visualizerShowPoint()');
+      }
+
+      webdriver.ActionSequence.prototype.touchFlick = function(speed) {
+        var command = new webdriver.Command(webdriver.CommandName.TOUCH_FLICK);
+
+        command.setParameter('xspeed', speed.x);
+        command.setParameter('yspeed', speed.y);
+
+        this.schedule_('touchFlick', command);
+        return this;
       }
 
       var Util = function() {}
@@ -372,6 +383,12 @@
 
           return false;
         }
+
+        Hammer(win.document).on("swipe", function(event) {
+          self.driver.actions().
+            touchFlick({x: event.gesture.velocityX, y: event.gesture.velocityY}).
+            perform();
+        });
       }
 
       WebDriverJsDemo.prototype.showVisualizationWindow = function(source, size) {
