@@ -95,7 +95,8 @@
               '-lQt5Core',
               '-lQt5Quick',
               '-lQt5Qml',
-              '-lQt5Xml',
+              '-lQt5Multimedia',
+              '-lQt5MultimediaWidgets',
               '-L<(ANDROID_LIB)',
               '-lgnustl_shared',
               '-llog',
@@ -252,9 +253,6 @@
         'src/Test/BasicMouseInterfaceTest.cc',
         'src/Test/BasicMouseInterfaceTest.h',
         '<(INTERMEDIATE_DIR)/moc_BasicMouseInterfaceTest.cc',
-        'src/Test/WindowWithDeclarativeViewTest.cc',
-        'src/Test/WindowWithDeclarativeViewTest.h',
-        '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
         'src/Test/TouchTest.cc',
         'src/Test/TouchTest.h',
         '<(INTERMEDIATE_DIR)/moc_TouchTest.cc',
@@ -299,6 +297,7 @@
         'src/Test/GraphicsWebViewTest.cc',
         'src/Test/GraphicsWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_GraphicsWebViewTest.cc',
+
       ],
 
       'conditions': [
@@ -328,6 +327,9 @@
             'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
             'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
             '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
+            'src/Test/WindowWithDeclarativeViewTest.cc',
+            'src/Test/WindowWithDeclarativeViewTest.h',
+            '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
           ],
 
           'conditions': [
