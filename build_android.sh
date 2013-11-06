@@ -135,6 +135,12 @@ fi
     fi
 
     $ANDROID_DEPLOY_QT --output $dist_dir/android --input $ANDROID_JSON_CONFIG --verbose $MINISTRO $RELEASE_ARG 
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ];
+    then
+      echo "####################### androiddeployqt error!!! #######################"
+      exit $RETVAL
+    fi
 
   done
 
