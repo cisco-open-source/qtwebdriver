@@ -107,12 +107,15 @@
       }
 
       webdriver.ActionSequence.prototype.touchFlick = function(speed) {
+        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_FLICK] = {
+          method: 'POST', path: '/session/:sessionId/touch/flick'};
+
         var command = new webdriver.Command(webdriver.CommandName.TOUCH_FLICK);
 
         command.setParameter('xspeed', speed.x);
         command.setParameter('yspeed', speed.y);
 
-        this.schedule_('touchFlick', command);
+        this.schedule_(webdriver.CommandName.TOUCH_FLICK, command);
         return this;
       }
 
@@ -384,9 +387,15 @@
           return false;
         }
 
-        Hammer(win.document).on("swipe", function(event) {
+        Hammer.DOCUMENT = win.document;
+        var hammer = Hammer(win.document, {
+          prevent_default: true,
+          no_mouseevents: true});
+        hammer.on("swipe", function(event) {
+          var xspeed = Math.floor(event.gesture.velocityX * 1000);
+          var yspeed = Math.floor(event.gesture.velocityY * 1000);
           self.driver.actions().
-            touchFlick({x: event.gesture.velocityX, y: event.gesture.velocityY}).
+            touchFlick({x: xspeed, y: yspeed}).
             perform();
         });
       }
