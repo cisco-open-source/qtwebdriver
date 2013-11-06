@@ -30,7 +30,7 @@ cd -
 
 export ANDROID_DEPLOY_QT=$ANDROID_DEPLOY_QT_PATH/androiddeployqt
 export ANDROID_PACKAGE=org.webdriver.qt
-export ANDROID_JAVA=/home/dmytro/Chromium/wd_working/platform/android/java/
+export ANDROID_JAVA=`pwd`/platform/android/java/
 export ANDROID_APP_NAME=AndroidWD
 export MINISTRO="--deployment ministro"
 
@@ -139,6 +139,7 @@ fi
     if [ $RETVAL -ne 0 ];
     then
       echo "####################### androiddeployqt error!!! #######################"
+      echo $RETVAL
       exit $RETVAL
     fi
 
