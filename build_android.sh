@@ -8,13 +8,24 @@ then
   export QT_DIR=/opt/Qt5.1/5.1.0
 fi
 
+if [ -z $QT_DESK_DIR ]
+then
+  export QT_DESK_DIR=/opt/Qt5.1/5.1.0/gcc
+fi
+
 echo "####################### Build androiddeployqt #######################"
-export QT_DESK_QMAKE=$QT_DIR/gcc/bin/qmake
+export QT_DESK_QMAKE=$QT_DESK_DIR/bin/qmake
 export ANDROID_DEPLOY_QT_PATH=./platform/android/androiddeployqt
 
 cd $ANDROID_DEPLOY_QT_PATH
 $QT_DESK_QMAKE androiddeployqt.pro -r -spec linux-g++
 make
+RETVAL=$?
+if [ $RETVAL -ne 0 ];
+then
+  echo "####################### Build androiddeployqt failed !!! #######################"
+  exit $RETVAL
+fi
 cd -
 
 export ANDROID_DEPLOY_QT=$ANDROID_DEPLOY_QT_PATH/androiddeployqt
