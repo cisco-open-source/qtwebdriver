@@ -265,6 +265,13 @@
             'src/Test/VideoTest.cc',
             '<(INTERMEDIATE_DIR)/moc_VideoTest.cc',
           ],
+        } ],
+        [ 'OS != "android" and <(QT5) == 0', {
+          'sources': [
+            'src/Test/WindowWithDeclarativeViewTest.cc',
+            'src/Test/WindowWithDeclarativeViewTest.h',
+            '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
+          ],
         } ]
       ],
     }, {
@@ -327,9 +334,6 @@
             'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
             'src/Test/WindowWithSeparatedDeclarativeAndWebViewsTest.h',
             '<(INTERMEDIATE_DIR)/moc_WindowWithSeparatedDeclarativeAndWebViewsTest.cc',
-            'src/Test/WindowWithDeclarativeViewTest.cc',
-            'src/Test/WindowWithDeclarativeViewTest.h',
-            '<(INTERMEDIATE_DIR)/moc_WindowWithDeclarativeViewTest.cc',
           ],
 
           'conditions': [
