@@ -212,42 +212,39 @@
       }
 
       function WebDriverJsDemo() {
+        this.xsltProcessors = new VisualizerXsltProcessors();
       }
 
       WebDriverJsDemo.prototype._constructWebDriver = function() {
-        var self = this;
         var webDriverUrlPort = document.getElementsByName('webDriverUrlPort')[0].value;
-        var webDriverSession = document.getElementsByName('webDriverSession')[0].value;
         var webPage = document.getElementsByName('webPage')[0].value;
 
         if (this.webDriverUrlPort == webDriverUrlPort &&
-            this.webDriverSession == webDriverSession &&
             this.webPage == webPage)
           return;
 
-        if (this.webDriverUrlPort != webDriverUrlPort ||
-            this.webDriverSession != webDriverSession) {
-          this.driver = new webdriver.Builder().
-            usingServer(webDriverUrlPort).
-            usingSession(webDriverSession).
-            withCapabilities({'browserName': 'qtwebkit'}).
-            build();
+        if (this.webDriverUrlPort != webDriverUrlPort) {
+          var capabilities = {'browserName': 'qtwebkit'};
 
-          this.webDriverUrlPort = webDriverUrlPort;
-          localStorage.webDriverUrlPort = this.webDriverUrlPort;
-
-          this.driver.getSession().then(function(session) {
-            self.setSession(session.getId());
-            self.xsltProcessors = new VisualizerXsltProcessors();
+          var client = new webdriver.http.CorsClient(webDriverUrlPort);
+          var executor = new webdriver.http.Executor(client);
+          var session = webdriver.Session.getSessions(executor).then(function(sessions) {
+            if (sessions[0])
+              return sessions[0];
+            else
+              return webdriver.WebDriver.createSession(executor, capabilities).getSession();
           });
+
+          this.driver = new webdriver.WebDriver(session, executor);
+
+          this.webDriverUrlPort = localStorage.webDriverUrlPort = webDriverUrlPort;
         }
 
         if (this.webPage != webPage) {
           this.driver.get(webPage);
           this.element = null;
 
-          this.webPage = webPage;
-          localStorage.webPage = webPage;
+          this.webPage = localStorage.webPage = webPage;
         }
       }
 
@@ -432,37 +429,14 @@
           return;
 
         this.driver.quit();
-        this.setSession('');
         this.webDriverUrlPort = null;
         this.webPage = null;
-      }
-
-      WebDriverJsDemo.prototype.setSession = function(sessionId) {
-        this.webDriverSession = sessionId;
-        document.getElementsByName('webDriverSession')[0].value = sessionId;
-        localStorage.webDriverSession = sessionId;
       }
 
       function init() {
         if (localStorage.webDriverUrlPort) {
           var input = document.getElementsByName('webDriverUrlPort')[0];
           input.value = localStorage.webDriverUrlPort;
-        }
-
-        if (localStorage.webDriverUrlPort &&
-            localStorage.webDriverSession) {
-          var driver = new webdriver.Builder().
-            usingServer(localStorage.webDriverUrlPort).
-            usingSession(localStorage.webDriverSession).
-            withCapabilities({'browserName': 'qtwebkit'}).
-            build();
-
-          driver.getSession().then(function(session) {
-            if (session.getId()) {
-              var input = document.getElementsByName('webDriverSession')[0];
-              input.value = session.getId();
-            }
-          });
         }
 
         if (localStorage.webPage) {
@@ -482,11 +456,6 @@
           <input name="webDriverUrlPort" type="text"/>
         </td>
       </tr>
-      <tr>
-        <td>Session</td>
-        <td>
-          <input name="webDriverSession" type="text"/>
-        </td>
       <tr>
         <td>Web page</td>
         <td>
