@@ -603,6 +603,7 @@
           return false;
         }
 
+        Hammer.detection.gestures = [];
         Hammer.READY = false;
         Hammer.DOCUMENT = win.document;
         var hammer = Hammer(win.document, {
