@@ -143,6 +143,8 @@ fi
       exit $RETVAL
     fi
 
+    cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD.apk
+
   done
 
 done
