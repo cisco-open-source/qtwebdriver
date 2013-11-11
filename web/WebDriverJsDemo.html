@@ -603,6 +603,7 @@
           return false;
         }
 
+        Hammer.READY = false;
         Hammer.DOCUMENT = win.document;
         var hammer = Hammer(win.document, {
           prevent_default: true});
