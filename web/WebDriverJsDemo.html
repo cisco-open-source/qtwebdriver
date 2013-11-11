@@ -633,19 +633,19 @@
 
         hammer.on("touch", function(event) {
           self.driver.actions().
-            touchDown({x: event.gesture.center.pageX, y: event.gesture.center.pageY}).
+            touchDown(event.gesture.center.pageX, event.gesture.center.pageY).
             perform();
         });
 
         hammer.on("release", function(event) {
           self.driver.actions().
-            touchUp({x: event.gesture.center.pageX, y: event.gesture.center.pageY}).
+            touchUp(event.gesture.center.pageX, event.gesture.center.pageY).
             perform();
         });
 
         hammer.on("drag", function(event) {
           self.driver.actions().
-            touchMove({x: event.gesture.center.pageX, y: event.gesture.center.pageY}).
+            touchMove(event.gesture.center.pageX, event.gesture.center.pageY).
             perform();
         });
 
