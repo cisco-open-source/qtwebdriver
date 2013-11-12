@@ -1,0 +1,35 @@
+AndroidWD is a test application for Android port of WebDriver
+
+To run AndroidWD on real device or emulator:
+    -- copy on device AndroidWD.apk and install;
+    -- run AndroidWD;
+After start of AndroidWD the screen will be black(No UI will be shown). In tests AndroidWD could be used like any other driver.
+
+To test application on device connected via usb or on emulator you should do next steps:
+    -- install Android SDK;
+    -- enable developer mode in settings; //only for device
+    -- connect via usb to PC; //only for device
+    -- using adb (android debug bridge from Android SDK) make port forwarding
+        ./adb forward tcp:9517 tcp:9517
+    -- from test connect to http://127.0.0.1:9517;
+
+Currently AndroiWD supports only two view types Widgets and QML (Quick2).
+
+There is two ways to use AndroidWD with QML:
+    1. Use webserver that could provide qml files to test;
+    2. Place qml files to the device or emulator;
+
+To use WebDriver with custom Widgets or complex QML/C++ application you need build your own apk.
+The easiest way to do this is to use QtCreator.
+    1. Create new project;
+    2. add dependencies for next libs (should be built with the same version of Qt): 
+        - libWebDriver_extension_qt_quick.a,
+        - libWebDriver_extension_qt_base.a,
+        - libWebDriver_core.a, 
+        - libchromium_base.a
+        - mongoose (library or add source to project);
+    3. add necessary config dependencies in pro-file:
+         QT       += core gui qml quick multimedia multimediawidgets
+    4. Implement main function. (see example in src/Test/main.cc)
+    5. Register necessary Widget classes;
+    6. Build and Run (in QtCreator 2.8.1 apk is generated in "run" step; to have ability to run generated apk on device in release mode you need to specify keystore in project run configuration).

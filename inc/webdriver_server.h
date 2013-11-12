@@ -1,10 +1,15 @@
 /*! \mainpage Hybrid WebDriver Framework
 
 Hybrid WebDriver(HWD) is library based on Google ChromeDriver and intended
-for supporting not only web UI testing. By design it can be extended with 
-extension that allow testing native UI. 
+for automatic testing. At the momemnt, you can use it to test
+many kinds of Qt application - QWidget, QwebView and QQuick1(Qt4) or QQuick2(Qt5) based applications.
+For understanding how to use library, you can use source code of our test application,
+that we created, in order to test HWD.
+If you hadn't used selenium for automatic testing, you may also find this links helpfull:
+- http://code.google.com/p/selenium/w/list
+- http://docs.seleniumhq.org/
 
-Topics:
+Some project-related topics:
 - \subpage page_wd_server
 - \subpage page_commands_routing
 - \subpage page_sessions
@@ -19,10 +24,10 @@ Topics:
 /*! \page page_wd_server WD Server
 Entry point for HWD is webdriver::Server singleton class.
 It allows to configure, set predefined command routes and start
-webdriver service. It is not thread safe.
+webdriver service. It isn't thread safe.
 
 Server accepts options in form of command line arguments.
-Also by default it uses webdriver::DefaultRouteTable. Or custom route table
+Also by default it uses webdriver::DefaultRouteTable. Custom route table
 can be passed after init.
 
 Example:

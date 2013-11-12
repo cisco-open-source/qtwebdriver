@@ -265,7 +265,8 @@ bool Server::ProcessHttpRequest(struct mg_connection* connection,
                         method + "  " + uri);
 
     // remove url_base from uri
-    uri = uri.substr(url_base_.length());
+    if (uri.length() >= url_base_.length())
+        uri = uri.substr(url_base_.length());
 
     AbstractCommandCreator* cmdCreator = routeTable_->GetRouteForURL(uri, &matched_route);
     if (NULL == cmdCreator)
@@ -428,7 +429,8 @@ bool Server::ParseRequestInfo(const struct mg_request_info* const request_info,
         *method = "POST";
 
     std::string uri(request_info->uri);
-    uri = uri.substr(url_base_.length());
+    if (uri.length() >= url_base_.length())
+        uri = uri.substr(url_base_.length());
 
     base::SplitString(uri, '/', path_segments);
 

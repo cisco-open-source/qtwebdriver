@@ -50,7 +50,7 @@ bool QQmlViewUtil::isUrlSupported(const std::string& url) {
 }
 
 bool QQmlViewUtil::isContentTypeSupported(const std::string& mime) {
-    if (mime == "application/qml") 
+    if (mime == "text/x-qml") 
         return true;
 
     return false;

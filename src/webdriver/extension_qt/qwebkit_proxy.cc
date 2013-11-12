@@ -907,8 +907,19 @@ Error* QWebkitProxy::GetBrowserLog(base::ListValue** browserLog) {
 
 Error* QWebkitProxy::GetPlayerState(const ElementId& element, PlayerState *state) {
     bool isPaused;
+
+    std::string tagName;
+    Error *error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
     base::Value* isPausedValue = NULL;
-    Error* error = GetAttribute(element, std::string("paused"), &isPausedValue);
+    error = GetAttribute(element, std::string("paused"), &isPausedValue);
     scoped_ptr<base::Value> scoped_isPausedValue(isPausedValue);
     if (error)
         return error;
@@ -940,6 +951,17 @@ Error* QWebkitProxy::GetPlayerState(const ElementId& element, PlayerState *state
 Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState state) {
     Value* value = NULL;
 	Error* error = NULL;
+
+    std::string tagName;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
     switch(state){
     case Playing:
             error = ExecuteScriptAndParse(
@@ -969,7 +991,19 @@ Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState 
 
 Error* QWebkitProxy::GetPlayerVolume(const ElementId& element, double *volumeLevel) {
     base::Value* volumeValue = NULL;
-    Error* error = GetAttribute(element, std::string("volume"), &volumeValue);
+
+    std::string tagName;
+    Error* error;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = GetAttribute(element, std::string("volume"), &volumeValue);
     scoped_ptr<base::Value> scoped_volume_value(volumeValue);
     if(error)
         return error;
@@ -983,7 +1017,18 @@ Error* QWebkitProxy::GetPlayerVolume(const ElementId& element, double *volumeLev
 Error* QWebkitProxy::SetPlayerVolume(const ElementId& element, const double level) {
 	Value* value = NULL;
 
-    Error* error = ExecuteScriptAndParse(
+    std::string tagName;
+    Error* error;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = ExecuteScriptAndParse(
                         GetFrame(page_, session_->current_frame()),
                         "function(elem, level) { elem.volume = level; }",
                         "setVolume",
@@ -995,7 +1040,19 @@ Error* QWebkitProxy::SetPlayerVolume(const ElementId& element, const double leve
 
 Error* QWebkitProxy::GetPlayingPosition(const ElementId& element, double* reletivePos) {
     base::Value* positionValue = NULL;
-    Error* error = GetAttribute(element, std::string("currentTime"), &positionValue);
+
+    std::string tagName;
+    Error* error;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = GetAttribute(element, std::string("currentTime"), &positionValue);
     scoped_ptr<base::Value> scoped_position_value(positionValue);
     if(error)
         return error;
@@ -1009,7 +1066,18 @@ Error* QWebkitProxy::GetPlayingPosition(const ElementId& element, double* releti
 Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double reletivePos) {
 	Value* value = NULL;
 
-    Error* error = ExecuteScriptAndParse(
+    std::string tagName;
+    Error* error;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = ExecuteScriptAndParse(
                 GetFrame(page_, session_->current_frame()),
                 "function(elem, time) { elem.currentTime = time; }",
                 "setPosition",
@@ -1023,7 +1091,18 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
 Error *QWebkitProxy::GetPlaybackSpeed(const ElementId &element, double *speed)
 {
     base::Value* speedValue = NULL;
-    Error* error = GetAttribute(element, std::string("playbackRate"), &speedValue);
+    std::string tagName;
+    Error* error;
+    error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = GetAttribute(element, std::string("playbackRate"), &speedValue);
     scoped_ptr<base::Value> scoped_position_value(speedValue);
     if(error)
         return error;
@@ -1038,7 +1117,17 @@ Error *QWebkitProxy::SetPlaybackSpeed(const ElementId &element, const double spe
 {
     Value* value = NULL;
 
-    Error* error = ExecuteScriptAndParse(
+    std::string tagName;
+    Error *error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = ExecuteScriptAndParse(
                 GetFrame(page_, session_->current_frame()),
                 "function(elem, speed) { elem.playbackRate = speed; }",
                 "setPlaybackRate",
@@ -1052,7 +1141,17 @@ Error *QWebkitProxy::SetPlaybackSpeed(const ElementId &element, const double spe
 Error* QWebkitProxy::SetMute(const ElementId& element, bool mute) {
 	Value* value = NULL;
 
-    Error* error = ExecuteScriptAndParse(
+    std::string tagName;
+    Error *error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = ExecuteScriptAndParse(
                         GetFrame(page_, session_->current_frame()),
                         "function(elem, mute) { elem.muted = mute; }",
                         "setVolume",
@@ -1065,7 +1164,18 @@ Error* QWebkitProxy::SetMute(const ElementId& element, bool mute) {
 
 Error* QWebkitProxy::GetMute(const ElementId& element, bool* mute) {
     base::Value* isMutedValue = NULL;
-    Error* error = GetAttribute(element, std::string("muted"), &isMutedValue);
+
+    std::string tagName;
+    Error *error = GetElementTagName(element, &tagName);
+    if(error)
+        return error;
+
+    if(tagName != "video" && tagName != "audio"){
+        error = new Error(kInvalidElementState);
+        return error;
+    }
+
+    error = GetAttribute(element, std::string("muted"), &isMutedValue);
     scoped_ptr<Value> scoped_value(isMutedValue);
     if(error)
         return error;

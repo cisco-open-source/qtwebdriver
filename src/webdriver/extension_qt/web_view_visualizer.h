@@ -2,13 +2,14 @@
 #define WEB_VIEW_VISUALIZER_H
 
 #include <QtCore/QtGlobal>
-#include <QtXml/QDomDocument>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWebKitWidgets/QWebView>
 #else
 #include <QtWebKit/QtWebKit>
 #endif
+
+#include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
 
@@ -25,27 +26,27 @@ public:
     void Execute(std::string* source, Error** error);
 
 private:
-    static QSharedPointer<QDomDocument> ParseXml(const QString& input, Error** error);
+    QSharedPointer<pugi::xml_document> ParseXml(const QString& input, Error** error);
     static void UnescapeXml(QString& input);
 
-    void AssemblePage(QDomElement element) const;
-    void AssembleLink(QDomElement element) const;
-    void AssembleImg(QDomElement element) const;
-    void AssembleStyle(QDomElement element) const;
-    void AssembleStyle(QDomAttr attribute) const;
+    void AssemblePage(pugi::xml_node element) const;
+    void AssembleLink(pugi::xml_node element) const;
+    void AssembleImg(pugi::xml_node element) const;
+    void AssembleStyle(pugi::xml_node element) const;
+    void AssembleStyle(pugi::xml_attribute attribute) const;
     QString AssembleStyle(const QString& value) const;
-    void RemoveScripts(QDomElement element) const;
+    void RemoveScripts(pugi::xml_node element) const;
 
     QString AbsoluteUrl(const QString& url) const;
     void Download(const QString& url, QByteArray* buffer, QString* contentType) const;
     QString DownloadAndEncode(const QString& url) const;
 
-    static QString trimmed(const QString& str, const QString& symbols);
-
 private Q_SLOTS:
     void DownloadFinished();
 
 private:
+    static bool isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range);
+    static void clearChildren(pugi::xml_node element);
     static const char DATA_PROTOCOL[];
 
     QWebViewCmdExecutor* executor_;

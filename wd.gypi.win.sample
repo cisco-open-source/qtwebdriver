@@ -1,7 +1,0 @@
-{
-  'variables': {
-    'QT_BIN_PATH': 'c:/Qt/4_8_4/bin',
-    'QT_INC_PATH': 'c:/Qt/4_8_4/include',
-    'QT_LIB_PATH': 'c:/Qt/4_8_4/lib'
-  },
-}

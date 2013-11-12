@@ -54,6 +54,7 @@ std::string tests::testDataFolder;
 #include "versioninfo.h"
 #include "webdriver_route_table.h"
 #include "shutdown_command.h"
+#include "webdriver_route_patterns.h"
 
 #ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -259,6 +260,7 @@ int main(int argc, char *argv[])
     webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
     const char shutdownCommandRoute[] = "/-cisco-shutdown";
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
+    routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(webdriver::CommandRoutes::kShutdown);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
     InitVNCClient();
@@ -368,9 +370,9 @@ void PrintHelp() {
                 << "wi-port        9222               Web inspector listening port"                   << std::endl
                 << "version                           Print version information to stdout and exit"   << std::endl
                 << "vnc-login      127.0.0.1:5900     VNC server login parameters"                    << std::endl
-                << "                                  Fomat: login:password@ip:port"                  << std::endl
+                << "                                  format: login:password@ip:port"                 << std::endl
                 << "uinput         false              If option set, user input device"               << std::endl
-                << "                                  will be registered in system"                   << std::endl
+                << "                                  will be registered in the system"               << std::endl
                 << "test_data      ./                 Specifies where to look for test specific data" << std::endl;
 }
 

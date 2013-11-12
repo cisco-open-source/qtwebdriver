@@ -28,10 +28,98 @@
 /// \endcode
 /// 
 /// Another note is that webdriver::RouteTable::Add() method will refuse non-standard
-/// routes that dont comply vendor-specific syntax.
+/// routes that dont comply vendor-specific syntax. Under "vendor-specific syntax"
+/// we mean, that your custom commands should match something like "/session/*/-vendor_name-command_name"
 /// 
-/// \todo place here some description about commands 
-/// 
+/// Command list:<pre>
+/// - kStatus[]                     = "/status";
+/// - kGetLog[]                     = "/log";
+/// - kNewSession[]                 = "/session";
+/// - kSession[]                    = "/session/*";
+/// - kSessions[]                   = "/sessions";
+/// - kImplicitlyWait[]             = "/session/*/timeouts/implicit_wait";
+/// - kSetScriptTimeout[]           = "/session/*/timeouts/async_script";
+/// - kGetAvailableLogTypes[]       = "/session/*/log/types";
+/// - kGetSessionLogs[]             = "/session/*/log";
+/// - kWindowSize[]                 = "/session/*/window/*/size";
+/// - kWindowPosition[]             = "/session/*/window/*/position";
+/// - kMaximizeWindow[]             = "/session/*/window/*/maximize";
+/// - kGetTitle[]                   = "/session/*/title";
+/// - kGoForward[]                  = "/session/*/forward";
+/// - kGoBack[]                     = "/session/*/back";
+/// - kRefresh[]                    = "/session/*/refresh";
+/// - kScreenshot[]                 = "/session/*/screenshot";
+/// - kElementScreenshot[]          = "/session/*/element/*/screenshot";
+/// - kSendKeys[]                   = "/session/*/keys";
+/// - kClickElement[]               = "/session/*/element/*/click";
+/// - kHoverOverElement[]           = "/session/*/element/*/hover";
+/// - kMouseClick[]                 = "/session/*/click";
+/// - kMouseDoubleClick[]           = "/session/*/doubleclick";
+/// - kMouseButtonDown[]            = "/session/*/buttondown";
+/// - kMouseButtonUp[]              = "/session/*/buttonup";
+/// - kMouseMoveTo[]                = "/session/*/moveto";
+/// - kFindElement[]                = "/session/*/element";
+/// - kFindElements[]               = "/session/*/elements";
+/// - kClearElement[]               = "/session/*/element/*/clear";
+/// - kSendKeysToElement[]          = "/session/*/element/*/value";
+/// - kSubmitElement[]              = "/session/*/element/*/submit";
+/// - kGetElementText[]             = "/session/*/element/*/text";
+/// - kGetElementTagName[]          = "/session/*/element/*/name";
+/// - kIsElementSelected[]          = "/session/*/element/*/selected";
+/// - kIsElementEnabled[]           = "/session/*/element/*/enabled";
+/// - kIsElementDisplayed[]         = "/session/*/element/*/displayed";
+/// - kGetElementLocation[]         = "/session/*/element/*/location";
+/// - kGetElementLocationInView[]   = "/session/*/element/*/location_in_view";
+/// - kGetElementSize[]             = "/session/*/element/*/size";
+/// - kGetElementAttribute[]        = "/session/*/element/*/attribute/*";
+/// - kGetElementCssProp[]          = "/session/*/element/*/css/*";
+/// - kElementEquals[]              = "/session/*/element/*/equals/*";
+/// - kFindChildElement[]           = "/session/*/element/*/element";
+/// - kFindChildElements[]          = "/session/*/element/*/elements";
+/// - kSwitchToFrame[]              = "/session/*/frame";
+/// - kGetActiveElement[]           = "/session/*/element/active";
+/// - kGetCurrentWindowHandle[]     = "/session/*/window_handle";
+/// - kGetWindowHandles[]           = "/session/*/window_handles";
+/// - kWindowCmd[]                  = "/session/*/window";
+/// - kGetPageSource[]              = "/session/*/source";
+/// - kUrlCmd[]                     = "/session/*/url";
+/// - kExecuteScript[]              = "/session/*/execute";
+/// - kExecuteAsyncScript[]         = "/session/*/execute_async";
+/// - kGetAppCache[]                = "/session/*/application_cache/status";
+/// - kBrowserConnection[]          = "/session/*/browser_connection";
+/// - kAlertText[]                  = "/session/*/alert_text";
+/// - kAcceptAlert[]                = "/session/*/accept_alert";
+/// - kDismissAlert[]               = "/session/*/dismiss_alert";
+/// - kCookie[]                     = "/session/*/cookie";
+/// - kNamedCookie[]                = "/session/*/cookie/*";
+/// - kLocalStorage[]               = "/session/*/local_storage";
+/// - kLocalStorageKey[]            = "/session/*/local_storage/key/*";
+/// - kLocalStorageSize[]           = "/session/*/local_storage/size";
+/// - kSessionStorage[]             = "/session/*/session_storage";
+/// - kSessionStorageKey[]          = "/session/*/session_storage/key/*";
+/// - kSessionStorageSize[]         = "/session/*/session_storage/size";
+/// - kGetLocation[]                = "/session/*/location";
+/// - kTouchClick[]                 = "/session/*/touch/click";
+/// - kTouchDown[]                  = "/session/*/touch/down";
+/// - kTouchUp[]                    = "/session/*/touch/up";
+/// - kTouchMove[]                  = "/session/*/touch/move";
+/// - kTouchScroll[]                = "/session/*/touch/scroll";
+/// - kTouchDoubleClick[]           = "/session/*/touch/doubleclick";
+/// - kTouchLongClick[]             = "/session/*/touch/longclick";
+/// - kTouchFlick[]                 = "/session/*/touch/flick";
+/// - kOrientation[]                = "/session/*/orientation";
+/// - kXdrpc[]                      = "/xdrpc";
+/// - kCiscoPlayerState[]           = "/session/*/element/*/-cisco-player-element/state";
+/// - kCiscoPlayerVolume[]          = "/session/*/element/*/-cisco-player-element/volume";
+/// - kCiscoPlayingPosition[]       = "/session/*/element/*/-cisco-player-element/seek";
+/// - kCiscoPlayerMute[]            = "/session/*/element/*/-cisco-player-element/mute";
+/// - kCiscoPlayerPlayingSpeed[]    = "/session/*/element/*/-cisco-player-element/speed";
+/// - kVisualizerSource[]           = "/session/*/-cisco-visualizer_source";
+/// - kVisualizerShowPoint[]        = "/session/*/-cisco-visualizer_show_point";
+/// - kTouchPinchZoom[]             = "/session/*/touch/-cisco-pinch-zoom";
+/// - kTouchPinchRotate[]           = "/session/*/touch/-cisco-pinch-rotate";
+/// - kShutdown[]                   = "/shutdown";
+/// </pre>
 
 #ifndef WEBDRIVER_ROUTE_TABLE_H_
 #define WEBDRIVER_ROUTE_TABLE_H_

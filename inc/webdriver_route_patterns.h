@@ -104,6 +104,7 @@ public:
     static const char kVisualizerShowPoint[];
     static const char kTouchPinchZoom[];
     static const char kTouchPinchRotate[];
+    static const char kShutdown[];
 
 private:
     static std::set<std::string> standardCommandRoutes;
