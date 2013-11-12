@@ -35,8 +35,10 @@ void LogCommand::ExecutePost(Response* const response) {
     }
 
     LogType log_type;
+    base::ListValue* browserLog = NULL;
     if (!LogType::FromString(type, &log_type)) {
-        response->SetError(new Error(kUnknownError, "Unknown log type: " + type));
+        browserLog = new base::ListValue();
+        response->SetValue(browserLog);
         return;
     }
 
@@ -45,7 +47,6 @@ void LogCommand::ExecutePost(Response* const response) {
     }
     else if (log_type.type() == LogType::kBrowser) {
         Error* error = NULL;
-        base::ListValue* browserLog = NULL;
 
         session_->RunSessionTask(base::Bind(
                     &ViewCmdExecutor::GetBrowserLog,
@@ -64,11 +65,6 @@ void LogCommand::ExecutePost(Response* const response) {
         {
             response->SetValue(browserLog);
         }
-    }
-    else
-    {
-        response->SetError(new Error(kUnknownError, "Unrecognized type: " + type));
-        return;
     }
 }
 
