@@ -452,14 +452,18 @@
 
           this.driver = new webdriver.WebDriver(session, executor);
 
-          this.webDriverUrlPort = localStorage.webDriverUrlPort = webDriverUrlPort;
+          this.webDriverUrlPort = webDriverUrlPort;
+          if (localStorage)
+            localStorage.webDriverUrlPort = webDriverUrlPort;
         }
 
         if (this.webPage != webPage) {
           this.driver.get(webPage);
           this.element = null;
 
-          this.webPage = localStorage.webPage = webPage;
+          this.webPage = webPage;
+          if (localStorage)
+            localStorage.webPage = webPage;
         }
       }
 
@@ -739,12 +743,12 @@
       }
 
       function init() {
-        if (localStorage.webDriverUrlPort) {
+        if (localStorage && localStorage.webDriverUrlPort) {
           var input = document.getElementsByName('webDriverUrlPort')[0];
           input.value = localStorage.webDriverUrlPort;
         }
 
-        if (localStorage.webPage) {
+        if (localStorage && localStorage.webPage) {
           var input = document.getElementsByName('webPage')[0];
           input.value = localStorage.webPage;
         }
