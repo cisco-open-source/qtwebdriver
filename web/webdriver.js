@@ -3776,7 +3776,7 @@ SWITCH_TO_FRAME:"switchToFrame", GET_PAGE_SOURCE:"getPageSource", GET_TITLE:"get
 GET_ELEMENT_ATTRIBUTE:"getElementAttribute", GET_ELEMENT_VALUE_OF_CSS_PROPERTY:"getElementValueOfCssProperty", ELEMENT_EQUALS:"elementEquals", SCREENSHOT:"screenshot", IMPLICITLY_WAIT:"implicitlyWait", SET_SCRIPT_TIMEOUT:"setScriptTimeout", SET_TIMEOUT:"setTimeout", ACCEPT_ALERT:"acceptAlert", DISMISS_ALERT:"dismissAlert", GET_ALERT_TEXT:"getAlertText", SET_ALERT_TEXT:"setAlertValue", EXECUTE_SQL:"executeSQL", GET_LOCATION:"getLocation", SET_LOCATION:"setLocation", GET_APP_CACHE:"getAppCache", GET_APP_CACHE_STATUS:"getStatus", 
 CLEAR_APP_CACHE:"clearAppCache", IS_BROWSER_ONLINE:"isBrowserOnline", SET_BROWSER_ONLINE:"setBrowserOnline", GET_LOCAL_STORAGE_ITEM:"getLocalStorageItem", GET_LOCAL_STORAGE_KEYS:"getLocalStorageKeys", SET_LOCAL_STORAGE_ITEM:"setLocalStorageItem", REMOVE_LOCAL_STORAGE_ITEM:"removeLocalStorageItem", CLEAR_LOCAL_STORAGE:"clearLocalStorage", GET_LOCAL_STORAGE_SIZE:"getLocalStorageSize", GET_SESSION_STORAGE_ITEM:"getSessionStorageItem", GET_SESSION_STORAGE_KEYS:"getSessionStorageKey", SET_SESSION_STORAGE_ITEM:"setSessionStorageItem", 
 REMOVE_SESSION_STORAGE_ITEM:"removeSessionStorageItem", CLEAR_SESSION_STORAGE:"clearSessionStorage", GET_SESSION_STORAGE_SIZE:"getSessionStorageSize", SET_SCREEN_ORIENTATION:"setScreenOrientation", GET_SCREEN_ORIENTATION:"getScreenOrientation", CLICK:"mouseClick", DOUBLE_CLICK:"mouseDoubleClick", MOUSE_DOWN:"mouseDown", MOUSE_UP:"mouseUp", MOVE_TO:"mouseMove", SEND_KEYS_TO_ACTIVE_ELEMENT:"sendKeysToActiveElement", TOUCH_SINGLE_TAP:"touchSingleTap", TOUCH_DOWN:"touchDown", TOUCH_UP:"touchUp", TOUCH_MOVE:"touchMove", 
-TOUCH_SCROLL:"touchScroll", TOUCH_DOUBLE_TAP:"touchDoubleTap", TOUCH_LONG_PRESS:"touchLongPress", TOUCH_FLICK:"touchFlick", TOUCH_PINCH_ZOOM:"touchPinchZoom", TOUCH_PINCH_ROTATE:"touchPinchRotate", GET_AVAILABLE_LOG_TYPES:"getAvailableLogTypes", GET_LOG:"getLog", GET_SESSION_LOGS:"getSessionLogs"};
+TOUCH_SCROLL:"touchScroll", TOUCH_DOUBLE_TAP:"touchDoubleTap", TOUCH_LONG_PRESS:"touchLongPress", TOUCH_FLICK:"touchFlick", TOUCH_PINCH_ROTATE:"touchPinchRotate", TOUCH_PINCH_ZOOM:"touchPinchZoom", GET_AVAILABLE_LOG_TYPES:"getAvailableLogTypes", GET_LOG:"getLog", GET_SESSION_LOGS:"getSessionLogs"};
 webdriver.CommandExecutor = function() {
 };
 webdriver.ActionSequence = function(a) {
@@ -3851,6 +3851,103 @@ webdriver.ActionSequence.prototype.keyUp = function(a) {
 webdriver.ActionSequence.prototype.sendKeys = function(a) {
   var b = goog.array.flatten(goog.array.slice(arguments, 0));
   return this.scheduleKeyboardAction_("sendKeys", b)
+};
+webdriver.ActionSequence.prototype.touchSingleTap = function(a) {
+  var b = new webdriver.Command(webdriver.CommandName.TOUCH_SINGLE_TAP);
+  a = a.toWireValue().then(function(a) {
+    return a.ELEMENT
+  });
+  b.setParameter("element", a);
+  this.schedule_(webdriver.CommandName.TOUCH_SINGLE_TAP, b);
+  return this
+};
+webdriver.ActionSequence.prototype.touchDown = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_DOWN);
+  c.setParameter("x", a);
+  c.setParameter("y", b);
+  this.schedule_(webdriver.CommandName.TOUCH_DOWN, c);
+  return this
+};
+webdriver.ActionSequence.prototype.touchUp = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_UP);
+  c.setParameter("x", a);
+  c.setParameter("y", b);
+  this.schedule_(webdriver.CommandName.TOUCH_UP, c);
+  return this
+};
+webdriver.ActionSequence.prototype.touchMove = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_MOVE);
+  c.setParameter("x", a);
+  c.setParameter("y", b);
+  this.schedule_(webdriver.CommandName.TOUCH_MOVE, c);
+  return this
+};
+webdriver.ActionSequence.prototype.touchScroll = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_SCROLL);
+  if(void 0 != b) {
+    var d = a.toWireValue().then(function(a) {
+      return a.ELEMENT
+    });
+    c.setParameter("element", d);
+    c.setParameter("xoffset", b.x);
+    c.setParameter("yoffset", b.y)
+  }else {
+    c.setParameter("xoffset", a.x), c.setParameter("yoffset", a.y)
+  }
+  this.schedule_(webdriver.CommandName.TOUCH_SCROLL, c);
+  return this
+};
+webdriver.ActionSequence.prototype.touchDoubleTap = function(a) {
+  var b = new webdriver.Command(webdriver.CommandName.TOUCH_DOUBLE_TAP);
+  a = a.toWireValue().then(function(a) {
+    return a.ELEMENT
+  });
+  b.setParameter("element", a);
+  this.schedule_(webdriver.CommandName.TOUCH_DOUBLE_TAP, b);
+  return this
+};
+webdriver.ActionSequence.prototype.touchLongPress = function(a) {
+  var b = new webdriver.Command(webdriver.CommandName.TOUCH_LONG_PRESS);
+  a = a.toWireValue().then(function(a) {
+    return a.ELEMENT
+  });
+  b.setParameter("element", a);
+  this.schedule_(webdriver.CommandName.TOUCH_LONG_PRESS, b);
+  return this
+};
+webdriver.ActionSequence.prototype.touchFlick = function(a, b, c) {
+  var d = new webdriver.Command(webdriver.CommandName.TOUCH_FLICK);
+  if(3 == arguments.length) {
+    var e = a.toWireValue().then(function(a) {
+      return a.ELEMENT
+    });
+    d.setParameter("element", e);
+    d.setParameter("xoffset", b.x);
+    d.setParameter("yoffset", b.y);
+    d.setParameter("speed", c)
+  }else {
+    d.setParameter("xspeed", a.x), d.setParameter("yspeed", a.y)
+  }
+  this.schedule_(webdriver.CommandName.TOUCH_FLICK, d);
+  return this
+};
+webdriver.ActionSequence.prototype.touchPinchRotate = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_PINCH_ROTATE), d = a.toWireValue().then(function(a) {
+    return a.ELEMENT
+  });
+  c.setParameter("element", d);
+  c.setParameter("angle", b);
+  this.schedule_(webdriver.CommandName.TOUCH_PINCH_ROTATE, c);
+  return this
+};
+webdriver.ActionSequence.prototype.touchPinchZoom = function(a, b) {
+  var c = new webdriver.Command(webdriver.CommandName.TOUCH_PINCH_ZOOM), d = a.toWireValue().then(function(a) {
+    return a.ELEMENT
+  });
+  c.setParameter("element", d);
+  c.setParameter("scale", b);
+  this.schedule_(webdriver.CommandName.TOUCH_PINCH_ZOOM, c);
+  return this
 };
 webdriver.logging = {};
 webdriver.logging.LevelName = {ALL:"ALL", DEBUG:"DEBUG", INFO:"INFO", WARNING:"WARNING", SEVERE:"SEVERE", OFF:"OFF"};
@@ -4598,8 +4695,10 @@ webdriver.http.Executor.COMMAND_MAP_ = function() {
   b("/session/:sessionId/element/:id/attribute/:name")).put(webdriver.CommandName.GET_ELEMENT_VALUE_OF_CSS_PROPERTY, b("/session/:sessionId/element/:id/css/:propertyName")).put(webdriver.CommandName.ELEMENT_EQUALS, b("/session/:sessionId/element/:id/equals/:other")).put(webdriver.CommandName.SWITCH_TO_WINDOW, a("/session/:sessionId/window")).put(webdriver.CommandName.MAXIMIZE_WINDOW, a("/session/:sessionId/window/:windowHandle/maximize")).put(webdriver.CommandName.GET_WINDOW_POSITION, b("/session/:sessionId/window/:windowHandle/position")).put(webdriver.CommandName.SET_WINDOW_POSITION, 
   a("/session/:sessionId/window/:windowHandle/position")).put(webdriver.CommandName.GET_WINDOW_SIZE, b("/session/:sessionId/window/:windowHandle/size")).put(webdriver.CommandName.SET_WINDOW_SIZE, a("/session/:sessionId/window/:windowHandle/size")).put(webdriver.CommandName.SWITCH_TO_FRAME, a("/session/:sessionId/frame")).put(webdriver.CommandName.GET_PAGE_SOURCE, b("/session/:sessionId/source")).put(webdriver.CommandName.GET_TITLE, b("/session/:sessionId/title")).put(webdriver.CommandName.EXECUTE_SCRIPT, 
   a("/session/:sessionId/execute")).put(webdriver.CommandName.EXECUTE_ASYNC_SCRIPT, a("/session/:sessionId/execute_async")).put(webdriver.CommandName.SCREENSHOT, b("/session/:sessionId/screenshot")).put(webdriver.CommandName.SET_TIMEOUT, a("/session/:sessionId/timeouts")).put(webdriver.CommandName.SET_SCRIPT_TIMEOUT, a("/session/:sessionId/timeouts/async_script")).put(webdriver.CommandName.IMPLICITLY_WAIT, a("/session/:sessionId/timeouts/implicit_wait")).put(webdriver.CommandName.MOVE_TO, a("/session/:sessionId/moveto")).put(webdriver.CommandName.CLICK, 
-  a("/session/:sessionId/click")).put(webdriver.CommandName.DOUBLE_CLICK, a("/session/:sessionId/doubleclick")).put(webdriver.CommandName.MOUSE_DOWN, a("/session/:sessionId/buttondown")).put(webdriver.CommandName.MOUSE_UP, a("/session/:sessionId/buttonup")).put(webdriver.CommandName.MOVE_TO, a("/session/:sessionId/moveto")).put(webdriver.CommandName.SEND_KEYS_TO_ACTIVE_ELEMENT, a("/session/:sessionId/keys")).put(webdriver.CommandName.ACCEPT_ALERT, a("/session/:sessionId/accept_alert")).put(webdriver.CommandName.DISMISS_ALERT, 
-  a("/session/:sessionId/dismiss_alert")).put(webdriver.CommandName.GET_ALERT_TEXT, b("/session/:sessionId/alert_text")).put(webdriver.CommandName.SET_ALERT_TEXT, a("/session/:sessionId/alert_text")).put(webdriver.CommandName.GET_LOG, a("/session/:sessionId/log")).put(webdriver.CommandName.GET_AVAILABLE_LOG_TYPES, b("/session/:sessionId/log/types")).put(webdriver.CommandName.GET_SESSION_LOGS, a("/logs")).build()
+  a("/session/:sessionId/click")).put(webdriver.CommandName.DOUBLE_CLICK, a("/session/:sessionId/doubleclick")).put(webdriver.CommandName.MOUSE_DOWN, a("/session/:sessionId/buttondown")).put(webdriver.CommandName.MOUSE_UP, a("/session/:sessionId/buttonup")).put(webdriver.CommandName.MOVE_TO, a("/session/:sessionId/moveto")).put(webdriver.CommandName.SEND_KEYS_TO_ACTIVE_ELEMENT, a("/session/:sessionId/keys")).put(webdriver.CommandName.TOUCH_SINGLE_TAP, a("/session/:sessionId/touch/click")).put(webdriver.CommandName.TOUCH_DOWN, 
+  a("/session/:sessionId/touch/down")).put(webdriver.CommandName.TOUCH_UP, a("/session/:sessionId/touch/up")).put(webdriver.CommandName.TOUCH_MOVE, a("/session/:sessionId/touch/move")).put(webdriver.CommandName.TOUCH_SCROLL, a("/session/:sessionId/touch/scroll")).put(webdriver.CommandName.TOUCH_DOUBLE_TAP, a("/session/:sessionId/touch/doubleclick")).put(webdriver.CommandName.TOUCH_LONG_PRESS, a("/session/:sessionId/touch/longclick")).put(webdriver.CommandName.TOUCH_FLICK, a("/session/:sessionId/touch/flick")).put(webdriver.CommandName.TOUCH_PINCH_ROTATE, 
+  a("/session/:sessionId/touch/-cisco-pinch-rotate")).put(webdriver.CommandName.TOUCH_PINCH_ZOOM, a("/session/:sessionId/touch/-cisco-pinch-zoom")).put(webdriver.CommandName.ACCEPT_ALERT, a("/session/:sessionId/accept_alert")).put(webdriver.CommandName.DISMISS_ALERT, a("/session/:sessionId/dismiss_alert")).put(webdriver.CommandName.GET_ALERT_TEXT, b("/session/:sessionId/alert_text")).put(webdriver.CommandName.SET_ALERT_TEXT, a("/session/:sessionId/alert_text")).put(webdriver.CommandName.GET_LOG, 
+  a("/session/:sessionId/log")).put(webdriver.CommandName.GET_AVAILABLE_LOG_TYPES, b("/session/:sessionId/log/types")).put(webdriver.CommandName.GET_SESSION_LOGS, a("/logs")).build()
 }();
 webdriver.http.headersToString_ = function(a) {
   var b = [], c;
