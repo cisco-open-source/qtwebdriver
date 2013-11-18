@@ -452,14 +452,18 @@
 
           this.driver = new webdriver.WebDriver(session, executor);
 
-          this.webDriverUrlPort = localStorage.webDriverUrlPort = webDriverUrlPort;
+          this.webDriverUrlPort = webDriverUrlPort;
+          if (localStorage)
+            localStorage.webDriverUrlPort = webDriverUrlPort;
         }
 
         if (this.webPage != webPage) {
           this.driver.get(webPage);
           this.element = null;
 
-          this.webPage = localStorage.webPage = webPage;
+          this.webPage = webPage;
+          if (localStorage)
+            localStorage.webPage = webPage;
         }
       }
 
@@ -606,8 +610,7 @@
         Hammer.detection.gestures = [];
         Hammer.READY = false;
         Hammer.DOCUMENT = win.document;
-        var hammer = Hammer(win.document, {
-          prevent_default: true});
+        var hammer = Hammer(win.document);
 
         hammer.on("tap", function(event) {
           var xpath = getXPath(event.target);
@@ -739,12 +742,12 @@
       }
 
       function init() {
-        if (localStorage.webDriverUrlPort) {
+        if (localStorage && localStorage.webDriverUrlPort) {
           var input = document.getElementsByName('webDriverUrlPort')[0];
           input.value = localStorage.webDriverUrlPort;
         }
 
-        if (localStorage.webPage) {
+        if (localStorage && localStorage.webPage) {
           var input = document.getElementsByName('webPage')[0];
           input.value = localStorage.webPage;
         }
