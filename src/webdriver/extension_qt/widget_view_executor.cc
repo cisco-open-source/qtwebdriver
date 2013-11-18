@@ -52,6 +52,7 @@
 #include <QtGui/QScrollArea>
 #include <QtGui/QProgressBar>
 #include <QtGui/QListView>
+#include <QtGui/QAction>
 #endif
 
 #include "third_party/pugixml/pugixml.hpp"
@@ -95,7 +96,7 @@ QWidgetViewCmdExecutor::QWidgetViewCmdExecutor(Session* session, ViewId viewId)
 
 QWidgetViewCmdExecutor::~QWidgetViewCmdExecutor() {}
 
-QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** error) {
+QObject* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** error) {
     QElementHandle* element_handle = dynamic_cast<QElementHandle*>(session_->GetElementHandle(view_id_, element));
 
     if (NULL == element_handle) {
@@ -108,13 +109,23 @@ QWidget* QWidgetViewCmdExecutor::getElement(const ElementId &element, Error** er
         return NULL;
     }
 
-    QWidget* retObj = qobject_cast<QWidget*>(element_handle->get());
-    if (NULL == retObj) {
-        *error = new Error(kUnknownError, "canot cast element to QWidget.");
+    return element_handle->get();
+}
+
+QWidget* QWidgetViewCmdExecutor::getWidget(const ElementId &element, Error** error) {
+    QObject* obj = getElement(element, error);
+
+    if (NULL == obj)
+        return NULL;
+
+    QWidget* pWidget = qobject_cast<QWidget*>(obj);
+
+    if (NULL == pWidget) {
+        *error = new Error(kInvalidElementState);
         return NULL;
     }
 
-    return retObj;
+    return pWidget;
 }
 
 void QWidgetViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error **error) {
@@ -139,7 +150,7 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -180,7 +191,7 @@ void QWidgetViewCmdExecutor::GetElementScreenShot(const ElementId& element, std:
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -325,7 +336,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, c
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -354,7 +365,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, Error** error) 
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -382,7 +393,28 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
+        return;
+
+    QAction* action = qobject_cast<QAction*>(pElement);
+    if (NULL != action) {
+        if (!action->isVisible()) {
+            *error = new Error(kElementNotVisible);
+            return;
+        }
+
+        if (!action->isEnabled()) {
+            *error = new Error(kInvalidElementState);
+            return;
+        }
+
+        action->trigger();
+
+        return;
+    }
+
+    QWidget* pWidget = qobject_cast<QWidget*>(pElement);
     if (NULL == pWidget)
         return;
 
@@ -442,11 +474,11 @@ void QWidgetViewCmdExecutor::GetAttribute(const ElementId& element, const std::s
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    QVariant propertyValue = pWidget->property(key.c_str());
+    QVariant propertyValue = pElement->property(key.c_str());
     Value* val = NULL;
 
     if (propertyValue.isValid()) {
@@ -485,7 +517,7 @@ void QWidgetViewCmdExecutor::ClearElement(const ElementId& element, Error** erro
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -538,11 +570,11 @@ void QWidgetViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool i
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    *is_displayed = pWidget->isVisible();
+    *is_displayed = pElement->property("visible").toBool();
 }
 
 void QWidgetViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) {
@@ -550,11 +582,11 @@ void QWidgetViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    *is_enabled = pWidget->isEnabled();
+    *is_enabled = pElement->property("enabled").toBool();
 }
 
 void QWidgetViewCmdExecutor::ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) {
@@ -562,15 +594,15 @@ void QWidgetViewCmdExecutor::ElementEquals(const ElementId& element1, const Elem
     if (NULL == view)
         return;
 
-    QWidget* pWidget1 = getElement(element1, error);
-    if (NULL == pWidget1)
+    QObject* pElement1 = getElement(element1, error);
+    if (NULL == pElement1)
         return;
 
-    QWidget* pWidget2 = getElement(element2, error);
-    if (NULL == pWidget2)
+    QObject* pElement2 = getElement(element2, error);
+    if (NULL == pElement2)
         return;
 
-    *is_equal = (pWidget1 == pWidget2);
+    *is_equal = (pElement1 == pElement2);
 }
 
 void QWidgetViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
@@ -578,7 +610,7 @@ void QWidgetViewCmdExecutor::GetElementLocation(const ElementId& element, Point*
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -592,7 +624,7 @@ void QWidgetViewCmdExecutor::GetElementLocationInView(const ElementId& element, 
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -607,11 +639,11 @@ void QWidgetViewCmdExecutor::GetElementTagName(const ElementId& element, std::st
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    *tag_name = pWidget->metaObject()->className();
+    *tag_name = pElement->metaObject()->className();
 }
 
 void QWidgetViewCmdExecutor::IsOptionElementSelected(const ElementId& element, bool* is_selected, Error** error) {
@@ -619,19 +651,25 @@ void QWidgetViewCmdExecutor::IsOptionElementSelected(const ElementId& element, b
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
+    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pElement);
     if (NULL != checkBox) {
         *is_selected = checkBox->isChecked();
         return;
     }
 
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
+    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pElement);
     if (NULL != radioButton) {
         *is_selected = radioButton->isChecked();
+        return;
+    }
+
+    QAction* action = qobject_cast<QAction*>(pElement);
+    if ((NULL != action) && action->isCheckable()) {
+        *is_selected = action->isChecked();
         return;
     }
 
@@ -643,19 +681,25 @@ void QWidgetViewCmdExecutor::SetOptionElementSelected(const ElementId& element, 
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
+    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pElement);
     if (NULL != checkBox) {
         checkBox->setChecked(selected);
         return;
     }
 
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
+    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pElement);
     if (NULL != radioButton) {
         radioButton->setChecked(selected);
+        return;
+    }
+
+    QAction* action = qobject_cast<QAction*>(pElement);
+    if ((NULL != action) && action->isCheckable()) {
+        action->setChecked(selected);
         return;
     }
 
@@ -667,7 +711,7 @@ void QWidgetViewCmdExecutor::GetElementSize(const ElementId& element, Size* size
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -679,70 +723,37 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
-    if (NULL == pWidget)
+    QObject* pElement = getElement(element, error);
+    if (NULL == pElement)
         return;
 
-    if (!pWidget->isVisible()) {
-        *element_text = "";
-        return;
+    QVariant visibleValue = pElement->property("visible");
+    if (visibleValue.isValid()) {
+        if (!visibleValue.toBool()) {
+            *element_text = "";
+            return;
+        }    
     }
 
-    QComboBox *comboBox = qobject_cast<QComboBox*>(pWidget);
+    QComboBox *comboBox = qobject_cast<QComboBox*>(pElement);
     if (NULL != comboBox) {
         *element_text = comboBox->currentText().toStdString();
         return;
     }
 
-    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(pWidget);
-    if (NULL != lineEdit) {
-        *element_text = lineEdit->text().toStdString();
-        return;
-    }
-
-    QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit*>(pWidget);
+    QPlainTextEdit *plainText = qobject_cast<QPlainTextEdit*>(pElement);
     if (NULL != plainText) {
         *element_text = plainText->toPlainText().toStdString();
         return;
     }
 
-    QTextEdit *pText = qobject_cast<QTextEdit*>(pWidget);
+    QTextEdit *pText = qobject_cast<QTextEdit*>(pElement);
     if (NULL != pText) {
         *element_text = pText->toPlainText().toStdString();
         return;
     }
 
-    QPushButton *pushButton = qobject_cast<QPushButton*>(pWidget);
-    if (NULL != pushButton) {
-        *element_text = pushButton->text().toStdString();
-        return;
-    }
-
-    QRadioButton *radioButton = qobject_cast<QRadioButton*>(pWidget);
-    if (NULL != radioButton) {
-        *element_text = radioButton->text().toStdString();
-        return;
-    }
-
-    QLabel *label = qobject_cast<QLabel*>(pWidget);
-    if (NULL != label) {
-        *element_text = label->text().toStdString();
-        return;
-    }
-
-    QCheckBox *checkBox = qobject_cast<QCheckBox*>(pWidget);
-    if (NULL != checkBox) {
-        *element_text = checkBox->text().toStdString();
-        return;
-    }
-
-    QProgressBar *progressBar= qobject_cast<QProgressBar*>(pWidget);
-    if (NULL != progressBar) {
-        *element_text = progressBar->text().toStdString();
-        return;
-    }
-
-    QListView *listView = qobject_cast<QListView*>(pWidget);
+    QListView *listView = qobject_cast<QListView*>(pElement);
     if (NULL != listView)
     {
         QStringList list;
@@ -752,6 +763,14 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         }
         *element_text = list.join("\n").toStdString();
         return;
+    }
+
+    QVariant textValue = pElement->property("text");
+    if (textValue.isValid()) {
+        if (textValue.canConvert<QString>()) {
+            *element_text = textValue.toString().toStdString();
+            return;   
+        }
     }
 
     *error = new Error(kNoSuchElement);
@@ -765,7 +784,7 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
     session_->logger().Log(kFineLogLevel, "FindNativeElements, loc:"+locator+" query:"+query);
 
     Error* tmp_error = NULL;
-    QWidget *parentWidget = getElement(root_element, &tmp_error);
+    QWidget *parentWidget = getWidget(root_element, &tmp_error);
     scoped_ptr<Error> scoped_err(tmp_error);
 
     if (NULL == parentWidget) {
@@ -777,9 +796,10 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
         FindNativeElementsByXpath(parentWidget, query, elements, error);
     } else {
         // list all child widgets and find matched locator
+        // TODO:
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
         foreach(QWidget *child, childs) {
-            if (MatchNativeWidget(child, locator, query)) {
+            if (MatchNativeElement(child, locator, query)) {
                 ElementId elm;
                 session_->AddElement(view_id_, new QElementHandle(child), &elm);
                 (*elements).push_back(elm);
@@ -858,7 +878,7 @@ void QWidgetViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -885,7 +905,7 @@ void QWidgetViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -984,7 +1004,7 @@ void QWidgetViewCmdExecutor::TouchLongClick(const ElementId& element, Error **er
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1018,7 +1038,7 @@ void QWidgetViewCmdExecutor::TouchScroll(const ElementId &element, const int &xo
 
     QPoint startPoint = QCommonUtil::ConvertPointToQPoint(location);
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1065,7 +1085,7 @@ void QWidgetViewCmdExecutor::TouchFlick(const ElementId &element, const int &xof
 
     QPoint startPoint = QCommonUtil::ConvertPointToQPoint(location);
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1106,7 +1126,7 @@ void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerStat
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1134,7 +1154,7 @@ void QWidgetViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerStat
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1168,7 +1188,7 @@ void QWidgetViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *v
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1197,7 +1217,7 @@ void QWidgetViewCmdExecutor::SetPlayerVolume(const ElementId &element, double vo
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1226,7 +1246,7 @@ void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId &element, double
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1254,7 +1274,7 @@ void QWidgetViewCmdExecutor::SetPlayingPosition(const ElementId &element, double
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1282,7 +1302,7 @@ void QWidgetViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error 
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1310,7 +1330,7 @@ void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1338,7 +1358,7 @@ void QWidgetViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double s
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1366,7 +1386,7 @@ void QWidgetViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *
     if (NULL == view)
         return;
 
-    QWidget* pWidget = getElement(element, error);
+    QWidget* pWidget = getWidget(element, error);
     if (NULL == pWidget)
         return;
 
@@ -1387,16 +1407,17 @@ void QWidgetViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *
         #endif
 }
 
-bool QWidgetViewCmdExecutor::MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query) {
+bool QWidgetViewCmdExecutor::MatchNativeElement(const QObject* item, const std::string& locator, const std::string& query) {
     if (locator == LocatorType::kClassName) {
-        if (query == widget->metaObject()->className())
+        if (query == item->metaObject()->className())
             return true;
     } else if (locator == LocatorType::kId) {
-        if (query == widget->objectName().toStdString())
+        if (query == item->objectName().toStdString())
             return true;
     } else if (locator == LocatorType::kName) {
-        if (query == widget->windowTitle().toStdString())
-            return true;
+        if (item->isWidgetType())
+            if (query == (qobject_cast<const QWidget*>(item))->windowTitle().toStdString())
+                return true;
     } else {
         session_->logger().Log(kWarningLogLevel, "unsupported locator - "+locator);
         // LocatorType::kLinkText

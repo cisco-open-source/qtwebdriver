@@ -5,6 +5,7 @@
 #include "extension_qt/widget_view_handle.h"
 
 #include <QtCore/QMetaProperty>
+#include <QtGui/QAction>
 
 namespace webdriver {
 
@@ -44,38 +45,68 @@ QWidget* QWidgetViewUtil::getView(Session* session, const ViewId& viewId) {
     return qViewHandle->get();
 }
 
-void QWidgetXmlSerializer::addWidget(QWidget* widget) {
-    QString elementName = getElementName(widget);
+void QWidgetXmlSerializer::addWidget(QObject* widget) {
+    QWidget* pWidget = qobject_cast<QWidget*>(widget);
+    if (NULL == pWidget)
+        return;
+
+    QString elementName = getElementName(pWidget);
     writer_.writeStartElement(elementName);
 
     if (dumpAll_) {
-        for (int propertyIndex = 0; propertyIndex < widget->metaObject()->propertyCount(); propertyIndex++) {
-            const QMetaProperty& property = widget->metaObject()->property(propertyIndex);
-            writer_.writeAttribute(property.name(), property.read(widget).toString());
+        for (int propertyIndex = 0; propertyIndex < pWidget->metaObject()->propertyCount(); propertyIndex++) {
+            const QMetaProperty& property = pWidget->metaObject()->property(propertyIndex);
+            writer_.writeAttribute(property.name(), property.read(pWidget).toString());
         }
     }
 
-    if (!widget->objectName().isEmpty())
-        writer_.writeAttribute("id", widget->objectName());
+    if (!pWidget->objectName().isEmpty())
+        writer_.writeAttribute("id", pWidget->objectName());
 
-    if (!widget->windowTitle().isEmpty())
-        writer_.writeAttribute("name", widget->windowTitle());
+    if (!pWidget->windowTitle().isEmpty())
+        writer_.writeAttribute("name", pWidget->windowTitle());
 
     QString elementKey;
     if (session_) {
-        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(widget));
+        ElementId elementId = session_->GetElementIdForHandle(viewId_, new QElementHandle(pWidget));
         if (!elementId.is_valid())
-            session_->AddElement(viewId_, new QElementHandle(widget), &elementId);
+            session_->AddElement(viewId_, new QElementHandle(pWidget), &elementId);
         elementKey = QString::fromStdString(elementId.id());
     } else {
         elementKey = GenerateRandomID().c_str();
     }
-    elementsMap_.insert(elementKey, QPointer<QWidget>(widget));
+    elementsMap_.insert(elementKey, QPointer<QObject>(pWidget));
     writer_.writeAttribute("elementId", elementKey);
 
-    writer_.writeAttribute("className", widget->metaObject()->className());
+    writer_.writeAttribute("className", pWidget->metaObject()->className());
 
-    QList<QObject*> childs = widget->children();
+    // write QAction items
+    QList<QAction*> actions = pWidget->actions();
+    foreach(QAction* action, actions) {
+        QString actionName = action->metaObject()->className();
+        writer_.writeStartElement(actionName);
+
+        if (!action->objectName().isEmpty())
+            writer_.writeAttribute("id", action->objectName());
+
+        writer_.writeAttribute("className", action->metaObject()->className());
+
+        elementKey = GenerateRandomID().c_str();
+        elementsMap_.insert(elementKey, QPointer<QObject>(action));
+        writer_.writeAttribute("elementId", elementKey);
+
+        if (dumpAll_) {
+            for (int propertyIndex = 0; propertyIndex < action->metaObject()->propertyCount(); propertyIndex++) {
+                const QMetaProperty& property = action->metaObject()->property(propertyIndex);
+                writer_.writeAttribute(property.name(), property.read(action).toString());
+            }
+        }
+        
+        writer_.writeEndElement();
+    }
+
+    // write child widgets 
+    QList<QObject*> childs = pWidget->children();
     foreach(QObject* child, childs) {
         QWidget* childWgt = qobject_cast<QWidget*>(child);
         if (childWgt)
