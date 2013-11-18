@@ -33,6 +33,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
+#include <QtWidgets/QAction>
 #ifndef OS_IOS
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
