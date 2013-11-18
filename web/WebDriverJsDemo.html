@@ -579,9 +579,37 @@
           return true;
         }
 
+        win.document.onmousedown = function(event) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
+            return;
+          }
+
+          var xpath = getXPath(event.target);
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            mouseDown(event.button).
+            perform();
+        }
+
+        win.document.onmouseup = function(event) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
+            return;
+          }
+
+          var xpath = getXPath(event.target);
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            mouseUp(event.button).
+            perform();
+        }
+
         win.document.onclick = function(event) {
-          var disableClickEvent = document.getElementsByName('disableClickEvent')[0].checked;
-          if (disableClickEvent) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
             return;
           }
 
@@ -589,7 +617,7 @@
             var elementId = event.target.getAttribute('elementId');
             var element = new webdriver.WebElement(self.driver, elementId);
             element.click();
-            return true;
+            return;
           }
 
           var xpath = getXPath(event.target);
@@ -600,11 +628,7 @@
             perform().
           then(function() {
             return self.driver.visualizerShowPoint();
-          }).then(function() {
-//            self.updateSource();
           });
-
-          return false;
         }
 
         Hammer.detection.gestures = [];
@@ -849,7 +873,7 @@
     </div>
 
     <div class="commandBlock">
-      <input name="disableClickEvent" type="checkbox" style="width: 50px">Disable click events (send touch only)</input>
+      <input name="disableMouseEvents" type="checkbox" style="width: 50px">Disable click events</input>
     </div>
 
     <div style="margin-top: 20px">
