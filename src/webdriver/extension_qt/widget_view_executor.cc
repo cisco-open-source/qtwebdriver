@@ -796,7 +796,6 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
         FindNativeElementsByXpath(parentWidget, query, elements, error);
     } else {
         // list all child widgets and find matched locator
-        // TODO:
         QList<QWidget*> childs = parentWidget->findChildren<QWidget*>();
         foreach(QWidget *child, childs) {
             if (MatchNativeElement(child, locator, query)) {
@@ -805,6 +804,18 @@ void QWidgetViewCmdExecutor::FindElements(const ElementId& root_element, const s
                 (*elements).push_back(elm);
 
                 session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+            }
+
+            // list child actions
+            QList<QAction*> actions = child->actions();
+            foreach(QAction* action, actions) {
+                if (MatchNativeElement(action, locator, query)) {
+                    ElementId elm;
+                    session_->AddElement(view_id_, new QElementHandle(action), &elm);
+                    (*elements).push_back(elm);
+
+                    session_->logger().Log(kFineLogLevel, "element found: "+elm.id());       
+                }
             }
         }
     }
