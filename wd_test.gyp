@@ -307,9 +307,6 @@
         'src/Test/GraphicsWebViewTest.cc',
         'src/Test/GraphicsWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_GraphicsWebViewTest.cc',
-        'src/Test/mainwindow.cpp',
-        'src/Test/mainwindow.h',
-        '<(INTERMEDIATE_DIR)/moc_mainwindow.cc',
       ],
 
       'conditions': [
