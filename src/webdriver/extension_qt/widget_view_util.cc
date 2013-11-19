@@ -5,7 +5,6 @@
 #include "extension_qt/widget_view_handle.h"
 
 #include <QtCore/QMetaProperty>
-#include <QtGui/QAction>
 
 namespace webdriver {
 
