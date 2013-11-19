@@ -644,26 +644,24 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
     if (locator == LocatorType::kXpath) {
         FindElementsByXpath(parentItem, query, elements, error);
     } else {
-        // process root        
-        if (FilterElement(parentItem, locator, query)) {
-            ElementId elm;
-            session_->AddElement(view_id_, new QElementHandle(parentItem), &elm);
-            (*elements).push_back(elm);
+        FindElements(parentItem, locator, query, elements, error);
+    }
+}
 
-            session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-        }
+void QQmlViewCmdExecutor::FindElements(QDeclarativeItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+    if (FilterElement(parent, locator, query)) {
+        ElementId elm;
+        session_->AddElement(view_id_, new QElementHandle(parent), &elm);
+        (*elements).push_back(elm);
 
-        // list all child items and find matched locator
-        QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
-        foreach(QDeclarativeItem *child, childs) {
-            if (FilterElement(child, locator, query)) {
-                ElementId elm;
-                session_->AddElement(view_id_, new QElementHandle(child), &elm);
-                (*elements).push_back(elm);
+        session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+    }
 
-                session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-            }
-        }
+    QList<QGraphicsItem*> childs = parent->childItems();
+    foreach(QGraphicsItem *child, childs) {
+        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
+        if (childItem)
+            FindElements(childItem, locator, query, elements, error);
     }
 }
 
