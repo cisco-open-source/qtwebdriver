@@ -256,6 +256,9 @@
         'src/Test/TouchTest.cc',
         'src/Test/TouchTest.h',
         '<(INTERMEDIATE_DIR)/moc_TouchTest.cc',
+        'src/Test/MenuTest.cc',
+        'src/Test/MenuTest.h',
+        '<(INTERMEDIATE_DIR)/moc_MenuTest.cc',
       ],
       'conditions': [
         # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
@@ -304,7 +307,9 @@
         'src/Test/GraphicsWebViewTest.cc',
         'src/Test/GraphicsWebViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_GraphicsWebViewTest.cc',
-
+        'src/Test/mainwindow.cpp',
+        'src/Test/mainwindow.h',
+        '<(INTERMEDIATE_DIR)/moc_mainwindow.cc',
       ],
 
       'conditions': [
