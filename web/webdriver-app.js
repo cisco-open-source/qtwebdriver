@@ -199,6 +199,14 @@ VisualizerController.prototype.updateSource = function(webPage) {
   });
 }
 
+VisualizerController.prototype.quit = function() {
+  this.webPage = null;
+  if (this.visualizationWin) {
+    this.visualizationWin.close();
+    this.visualizationWin = null;
+  }
+}
+
 VisualizerController.prototype.isVisualizerOpened = function() {
   return this.visualizationWin && !this.visualizationWin.closed && this.visualizationWin.innerHeight > 0;
 }
@@ -525,6 +533,7 @@ WebDriverJsController.prototype.quit = function() {
     return;
 
   this.driver.quit();
+  this.visualizer.quit();
   this.webDriverUrlPort = null;
   this.webPage = null;
 }
