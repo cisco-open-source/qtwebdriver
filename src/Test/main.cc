@@ -36,6 +36,7 @@ std::string tests::testDataFolder;
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
 #include "TouchTest.h"
+#include "MenuTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
@@ -143,6 +144,7 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
     widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
+    widgetCreator->RegisterViewClass<MenuTestWidget>("MenuTestWidget");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
 #endif
@@ -273,6 +275,7 @@ int main(int argc, char *argv[])
     }
 
     setQtSettings();
+
     return app.exec();
 }
 

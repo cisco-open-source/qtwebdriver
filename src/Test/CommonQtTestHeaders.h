@@ -19,6 +19,9 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMenu>
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDropEvent>
 #include <QtGui/QDragMoveEvent>
@@ -35,6 +38,9 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QRadioButton>
+#include <QtGui/QAction>
+#include <QtGui/QMenuBar>
+#include <QtGui/QMenu>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QDragEnterEvent>
