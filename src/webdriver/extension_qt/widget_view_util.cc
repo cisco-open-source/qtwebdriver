@@ -89,14 +89,17 @@ void QWidgetXmlSerializer::addWidget(QObject* widget) {
             writer_.writeAttribute("id", action->objectName());
 
         writer_.writeAttribute("className", action->metaObject()->className());
+        writer_.writeAttribute("text", action->text());
 
         elementKey = GenerateRandomID().c_str();
         elementsMap_.insert(elementKey, QPointer<QObject>(action));
         writer_.writeAttribute("elementId", elementKey);
 
+        QString skipAttr("text");
         if (dumpAll_) {
             for (int propertyIndex = 0; propertyIndex < action->metaObject()->propertyCount(); propertyIndex++) {
                 const QMetaProperty& property = action->metaObject()->property(propertyIndex);
+                if (0 == skipAttr.compare(property.name())) continue;
                 writer_.writeAttribute(property.name(), property.read(action).toString());
             }
         }
