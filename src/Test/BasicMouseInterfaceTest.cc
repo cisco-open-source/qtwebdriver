@@ -30,7 +30,7 @@ BasicMouseInterfaceTestWidget::BasicMouseInterfaceTestWidget(QWidget *parent) :
         }
     }
 
-    QLabel *eventInfo = new QLabel("Nothing happened. ", this);
+    QLabel *eventInfo = new QLabel("Nothing happened.", this);
     eventInfo->setObjectName("dragging_reports");
     firstWidget->setDraggingReportsDestination(eventInfo);
     QVBoxLayout *vLayout = new QVBoxLayout();
