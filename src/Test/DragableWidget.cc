@@ -73,7 +73,7 @@ void DragableWidget::dropEvent(QDropEvent *event)
         event->accept();
         if(this->isReportDraggingOn && this->draggingReports != NULL){
             this->draggingReports->setText(this->draggingReports->text()
-                                           .append(" DropIn").append(droppedLabel->objectName()));
+                                           .append(" DropIn ").append(droppedLabel->objectName()));
         }
 }
 
