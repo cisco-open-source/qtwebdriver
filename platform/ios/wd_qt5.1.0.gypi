@@ -4,6 +4,7 @@
     'WD_BUILD_MONGOOSE': '1',
     'WD_BUILD_MODP_B64': '0',
     'WD_CONFIG_QUICK': '0',
+    'WD_CONFIG_PLAYER': '0',
     'QT_INC_PATH':    '/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/include',
     'QT_LIB_PATH':    '/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/lib',
     'QT_BIN_PATH':    '/Developer/Qt4iOS/qt-everywhere-ios-5.1.0/bin',
