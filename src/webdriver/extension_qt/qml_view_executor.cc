@@ -225,13 +225,21 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDblClick, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDblClick, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
     QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
     dbClckEvent->setScenePos(scenePoint);
+    dbClckEvent->setScreenPos(screenPos);
     dbClckEvent->setButton(Qt::LeftButton);
     dbClckEvent->setButtons(Qt::LeftButton);
 
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
+    dbClckEvent->setScreenPos(screenPos);
     releaseEvent->setButton(Qt::LeftButton);
     releaseEvent->setButtons(Qt::NoButton);
 
@@ -247,8 +255,15 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setScreenPos(screenPos);
     releaseEvent->setButton(Qt::LeftButton);
     releaseEvent->setButtons(Qt::NoButton);
 
@@ -263,8 +278,15 @@ void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
     QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
     pressEvent->setScenePos(scenePoint);
+    pressEvent->setScreenPos(screenPos);
     pressEvent->setButton(Qt::LeftButton);
     pressEvent->setButtons(Qt::LeftButton);
 
@@ -279,15 +301,23 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
     Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
 
     QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
     pressEvent->setScenePos(scenePoint);
+    pressEvent->setScreenPos(screenPos);
     pressEvent->setButton(mouseButton);
     pressEvent->setButtons(mouseButton);
 
     QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
     releaseEvent->setScenePos(scenePoint);
+    releaseEvent->setScreenPos(screenPos);
     releaseEvent->setButton(mouseButton);
     releaseEvent->setButtons(Qt::NoButton);
 
@@ -310,6 +340,12 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
 	QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
     QPointF scenePoint(point.x(), point.y());
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));    
+
     if (!view->sceneRect().contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
@@ -317,6 +353,7 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
 
     QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
     moveEvent->setScenePos(scenePoint);
+    moveEvent->setScreenPos(screenPos);
     QApplication::postEvent(view->scene(), moveEvent);
 
     session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
@@ -337,6 +374,12 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
 
     QPointF scenePoint = pItem->mapToScene(x_offset, y_offset);
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));    
+
     if (!view->sceneRect().contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
@@ -344,6 +387,7 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
 
     QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
     moveEvent->setScenePos(scenePoint);
+    moveEvent->setScreenPos(screenPos);
     QApplication::postEvent(view->scene(), moveEvent);
 
     session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
@@ -364,6 +408,12 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
 
     QPointF scenePoint = pItem->mapToScene(0, 0);
 
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", screenPos.x(), screenPos.y()));    
+
     if (!view->sceneRect().contains(scenePoint)) {
         *error = new Error(kMoveTargetOutOfBounds);
         return;
@@ -371,6 +421,7 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
 
     QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
     moveEvent->setScenePos(scenePoint);
+    moveEvent->setScreenPos(screenPos);
     QApplication::postEvent(view->scene(), moveEvent);
 
     session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
