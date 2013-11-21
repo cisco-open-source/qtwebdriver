@@ -1,4 +1,4 @@
-	{
+{
    # do not require cygwin
   'msvs_cygwin_shell': 0,
 
@@ -50,7 +50,7 @@
          'action_name': 'input_dir',
          'inputs':      [],
          'outputs':     ['<(INTERMEDIATE_DIR)'],
-         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],	    
+         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
        } ],
        'defines': [ 
          '__STDC_FORMAT_MACROS',
@@ -63,7 +63,7 @@
          'action_name': 'input_dir',
          'inputs':      [],
          'outputs':     ['<(INTERMEDIATE_DIR)'],
-         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],     
+         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
        } ],
        'defines': [ 
          'ANDROID',
@@ -88,7 +88,7 @@
          'NOMINMAX',
          '_UNICODE',
          '_WINSOCKAPI_',
-      ],	
+      ],
 
       'msvs_settings': {
         'VCCLCompilerTool': {
@@ -99,11 +99,11 @@
     } ],
 
     [ 'OS == "mac" or OS == "ios"', {
-      'actions': [ {                                                                                                                                                 
+      'actions': [ {
         'action_name': 'create_input_dir',
         'inputs':      [],
         'outputs':     [],
-        'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],                                                                                                  
+        'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
        } ],
        
       'defines': [ 
@@ -120,6 +120,10 @@
         'SDKROOT': 'iphonesimulator',
         'CLANG_WARN_CXX0X_EXTENSIONS': 'NO',
       },
-    }], 
+    }],
+
+    [ '<(WD_CONFIG_PLAYER) == 1', {
+     'defines': [ 'WD_ENABLE_PLAYER=1' ],
+    } ]
   ],
 }

@@ -5,6 +5,7 @@
     'WD_CONFIG_WEBKIT%': '1',
     'WD_CONFIG_QUICK%': '1',
     'WD_BUILD_MONGOOSE%': '0',
+    'WD_CONFIG_PLAYER%': '1',
 
     'QT_BIN_PATH%': '/usr/lib/qt4/bin',
     'QT_INC_PATH%': '/usr/include',
