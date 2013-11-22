@@ -733,9 +733,9 @@ void QWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffse
         return;
 
     location.Offset(size.width() / 2, size.height() / 2);
-    QPoint startPoint = QCommonUtil::ConvertPointToQPoint(location);
+    QPointF startPoint = QCommonUtil::ConvertPointToQPoint(location);
 
-    QPoint offsetPoint = QCommonUtil::ConvertPointToQPoint(Point(xoffset, yoffset));
+    QPointF offsetPoint = QCommonUtil::ConvertPointToQPoint(Point(xoffset, yoffset));
 
     //some magic numbers
     int stepCount = 20;
@@ -776,9 +776,7 @@ void QWebViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &
 
     QPointF point = QCommonUtil::ConvertPointToQPoint(location);
 
-
-    float d = (size.width() > size.height()) ? size.height()/4 : size.width()/4;
-
+    float d = QApplication::startDragDistance()*4;
 
     QPointF startPoint(point.x() - d, point.y());
     QPointF startPoint2(point.x() + d, point.y());
@@ -787,7 +785,6 @@ void QWebViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &
 
 
     QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint2);
-    qDebug()<<"i"<<startPoint<<startPoint2;
     QApplication::postEvent(view_, touchBeginEvent);
 
     int stepCount = 20;
@@ -796,7 +793,6 @@ void QWebViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &
     {
         QPointF point1(point.x() - d*cos(rad*i/stepCount), point.y() - d*sin(rad*i/stepCount));
         QPointF point2(point.x() + d*cos(rad*i/stepCount), point.y() + d*sin(rad*i/stepCount));
-        qDebug()<<i<<point1<<point2;
 
         QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
         QApplication::postEvent(view_, touchMoveEvent);
@@ -830,23 +826,23 @@ void QWebViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double 
 
     QPointF point = QCommonUtil::ConvertPointToQPoint(location);
 
-
-    QPointF startPoint2(point.x()+10, point.y());
+    float offset = QApplication::startDragDistance()*4;
     QPointF startPoint(point.x(), point.y());
+    QPointF startPoint2(point.x()+offset, point.y());
 
     float dx;
 
     if (scale >= 1)
-        dx = scale*10 - 10;
+        dx = (scale - 1)*offset;
     else
-        dx = (1-scale)*10;
+        dx = (1 - scale)*offset;
 
     QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint2);
     QApplication::postEvent(view_, touchBeginEvent);
 
     int stepCount = 20;
 
-    for (int i = 1; i <= stepCount; ++i)
+    for (int i = 0; i <= stepCount; ++i)
     {
         QPointF point1(startPoint);
         QPointF point2(startPoint2);
