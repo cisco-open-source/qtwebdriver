@@ -224,19 +224,20 @@ void QQmlViewCmdExecutor::MouseDoubleClick(Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPoint viewPos = view->mapFromScene(scenePoint);
 
-    QGraphicsSceneMouseEvent *dbClckEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseDoubleClick);
-    dbClckEvent->setScenePos(scenePoint);
-    dbClckEvent->setButton(Qt::LeftButton);
-    dbClckEvent->setButtons(Qt::LeftButton);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDblClick,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDblClick,   view: (%4d, %4d)", viewPos.x(), viewPos.y()));
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::NoButton);
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
 
-    QApplication::postEvent(view->scene(), dbClckEvent);
-    QApplication::postEvent(view->scene(), releaseEvent);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDblClick, screen: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
+    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, viewPos, screenPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, viewPos, screenPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view->viewport(), dbEvent);
+    QApplication::postEvent(view->viewport(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
@@ -246,13 +247,17 @@ void QQmlViewCmdExecutor::MouseButtonUp(Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPoint viewPos = view->mapFromScene(scenePoint);
 
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(Qt::LeftButton);
-    releaseEvent->setButtons(Qt::NoButton);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp,   view: (%4d, %4d)", viewPos.x(), viewPos.y()));
 
-    QApplication::postEvent(view->scene(), releaseEvent);
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, screen: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, viewPos, screenPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view->viewport(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
@@ -262,13 +267,17 @@ void QQmlViewCmdExecutor::MouseButtonDown(Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPoint viewPos = view->mapFromScene(scenePoint);
 
-    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-    pressEvent->setScenePos(scenePoint);
-    pressEvent->setButton(Qt::LeftButton);
-    pressEvent->setButtons(Qt::LeftButton);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown,   view: (%4d, %4d)", viewPos.x(), viewPos.y()));
 
-    QApplication::postEvent(view->scene(), pressEvent);
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, screen: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, viewPos, screenPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::postEvent(view->viewport(), pressEvent);
 }
 
 void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
@@ -278,25 +287,21 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPoint viewPos = view->mapFromScene(scenePoint);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick,   view: (%4d, %4d)", viewPos.x(), viewPos.y()));
+
+    QPoint screenPos = view->mapToGlobal(view->mapFromScene(scenePoint));
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, screen: (%4d, %4d)", screenPos.x(), screenPos.y()));
 
     Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, viewPos, screenPos, mouseButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, viewPos, screenPos, mouseButton, Qt::NoButton, Qt::NoModifier);
 
-    QGraphicsSceneMouseEvent *pressEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMousePress);
-    pressEvent->setScenePos(scenePoint);
-    pressEvent->setButton(mouseButton);
-    pressEvent->setButtons(mouseButton);
-
-    QGraphicsSceneMouseEvent *releaseEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseRelease);
-    releaseEvent->setScenePos(scenePoint);
-    releaseEvent->setButton(mouseButton);
-    releaseEvent->setButtons(Qt::NoButton);
-
-    QApplication::postEvent(view->scene(), pressEvent);
-    QApplication::postEvent(view->scene(), releaseEvent);
-//    if (Qt::RightButton == mouseButton) {
-//        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
-//        QApplication::postEvent(view->scene(), contextEvent);
-//    }
+    QApplication::postEvent(view->viewport(), pressEvent);
+    QApplication::postEvent(view->viewport(), releaseEvent);
 }
 
 void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
@@ -315,14 +320,8 @@ void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    moveMouseInternal(view, scenePoint);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
-                            (int)prev_pos.x(),
-                            (int)prev_pos.y()));
-      
     session_->set_mouse_position(prev_pos);
 }
 
@@ -342,14 +341,8 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    moveMouseInternal(view, scenePoint);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
-                            (int)scenePoint.x(),
-                            (int)scenePoint.y()));
-    
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
 
@@ -369,15 +362,39 @@ void QQmlViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
         return;
     }
 
-    QGraphicsSceneMouseEvent *moveEvent = new QGraphicsSceneMouseEvent(QEvent::GraphicsSceneMouseMove);
-    moveEvent->setScenePos(scenePoint);
-    QApplication::postEvent(view->scene(), moveEvent);
+    moveMouseInternal(view, scenePoint);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("mouse move to: %d, %d",
-                            (int)scenePoint.x(),
-                            (int)scenePoint.y()));
-    
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
+}
+
+void QQmlViewCmdExecutor::moveMouseInternal(QDeclarativeView* view, QPointF& point) {
+    QPoint startScenePos = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint startViewPos = view->mapFromScene(startScenePos);
+    QPoint targetViewPos = view->mapFromScene(point);
+    QPoint targetScreenPos = view->mapToGlobal(targetViewPos);
+
+    Qt::MouseButton mouseButton = (view->scene()->mouseGrabberItem())?(Qt::LeftButton):(Qt::NoButton);
+
+    QPointF minDragVector(QApplication::startDragDistance(), QApplication::startDragDistance());
+    qreal dragThreshold = minDragVector.manhattanLength();
+    QLineF line(startViewPos.x(), startViewPos.y(), targetViewPos.x(), targetViewPos.y());
+
+    if ( line.length() > dragThreshold ) {
+        // we need first mousemove event to initiate drag
+        QPointF dragStartPointF = line.pointAt(dragThreshold / line.length());
+        QPoint dragStartPoint((int)dragStartPointF.x(), (int)dragStartPointF.y());
+        QPoint dragStartScreenPos = view->mapToGlobal(dragStartPoint);
+
+        QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, dragStartPoint, dragStartScreenPos, Qt::NoButton, mouseButton, Qt::NoModifier);
+        QApplication::postEvent(view->viewport(), moveEvent);    
+    }
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove,  scene: (%4d, %4d)", (int)point.x(), (int)point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove,   view: (%4d, %4d)", targetViewPos.x(), targetViewPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", targetScreenPos.x(), targetScreenPos.y()));
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, targetViewPos, targetScreenPos, Qt::NoButton, mouseButton, Qt::NoModifier);
+    QApplication::postEvent(view->viewport(), moveEvent);    
 }
 
 void QQmlViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
@@ -644,26 +661,24 @@ void QQmlViewCmdExecutor::FindElements(const ElementId& root_element, const std:
     if (locator == LocatorType::kXpath) {
         FindElementsByXpath(parentItem, query, elements, error);
     } else {
-        // process root        
-        if (FilterElement(parentItem, locator, query)) {
-            ElementId elm;
-            session_->AddElement(view_id_, new QElementHandle(parentItem), &elm);
-            (*elements).push_back(elm);
+        FindElements(parentItem, locator, query, elements, error);
+    }
+}
 
-            session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-        }
+void QQmlViewCmdExecutor::FindElements(QDeclarativeItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
+    if (FilterElement(parent, locator, query)) {
+        ElementId elm;
+        session_->AddElement(view_id_, new QElementHandle(parent), &elm);
+        (*elements).push_back(elm);
 
-        // list all child items and find matched locator
-        QList<QDeclarativeItem*> childs = parentItem->findChildren<QDeclarativeItem*>();
-        foreach(QDeclarativeItem *child, childs) {
-            if (FilterElement(child, locator, query)) {
-                ElementId elm;
-                session_->AddElement(view_id_, new QElementHandle(child), &elm);
-                (*elements).push_back(elm);
+        session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
+    }
 
-                session_->logger().Log(kFineLogLevel, "element found: "+elm.id());
-            }
-        }
+    QList<QGraphicsItem*> childs = parent->childItems();
+    foreach(QGraphicsItem *child, childs) {
+        QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
+        if (childItem)
+            FindElements(childItem, locator, query, elements, error);
     }
 }
 

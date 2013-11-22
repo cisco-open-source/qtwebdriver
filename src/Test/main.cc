@@ -36,17 +36,16 @@ std::string tests::testDataFolder;
 #include "VisibilityTest.h"
 #include "BasicMouseInterfaceTest.h"
 #include "TouchTest.h"
+#include "MenuTest.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
 #endif
 
 // Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
-#ifndef OS_IOS
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "VideoTest.h"
-#endif
-#endif//OS_IOS
+#endif//WD_ENABLE_PLAYER
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -143,15 +142,14 @@ int main(int argc, char *argv[])
     widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
     widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
     widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
+    widgetCreator->RegisterViewClass<MenuTestWidget>("MenuTestWidget");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
 #endif
 
-#ifndef OS_IOS
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
-#endif
-#endif //OS_IOS
+#endif //WD_ENABLE_PLAYER
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
@@ -273,6 +271,7 @@ int main(int argc, char *argv[])
     }
 
     setQtSettings();
+
     return app.exec();
 }
 

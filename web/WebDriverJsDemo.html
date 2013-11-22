@@ -111,229 +111,6 @@
           'WebDriver.visualizerShowPoint()');
       }
 
-      /**
-       * Single tap on the touch enabled device.
-       * @param {!webdriver.WebElement} element The element to tap on.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchSingleTap = function(element) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_SINGLE_TAP] = {
-          method: 'POST', path: '/session/:sessionId/touch/click'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_SINGLE_TAP);
-
-        var id = element.toWireValue().then(function(value) {
-            return value['ELEMENT'];
-          });
-        command.setParameter('element', id);
-
-        this.schedule_(webdriver.CommandName.TOUCH_SINGLE_TAP, command);
-        return this;
-      }
-
-      /**
-       * Finger down on the screen.
-       * @param {number} x X coordinate on the screen
-       * @param {number} y Y coordinate on the screen
-       */
-      webdriver.ActionSequence.prototype.touchDown = function(x, y) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_DOWN] = {
-          method: 'POST', path: '/session/:sessionId/touch/down'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_DOWN);
-
-        command.setParameter('x', x);
-        command.setParameter('y', y);
-
-        this.schedule_(webdriver.CommandName.TOUCH_DOWN, command);
-        return this;
-      }
-
-      /**
-       * Finger up on the screen.
-       * @param {number} x X coordinate on the screen
-       * @param {number} y Y coordinate on the screen
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchUp = function(x, y) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_UP] = {
-          method: 'POST', path: '/session/:sessionId/touch/up'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_UP);
-
-        command.setParameter('x', x);
-        command.setParameter('y', y);
-
-        this.schedule_(webdriver.CommandName.TOUCH_UP, command);
-        return this;
-      }
-
-      /**
-       * Finger move on the screen.
-       * @param {number} x X coordinate on the screen
-       * @param {number} y Y coordinate on the screen
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchMove = function(x, y) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_MOVE] = {
-          method: 'POST', path: '/session/:sessionId/touch/move'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_MOVE);
-
-        command.setParameter('x', x);
-        command.setParameter('y', y);
-
-        this.schedule_(webdriver.CommandName.TOUCH_MOVE, command);
-        return this;
-      }
-
-      /**
-       * Scroll on the touch screen using finger based motion events.
-       * @param {(!webdriver.WebElement|{x: number, y: number})} elementOrOffset Either
-       *     the element where scrolls starts or offset in pixels to scroll by.
-       * @param {({x: number, y: number})=} opt_offset The offset in pixels to scroll by
-       *     if the first argument is the element.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchScroll = function(elementOrOffset, opt_offset) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_SCROLL] = {
-          method: 'POST', path: '/session/:sessionId/touch/scroll'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_SCROLL);
-
-        if (opt_offset != undefined) {
-          var id = elementOrOffset.toWireValue().then(function(value) {
-              return value['ELEMENT'];
-            });
-          command.setParameter('element', id);
-          command.setParameter('xoffset', opt_offset.x);
-          command.setParameter('yoffset', opt_offset.y);
-        } else {
-          command.setParameter('xoffset', elementOrOffset.x);
-          command.setParameter('yoffset', elementOrOffset.y);
-        }
-
-        this.schedule_(webdriver.CommandName.TOUCH_SCROLL, command);
-        return this;
-      }
-
-      /**
-       * Double tap on the touch screen using finger motion events.
-       * @param {!webdriver.WebElement} element The element to double tap on.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchDoubleClick = function(element) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_DOUBLE_CLICK] = {
-          method: 'POST', path: '/session/:sessionId/touch/doubleclick'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_DOUBLE_CLICK);
-
-        var id = element.toWireValue().then(function(value) {
-            return value['ELEMENT'];
-          });
-        command.setParameter('element', id);
-
-        this.schedule_(webdriver.CommandName.TOUCH_DOUBLE_CLICK, command);
-        return this;
-      }
-
-      /**
-       * Long press on the touch screen using finger motion events.
-       * @param {!webdriver.WebElement} element The element to long press on.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchLongClick = function(element) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_LONG_CLICK] = {
-          method: 'POST', path: '/session/:sessionId/touch/longclick'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_LONG_CLICK);
-
-        var id = element.toWireValue().then(function(value) {
-            return value['ELEMENT'];
-          });
-        command.setParameter('element', id);
-
-        this.schedule_(webdriver.CommandName.TOUCH_LONG_CLICK, command);
-        return this;
-      }
-
-      /**
-       * Flick on the touch screen using finger motion events.
-       * @param {(!webdriver.WebElement|{x: number, y: number})} elementOrOffset Either
-       *     the element where flick starts or speed in pixels per second.
-       * @param {({x: number, y: number})=} opt_offset The offset in pixels to flick by
-       *     if the first argument is the element.
-       * @param {number=} opt_speed The speed in pixels per seconds if the first argument
-       *     is the element.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchFlick = function(elementOrSpeed, opt_offset, opt_speed) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_FLICK] = {
-          method: 'POST', path: '/session/:sessionId/touch/flick'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_FLICK);
-
-        if (arguments.length == 3) {
-          var id = elementOrSpeed.toWireValue().then(function(value) {
-              return value['ELEMENT'];
-            });
-          command.setParameter('element', id);
-          command.setParameter('xoffset', opt_offset.x);
-          command.setParameter('yoffset', opt_offset.y);
-          command.setParameter('speed', opt_speed);
-        } else {
-          command.setParameter('xspeed', elementOrSpeed.x);
-          command.setParameter('yspeed', elementOrSpeed.y);
-        }
-
-        this.schedule_(webdriver.CommandName.TOUCH_FLICK, command);
-        return this;
-      }
-
-      /**
-       * Pinch and rotate on the touch screen using finger motion events.
-       * @param {!webdriver.WebElement} element The element to rotate.
-       * @param {!number} angle The angle by which to rotate.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchPinchRotate = function(element, angle) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_PINCH_ROTATE] = {
-          method: 'POST', path: '/session/:sessionId/touch/-cisco-pinch-rotate'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_PINCH_ROTATE);
-
-        var id = element.toWireValue().then(function(value) {
-            return value['ELEMENT'];
-          });
-        command.setParameter('element', id);
-        command.setParameter('angle', angle);
-
-        this.schedule_(webdriver.CommandName.TOUCH_PINCH_ROTATE, command);
-        return this;
-      }
-
-      /**
-       * Pinch and zoom on the touch screen using finger motion events.
-       * @param {!webdriver.WebElement} element The element to zoom.
-       * @param {!number} scale The scale by which to zoom.
-       * @return {!webdriver.ActionSequence} A self reference.
-       */
-      webdriver.ActionSequence.prototype.touchPinchZoom = function(element, scale) {
-        webdriver.http.Executor.COMMAND_MAP_[webdriver.CommandName.TOUCH_PINCH_ZOOM] = {
-          method: 'POST', path: '/session/:sessionId/touch/-cisco-pinch-zoom'};
-
-        var command = new webdriver.Command(webdriver.CommandName.TOUCH_PINCH_ZOOM);
-
-        var id = element.toWireValue().then(function(value) {
-            return value['ELEMENT'];
-          });
-        command.setParameter('element', id);
-        command.setParameter('scale', scale);
-
-        this.schedule_(webdriver.CommandName.TOUCH_PINCH_ZOOM, command);
-        return this;
-      }
-
       var Util = function() {}
       Util.WebDriverKeyFromJs = function(keyCode) {
         switch (keyCode) {
@@ -452,14 +229,18 @@
 
           this.driver = new webdriver.WebDriver(session, executor);
 
-          this.webDriverUrlPort = localStorage.webDriverUrlPort = webDriverUrlPort;
+          this.webDriverUrlPort = webDriverUrlPort;
+          if (localStorage)
+            localStorage.webDriverUrlPort = webDriverUrlPort;
         }
 
         if (this.webPage != webPage) {
           this.driver.get(webPage);
           this.element = null;
 
-          this.webPage = localStorage.webPage = webPage;
+          this.webPage = webPage;
+          if (localStorage)
+            localStorage.webPage = webPage;
         }
       }
 
@@ -575,9 +356,37 @@
           return true;
         }
 
+        win.document.onmousedown = function(event) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
+            return;
+          }
+
+          var xpath = getXPath(event.target);
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            mouseDown(event.button).
+            perform();
+        }
+
+        win.document.onmouseup = function(event) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
+            return;
+          }
+
+          var xpath = getXPath(event.target);
+          var target = self.driver.findElement(webdriver.By.xpath(xpath));
+          self.driver.actions().
+            mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+            mouseUp(event.button).
+            perform();
+        }
+
         win.document.onclick = function(event) {
-          var disableClickEvent = document.getElementsByName('disableClickEvent')[0].checked;
-          if (disableClickEvent) {
+          var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
+          if (disableMouseEvents) {
             return;
           }
 
@@ -585,7 +394,7 @@
             var elementId = event.target.getAttribute('elementId');
             var element = new webdriver.WebElement(self.driver, elementId);
             element.click();
-            return true;
+            return;
           }
 
           var xpath = getXPath(event.target);
@@ -596,18 +405,13 @@
             perform().
           then(function() {
             return self.driver.visualizerShowPoint();
-          }).then(function() {
-//            self.updateSource();
           });
-
-          return false;
         }
 
         Hammer.detection.gestures = [];
         Hammer.READY = false;
         Hammer.DOCUMENT = win.document;
-        var hammer = Hammer(win.document, {
-          prevent_default: true});
+        var hammer = Hammer(win.document);
 
         hammer.on("tap", function(event) {
           var xpath = getXPath(event.target);
@@ -621,7 +425,7 @@
           var xpath = getXPath(event.target);
           var target = self.driver.findElement(webdriver.By.xpath(xpath));
           self.driver.actions().
-            touchLongClick(target).
+            touchLongPress(target).
             perform();
         });
 
@@ -739,12 +543,12 @@
       }
 
       function init() {
-        if (localStorage.webDriverUrlPort) {
+        if (localStorage && localStorage.webDriverUrlPort) {
           var input = document.getElementsByName('webDriverUrlPort')[0];
           input.value = localStorage.webDriverUrlPort;
         }
 
-        if (localStorage.webPage) {
+        if (localStorage && localStorage.webPage) {
           var input = document.getElementsByName('webPage')[0];
           input.value = localStorage.webPage;
         }
@@ -846,7 +650,7 @@
     </div>
 
     <div class="commandBlock">
-      <input name="disableClickEvent" type="checkbox" style="width: 50px">Disable click events (send touch only)</input>
+      <input name="disableMouseEvents" type="checkbox" style="width: 50px">Disable click events</input>
     </div>
 
     <div style="margin-top: 20px">

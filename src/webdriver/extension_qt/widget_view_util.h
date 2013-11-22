@@ -30,10 +30,10 @@ private:
     ~QWidgetViewUtil() {}
 };
 
-class QWidgetXmlSerializer : public QViewXmlSerializer<QWidget> {
+class QWidgetXmlSerializer : public QViewXmlSerializer<QObject> {
 public:
     QWidgetXmlSerializer(QIODevice* buff)
-        : QViewXmlSerializer<QWidget>(buff)
+        : QViewXmlSerializer<QObject>(buff)
     {}
 
     void setViewId(ViewId viewId) {
@@ -45,7 +45,7 @@ public:
     }
 
 private:
-    virtual void addWidget(QWidget* widget);
+    virtual void addWidget(QObject* widget);
     QString getElementName(const QObject* object) const;
 
     ViewId viewId_;

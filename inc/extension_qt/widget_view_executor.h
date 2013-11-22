@@ -108,8 +108,9 @@ public:
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
-    QWidget* getElement(const ElementId &element, Error** error);
-    bool MatchNativeWidget(const QWidget* widget, const std::string& locator, const std::string& query);
+    QObject* getElement(const ElementId &element, Error** error);
+    QWidget* getWidget(const ElementId &element, Error** error);
+    bool MatchNativeElement(const QObject* item, const std::string& locator, const std::string& query);
     void FindNativeElementsByXpath(QWidget* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
 
 private:

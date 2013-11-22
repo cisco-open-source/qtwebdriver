@@ -118,6 +118,8 @@ protected:
     QDeclarativeItem* getElement(const ElementId &element, Error** error);
     bool FilterElement(const QDeclarativeItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QDeclarativeItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
+    void FindElements(QDeclarativeItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
+    void moveMouseInternal(QDeclarativeView* view, QPointF& point);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(QQmlViewCmdExecutor);

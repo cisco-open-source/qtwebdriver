@@ -136,8 +136,8 @@ void QQmlXmlSerializer::addWidget(QDeclarativeItem* item) {
         }
     }
 
-    QList<QObject*> childs = item->children();
-    foreach(QObject *child, childs) {
+    QList<QGraphicsItem*> childs = item->childItems();
+    foreach(QGraphicsItem *child, childs) {
         QDeclarativeItem* childItem = qobject_cast<QDeclarativeItem*>(child);
         if (childItem)
             addWidget(childItem);
