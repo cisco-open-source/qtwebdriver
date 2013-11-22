@@ -1338,12 +1338,12 @@ void Quick2ViewCmdExecutor::TouchScroll(const ElementId &element, const int &xof
     Point location(0,0);
 
     // calculate the half of the element size and translate by it.
-    Size sizel;
-    GetElementSize(element, &sizel, error);
+    Size size;
+    GetElementSize(element, &size, error);
     if (*error)
         return;
 
-    location.Offset(sizel.width() / 2, sizel.height() / 2);
+    location.Offset(size.width() / 2, size.height() / 2);
 
     QPointF startPoint = ConvertPointToQPoint(location);
 
