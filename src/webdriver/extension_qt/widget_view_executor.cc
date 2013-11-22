@@ -34,10 +34,10 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QAction>
-#ifndef OS_IOS
+#if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
-#endif //OS_IOS
+#endif //WD_ENABLE_PLAYER
 #else
 #include <QtGui/QApplication>
 #include <QtGui/QLineEdit>
@@ -1171,7 +1171,7 @@ void QWidgetViewCmdExecutor::TouchFlick(const ElementId &element, const int &xof
 
 void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState *state, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1199,7 +1199,7 @@ void QWidgetViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerStat
 
 void QWidgetViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState state, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1233,7 +1233,7 @@ void QWidgetViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerStat
 
 void QWidgetViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *volume, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1262,7 +1262,7 @@ void QWidgetViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *v
 
 void QWidgetViewCmdExecutor::SetPlayerVolume(const ElementId &element, double volume, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1291,7 +1291,7 @@ void QWidgetViewCmdExecutor::SetPlayerVolume(const ElementId &element, double vo
 
 void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId &element, double *position, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1319,7 +1319,7 @@ void QWidgetViewCmdExecutor::GetPlayingPosition(const ElementId &element, double
 
 void QWidgetViewCmdExecutor::SetPlayingPosition(const ElementId &element, double position, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1347,7 +1347,7 @@ void QWidgetViewCmdExecutor::SetPlayingPosition(const ElementId &element, double
 
 void QWidgetViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1375,7 +1375,7 @@ void QWidgetViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error 
 
 void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1403,7 +1403,7 @@ void QWidgetViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error
 
 void QWidgetViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1431,7 +1431,7 @@ void QWidgetViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double s
 
 void QWidgetViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
 {
-#if (!OS_IOS) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
@@ -1454,7 +1454,7 @@ void QWidgetViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *
     *speed = player->playbackRate();
 #else
     NOT_SUPPORTED_IMPL
-        #endif
+#endif
 }
 
 bool QWidgetViewCmdExecutor::MatchNativeElement(const QObject* item, const std::string& locator, const std::string& query) {
