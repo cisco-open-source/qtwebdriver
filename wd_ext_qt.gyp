@@ -71,6 +71,10 @@
       'type': 'static_library',
       'standalone_static_library': 1,
 
+      'include_dirs': [
+        'src/third_party/tidy-html5/include',
+      ],
+
       'sources': [
         'src/webdriver/extension_qt/web_view_creator.cc',
         'src/webdriver/extension_qt/web_view_executor.cc',
@@ -89,6 +93,10 @@
         '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
         '<(INTERMEDIATE_DIR)/moc_qwebkit_proxy.cc',
         'src/third_party/webdriver/atoms.cc',
+      ],
+
+      'dependencies': [
+        'src/third_party/tidy-html5/tidy-html5.gyp:tidy-html5',
       ],
 
     } , {
