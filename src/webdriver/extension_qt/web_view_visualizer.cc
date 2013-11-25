@@ -21,6 +21,11 @@ QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExec
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     // Convert DOM tree to valid XML.
     const char* kSource =
+        "var elements = document.getElementsByTagName('*');\n"
+        "for (var index = 0; index < elements.length; index++) {\n"
+        "  var element = elements[index];\n"
+        "  element.setAttribute('data-viz-id', index);\n"
+        "}\n"
         "var root = document.documentElement.cloneNode(true);\n"
         "var elements = root.getElementsByTagName('script');\n"
         "for (var index = 0; index < elements.length; index++) {\n"

@@ -73,6 +73,9 @@ function _getXPath(node, path) {
 }
 
 function getXPath(node) {
+  if (node.hasAttribute('data-viz-id'))
+    return '//*[@data-viz-id=' + node.getAttribute('data-viz-id') + "]";
+
   var path = _getXPath(node);
   return '/' + path.join('/');
 }
