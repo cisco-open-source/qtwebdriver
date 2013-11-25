@@ -27,6 +27,7 @@ public:
 
 private:
     QSharedPointer<pugi::xml_document> ParseXml(const QString& input, Error** error);
+    std::string Tidy(const std::string& input, Error** error) const;
     static void UnescapeXml(QString& input);
 
     void AssemblePage(pugi::xml_node element) const;

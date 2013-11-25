@@ -1,5 +1,7 @@
 #include "web_view_visualizer.h"
 
+#include <buffio.h>
+#include <tidy.h>
 #include <stdexcept>
 #include <QtCore/QEventLoop>
 #include <QtNetwork/QNetworkRequest>
@@ -19,33 +21,19 @@ QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExec
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
     // Convert DOM tree to valid XML.
     const char* kSource =
+        "var elements = document.getElementsByTagName('*');\n"
+        "for (var index = 0; index < elements.length; index++) {\n"
+        "  var element = elements[index];\n"
+        "  element.setAttribute('data-viz-id', index);\n"
+        "}\n"
         "var root = document.documentElement.cloneNode(true);\n"
-        "var elements = root.getElementsByTagName('*');\n"
-        "for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {\n"
-        "  var element = elements[elementIndex];\n"
-        "  if (element.tagName.toLowerCase() == 'script')\n"
-        "    element.innerHTML = '';\n"
-        "  if (element.hasAttribute('\"'))\n"
-        "    element.removeAttribute('\"');\n"
-        "\n"
-        "  var childNodes = element.childNodes;\n"
-        "  for (var childIndex = 0; childIndex < childNodes.length; childIndex++) {\n"
-        "    var child = childNodes[childIndex];\n"
-        "    if (child.nodeType == Node.TEXT_NODE) {\n"
-        "      child.nodeValue = child.nodeValue.replace(/&/g, '&amp;');\n"
-        "    }\n"
-        "  }\n"
+        "var elements = root.getElementsByTagName('script');\n"
+        "for (var index = 0; index < elements.length; index++) {\n"
+        "  var element = elements[index];\n"
+        "  element.innerHTML = '';\n"
         "}\n"
         "\n"
-        "var xhtml = document.implementation.createDocument();\n"
-        "var dt = '';\n"
-        "if (document.childNodes[0].nodeType == Node.DOCUMENT_TYPE_NODE) {\n"
-        "  dt = document.childNodes[0];\n"
-        "  dt = new XMLSerializer().serializeToString(dt);\n"
-        "}\n"
-        "xhtml = xhtml.importNode(root, true);\n"
-        "xhtml = new XMLSerializer().serializeToString(xhtml);\n"
-        "return dt + xhtml;";
+        "return new XMLSerializer().serializeToString(root);";
 
     Value* unscoped_value = NULL;
     executor_->ExecuteScript(
@@ -69,6 +57,9 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
 
     session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
     session_->logger().Log(kInfoLogLevel, *source);
+    *source = Tidy(*source, error);
+    if (*error)
+        return;
 
     QSharedPointer<pugi::xml_document> document = ParseXml(QString::fromStdString(*source), error);
     if (!document)
@@ -103,6 +94,64 @@ QSharedPointer<pugi::xml_document> QWebViewVisualizerSourceCommand::ParseXml(con
     }
 
     return document;
+}
+
+std::string QWebViewVisualizerSourceCommand::Tidy(const std::string& input, Error** error) const {
+    static const bool SHOW_DIAGNOSTICS = false;
+    TidyBuffer outbuf;
+    TidyBuffer errbuf;
+    int retval = -1;
+
+    TidyDoc doc = tidyCreate();
+    tidyBufInit(&outbuf);
+    tidyBufInit(&errbuf);
+
+    tidyOptSetBool(doc, TidyXhtmlOut, yes);
+    tidyOptSetBool(doc, TidyForceOutput, yes);
+    tidySetErrorBuffer(doc, &errbuf);
+
+    retval = tidyParseString(doc, input.c_str());
+    if (retval >= 0) {
+        retval = tidyCleanAndRepair(doc);
+        if (retval >= 0) {
+            if (SHOW_DIAGNOSTICS) {
+                retval = tidyRunDiagnostics(doc);
+                if (retval >= 0) {
+                    std::string diagnostics(reinterpret_cast<const char*>(errbuf.bp), errbuf.size);
+                    session_->logger().Log(kWarningLogLevel, diagnostics);
+                } else {
+                    std::string details = base::StringPrintf(
+                        "tidyRunDiagnostics failed with retval %d", retval);
+                    session_->logger().Log(kSevereLogLevel, details);
+                    *error = new Error(kInternalServerError, details);
+                }
+            }
+
+            retval = tidySaveBuffer(doc, &outbuf);
+            if (retval < 0) {
+                std::string details = base::StringPrintf(
+                    "tidySaveBuffer failed with retval %d", retval);
+                session_->logger().Log(kSevereLogLevel, details);
+                *error = new Error(kInternalServerError, details);
+            }
+        } else {
+            std::string details = base::StringPrintf(
+                "tidyCleanAndRepair failed with retval %d", retval);
+            session_->logger().Log(kSevereLogLevel, details);
+            *error = new Error(kInternalServerError, details);
+        }
+    } else {
+        std::string details = base::StringPrintf(
+            "tidyParseString failed with retval %d", retval);
+        session_->logger().Log(kSevereLogLevel, details);
+        *error = new Error(kInternalServerError, details);
+    }
+
+    std::string output(reinterpret_cast<const char*>(outbuf.bp), outbuf.size);
+    tidyBufFree(&outbuf);
+    tidyBufFree(&errbuf);
+    tidyRelease(doc);
+    return output;
 }
 
 void QWebViewVisualizerSourceCommand::UnescapeXml(QString& input) {

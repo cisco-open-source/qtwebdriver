@@ -71,7 +71,7 @@ Error* QProxyCapabilitiesParser::Parse() {
     proxy_type_parser_map["pac"] = &QProxyCapabilitiesParser::ParseProxyAutoconfigUrl;
     proxy_type_parser_map["manual"] = &QProxyCapabilitiesParser::ParseProxyServers;
     proxy_type_parser_map["direct"] = NULL;
-    proxy_type_parser_map["system"] = NULL;
+    proxy_type_parser_map["system"] = &QProxyCapabilitiesParser::ParseSystemProxy;
 
     const Value* proxy_type_value;
     if (!dict_->Get("proxyType", &proxy_type_value))
@@ -88,8 +88,6 @@ Error* QProxyCapabilitiesParser::Parse() {
     if (proxy_type == "direct") {
         logger_.Log(kInfoLogLevel, "found noProxy configuration.");
         *proxy_ = QNetworkProxy(QNetworkProxy::NoProxy);
-    } else if (proxy_type == "system") {
-        *proxy_ = QNetworkProxy(QNetworkProxy::DefaultProxy);
     } else {
         Error* error = (this->*proxy_type_parser_map[proxy_type])(dict_);
         if (error) {
@@ -195,6 +193,26 @@ Error* QProxyCapabilitiesParser::ParseNoProxy(const base::Value* option){
 
     *proxy_ = QNetworkProxy(QNetworkProxy::NoProxy);
     
+    return NULL;
+}
+
+Error* QProxyCapabilitiesParser::ParseSystemProxy(const base::DictionaryValue *options) {
+
+    QString urlString(qgetenv("http_proxy"));
+    if (!urlString.startsWith("http://"))
+        urlString.insert(0, "http://");
+    QUrl proxyUrl(urlString);
+
+    if (!proxyUrl.isValid()) {
+        return new Error(kBadRequest,"Proxy url invalid");
+    }
+    if (proxyUrl.host().isEmpty()) {
+        return new Error(kBadRequest,"Proxy host is empty");
+    }
+
+    int proxyPort = (proxyUrl.port() > 0) ? proxyUrl.port() : 8080;
+    logger_.Log(kInfoLogLevel, "found system proxy configuration - "+ proxyUrl.toString().toStdString());
+    *proxy_ = QNetworkProxy(QNetworkProxy::HttpProxy, proxyUrl.host(), proxyPort);
     return NULL;
 }
 

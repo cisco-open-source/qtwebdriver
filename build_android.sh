@@ -144,6 +144,7 @@ fi
     fi
 
     cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD.apk
+    rm -rf $dist_dir/android
 
   done
 

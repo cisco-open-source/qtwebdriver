@@ -37,6 +37,7 @@ private:
     Error* ParseProxyAutoDetect(const base::DictionaryValue* options);
     Error* ParseProxyAutoconfigUrl(const base::DictionaryValue* options);
     Error* ParseProxyServers(const base::DictionaryValue* options);
+    Error* ParseSystemProxy(const base::DictionaryValue* options);
 
     const base::DictionaryValue* dict_;
     const Logger& logger_;

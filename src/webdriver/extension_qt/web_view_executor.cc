@@ -30,6 +30,9 @@
 #else
 #include <QtGui/QApplication>
 #endif
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 class QNetworkCookie;
 namespace webdriver {
 
@@ -647,8 +650,18 @@ void QWebViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Other, point, view_->mapToGlobal(point));
-    qApp->postEvent(view_, contextEvent);
+    QEventLoop loop;
+    QTimer::singleShot(1000, &loop, SLOT(quit()));
+
+    QTouchEvent *touchBeginEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, point);
+    QApplication::postEvent(view_, touchBeginEvent);
+
+    loop.exec();
+
+    QTouchEvent *touchEndEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point);
+    QApplication::postEvent(view_, touchEndEvent);
+
+    QApplication::processEvents();
 }
 
 void QWebViewCmdExecutor::TouchScroll(const int &xoffset, const int &yoffset, Error **error) {
@@ -660,7 +673,44 @@ void QWebViewCmdExecutor::TouchScroll(const int &xoffset, const int &yoffset, Er
 void QWebViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error) {
     CHECK_VIEW_EXISTANCE
 
-    view_->page()->mainFrame()->scroll(-xoffset, -yoffset);
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPoint startPoint = QCommonUtil::ConvertPointToQPoint(location);
+
+    Point offset(xoffset, yoffset);
+    QPoint offsetPoint = QCommonUtil::ConvertPointToQPoint(offset);
+    int stepCount = 20;
+    int timeBetweenEvent = 30;
+    QEventLoop loop;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF touchPoint(startPoint.x()+offsetPoint.x()*i/stepCount, startPoint.y()+offsetPoint.y()*i/stepCount);
+
+        QTouchEvent *touchEvent;
+        if (i == 0)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, touchPoint);
+        else if (i == stepCount)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, touchPoint);
+        else
+            touchEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, touchPoint);
+
+
+        QApplication::postEvent(view_, touchEvent);
+        QTimer::singleShot(timeBetweenEvent, &loop, SLOT(quit()));
+        loop.exec();
+    }
+    QApplication::processEvents();
 }
 
 void QWebViewCmdExecutor::TouchFlick(const int &xSpeed, const int &ySpeed, Error **error) {
@@ -672,8 +722,150 @@ void QWebViewCmdExecutor::TouchFlick(const int &xSpeed, const int &ySpeed, Error
 void QWebViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error) {
     CHECK_VIEW_EXISTANCE
 
-    view_->page()->mainFrame()->scroll(-xoffset*(speed+1), -yoffset*(speed+1));
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+    QPointF startPoint = QCommonUtil::ConvertPointToQPoint(location);
+
+    QPointF offsetPoint = QCommonUtil::ConvertPointToQPoint(Point(xoffset, yoffset));
+
+    //some magic numbers
+    int stepCount = 20;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF touchPoint(startPoint.x()+offsetPoint.x()*i/stepCount, startPoint.y()+offsetPoint.y()*i/stepCount);
+
+        QTouchEvent *touchEvent;
+        if (i == 0)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, touchPoint);
+        else if (i == stepCount)
+            touchEvent = createSimpleTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, touchPoint);
+        else
+            touchEvent = createSimpleTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, touchPoint);
+
+        QApplication::postEvent(view_, touchEvent);
+    }
+    QApplication::processEvents();
 }
+
+void QWebViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &angle, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = QCommonUtil::ConvertPointToQPoint(location);
+
+    float d = QApplication::startDragDistance()*4;
+
+    QPointF startPoint(point.x() - d, point.y());
+    QPointF startPoint2(point.x() + d, point.y());
+    float degree = angle;
+    float rad = M_PI*degree/180;
+
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint2);
+    QApplication::postEvent(view_, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF point1(point.x() - d*cos(rad*i/stepCount), point.y() - d*sin(rad*i/stepCount));
+        QPointF point2(point.x() + d*cos(rad*i/stepCount), point.y() + d*sin(rad*i/stepCount));
+
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
+        QApplication::postEvent(view_, touchMoveEvent);
+
+        if (stepCount == i)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point1, point2);
+            QApplication::postEvent(view_, touchEndEvent);
+        }
+    }
+
+    QApplication::processEvents();
+}
+
+void QWebViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double &scale, Error **error)
+{
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    // calculate the half of the element size and translate by it.
+    Size size;
+    GetElementSize(element, &size, error);
+    if (*error)
+        return;
+
+    location.Offset(size.width() / 2, size.height() / 2);
+
+    QPointF point = QCommonUtil::ConvertPointToQPoint(location);
+
+    float offset = QApplication::startDragDistance()*4;
+    QPointF startPoint(point.x(), point.y());
+    QPointF startPoint2(point.x()+offset, point.y());
+
+    float dx;
+
+    if (scale >= 1)
+        dx = (scale - 1)*offset;
+    else
+        dx = (1 - scale)*offset;
+
+    QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint2);
+    QApplication::postEvent(view_, touchBeginEvent);
+
+    int stepCount = 20;
+
+    for (int i = 0; i <= stepCount; ++i)
+    {
+        QPointF point1(startPoint);
+        QPointF point2(startPoint2);
+
+        if (scale > 1)
+            point2.setX(startPoint2.x() + dx*i/stepCount);
+        else
+            point2.setX(startPoint2.x() - dx*i/stepCount);
+        qDebug()<<i<<point1<<point2;
+        QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
+        QApplication::postEvent(view_, touchMoveEvent);
+
+        if (i == stepCount)
+        {
+            QTouchEvent *touchEndEvent = create2PointTouchEvent(QEvent::TouchEnd, Qt::TouchPointReleased, point1, point2);
+            QApplication::postEvent(view_, touchEndEvent);
+        }
+    }
+
+    QApplication::processEvents();
+}
+
 
 void QWebViewCmdExecutor::GetBrowserLog(base::ListValue** browserLog, Error **error) {
     CHECK_VIEW_EXISTANCE
