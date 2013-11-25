@@ -26,7 +26,6 @@
               #'-L/opt/lib',
               '-lQt5OpenGL',
               '-lQt5PrintSupport',
-              '-lQt5Script',
               '-lQt5Network',
               '-lQt5V8',
               '-lQt5Widgets',
