@@ -31,6 +31,7 @@
 #include <QtGui/QApplication>
 #endif
 
+#define _USE_MATH_DEFINES
 #include <math.h>
 class QNetworkCookie;
 namespace webdriver {
