@@ -125,6 +125,7 @@ protected:
     bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
+    void moveMouseInternal(QQuickView* view, QPointF& point);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(Quick2ViewCmdExecutor);

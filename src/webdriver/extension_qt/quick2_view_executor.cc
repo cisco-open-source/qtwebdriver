@@ -214,17 +214,23 @@ void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPointF screenPos(view->x() + scenePoint.x(), view->y() + scenePoint.y());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDoubleClick,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDoubleClick, screen: (%4d, %4d)", (int)screenPos.x(), (int)screenPos.y()));
 
     Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
     QMouseEvent *dbClckEvent = new QMouseEvent(QEvent::MouseButtonDblClick,
                             scenePoint,
+                            screenPos,
                             Qt::LeftButton,
                             Qt::LeftButton,
                             sticky_modifiers);
 
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
+                            screenPos,
                             Qt::LeftButton,
                             Qt::NoButton,
                             sticky_modifiers);
@@ -240,11 +246,16 @@ void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPointF screenPos(view->x() + scenePoint.x(), view->y() + scenePoint.y());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseButtonUp,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseButtonUp, screen: (%4d, %4d)", (int)screenPos.x(), (int)screenPos.y()));
 
     Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
+                            screenPos,
                             Qt::LeftButton,
                             Qt::NoButton,
                             sticky_modifiers);
@@ -259,11 +270,16 @@ void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPointF screenPos(view->x() + scenePoint.x(), view->y() + scenePoint.y());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseButtonDown,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseButtonDown, screen: (%4d, %4d)", (int)screenPos.x(), (int)screenPos.y()));
 
     Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress,
                             scenePoint,
+                            screenPos,
                             Qt::LeftButton,
                             Qt::LeftButton,
                             sticky_modifiers);
@@ -278,6 +294,10 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 
     QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
     QPointF scenePoint(point.x(), point.y());
+    QPointF screenPos(view->x() + scenePoint.x(), view->y() + scenePoint.y());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, screen: (%4d, %4d)", (int)screenPos.x(), (int)screenPos.y()));
 
     Qt::MouseButton mouseButton = ConvertMouseButtonToQtMouseButton(button);
 
@@ -285,12 +305,14 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress,
                             scenePoint,
+                            screenPos,
                             mouseButton,
                             mouseButton,
                             sticky_modifiers);
 
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease,
                             scenePoint,
+                            screenPos,
                             mouseButton,
                             Qt::NoButton,
                             sticky_modifiers);
@@ -316,15 +338,7 @@ void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Er
         return;
     }
 
-    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
-
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
-                        scenePoint,
-                        Qt::NoButton,
-                        Qt::NoButton,
-                        sticky_modifiers);
-
-    QGuiApplication::postEvent(view, moveEvent);
+    moveMouseInternal(view, scenePoint);
 
     session_->set_mouse_position(prev_pos);
 }
@@ -346,15 +360,7 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, co
         return;
     }
 
-    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
-
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
-                     scenePoint,
-                     Qt::NoButton,
-                     Qt::NoButton,
-                     sticky_modifiers);
-
-    QGuiApplication::postEvent(view, moveEvent);
+    moveMouseInternal(view, scenePoint);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
@@ -376,17 +382,38 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
         return;
     }
 
-    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
-
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove,
-                     scenePoint,
-                     Qt::NoButton,
-                     Qt::NoButton,
-                     sticky_modifiers);
-
-    QGuiApplication::postEvent(view, moveEvent);
+    moveMouseInternal(view, scenePoint);
     
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
+}
+
+void Quick2ViewCmdExecutor::moveMouseInternal(QQuickView* view, QPointF& point) {
+    QPoint startViewPos = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF targetScreenPos(view->x() + point.x(), view->y() + point.y());
+
+    Qt::MouseButton mouseButton = (view->mouseGrabberItem())?(Qt::LeftButton):(Qt::NoButton);
+    Qt::KeyboardModifiers sticky_modifiers(session_->get_sticky_modifiers());
+
+
+    QStyleHints *styleHints = QGuiApplication::styleHints();
+    QPointF minDragVector(styleHints->startDragDistance(), styleHints->startDragDistance());
+    qreal dragThreshold = minDragVector.manhattanLength();
+    QLineF line(startViewPos.x(), startViewPos.y(), point.x(), point.y());
+
+    if ( line.length() > dragThreshold ) {
+        // we need first mousemove event to initiate drag
+        QPointF dragStartPoint = line.pointAt(dragThreshold / line.length());
+        QPointF dragStartScreenPos(view->x() + dragStartPoint.x(), view->y() + dragStartPoint.y());
+
+        QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, dragStartPoint, dragStartScreenPos, Qt::NoButton, mouseButton, sticky_modifiers);
+        QGuiApplication::postEvent(view, moveEvent);    
+    }
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove,  scene: (%4d, %4d)", (int)point.x(), (int)point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", (int)targetScreenPos.x(), (int)targetScreenPos.y()));
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, targetScreenPos, Qt::NoButton, mouseButton, sticky_modifiers);
+    QGuiApplication::postEvent(view, moveEvent);    
 }
 
 void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
