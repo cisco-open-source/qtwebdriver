@@ -230,15 +230,27 @@ void QWebViewVisualizerSourceCommand::AssembleImg(pugi::xml_node element) const 
 
 void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_node element) const {
     pugi::xml_attribute type = element.attribute("type");
-    if (type.empty() != 0 &&
+    if (!type.empty() &&
         std::string(type.value()) != "text/css") {
         return;
     }
 
-    QString value = QString::fromUtf8(element.text().as_string());
-    value = AssembleStyle(value);
-    clearChildren(element);
-    element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
+    if (len(element.children()) == 1 &&
+        element.first_child().type() == pugi::node_cdata) {
+        pugi::xml_node cdata = element.first_child();
+        element.remove_child(cdata);
+        QString value = QString::fromUtf8(cdata.value());
+        value = AssembleStyle(value);
+        element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
+    } else {
+        for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
+            if (childIt->type() == pugi::node_pcdata) {
+                QString value = QString::fromUtf8(childIt->value());
+                value = AssembleStyle(value);
+                childIt->set_value(value.toStdString().c_str());
+            }
+        }
+    }
 }
 
 void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_attribute attribute) const {
@@ -351,6 +363,10 @@ void QWebViewVisualizerSourceCommand::DownloadFinished() {
 
 bool QWebViewVisualizerSourceCommand::isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
     return range.begin() == range.end();
+}
+
+int QWebViewVisualizerSourceCommand::len(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
+    return std::distance(range.begin(), range.end());
 }
 
 void QWebViewVisualizerSourceCommand::clearChildren(pugi::xml_node element) {

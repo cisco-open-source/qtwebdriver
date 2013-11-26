@@ -47,6 +47,7 @@ private Q_SLOTS:
 
 private:
     static bool isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range);
+    static int len(const pugi::xml_object_range<pugi::xml_node_iterator>& range);
     static void clearChildren(pugi::xml_node element);
     static const char DATA_PROTOCOL[];
 
