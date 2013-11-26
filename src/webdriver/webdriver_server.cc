@@ -607,7 +607,7 @@ int Server::InitMongooseOptions() {
         }
     }
     mg_options_.push_back("extra_mime_types");
-    mg_options_.push_back(".xhtml=application/xhtml+xml");
+    mg_options_.push_back(".xhtml=application/xhtml+xml,.qml=text/x-qml");
 
     return 0;
 }
