@@ -88,6 +88,16 @@ public:
 
     static const char kWhiteList[];
 
+    /// \page page_webdriver_switches WD Server switches
+    /// - <b>webserver-cfg</b><br>
+    /// The path to mongoose config file (e.g. config.json) in
+    /// JSON format with specified mongoose start option
+    /// (extra-mime-types, listening_ports, etc.)
+    /// Option from webserver config file will have more priority than
+    /// commandline param that specify the same option.
+
+    static const char kWebServerCfg[];
+
 };
 
 }  // namespace webdriver

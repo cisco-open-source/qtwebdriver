@@ -183,6 +183,8 @@ private:
 
     int ParseConfigToOptions();
 
+    int ParseMongooseConfig();
+
     DISALLOW_COPY_AND_ASSIGN(Server);
 };
 
