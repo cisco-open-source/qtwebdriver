@@ -14,8 +14,8 @@
 
 namespace webdriver {
 
-QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
-    : executor_(executor), session_(session), view_(view)
+QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view)
+    : webkitProxy_(webkitProxy), session_(session), view_(view)
 {}
 
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
@@ -36,11 +36,10 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "return new XMLSerializer().serializeToString(root);";
 
     Value* unscoped_value = NULL;
-    executor_->ExecuteScript(
+    *error = webkitProxy_->ExecuteScript(
                 kSource,
                 new ListValue(),
-                &unscoped_value,
-                error);
+                &unscoped_value);
     if (*error) {
         (*error)->AddDetails("getSource execution failed");
         return;
@@ -230,15 +229,27 @@ void QWebViewVisualizerSourceCommand::AssembleImg(pugi::xml_node element) const 
 
 void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_node element) const {
     pugi::xml_attribute type = element.attribute("type");
-    if (type.empty() != 0 &&
+    if (!type.empty() &&
         std::string(type.value()) != "text/css") {
         return;
     }
 
-    QString value = QString::fromUtf8(element.text().as_string());
-    value = AssembleStyle(value);
-    clearChildren(element);
-    element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
+    if (len(element.children()) == 1 &&
+        element.first_child().type() == pugi::node_cdata) {
+        pugi::xml_node cdata = element.first_child();
+        element.remove_child(cdata);
+        QString value = QString::fromUtf8(cdata.value());
+        value = AssembleStyle(value);
+        element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
+    } else {
+        for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
+            if (childIt->type() == pugi::node_pcdata) {
+                QString value = QString::fromUtf8(childIt->value());
+                value = AssembleStyle(value);
+                childIt->set_value(value.toStdString().c_str());
+            }
+        }
+    }
 }
 
 void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_attribute attribute) const {
@@ -353,6 +364,10 @@ bool QWebViewVisualizerSourceCommand::isEmpty(const pugi::xml_object_range<pugi:
     return range.begin() == range.end();
 }
 
+int QWebViewVisualizerSourceCommand::len(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
+    return std::distance(range.begin(), range.end());
+}
+
 void QWebViewVisualizerSourceCommand::clearChildren(pugi::xml_node element) {
     std::vector<pugi::xml_node> children;
     for (pugi::xml_node_iterator it = element.children().begin(); it != element.children().end(); it++) {
@@ -390,8 +405,8 @@ private:
     static const int RADIUS = 5;
 };
 
-QWebViewVisualizerShowPointCommand::QWebViewVisualizerShowPointCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
-    : executor_(executor), session_(session), view_(view)
+QWebViewVisualizerShowPointCommand::QWebViewVisualizerShowPointCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view)
+    : webkitProxy_(webkitProxy), session_(session), view_(view)
 {}
 
 void QWebViewVisualizerShowPointCommand::Execute(Error** error) {

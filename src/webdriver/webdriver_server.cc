@@ -607,7 +607,9 @@ int Server::InitMongooseOptions() {
         }
     }
     mg_options_.push_back("extra_mime_types");
-    mg_options_.push_back(".xhtml=application/xhtml+xml");
+    mg_options_.push_back(".xhtml=application/xhtml+xml,.qml=text/x-qml");
+
+    ParseMongooseConfig();
 
     return 0;
 }
@@ -674,7 +676,7 @@ int Server::ParseConfigToOptions() {
 
             if (value->GetType() != Value::TYPE_DICTIONARY)
             {
-                std::cerr << "Execute script returned non-dict: " + JsonStringify(value.get()) << std::endl;
+                std::cerr << "Config file: result of parsing json is not a dictionary " + JsonStringify(value.get()) << std::endl;
                 return 2;
             }
 
@@ -700,7 +702,52 @@ int Server::ParseConfigToOptions() {
         }
         else
         {
-            std::cerr << "can't read file" << std::endl;
+            std::cerr << "can't read config file" << std::endl;
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+int Server::ParseMongooseConfig() {
+    if (options_->HasSwitch(webdriver::Switches::kWebServerCfg))
+    {
+        //parse json config file and set value
+        std::string mongoose_cfg;
+        FilePath configPath(options_->GetSwitchValueNative(webdriver::Switches::kWebServerCfg));
+
+        if (file_util::ReadFileToString(configPath, &mongoose_cfg))
+        {
+            scoped_ptr<Value> value(base::JSONReader::ReadAndReturnError(
+                mongoose_cfg, base::JSON_ALLOW_TRAILING_COMMAS, NULL, NULL));
+            if (!value.get())
+            {
+                std::cout << "Failed to parse webserver config file" << std::endl;
+                return 1;
+            }
+
+            if (value->GetType() != Value::TYPE_DICTIONARY)
+            {
+                std::cerr << "Webserver config: result of parsing json is not a dictionary " + JsonStringify(value.get()) << std::endl;
+                return 2;
+            }
+
+            DictionaryValue* result_dict = static_cast<DictionaryValue*>(value.get());
+
+            DictionaryValue::key_iterator key_iter = result_dict->begin_keys();
+            for (; key_iter != result_dict->end_keys(); ++key_iter) {
+                std::string value;
+                result_dict->GetStringWithoutPathExpansion(*key_iter, &value);
+                mg_options_.push_back(*key_iter);
+                mg_options_.push_back(value.c_str());
+            }
+
+            return 0;
+        }
+        else
+        {
+            std::cerr << "can't read webserver confifg file" << std::endl;
             return 1;
         }
     }

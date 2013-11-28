@@ -160,7 +160,7 @@ Error* QWebkitProxy::GetTitle(std::string* title) {
         "}";
 
     return ExecuteScriptAndParse(
-                GetFrame(page_, FramePath()),
+                GetFrame(FramePath()),
                 kGetTitleScript,
                 "getTitle",
                 new ListValue(),
@@ -169,7 +169,7 @@ Error* QWebkitProxy::GetTitle(std::string* title) {
 
 Error* QWebkitProxy::GetWindowName(std::string* name) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 "function() { return window.name; }",
                 "getWindowName",
                 new ListValue(),
@@ -188,7 +188,7 @@ Error* QWebkitProxy::GetBounds(Rect *bounds) {
         "}";
 
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 kGetWindowBoundsScript,
                 "getWindowBoundsScript",
                 new ListValue(),
@@ -232,7 +232,7 @@ Error* QWebkitProxy::GetSource(std::string* source) {
         "}";
 
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 kSource,
                 "getSource",
                 new ListValue(),
@@ -241,7 +241,7 @@ Error* QWebkitProxy::GetSource(std::string* source) {
 
 Error* QWebkitProxy::GetAttribute(const ElementId& element, const std::string& key, base::Value** value) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::GET_ATTRIBUTE),
                 "getAttribute",
                 CreateListValueFrom(element, key),
@@ -257,7 +257,7 @@ Error* QWebkitProxy::ClearElement(const ElementId& element) {
 
     Value* value = NULL;
     Error* err = ExecuteScript(
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     script,
                     &args,
                     &value);
@@ -268,7 +268,7 @@ Error* QWebkitProxy::ClearElement(const ElementId& element) {
 
 Error* QWebkitProxy::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::IS_DISPLAYED),
                 "isDisplayed",
                 CreateListValueFrom(element, ignore_opacity),
@@ -277,7 +277,7 @@ Error* QWebkitProxy::IsElementDisplayed(const ElementId& element, bool ignore_op
 
 Error* QWebkitProxy::IsElementEnabled(const ElementId& element, bool* is_enabled) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::IS_ENABLED),
                 "isEnabled",
                 CreateListValueFrom(element),
@@ -288,7 +288,7 @@ Error* QWebkitProxy::ElementEquals(const ElementId& element1, const ElementId& e
 	const std::string script = "function(el1, el2) { return el1 == el2; }";
 
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 script,
                 "elementEquals",
                 CreateListValueFrom(element1, element2),
@@ -297,7 +297,7 @@ Error* QWebkitProxy::ElementEquals(const ElementId& element1, const ElementId& e
 
 Error* QWebkitProxy::GetElementLocation(const ElementId& element, Point* location) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::GET_LOCATION),
                 "getLocation",
                 CreateListValueFrom(element),
@@ -311,7 +311,6 @@ Error* QWebkitProxy::GetElementLocationInView(const ElementId& element, Point* l
         return error;
         
     return GetElementRegionInView(
-            page_,
             element,
             Rect(Point(0, 0), size),
             false, // cente,
@@ -321,7 +320,7 @@ Error* QWebkitProxy::GetElementLocationInView(const ElementId& element, Point* l
 
 Error* QWebkitProxy::GetElementTagName(const ElementId& element, std::string* tag_name) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 "function(elem) { return elem.tagName.toLowerCase() }",
                 "getElementTagName",
                 CreateListValueFrom(element),
@@ -330,7 +329,7 @@ Error* QWebkitProxy::GetElementTagName(const ElementId& element, std::string* ta
 
 Error* QWebkitProxy::IsOptionElementSelected(const ElementId& element, bool* is_selected) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::IS_SELECTED),
                 "isSelected",
                 CreateListValueFrom(element),
@@ -347,7 +346,7 @@ Error* QWebkitProxy::SetOptionElementSelected(const ElementId& element, bool sel
         "return (%s).apply(null, args.slice(0, args.length - 1));";
     Value* value = NULL;
     Error* error = ExecuteAsyncScript(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 base::StringPrintf(kSetSelectedWrapper,
                          atoms::asString(atoms::CLICK).c_str()),
                 CreateListValueFrom(element, selected),
@@ -369,7 +368,7 @@ Error* QWebkitProxy::IsElementCanBeToggled(const ElementId& element, bool* can_b
             "  throw new Error('Option element is not in a select');"
             "}";
     return ExecuteScriptAndParse(
-            GetFrame(page_, session_->current_frame()),
+            GetFrame(session_->current_frame()),
             kCanOptionBeToggledScript,
             "canOptionBeToggled",
             CreateListValueFrom(element),
@@ -387,7 +386,7 @@ Error* QWebkitProxy::ToggleOptionElement(const ElementId& element) {
 
 Error* QWebkitProxy::GetElementSize(const ElementId& element, Size* size) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::GET_SIZE),
                 "getSize",
                 CreateListValueFrom(element),
@@ -403,7 +402,7 @@ Error* QWebkitProxy::ElementSubmit(const ElementId& element) {
 
     Value* result = NULL;
     Error* error = ExecuteScript(
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     script, &args, &result);
     scoped_ptr<Value> scoped_value(result);
     return error;
@@ -411,7 +410,7 @@ Error* QWebkitProxy::ElementSubmit(const ElementId& element) {
 
 Error* QWebkitProxy::GetElementText(const ElementId& element, std::string* element_text) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::GET_TEXT),
                 "getText",
                 CreateListValueFrom(element),
@@ -428,14 +427,14 @@ Error* QWebkitProxy::GetElementCssProperty(const ElementId& element, const std::
     args.Append(Value::CreateStringValue(property));
 
     return ExecuteScript(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 script, &args, value);
 }
 
 Error* QWebkitProxy::FindElement(const ElementId& root_element, const std::string& locator, const std::string& query, ElementId* element) {
 	std::vector<ElementId> elements;
     Error* error = FindElementsHelper(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 root_element, locator, query, true, &elements);
     if (!error)
       *element = elements[0];
@@ -444,7 +443,7 @@ Error* QWebkitProxy::FindElement(const ElementId& root_element, const std::strin
 
 Error* QWebkitProxy::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements) {
 	return FindElementsHelper(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 root_element, locator, query, false, elements);
 }
 
@@ -453,7 +452,7 @@ Error* QWebkitProxy::ActiveElement(ElementId* element) {
 	std::string script = "function() { return document.activeElement || document.body; }";
 
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 script,
                 "activeElement",
                 new ListValue(),
@@ -493,7 +492,7 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
         "  if (elem != doc.activeElement)"
         "    throw new Error('Failed to send keys because cannot focus element');"
         "}";
-    return ExecuteScriptAndParse(GetFrame(page_, session_->current_frame()),
+    return ExecuteScriptAndParse(GetFrame(session_->current_frame()),
                                 kFocusScript,
                                 "focusElement",
                                 CreateListValueFrom(element),
@@ -521,7 +520,7 @@ Error* QWebkitProxy::SwitchToFrameWithNameOrId(const std::string& name_or_id) {
         "}";
     return SwitchToFrameWithJavaScriptLocatedFrame(
                     page_,
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     script, CreateListValueFrom(name_or_id));
 
 }
@@ -544,7 +543,7 @@ Error* QWebkitProxy::SwitchToFrameWithIndex(int index) {
         "}";
     return SwitchToFrameWithJavaScriptLocatedFrame(
                     page_,
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     script, CreateListValueFrom(index));
 }
 
@@ -566,7 +565,7 @@ Error* QWebkitProxy::SwitchToFrameWithElement(const ElementId& element) {
         "}";
     return SwitchToFrameWithJavaScriptLocatedFrame(
             page_,
-            GetFrame(page_, session_->current_frame()),
+            GetFrame(session_->current_frame()),
             script, CreateListValueFrom(element));
 }
 
@@ -592,7 +591,7 @@ Error* QWebkitProxy::SwitchToTopFrameIfCurrentFrameInvalid() {
     // frame element is valid, otherwise the automation hangs until a timeout.
     for (size_t i = 0; i < session_->frame_elements_.size(); ++i) {
         scoped_ptr<Error> scoped_error(ExecuteScriptAndParse(
-            GetFrame(page_, frame_path),
+            GetFrame(frame_path),
             "function(){ }",
             "emptyScript",
             CreateListValueFrom(session_->frame_elements_[i]),
@@ -630,7 +629,7 @@ Error* QWebkitProxy::NavigateToURL(const std::string& url, bool sync) {
 
 Error* QWebkitProxy::GetURL(std::string* url) {
 	return ExecuteScriptAndParse(
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     "function() { return document.URL }",
                     "getUrl",
                     new ListValue(),
@@ -639,7 +638,7 @@ Error* QWebkitProxy::GetURL(std::string* url) {
 
 Error* QWebkitProxy::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value) {
 	return ExecuteScript(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 script,
                 args,
                 value);
@@ -647,7 +646,7 @@ Error* QWebkitProxy::ExecuteScript(const std::string& script, const base::ListVa
 
 Error* QWebkitProxy::ExecuteAsyncScript(const std::string& script, const base::ListValue* const args, base::Value** value) {
 	return ExecuteAsyncScript(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 script,
                 args,
                 value);
@@ -655,7 +654,7 @@ Error* QWebkitProxy::ExecuteAsyncScript(const std::string& script, const base::L
 
 Error* QWebkitProxy::GetAppCacheStatus(int* status) {
 	return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 atoms::asString(atoms::GET_APPCACHE_STATUS),
                 "getAppcacheStatus",
                 new ListValue(),
@@ -829,7 +828,7 @@ Error* QWebkitProxy::GetStorageKeys(StorageType type, base::ListValue** keys) {
         type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_KEYS
                                     : atoms::GET_SESSION_STORAGE_KEYS);
     return ExecuteScriptAndParse(
-                    GetFrame(page_, session_->current_frame()),
+                    GetFrame(session_->current_frame()),
                     js,
                     "getStorageKeys",
                     new ListValue(),
@@ -841,7 +840,7 @@ Error* QWebkitProxy::SetStorageItem(StorageType type, const std::string& key, co
         type == kLocalStorageType ? atoms::SET_LOCAL_STORAGE_ITEM
                                 : atoms::SET_SESSION_STORAGE_ITEM);
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 js,
                 "setStorageItem",
                 CreateListValueFrom(key, value),
@@ -853,7 +852,7 @@ Error* QWebkitProxy::ClearStorage(StorageType type) {
         type == kLocalStorageType ? atoms::CLEAR_LOCAL_STORAGE
                                 : atoms::CLEAR_SESSION_STORAGE);
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 js,
                 "clearStorage",
                 new ListValue(),
@@ -865,7 +864,7 @@ Error* QWebkitProxy::GetStorageItem(StorageType type, const std::string& key, st
         type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_ITEM
                                 : atoms::GET_SESSION_STORAGE_ITEM);
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 js,
                 "getStorageItem",
                 CreateListValueFrom(key),
@@ -877,7 +876,7 @@ Error* QWebkitProxy::RemoveStorageItem(StorageType type, const std::string& key,
         type == kLocalStorageType ? atoms::REMOVE_LOCAL_STORAGE_ITEM
                                 : atoms::REMOVE_SESSION_STORAGE_ITEM);
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 js,
                 "removeStorageItem",
                 CreateListValueFrom(key),
@@ -889,7 +888,7 @@ Error* QWebkitProxy::GetStorageSize(StorageType type, int* size) {
         type == kLocalStorageType ? atoms::GET_LOCAL_STORAGE_SIZE
                                 : atoms::GET_SESSION_STORAGE_SIZE);
     return ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 js,
                 "getStorageSize",
                 new ListValue(),
@@ -965,7 +964,7 @@ Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState 
     switch(state){
     case Playing:
             error = ExecuteScriptAndParse(
-                        GetFrame(page_, session_->current_frame()),
+                        GetFrame(session_->current_frame()),
                         "function(elem) { elem.play(); }",
                         "play",
                         CreateListValueFrom(element),
@@ -974,7 +973,7 @@ Error* QWebkitProxy::SetPlayerState(const ElementId& element, const PlayerState 
     case Paused:
     case Stopped:
             error = ExecuteScriptAndParse(
-                        GetFrame(page_, session_->current_frame()),
+                        GetFrame(session_->current_frame()),
                         "function(elem) { elem.pause(); }",
                         "pause",
                         CreateListValueFrom(element),
@@ -1029,7 +1028,7 @@ Error* QWebkitProxy::SetPlayerVolume(const ElementId& element, const double leve
     }
 
     error = ExecuteScriptAndParse(
-                        GetFrame(page_, session_->current_frame()),
+                        GetFrame(session_->current_frame()),
                         "function(elem, level) { elem.volume = level; }",
                         "setVolume",
                         CreateListValueFrom(element, level),
@@ -1078,7 +1077,7 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
     }
 
     error = ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 "function(elem, time) { elem.currentTime = time; }",
                 "setPosition",
                 CreateListValueFrom(element, reletivePos),
@@ -1128,7 +1127,7 @@ Error *QWebkitProxy::SetPlaybackSpeed(const ElementId &element, const double spe
     }
 
     error = ExecuteScriptAndParse(
-                GetFrame(page_, session_->current_frame()),
+                GetFrame(session_->current_frame()),
                 "function(elem, speed) { elem.playbackRate = speed; }",
                 "setPlaybackRate",
                 CreateListValueFrom(element, speed),
@@ -1152,7 +1151,7 @@ Error* QWebkitProxy::SetMute(const ElementId& element, bool mute) {
     }
 
     error = ExecuteScriptAndParse(
-                        GetFrame(page_, session_->current_frame()),
+                        GetFrame(session_->current_frame()),
                         "function(elem, mute) { elem.muted = mute; }",
                         "setVolume",
                         CreateListValueFrom(element, mute),
@@ -1214,10 +1213,10 @@ Error* QWebkitProxy::IsOnline(bool* online) {
 #endif //QT_NO_BEARERMANAGEMENT
 }
 
-QWebFrame* QWebkitProxy::GetFrame(QWebPage* page, const FramePath& frame_path) {
-    QWebFrame* frame = FindFrameByPath(page->mainFrame(), frame_path);
+QWebFrame* QWebkitProxy::GetFrame(const FramePath& frame_path) {
+    QWebFrame* frame = FindFrameByPath(page_->mainFrame(), frame_path);
     if (frame == NULL)
-        frame = page->mainFrame();
+        frame = page_->mainFrame();
 
     return frame;
 }
@@ -1586,7 +1585,6 @@ Error* QWebkitProxy::GetElementRegionInViewHelper(
 }
 
 Error* QWebkitProxy::GetElementRegionInView(
-        QWebPage* page,
         const ElementId& element,
         const Rect& region,
         bool center,
@@ -1599,7 +1597,7 @@ Error* QWebkitProxy::GetElementRegionInView(
     Size region_size = region.size();
 
     Error* error = GetElementRegionInViewHelper(
-                        GetFrame(page, session_->current_frame()),
+                        GetFrame(session_->current_frame()),
                         element, region, center, verify_clickable_at_middle,
                         &region_offset);
     if (error)
@@ -1613,7 +1611,7 @@ Error* QWebkitProxy::GetElementRegionInView(
         ElementId frame_element;
         std::string frameBasePath = base::StringPrintf("//*[@wd_frame_id_ = '%s']", frame_path.BaseName().value().c_str());
 
-        QWebFrame* cur_frame = GetFrame(page, frame_path.Parent());
+        QWebFrame* cur_frame = GetFrame(frame_path.Parent());
         std::vector<ElementId> elements;
         error = FindElementsHelper(
             cur_frame,
@@ -1742,12 +1740,12 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
     // client rect, and lastly the size of the element (via closure).
     // SVG is one case that doesn't have a first client rect.
     Rect rect;
-    scoped_ptr<Error> ignore_error(GetElementFirstClientRect(GetFrame(page_, session_->current_frame()),element, &rect));
+    scoped_ptr<Error> ignore_error(GetElementFirstClientRect(GetFrame(session_->current_frame()),element, &rect));
     if (ignore_error.get()) {
         Rect client_rect;
 
         ignore_error.reset(ExecuteScriptAndParse(
-            GetFrame(page_, session_->current_frame()),
+            GetFrame(session_->current_frame()),
             "function(elem) { console.log('Testing console'); return elem.getBoundingClientRect() }",
             "getBoundingClientRect",
             CreateListValueFrom(element),
@@ -1767,7 +1765,6 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
                      "Unable to determine clickable location of element");
     }
     error = GetElementRegionInView(
-        page_,
         element, rect, true /* center */, true /* verify_clickable_at_middle */,
         location);
 
