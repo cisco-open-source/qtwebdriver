@@ -108,6 +108,40 @@ void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
     *can = QWebViewUtil::isUrlSupported(pWebView->page(), url, error);
 }
 
+void QWebViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    Size size;
+    *error = webkitProxy_->GetElementSize(element, &size);
+    if (*error)
+        return;
+
+    QPixmap pixmap = QPixmap::grabWidget(view_);
+
+    QRect viewRect = pixmap.rect();
+    QRect elementRect(location.x(), location.y(), size.width(), size.height());
+    QRect intersectedRect = viewRect.intersected(elementRect);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, view: (%2d;%2d : %4d;%4d)", viewRect.x(), viewRect.y(), viewRect.width(), viewRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, elem: (%2d;%2d : %4d;%4d)", elementRect.x(), elementRect.y(), elementRect.width(), elementRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot,  res: (%2d;%2d : %4d;%4d)", intersectedRect.x(), intersectedRect.y(), intersectedRect.width(), intersectedRect.height()));
+
+    if ((0 == intersectedRect.width()) || (0 == intersectedRect.height())) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        session_->logger().Log(kWarningLogLevel, "GetElementScreenShot, element is not in view.");
+        return;
+    }
+
+    QPixmap elementPixmap = pixmap.copy(intersectedRect);
+
+    saveScreenshot(elementPixmap, png, error);
+}
+
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
     CHECK_VIEW_EXISTANCE
 

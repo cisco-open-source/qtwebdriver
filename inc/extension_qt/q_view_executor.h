@@ -58,6 +58,8 @@ protected:
   QTouchDevice touchDevice;
 #endif
 
+    void saveScreenshot(QPixmap& pixmap, std::string* png, Error** error);
+
 private:
     DISALLOW_COPY_AND_ASSIGN(QViewCmdExecutor);
 };
