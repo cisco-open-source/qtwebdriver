@@ -42,7 +42,7 @@ namespace webdriver {
         *error = new Error(kNoSuchWindow); \
         return; \
     } \
-    webkitProxy_.reset(new QWebkitProxy(session_, (view_)?view_->page():NULL));
+    webkitProxy_ = yasper::ptr<QWebkitProxy>(new QWebkitProxy(session_, (view_)?view_->page():NULL));
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
@@ -943,14 +943,14 @@ void QWebViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **
 void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerSourceCommand command(this, session_, view_);
+    QWebViewVisualizerSourceCommand command(webkitProxy_, session_, view_);
     command.Execute(source, error);
 }
 
 void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerShowPointCommand command(this, session_, view_);
+    QWebViewVisualizerShowPointCommand command(webkitProxy_, session_, view_);
     command.Execute(error);
 }
 

@@ -9,11 +9,12 @@
 #include <QtWebKit/QtWebKit>
 #endif
 
+#include "base/yasper.h"
+#include "qwebkit_proxy.h"
 #include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
 
-class QWebViewCmdExecutor;
 class Error;
 class Session;
 
@@ -21,7 +22,7 @@ class QWebViewVisualizerSourceCommand : public QObject {
     Q_OBJECT
 
 public:
-    QWebViewVisualizerSourceCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
+    QWebViewVisualizerSourceCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view);
 
     void Execute(std::string* source, Error** error);
 
@@ -51,19 +52,19 @@ private:
     static void clearChildren(pugi::xml_node element);
     static const char DATA_PROTOCOL[];
 
-    QWebViewCmdExecutor* executor_;
+    yasper::ptr<QWebkitProxy> webkitProxy_;
     Session* session_;
     QWebView* view_;
 };
 
 class QWebViewVisualizerShowPointCommand {
 public:
-    QWebViewVisualizerShowPointCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view);
+    QWebViewVisualizerShowPointCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view);
 
     void Execute(Error** error);
 
 private:
-    QWebViewCmdExecutor* executor_;
+    yasper::ptr<QWebkitProxy> webkitProxy_;
     Session* session_;
     QWebView* view_;
 };

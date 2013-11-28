@@ -14,8 +14,8 @@
 
 namespace webdriver {
 
-QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
-    : executor_(executor), session_(session), view_(view)
+QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view)
+    : webkitProxy_(webkitProxy), session_(session), view_(view)
 {}
 
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
@@ -36,11 +36,10 @@ void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error
         "return new XMLSerializer().serializeToString(root);";
 
     Value* unscoped_value = NULL;
-    executor_->ExecuteScript(
+    *error = webkitProxy_->ExecuteScript(
                 kSource,
                 new ListValue(),
-                &unscoped_value,
-                error);
+                &unscoped_value);
     if (*error) {
         (*error)->AddDetails("getSource execution failed");
         return;
@@ -406,8 +405,8 @@ private:
     static const int RADIUS = 5;
 };
 
-QWebViewVisualizerShowPointCommand::QWebViewVisualizerShowPointCommand(QWebViewCmdExecutor* executor, Session* session, QWebView* view)
-    : executor_(executor), session_(session), view_(view)
+QWebViewVisualizerShowPointCommand::QWebViewVisualizerShowPointCommand(yasper::ptr<QWebkitProxy> webkitProxy, Session* session, QWebView* view)
+    : webkitProxy_(webkitProxy), session_(session), view_(view)
 {}
 
 void QWebViewVisualizerShowPointCommand::Execute(Error** error) {

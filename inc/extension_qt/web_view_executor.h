@@ -1,6 +1,7 @@
 #ifndef WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
 #define WEBDRIVER_QT_WEB_VIEW_EXECUTOR_H_
 
+#include "base/yasper.h"
 #include "extension_qt/q_view_executor.h"
 #include "webdriver_logging.h"
 
@@ -133,7 +134,7 @@ protected:
 	QWebView* getView(const ViewId& viewId, Error** error);
 
 private:
-    scoped_ptr<QWebkitProxy> webkitProxy_;
+    yasper::ptr<QWebkitProxy> webkitProxy_;
     QWebView* view_;
 
     DISALLOW_COPY_AND_ASSIGN(QWebViewCmdExecutor);
