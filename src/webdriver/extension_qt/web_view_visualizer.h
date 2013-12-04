@@ -11,7 +11,6 @@
 
 #include "base/yasper.h"
 #include "qwebkit_proxy.h"
-#include "third_party/pugixml/pugixml.hpp"
 
 namespace webdriver {
 
@@ -27,17 +26,14 @@ public:
     void Execute(std::string* source, Error** error);
 
 private:
-    QSharedPointer<pugi::xml_document> ParseXml(const QString& input, Error** error);
-    std::string Tidy(const std::string& input, Error** error) const;
     static void UnescapeXml(QString& input);
 
-    void AssemblePage(pugi::xml_node element) const;
-    void AssembleLink(pugi::xml_node element) const;
-    void AssembleImg(pugi::xml_node element) const;
-    void AssembleStyle(pugi::xml_node element) const;
-    void AssembleStyle(pugi::xml_attribute attribute) const;
+    void AssemblePage(QWebElement element) const;
+    void AssembleLink(QWebElement element) const;
+    void AssembleImg(QWebElement element) const;
+    void AssembleStyle(QWebElement element) const;
     QString AssembleStyle(const QString& value) const;
-    void RemoveScripts(pugi::xml_node element) const;
+    void RemoveScripts(QWebElement element) const;
 
     QString AbsoluteUrl(const QString& url) const;
     void Download(const QString& url, QByteArray* buffer, QString* contentType) const;
@@ -47,9 +43,6 @@ private Q_SLOTS:
     void DownloadFinished();
 
 private:
-    static bool isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range);
-    static int len(const pugi::xml_object_range<pugi::xml_node_iterator>& range);
-    static void clearChildren(pugi::xml_node element);
     static const char DATA_PROTOCOL[];
 
     yasper::ptr<QWebkitProxy> webkitProxy_;

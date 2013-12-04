@@ -180,12 +180,12 @@ public:
     virtual Error* GetMute(const ElementId& element, bool* mute);
     virtual Error* SetOnline(bool online);
     virtual Error* IsOnline(bool* online);
+    QWebFrame* GetFrame(const FramePath& frame_path);
 
 protected:
     Session* session_;
     QWebPage* page_;
 
-    QWebFrame* GetFrame(const FramePath& frame_path);
     QWebFrame* FindFrameByMeta(QWebFrame* parent, const FramePath &frame_path);
     QWebFrame* FindFrameByPath(QWebFrame* parent, const FramePath &frame_path);
 

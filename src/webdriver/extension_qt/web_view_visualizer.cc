@@ -1,11 +1,16 @@
 #include "web_view_visualizer.h"
 
-#include <buffio.h>
-#include <tidy.h>
 #include <stdexcept>
 #include <QtCore/QEventLoop>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QtWebKit/QWebElement>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWebKitWidgets/QWebFrame>
+#else
+#include <QtWebKit/QWebFrame>
+#endif
+
 #include "base/stringprintf.h"
 #include "extension_qt/web_view_executor.h"
 #include "webdriver_session.h"
@@ -19,243 +24,97 @@ QWebViewVisualizerSourceCommand::QWebViewVisualizerSourceCommand(yasper::ptr<QWe
 {}
 
 void QWebViewVisualizerSourceCommand::Execute(std::string* source, Error** error) {
-    // Convert DOM tree to valid XML.
-    const char* kSource =
-        "var elements = document.getElementsByTagName('*');\n"
-        "for (var index = 0; index < elements.length; index++) {\n"
-        "  var element = elements[index];\n"
-        "  element.setAttribute('data-viz-id', index);\n"
-        "}\n"
-        "var root = document.documentElement.cloneNode(true);\n"
-        "var elements = root.getElementsByTagName('script');\n"
-        "for (var index = 0; index < elements.length; index++) {\n"
-        "  var element = elements[index];\n"
-        "  element.innerHTML = '';\n"
-        "}\n"
-        "\n"
-        "return new XMLSerializer().serializeToString(root);";
+    QWebElement documentElement = webkitProxy_->GetFrame(session_->current_frame())->documentElement().clone();
 
-    Value* unscoped_value = NULL;
-    *error = webkitProxy_->ExecuteScript(
-                kSource,
-                new ListValue(),
-                &unscoped_value);
-    if (*error) {
-        (*error)->AddDetails("getSource execution failed");
-        return;
-    }
-
-    scoped_ptr<Value> value(unscoped_value);
-    const ValueParser* parser = CreateDirectValueParser(source);
-    if (!parser->Parse(value.get())) {
-        std::string error_msg = base::StringPrintf("getSource returned invalid value: %s",
-            JsonStringify(value.get()).c_str());
-        *error = new Error(kUnknownError, error_msg);
-        return;
-    }
-
-    session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] before transform:");
-    session_->logger().Log(kInfoLogLevel, *source);
-    *source = Tidy(*source, error);
-    if (*error)
-        return;
-
-    QSharedPointer<pugi::xml_document> document = ParseXml(QString::fromStdString(*source), error);
-    if (!document)
-        return;
-
-    pugi::xml_node documentElement = document->document_element();
     AssemblePage(documentElement);
 
-    std::stringstream sourceStream;
-    document->save(sourceStream);
-    *source = sourceStream.str();
+    *source = documentElement.toOuterXml().toStdString();
 
-    session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] after transform:");
+    session_->logger().Log(kInfoLogLevel, "[QWebViewVisualizerSourceCommand] result:");
     session_->logger().Log(kInfoLogLevel, *source);
-}
-
-QSharedPointer<pugi::xml_document> QWebViewVisualizerSourceCommand::ParseXml(const QString& input, Error** error) {
-    if (*error) throw std::invalid_argument("error");
-
-    QSharedPointer<pugi::xml_document> document(new pugi::xml_document());
-    QByteArray buffer = input.toUtf8();
-    pugi::xml_parse_result result = document->load_buffer(buffer.data(), buffer.size(), pugi::parse_default, pugi::encoding_utf8);
-
-    if (!result)
-    {
-        std::string details = base::StringPrintf(
-            "pugi::xml_document::load_buffer failed with error message '%s' at offset %d",
-            result.description(), result.offset);
-        session_->logger().Log(kSevereLogLevel, details);
-        *error = new Error(kInternalServerError, details);
-        return QSharedPointer<pugi::xml_document>();
-    }
-
-    return document;
-}
-
-std::string QWebViewVisualizerSourceCommand::Tidy(const std::string& input, Error** error) const {
-    static const bool SHOW_DIAGNOSTICS = false;
-    TidyBuffer outbuf;
-    TidyBuffer errbuf;
-    int retval = -1;
-
-    TidyDoc doc = tidyCreate();
-    tidyBufInit(&outbuf);
-    tidyBufInit(&errbuf);
-
-    tidyOptSetBool(doc, TidyXhtmlOut, yes);
-    tidyOptSetBool(doc, TidyForceOutput, yes);
-    tidySetErrorBuffer(doc, &errbuf);
-
-    retval = tidyParseString(doc, input.c_str());
-    if (retval >= 0) {
-        retval = tidyCleanAndRepair(doc);
-        if (retval >= 0) {
-            if (SHOW_DIAGNOSTICS) {
-                retval = tidyRunDiagnostics(doc);
-                if (retval >= 0) {
-                    std::string diagnostics(reinterpret_cast<const char*>(errbuf.bp), errbuf.size);
-                    session_->logger().Log(kWarningLogLevel, diagnostics);
-                } else {
-                    std::string details = base::StringPrintf(
-                        "tidyRunDiagnostics failed with retval %d", retval);
-                    session_->logger().Log(kSevereLogLevel, details);
-                    *error = new Error(kInternalServerError, details);
-                }
-            }
-
-            retval = tidySaveBuffer(doc, &outbuf);
-            if (retval < 0) {
-                std::string details = base::StringPrintf(
-                    "tidySaveBuffer failed with retval %d", retval);
-                session_->logger().Log(kSevereLogLevel, details);
-                *error = new Error(kInternalServerError, details);
-            }
-        } else {
-            std::string details = base::StringPrintf(
-                "tidyCleanAndRepair failed with retval %d", retval);
-            session_->logger().Log(kSevereLogLevel, details);
-            *error = new Error(kInternalServerError, details);
-        }
-    } else {
-        std::string details = base::StringPrintf(
-            "tidyParseString failed with retval %d", retval);
-        session_->logger().Log(kSevereLogLevel, details);
-        *error = new Error(kInternalServerError, details);
-    }
-
-    std::string output(reinterpret_cast<const char*>(outbuf.bp), outbuf.size);
-    tidyBufFree(&outbuf);
-    tidyBufFree(&errbuf);
-    tidyRelease(doc);
-    return output;
 }
 
 void QWebViewVisualizerSourceCommand::UnescapeXml(QString& input) {
     input.replace("&amp;", "&");
 }
 
-void QWebViewVisualizerSourceCommand::AssemblePage(pugi::xml_node element) const {
-    if (std::string(element.name()) == std::string("img")) {
+void QWebViewVisualizerSourceCommand::AssemblePage(QWebElement element) const {
+    if (element.tagName().toLower() == QString("img")) {
         AssembleImg(element);
     }
-    if (std::string(element.name()) == std::string("link")) {
+    if (element.tagName().toLower() == QString("link")) {
         AssembleLink(element);
     }
-    if (std::string(element.name()) == std::string("style")) {
+    if (element.tagName().toLower() == QString("style")) {
         AssembleStyle(element);
     }
 
-    if (!element.attribute("style").empty()) {
-        AssembleStyle(element.attribute("style"));
+    if (!element.attribute("style").isEmpty()) {
+        QString style = AssembleStyle(element.attribute("style"));
+        element.setAttribute("style", style);
     }
 
     RemoveScripts(element);
 
-    // Chrome does like empty tags like <textarea/>
-    if (std::string(element.name()) != std::string("br") &&
-        isEmpty(element.children())) {
-        element.append_child(pugi::node_pcdata);
-    }
-
     // Recursively walk DOM tree
-    for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
-        if (childIt->type() == pugi::node_element)
-            AssemblePage(*childIt);
+    for (QWebElement child = element.firstChild(); !child.isNull(); child = child.nextSibling()) {
+        AssemblePage(child);
     }
 }
 
-void QWebViewVisualizerSourceCommand::AssembleLink(pugi::xml_node element) const {
-    QString rel = QString::fromUtf8(element.attribute("rel").value());
-    QString type = QString::fromUtf8(element.attribute("type").value());
+void QWebViewVisualizerSourceCommand::AssembleLink(QWebElement element) const {
+    QString rel = element.attribute("rel");
+    QString type = element.attribute("type");
     if (rel != "stylesheet" && type != "text/css")
         return;
 
-    QString href = QString::fromUtf8(element.attribute("href").value());
+    QString href = element.attribute("href");
     UnescapeXml(href);
     QString url = AbsoluteUrl(href);
     QByteArray file;
     QString contentType;
     Download(url, &file, &contentType);
 
-    pugi::xml_node parent = element.parent();
-    parent.remove_child(element);
+    if (type.isEmpty() && !contentType.isEmpty()) {
+        type = contentType.split(';')[0];
+    }
 
     if (!file.isEmpty()) {
-        pugi::xml_node style = parent.append_child("style");
+        QString style = "<style";
         if (!type.isEmpty()) {
-            style.append_attribute("type").set_value(type.toUtf8().data());
-        } else if (!contentType.isEmpty()) {
-            QString type = contentType.split(';')[0];
-            style.append_attribute("type").set_value(type.toUtf8().data());
+            style += " type=\"" + type + "\"";
         }
-        style.append_child(pugi::node_pcdata).set_value(file.data());
+        style += ">";
+        style += file.data();
+        style += "</style>";
+        element.setOuterXml(style);
+    } else {
+        element.removeFromDocument();
     }
 }
 
 // Convert <img> tag 'src' attribute to base64
-void QWebViewVisualizerSourceCommand::AssembleImg(pugi::xml_node element) const {
-    QString url = QString::fromUtf8(element.attribute("src").value());
+void QWebViewVisualizerSourceCommand::AssembleImg(QWebElement element) const {
+    QString url = element.attribute("src");
     if (!url.startsWith(DATA_PROTOCOL)) {
         QString value = DownloadAndEncode(url);
-        element.attribute("src").set_value(value.toUtf8().data());
+        element.setAttribute("src", value);
     }
 
-    if (element.attribute("srcset"))
-        element.remove_attribute("srcset");
+    if (!element.attribute("srcset").isNull())
+        element.removeAttribute("srcset");
 }
 
-void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_node element) const {
-    pugi::xml_attribute type = element.attribute("type");
-    if (!type.empty() &&
-        std::string(type.value()) != "text/css") {
+void QWebViewVisualizerSourceCommand::AssembleStyle(QWebElement element) const {
+    QString type = element.attribute("type");
+    if (type != "" &&
+        type != "text/css") {
         return;
     }
 
-    if (len(element.children()) == 1 &&
-        element.first_child().type() == pugi::node_cdata) {
-        pugi::xml_node cdata = element.first_child();
-        element.remove_child(cdata);
-        QString value = QString::fromUtf8(cdata.value());
-        value = AssembleStyle(value);
-        element.append_child(pugi::node_pcdata).set_value(value.toStdString().c_str());
-    } else {
-        for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
-            if (childIt->type() == pugi::node_pcdata) {
-                QString value = QString::fromUtf8(childIt->value());
-                value = AssembleStyle(value);
-                childIt->set_value(value.toStdString().c_str());
-            }
-        }
-    }
-}
-
-void QWebViewVisualizerSourceCommand::AssembleStyle(pugi::xml_attribute attribute) const {
-    QString value = attribute.value();
+    QString value = element.toInnerXml();
     value = AssembleStyle(value);
-    attribute.set_value(value.toUtf8().data());
+    element.setInnerXml(value);
 }
 
 QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) const {
@@ -285,18 +144,12 @@ QString QWebViewVisualizerSourceCommand::AssembleStyle(const QString& value) con
 }
 
 // Remove <script> tags
-void QWebViewVisualizerSourceCommand::RemoveScripts(pugi::xml_node element) const {
-    std::vector<pugi::xml_node> scripts;
-
-    for (pugi::xml_node_iterator childIt = element.begin(); childIt != element.end(); childIt++) {
-        if (childIt->type() == pugi::node_element &&
-            std::string(childIt->name()) == "script") {
-            scripts.push_back(*childIt);
+void QWebViewVisualizerSourceCommand::RemoveScripts(QWebElement element) const {
+    for (QWebElement child = element.firstChild(); !child.isNull(); child = child.nextSibling()) {
+        if (child.tagName().toLower() == "script") {
+            child.setInnerXml("");
+            child.removeAttribute("src");
         }
-    }
-
-    for (std::vector<pugi::xml_node>::const_iterator it = scripts.begin(); it != scripts.end(); it++) {
-        element.remove_child(*it);
     }
 }
 
@@ -358,24 +211,6 @@ QString QWebViewVisualizerSourceCommand::DownloadAndEncode(const QString& url) c
 }
 
 void QWebViewVisualizerSourceCommand::DownloadFinished() {
-}
-
-bool QWebViewVisualizerSourceCommand::isEmpty(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
-    return range.begin() == range.end();
-}
-
-int QWebViewVisualizerSourceCommand::len(const pugi::xml_object_range<pugi::xml_node_iterator>& range) {
-    return std::distance(range.begin(), range.end());
-}
-
-void QWebViewVisualizerSourceCommand::clearChildren(pugi::xml_node element) {
-    std::vector<pugi::xml_node> children;
-    for (pugi::xml_node_iterator it = element.children().begin(); it != element.children().end(); it++) {
-        children.push_back(*it);
-    }
-    for (std::vector<pugi::xml_node>::iterator it = children.begin(); it != children.end(); it++) {
-        element.remove_child(*it);
-    }
 }
 
 const char QWebViewVisualizerSourceCommand::DATA_PROTOCOL[] = "data:";
