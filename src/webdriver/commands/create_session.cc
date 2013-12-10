@@ -278,8 +278,10 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
         if (vect.size() == 2) {
             base::StringToInt(vect.at(0), &x);
             base::StringToInt(vect.at(1), &y);
-            w = currentbounds.width();
-            h = currentbounds.height();
+            if (!changed) {
+                w = currentbounds.width();
+                h = currentbounds.height();
+            }
             changed = true;
         } else {
             session->logger().Log(kInfoLogLevel, "Wrong parameter kWindowPosition");
