@@ -24,6 +24,14 @@ QPoint QCommonUtil::ConvertPointToQPoint(const Point &p) {
     return resultPoint;
 }
 
+QSize QCommonUtil::ConvertSizeToQSize(const Size &sz) {
+    QSize resultSize;
+    resultSize.setWidth(sz.width());
+    resultSize.setHeight(sz.height());
+
+    return resultSize;
+}
+
 Qt::MouseButton QCommonUtil::ConvertMouseButtonToQtMouseButton(MouseButton button) {
     Qt::MouseButton result = Qt::NoButton;
 

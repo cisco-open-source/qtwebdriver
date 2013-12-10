@@ -7,6 +7,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QRect>
 #include <QtCore/QPoint>
+#include <QtCore/QSize>
 //#include <QtGui/QMouseEvent>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtCore/QXmlStreamWriter>
@@ -27,6 +28,7 @@ public:
     static Rect ConvertQRectToRect(const QRect &rect);
     static QRect ConvertRectToQRect(const Rect &rect);
     static QPoint ConvertPointToQPoint(const Point &p);
+    static QSize ConvertSizeToQSize(const Size &sz);
     static Qt::MouseButton ConvertMouseButtonToQtMouseButton(MouseButton button);
     static std::string GetQtVersion();
 
