@@ -323,7 +323,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QApplication::postEvent(receiverWidget, pressEvent);
     QApplication::postEvent(receiverWidget, releaseEvent);
     if (Qt::RightButton == mouseButton) {
-        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
+        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point, globalPos);
         QApplication::postEvent(receiverWidget, contextEvent);
     }
 }
