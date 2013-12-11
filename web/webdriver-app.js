@@ -490,22 +490,35 @@ WebDriverJsController.prototype.screenshot = function() {
   })
 }
 
-WebDriverJsController.prototype.findElementById = function() {
+WebDriverJsController.prototype.logs = function(type) {
+  if (type === 'Logs')
+    return;
+
   this._constructWebDriver();
-  var name = document.getElementsByName('elementId')[0].value;
-  this.element = this.driver.findElement(webdriver.By.id(name));
+  this.driver.manage().logs().get(type).then(function(entries) {
+    var lines = [];
+    for (var entryIndex in entries) {
+      var entry = entries[entryIndex];
+      lines.push(entry.level.name + ' ' + entry.timestamp + ' ' + entry.message);
+    }
+
+    data = new Blob([lines.join('\n')], {type: 'text/plain'});
+    saveAs(data, 'webdriver.log');
+  })
 }
 
-WebDriverJsController.prototype.findElementByName = function() {
+WebDriverJsController.prototype.findElement = function() {
   this._constructWebDriver();
-  var name = document.getElementsByName('elementName')[0].value;
-  this.element = this.driver.findElement(webdriver.By.name(name));
-}
-
-WebDriverJsController.prototype.findElementByTagName = function() {
-  this._constructWebDriver();
-  var name = document.getElementsByName('elementTagName')[0].value;
-  this.element = this.driver.findElement(webdriver.By.tagName(name));
+  var criteria = document.getElementsByName('findElementCriteria')[0].value;
+  var key = document.getElementsByName('findElementKey')[0].value;
+  if (criteria === 'id')
+    this.element = this.driver.findElement(webdriver.By.id(key));
+  else if (criteria === 'name')
+    this.element = this.driver.findElement(webdriver.By.name(key));
+  else if (criteria === 'tagName')
+    this.element = this.driver.findElement(webdriver.By.tagName(key));
+  else if (criteria === 'xpath')
+    this.element = this.driver.findElement(webdriver.By.xpath(key));
 }
 
 WebDriverJsController.prototype.sendKeys = function(key) {
@@ -520,6 +533,28 @@ WebDriverJsController.prototype.sendKeys = function(key) {
 WebDriverJsController.prototype.click = function() {
   this._constructWebDriver();
   this.element.click();
+}
+
+WebDriverJsController.prototype.listWindowHandles = function() {
+  this._constructWebDriver();
+
+  var select = document.getElementById('windowList');
+  this.driver.getAllWindowHandles().then(function(handles) {
+    select.innerHTML = '';
+    for (var handle in handles) {
+      var item = document.createElement('option');
+      item.innerHTML = handle;
+      select.appendChild(item)
+    }
+    document.getElementById('windowList').style.visibility = 'visible';
+    document.getElementById('chooseWindow').style.visibility = 'visible';
+  });
+}
+
+WebDriverJsController.prototype.chooseWindow = function() {
+  this._constructWebDriver();
+  var handle = document.getElementById('windowList').value;
+  this.driver.switchTo().window(handle);
 }
 
 WebDriverJsController.prototype.setWindowSize = function() {
