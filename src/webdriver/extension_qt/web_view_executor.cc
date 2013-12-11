@@ -42,7 +42,7 @@ namespace webdriver {
         *error = new Error(kNoSuchWindow); \
         return; \
     } \
-    webkitProxy_.reset(new QWebkitProxy(session_, (view_)?view_->page():NULL));
+    webkitProxy_ = yasper::ptr<QWebkitProxy>(new QWebkitProxy(session_, (view_)?view_->page():NULL));
 
 const ViewType QWebViewCmdExecutorCreator::WEB_VIEW_TYPE = 0x13f0;
 
@@ -106,6 +106,40 @@ void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
         return;
     }
     *can = QWebViewUtil::isUrlSupported(pWebView->page(), url, error);
+}
+
+void QWebViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    Size size;
+    *error = webkitProxy_->GetElementSize(element, &size);
+    if (*error)
+        return;
+
+    QPixmap pixmap = QPixmap::grabWidget(view_);
+
+    QRect viewRect = pixmap.rect();
+    QRect elementRect(location.x(), location.y(), size.width(), size.height());
+    QRect intersectedRect = viewRect.intersected(elementRect);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, view: (%2d;%2d : %4d;%4d)", viewRect.x(), viewRect.y(), viewRect.width(), viewRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, elem: (%2d;%2d : %4d;%4d)", elementRect.x(), elementRect.y(), elementRect.width(), elementRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot,  res: (%2d;%2d : %4d;%4d)", intersectedRect.x(), intersectedRect.y(), intersectedRect.width(), intersectedRect.height()));
+
+    if ((0 == intersectedRect.width()) || (0 == intersectedRect.height())) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        session_->logger().Log(kWarningLogLevel, "GetElementScreenShot, element is not in view.");
+        return;
+    }
+
+    QPixmap elementPixmap = pixmap.copy(intersectedRect);
+
+    saveScreenshot(elementPixmap, png, error);
 }
 
 void QWebViewCmdExecutor::GetTitle(std::string* title, Error **error) {
@@ -207,9 +241,10 @@ void QWebViewCmdExecutor::MouseDoubleClick(Error** error) {
     CHECK_VIEW_EXISTANCE
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *dbEvent = new QMouseEvent(QEvent::MouseButtonDblClick, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
 
     QApplication::postEvent(view_, dbEvent);
     QApplication::postEvent(view_, releaseEvent);
@@ -219,8 +254,12 @@ void QWebViewCmdExecutor::MouseButtonUp(Error** error) {
     CHECK_VIEW_EXISTANCE
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, view: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view_, releaseEvent);
 }
 
@@ -228,8 +267,12 @@ void QWebViewCmdExecutor::MouseButtonDown(Error** error) {
     CHECK_VIEW_EXISTANCE
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, view: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::sendEvent(view_, pressEvent);
 }
 
@@ -237,15 +280,19 @@ void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     CHECK_VIEW_EXISTANCE
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint globalPos = view_->mapToGlobal(point);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, view: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
-    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, mouseButton, Qt::NoButton, Qt::NoModifier);
-    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, mouseButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, globalPos, mouseButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, globalPos, mouseButton, Qt::NoButton, Qt::NoModifier);
 
     QApplication::postEvent(view_, pressEvent);
     QApplication::postEvent(view_, releaseEvent);
     if (Qt::RightButton == mouseButton) {
-        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
+        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point, globalPos);
         QApplication::postEvent(view_, contextEvent);
     }
 }
@@ -257,8 +304,12 @@ void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Erro
     prev_pos.Offset(x_offset, y_offset);
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, view: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view_, moveEvent);
 
     session_->set_mouse_position(prev_pos);
@@ -275,8 +326,12 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, cons
     location.Offset(x_offset, y_offset);
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, view: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view_, moveEvent);
 
     session_->set_mouse_position(location);
@@ -301,8 +356,9 @@ void QWebViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     location.Offset(size.width() / 2, size.height() / 2);
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
+    QPoint globalPos = view_->mapToGlobal(point);
 
-    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(view_, moveEvent);
 
     session_->set_mouse_position(location);
@@ -943,14 +999,14 @@ void QWebViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **
 void QWebViewCmdExecutor::VisualizerSource(std::string* source, Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerSourceCommand command(this, session_, view_);
+    QWebViewVisualizerSourceCommand command(webkitProxy_, session_, view_);
     command.Execute(source, error);
 }
 
 void QWebViewCmdExecutor::VisualizerShowPoint(Error** error) {
     CHECK_VIEW_EXISTANCE
 
-    QWebViewVisualizerShowPointCommand command(this, session_, view_);
+    QWebViewVisualizerShowPointCommand command(webkitProxy_, session_, view_);
     command.Execute(error);
 }
 

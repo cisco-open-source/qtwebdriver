@@ -109,10 +109,14 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     if (NULL == view)
         return;
     
+    QPixmap pixmap = QPixmap::grabWidget(view);
+
+    saveScreenshot(pixmap, png, error);
+}
+
+void QViewCmdExecutor::saveScreenshot(QPixmap& pixmap, std::string* png, Error** error) {
     const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
     FilePath path = session_->temp_dir().Append(kPngFileName);;
-
-    QPixmap pixmap = QPixmap::grabWidget(view);
 
 #if defined(OS_WIN)
     session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
@@ -131,7 +135,7 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     }
 
     if (!file_util::ReadFileToString(path, png))
-        *error = new Error(kUnknownError, "Could not read screenshot file");
+        *error = new Error(kUnknownError, "Could not read screenshot file");   
 }
 
 void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {

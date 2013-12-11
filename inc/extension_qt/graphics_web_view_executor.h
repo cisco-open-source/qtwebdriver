@@ -47,7 +47,7 @@ public:
     virtual void SetBounds(const Rect& bounds, Error** error) NOT_SUPPORTED_IMPL;
     virtual void Maximize(Error** error) NOT_SUPPORTED_IMPL;
     virtual void GetScreenShot(std::string* png, Error** error);
-    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error) NOT_SUPPORTED_IMPL;
+    virtual void GetElementScreenShot(const ElementId& element, std::string* png, Error** error);
     virtual void GoForward(Error** error);
     virtual void GoBack(Error** error);
     virtual void Reload(Error** error);
@@ -137,6 +137,7 @@ public:
 
 protected:
     QGraphicsWebView* getView(const ViewId& viewId, Error** error);
+    void saveScreenshot(QImage& image, std::string* png, Error** error);
 
 private:
     scoped_ptr<QWebkitProxy> webkitProxy_;

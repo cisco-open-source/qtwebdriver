@@ -136,6 +136,49 @@ void GraphicsWebViewCmdExecutor::GetScreenShot(std::string* png, Error** error) 
     qobject_cast<QGraphicsObject*>(view_)->paint(&painter, &styleOption);
     painter.end();
 
+    saveScreenshot(image, png, error);
+}
+
+void GraphicsWebViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
+    CHECK_VIEW_EXISTANCE
+
+    Point location;
+    *error = webkitProxy_->GetElementLocationInView(element, &location);
+    if (*error)
+        return;
+
+    Size size;
+    *error = webkitProxy_->GetElementSize(element, &size);
+    if (*error)
+        return;
+
+    QImage image(view_->boundingRect().size().toSize(), QImage::Format_RGB32);
+    image.fill(QColor(0, 0, 0).rgb());
+    QPainter painter(&image);
+    QStyleOptionGraphicsItem styleOption;
+    qobject_cast<QGraphicsObject*>(view_)->paint(&painter, &styleOption);
+    painter.end();
+
+    QRect viewRect = image.rect();
+    QRect elementRect(location.x(), location.y(), size.width(), size.height());
+    QRect intersectedRect = viewRect.intersected(elementRect);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, view: (%2d;%2d : %4d;%4d)", viewRect.x(), viewRect.y(), viewRect.width(), viewRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot, elem: (%2d;%2d : %4d;%4d)", elementRect.x(), elementRect.y(), elementRect.width(), elementRect.height()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("GetElementScreenShot,  res: (%2d;%2d : %4d;%4d)", intersectedRect.x(), intersectedRect.y(), intersectedRect.width(), intersectedRect.height()));
+
+    if ((0 == intersectedRect.width()) || (0 == intersectedRect.height())) {
+        *error = new Error(kMoveTargetOutOfBounds);
+        session_->logger().Log(kWarningLogLevel, "GetElementScreenShot, element is not in view.");
+        return;
+    }
+
+    QImage elementImage = image.copy(intersectedRect);
+
+    saveScreenshot(elementImage, png, error);
+}
+
+void GraphicsWebViewCmdExecutor::saveScreenshot(QImage& image, std::string* png, Error** error) {
     const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
     FilePath path = session_->temp_dir().Append(kPngFileName);;
 
@@ -156,7 +199,7 @@ void GraphicsWebViewCmdExecutor::GetScreenShot(std::string* png, Error** error) 
     }
 
     if (!file_util::ReadFileToString(path, png))
-        *error = new Error(kUnknownError, "Could not read screenshot file");
+        *error = new Error(kUnknownError, "Could not read screenshot file");   
 }
 
 void GraphicsWebViewCmdExecutor::GoForward(Error** error) {

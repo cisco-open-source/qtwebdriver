@@ -28,4 +28,6 @@ const char Switches::kUserInputDevice[] = "uinput";
 
 const char Switches::kWhiteList[] = "white-list";
 
+const char Switches::kWebServerCfg[] = "webserver-cfg";
+
 }  // namespace webdriver

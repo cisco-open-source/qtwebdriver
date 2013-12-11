@@ -252,7 +252,7 @@ void QWidgetViewCmdExecutor::MouseButtonUp(Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, view: (%4d, %4d)", point.x(), point.y()));
     
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -264,7 +264,7 @@ void QWidgetViewCmdExecutor::MouseButtonUp(Error** error) {
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseUp, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     QMouseEvent *releaseEvent = new QMouseEvent(QEvent::MouseButtonRelease, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(receiverWidget, releaseEvent);
@@ -277,7 +277,7 @@ void QWidgetViewCmdExecutor::MouseButtonDown(Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, view: (%4d, %4d)", point.x(), point.y()));
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -289,7 +289,7 @@ void QWidgetViewCmdExecutor::MouseButtonDown(Error** error) {
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseDown, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, globalPos, Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(receiverWidget, pressEvent);
@@ -302,7 +302,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, view: (%4d, %4d)", point.x(), point.y()));
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -314,7 +314,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseClick, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     Qt::MouseButton mouseButton = QCommonUtil::ConvertMouseButtonToQtMouseButton(button);
     QMouseEvent *pressEvent = new QMouseEvent(QEvent::MouseButtonPress, point, globalPos, mouseButton, Qt::NoButton, Qt::NoModifier);
@@ -323,7 +323,7 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QApplication::postEvent(receiverWidget, pressEvent);
     QApplication::postEvent(receiverWidget, releaseEvent);
     if (Qt::RightButton == mouseButton) {
-        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point);
+        QContextMenuEvent *contextEvent = new QContextMenuEvent(QContextMenuEvent::Mouse, point, globalPos);
         QApplication::postEvent(receiverWidget, contextEvent);
     }
 }
@@ -338,7 +338,7 @@ void QWidgetViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, E
 
 	QPoint point = QCommonUtil::ConvertPointToQPoint(prev_pos);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, view: (%4d, %4d)", point.x(), point.y()));
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -350,7 +350,7 @@ void QWidgetViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, E
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(receiverWidget, moveEvent);
@@ -373,7 +373,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, c
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, view: (%4d, %4d)", point.x(), point.y()));
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -385,7 +385,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, c
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(receiverWidget, moveEvent);
@@ -407,7 +407,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, Error** error) 
 
     QPoint point = QCommonUtil::ConvertPointToQPoint(location);
 
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, abs: (%4d, %4d)", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, view: (%4d, %4d)", point.x(), point.y()));
 
     // Find child widget that will receive event
     QWidget *receiverWidget = view->childAt(point);
@@ -419,7 +419,7 @@ void QWidgetViewCmdExecutor::MouseMove(const ElementId& element, Error** error) 
     }
 
     QPoint globalPos = receiverWidget->mapToGlobal(point);
-    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, glb: (%4d, %4d)", globalPos.x(), globalPos.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseMove, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
 
     QMouseEvent *moveEvent = new QMouseEvent(QEvent::MouseMove, point, globalPos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     QApplication::postEvent(receiverWidget, moveEvent);
