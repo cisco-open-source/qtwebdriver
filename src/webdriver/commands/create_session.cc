@@ -165,7 +165,7 @@ bool CreateSession::CreateViewByClassName(Session* session, const std::string& n
     // create view
 
     typedef void (ViewFactory::*CreateViewByClassName)(const Logger&, const std::string&, ViewHandle**) const;
-    CreateViewByClassName createViewByClassName= static_cast<CreateViewByClassName>(&ViewFactory::CreateViewByClassName);
+    CreateViewByClassName createViewByClassName = static_cast<CreateViewByClassName>(&ViewFactory::CreateViewByClassName);
 
     session->RunSessionTask(base::Bind(
         createViewByClassName,
