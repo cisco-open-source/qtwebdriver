@@ -40,6 +40,10 @@ const char* GetJsonTypeName(base::Value::Type type);
 /// Flattens the given list of strings into one.
 Error* FlattenStringArray(const ListValue* src, string16* dest);
 
+/// Gives string, e.g.-"400, 600", split it, and assigns given number to first and second.
+/// Returns true on success.
+bool GetTwoIntsFromString(const std::string& src, int& first, int& second);
+
 #if defined(OS_MACOSX)
 // Gets the paths to the user and local application directory.
 void GetApplicationDirs(std::vector<FilePath>* app_dirs);

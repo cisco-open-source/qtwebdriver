@@ -154,6 +154,17 @@ Error* FlattenStringArray(const ListValue* src, string16* dest) {
     return NULL;
 }
 
+bool GetTwoIntsFromString(const std::string& src, int& first, int& second) {
+    std::vector<std::string> vect;
+    base::SplitString(src, ',', &vect);
+    if (vect.size() == 2) {
+        base::StringToInt(vect.at(0), &first);
+        base::StringToInt(vect.at(1), &second);
+        return true;
+    }
+    return false;
+}
+
 ValueParser::ValueParser() { }
 
 ValueParser::~ValueParser() { }
