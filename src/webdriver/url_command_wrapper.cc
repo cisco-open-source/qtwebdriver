@@ -11,6 +11,7 @@
 #include "webdriver_view_factory.h"
 #include "webdriver_session_manager.h"
 #include "webdriver_view_transitions.h"
+#include "webdriver_basic_types.h"
 
 
 namespace webdriver {
@@ -93,11 +94,11 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
         }
 
         session->RunSessionTask(base::Bind(
-                    &ViewCmdExecutor::CanHandleUrl,
-                    base::Unretained(executor.get()),
-                    url,
-                    &can_handle,
-                    &error));
+                &ViewCmdExecutor::CanHandleUrl,
+                base::Unretained(executor.get()),
+                url,
+                &can_handle,
+                &error));
 
         if (error) {
             break;
@@ -109,12 +110,37 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
             ViewHandle* viewHandle = NULL;
     	    ViewId viewId;
 
-		    session->RunSessionTask(base::Bind(
-                        &ViewFactory::CreateViewForUrl,
-                        base::Unretained(ViewFactory::GetInstance()),
-                        session->logger(),
-                        url,
-                        &viewHandle));
+            std::string window_size;
+            int w, h;
+            scoped_ptr<Size> size(NULL);
+            if (session->get_desired_caps()->GetString(Capabilities::kWindowSize, &window_size)) {
+                if (GetTwoIntsFromString(window_size, w, h)) {
+                    size.reset(new Size(w, h));
+                }
+            }
+
+            std::string window_position;
+            int x, y;
+            scoped_ptr<Point> position(NULL);
+            if (session->get_desired_caps()->GetString(Capabilities::kWindowPosition, &window_position)) {
+
+                if (GetTwoIntsFromString(window_position, x, y)) {
+                    position.reset(new Point(x, y));
+                }
+            }
+
+            typedef void (ViewFactory::*CreateViewForUrl)(const Logger&, const std::string&,
+                                                          const Point*, const Size*, ViewHandle**) const;
+            CreateViewForUrl createViewForUrl = static_cast<CreateViewForUrl>(&ViewFactory::CreateViewForUrl);
+
+            session->RunSessionTask(base::Bind(
+                    createViewForUrl,
+                    base::Unretained(ViewFactory::GetInstance()),
+                    session->logger(),
+                    url,
+                    position.get(),
+                    size.get(),
+                    &viewHandle));
 
             if (NULL == viewHandle) {
 			    session->logger().Log(kSevereLogLevel, "cant create view able to handle url.");
@@ -139,9 +165,9 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
 	    	}
 
 			session->RunSessionTask(base::Bind(
-            	&ViewCmdExecutor::SwitchTo,
-            	base::Unretained(executor.get()),
-            	&error));
+                    &ViewCmdExecutor::SwitchTo,
+                    base::Unretained(executor.get()),
+                    &error));
     	}
 
     	if (error) {
