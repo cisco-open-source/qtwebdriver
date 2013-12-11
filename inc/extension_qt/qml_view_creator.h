@@ -15,9 +15,11 @@ public:
     QQmlViewCreator();
     virtual ~QQmlViewCreator(){}
 
-    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const;
+    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className,
+                                       const Point* position, const Size* size, ViewHandle** view) const;
 
-    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const;    
+    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url,
+                                  const Point* position, const Size* size, ViewHandle** view) const;
 
 private:
 

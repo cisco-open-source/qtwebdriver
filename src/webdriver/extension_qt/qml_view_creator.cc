@@ -20,7 +20,8 @@ namespace webdriver {
 
 QQmlViewCreator::QQmlViewCreator() {}
 
-bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className,
+                                            const Point* position, const Size* size, ViewHandle** view) const {
 	ViewHandle* handle = NULL;
 
     if (factory.empty())
@@ -64,6 +65,11 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 
             widget->setAttribute(Qt::WA_DeleteOnClose, true);
 
+            if (NULL != size)
+                logger.Log(kWarningLogLevel, "Can't apply desired size for qml.");
+            if (NULL != position)
+                logger.Log(kWarningLogLevel, "Can't apply desired position for qml.");
+
             *view = handle;
 
             return true;
@@ -77,12 +83,13 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
     return false;
 }
 
-bool QQmlViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
+bool QQmlViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url,
+                                       const Point* position, const Size* size, ViewHandle** view) const {
     if (!QQmlViewUtil::isUrlSupported(url)) {
         return false;
     }
     
-    return CreateViewByClassName(logger, "", view);
+    return CreateViewByClassName(logger, "", position, size, view);
 }
 
 } // namespace webdriver

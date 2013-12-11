@@ -10,8 +10,6 @@
 #include "base/scoped_temp_dir.h"
 #include "base/values.h"
 #include "base/bind.h"
-#include "base/string_split.h"
-#include "base/string_number_conversions.h"
 #include "commands/response.h"
 #include "webdriver_error.h"
 #include "webdriver_server.h"
@@ -20,6 +18,7 @@
 #include "webdriver_view_executor.h"
 #include "webdriver_view_enumerator.h"
 #include "webdriver_view_factory.h"
+#include "webdriver_util.h"
 
 namespace webdriver {
 
@@ -162,9 +161,14 @@ bool CreateSession::CreateViewByClassName(Session* session, const std::string& n
     session->logger().Log(kFineLogLevel, "Trying to create window - "+name);
 
     ViewHandle* viewHandle = NULL;
+
     // create view
+
+    typedef void (ViewFactory::*CreateViewByClassName)(const Logger&, const std::string&, ViewHandle**) const;
+    CreateViewByClassName createViewByClassName= static_cast<CreateViewByClassName>(&ViewFactory::CreateViewByClassName);
+
     session->RunSessionTask(base::Bind(
-        &ViewFactory::CreateViewByClassName,
+        createViewByClassName,
         base::Unretained(ViewFactory::GetInstance()),
         session->logger(),
         name,
@@ -257,11 +261,7 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
     bool changed = false;
     std::string window_size;
     if (desired_caps_dict->GetString(Capabilities::kWindowSize, &window_size)) {
-        std::vector<std::string> vect;
-        base::SplitString(window_size, ',', &vect);
-        if (vect.size() == 2) {
-            base::StringToInt(vect.at(0), &w);
-            base::StringToInt(vect.at(1), &h);
+        if (GetTwoIntsFromString(window_size, w, h)) {
             x = currentbounds.x();
             y = currentbounds.y();
             changed = true;
@@ -273,11 +273,7 @@ Error* CreateSession::SetWindowBounds(const DictionaryValue* desired_caps_dict,S
 
     std::string window_position;
     if (desired_caps_dict->GetString(Capabilities::kWindowPosition, &window_position)) {
-        std::vector<std::string> vect;
-        base::SplitString(window_position, ',', &vect);
-        if (vect.size() == 2) {
-            base::StringToInt(vect.at(0), &x);
-            base::StringToInt(vect.at(1), &y);
+        if (GetTwoIntsFromString(window_position, x, y)) {
             if (!changed) {
                 w = currentbounds.width();
                 h = currentbounds.height();

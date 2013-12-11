@@ -39,6 +39,7 @@ webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 #include "base/basictypes.h"
 #include "webdriver_view_id.h"
 #include "webdriver_logging.h"
+#include "webdriver_basic_types.h"
 
 namespace webdriver {
 
@@ -67,16 +68,22 @@ public:
     /// creates new view of specified class
     /// @param[in] logger
     /// @param[in] className requested class name
+    /// @param[in] position - desired position
+    /// @param[in] size - desired size
     /// @param[out] view created view.
     /// @return true if handled
-    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const = 0;
+    virtual bool CreateViewByClassName(const Logger& logger, const std::string& className,
+                                       const Point* position, const Size* size, ViewHandle** view) const = 0;
 
     /// creates new view that can handle specified url
     /// @param[in] logger
     /// @param[in] url url to handle
+    /// @param[in] position - desired position
+    /// @param[in] size - desired size
     /// @param[out] view created view. 
     /// @return true if handled
-    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const = 0;    
+    virtual bool CreateViewForUrl(const Logger& logger, const std::string& url,
+                                  const Point* position, const Size* size, ViewHandle** view) const = 0;
 
 protected:
     typedef std::map<std::string, CreateViewMethod> FactoryMap;
@@ -98,12 +105,29 @@ public:
     /// @param[out] view created view.
     void CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const;
 
-    /// creates new view that can handle specified url
+    /// creates new view of specified class
+    /// @param[in] logger
+    /// @param[in] className requested class name
+    /// @param[in] position desired window position
+    /// @param[in] size desired window size
+    /// @param[out] view created view.
+    void CreateViewByClassName(const Logger& logger, const std::string& className,
+                               const Point* position, const Size* size, ViewHandle** view) const;
+
+    /// creates new view that can handle specified url with specified window sixe and position
     /// @param[in] logger
     /// @param[in] url url to handle
     /// @param[out] view created view.
     void CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const;
 
+    /// creates new view that can handle specified url with specified window sixe and position
+    /// @param[in] logger
+    /// @param[in] url url to handle
+    /// @param[in] position desired window position
+    /// @param[in] size desired window size
+    /// @param[out] view created view.
+    void CreateViewForUrl(const Logger& logger, const std::string& url,
+                          const Point* position, const Size* size, ViewHandle** view) const;
 
     /// add new view's creator
     /// @param creator pointer to custom creator. No need to delete object

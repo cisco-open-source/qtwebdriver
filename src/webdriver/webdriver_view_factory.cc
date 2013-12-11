@@ -23,33 +23,40 @@ ViewFactory* ViewFactory::GetInstance() {
 }
 
 void ViewFactory::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+    CreateViewByClassName(logger, className, NULL, NULL, view);
+}
+
+void ViewFactory::CreateViewByClassName(const Logger& logger, const std::string& className,
+                                        const Point* position, const Size* size, ViewHandle** view) const {
 	CreatorsList::const_iterator creator;
 
 	logger.Log(kInfoLogLevel, "ViewFactory::CreateViewByClassName - " + className);
 
 	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewByClassName(logger, className, view)) {
+        if ((*creator)->CreateViewByClassName(logger, className, position, size, view)) {
 			// succed, return
 			return;
 		}
 	}
 
-	logger.Log(kSevereLogLevel, "ViewFactory::CreateViewByClassName - cant create view.");
+    logger.Log(kSevereLogLevel, "ViewFactory::CreateViewByClassName - cant create view.");
 }
 
 void ViewFactory::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-	CreatorsList::const_iterator creator;
+    CreateViewForUrl(logger, url, NULL, NULL, view);
+}
 
-	logger.Log(kInfoLogLevel, "ViewFactory::CreateViewForUrl - " + url);
+void ViewFactory::CreateViewForUrl(const Logger& logger, const std::string& url,
+                                   const Point* position, const Size* size, ViewHandle** view) const {
 
-	for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
-		if ((*creator)->CreateViewForUrl(logger, url, view)) {
-			// succed, return
-			return;
-		}
-	}
+    CreatorsList::const_iterator creator;
 
-	logger.Log(kSevereLogLevel, "ViewFactory::CreateViewForUrl - cant create view.");
+    for (creator = creators_.begin(); creator < creators_.end(); ++creator)	{
+        if ((*creator)->CreateViewForUrl(logger, url, position, size, view)) {
+            // succed, return
+            return;
+        }
+    }
 }
 
 void ViewFactory::AddViewCreator(ViewCreator* creator) {

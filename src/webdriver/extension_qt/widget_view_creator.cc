@@ -20,7 +20,8 @@ namespace webdriver {
 
 QWidgetViewCreator::QWidgetViewCreator() {}
 
-bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className,
+                                               const Point* position, const Size* size, ViewHandle** view) const {
 	ViewHandle* handle = NULL;	
 
     if (factory.empty())
@@ -65,6 +66,11 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
 
             widget->setAttribute(Qt::WA_DeleteOnClose, true);
 
+            if (NULL != size)
+                logger.Log(kWarningLogLevel, "Can't apply desired size for widget.");
+            if (NULL != position)
+                logger.Log(kWarningLogLevel, "Can't apply desired position for widget.");
+
             *view = handle;
             
             return true;
@@ -78,15 +84,14 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
     return false;
 }
 
-bool QWidgetViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
-	if (!QWidgetViewUtil::isUrlSupported(url))
+bool QWidgetViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url,
+                                          const Point* position, const Size* size, ViewHandle** view) const {
+    if (!QWidgetViewUtil::isUrlSupported(url))
         return false;
 
     std::string className = QWidgetViewUtil::extractClassName(url);
 
-    return CreateViewByClassName(logger, className, view);
-};
-
-
+    return CreateViewByClassName(logger, className, position, size, view);
+}
 
 } // namespace webdriver

@@ -6,6 +6,7 @@
 
 #include "web_view_util.h"
 #include "extension_qt/widget_view_handle.h"
+#include "common_util.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
 
@@ -18,7 +19,8 @@ namespace webdriver {
 
 QWebViewCreator::QWebViewCreator() {}
 
-bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className, ViewHandle** view) const {
+bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::string& className,
+                                            const Point* position, const Size* size, ViewHandle** view) const {
 	ViewHandle* handle = NULL;
 
     if (factory.empty())
@@ -38,6 +40,21 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
     }
 
     if (NULL != handle && ShowView(logger, handle)) {
+        QWidget* widget = (dynamic_cast<QViewHandle*>(handle))->get();
+
+        if (NULL == widget)
+            return false;
+        if (NULL != size && NULL != position) {
+            Rect* rect = new Rect(*position, *size);
+            widget->setGeometry(QCommonUtil::ConvertRectToQRect(*rect));
+            delete rect;
+        } else if (NULL != size) {
+            widget->resize(QCommonUtil::ConvertSizeToQSize(*size));
+        } else if (NULL != position) {
+            int x_offset = widget->geometry().x() - widget->frameGeometry().x();
+            int y_offset = widget->geometry().y() - widget->frameGeometry().y();
+            widget->move(position->x() - x_offset, position->y() - y_offset);
+        }
         *view = handle;
         return true;
     }
@@ -46,14 +63,15 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
     return false;
 }
 
-bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url, ViewHandle** view) const {
+bool QWebViewCreator::CreateViewForUrl(const Logger& logger, const std::string& url,
+                                       const Point* position, const Size* size, ViewHandle** view) const {
     Error* tmp_err = NULL;
     if (!QWebViewUtil::isUrlSupported(url, &tmp_err)) {
         if (tmp_err) delete tmp_err;
         return false;
     }
     
-    return CreateViewByClassName(logger, "", view);
+    return CreateViewByClassName(logger, "", position, size, view);
 }
 
 bool QWebViewCreator::ShowView(const Logger& logger, ViewHandle* viewHandle) const {
