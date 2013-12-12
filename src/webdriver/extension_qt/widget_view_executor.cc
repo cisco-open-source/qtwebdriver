@@ -14,6 +14,7 @@
 #include "widget_view_visualizer.h"
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
+#include "webdriver_util.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -889,8 +890,18 @@ void QWidgetViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Er
 
     session_->logger().Log(kFineLogLevel, "Navigate to widget - "+url);
 
+    std::string window_position;
+    int x, y;
+    scoped_ptr<Point> position(NULL);
+    if (session_->get_desired_caps()->GetString(Capabilities::kWindowPosition, &window_position)) {
+
+        if (GetTwoIntsFromString(window_position, x, y)) {
+            position.reset(new Point(x, y));
+        }
+    }
+
     // create view
-    ViewFactory::GetInstance()->CreateViewForUrl(session_->logger(), url, &viewHandle);
+    ViewFactory::GetInstance()->CreateViewForUrl(session_->logger(), url, position.get(), NULL, &viewHandle);
     if (NULL == viewHandle) {
         *error = new Error(kUnknownError, "cant load widget - " + url);
         return;

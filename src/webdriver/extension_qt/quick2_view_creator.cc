@@ -66,8 +66,12 @@ bool Quick2ViewCreator::CreateViewByClassName(const Logger& logger, const std::s
 
             if (NULL != size)
                 logger.Log(kWarningLogLevel, "Can't apply desired size for quick2.");
-            if (NULL != position)
-                logger.Log(kWarningLogLevel, "Can't apply desired position for quick2.");
+
+            if (NULL != position) {
+                pWindow->setX(position->x());
+                pWindow->setY(position->y());
+                logger.Log(kInfoLogLevel, "Applying desired position for quick2.");
+            }
 
             *view = handle;
 

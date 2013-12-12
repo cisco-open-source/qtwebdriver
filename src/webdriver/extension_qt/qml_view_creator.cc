@@ -67,8 +67,13 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
 
             if (NULL != size)
                 logger.Log(kWarningLogLevel, "Can't apply desired size for qml.");
-            if (NULL != position)
-                logger.Log(kWarningLogLevel, "Can't apply desired position for qml.");
+
+            if (NULL != position) {
+                int x_offset = widget->geometry().x() - widget->frameGeometry().x();
+                int y_offset = widget->geometry().y() - widget->frameGeometry().y();
+                widget->move(position->x() - x_offset, position->y() - y_offset);
+                logger.Log(kInfoLogLevel, "Applying desired position for qml.");
+            }
 
             *view = handle;
 
