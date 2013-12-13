@@ -4872,6 +4872,7 @@ webdriver.http.XhrClient.prototype.send = function(a, b) {
   }
 };
 exports.ActionSequence = webdriver.ActionSequence;
+exports.AbstractBuilder = webdriver.AbstractBuilder;
 exports.Builder = webdriver.Builder;
 exports.Button = webdriver.Button;
 exports.By = webdriver.Locator.Strategy;

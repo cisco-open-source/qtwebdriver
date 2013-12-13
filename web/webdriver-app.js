@@ -80,6 +80,25 @@ function getXPath(node) {
   return '/' + path.join('/');
 }
 
+webdriver.FirstSessionBuilder = function() {
+  webdriver.AbstractBuilder.call(this);
+}
+
+webdriver.FirstSessionBuilder.prototype = new webdriver.AbstractBuilder();
+
+webdriver.FirstSessionBuilder.prototype.build = function() {
+  var self = this;
+  var client = new webdriver.http.CorsClient(this.getServerUrl());
+  var executor = new webdriver.http.Executor(client);
+  var session = webdriver.Session.getSessions(executor).then(function(sessions) {
+    if (sessions[0])
+      return sessions[0];
+    else
+      return webdriver.WebDriver.createSession(executor, self.getCapabilities()).getSession();
+  });
+  return new webdriver.WebDriver(session, executor);
+};
+
 webdriver.WebDriver.prototype.visualizerGetSource = function() {
   webdriver.http.Executor.COMMAND_MAP_['visualizerGetSource'] = {
     method: 'GET', path: '/session/:sessionId/-cisco-visualizer-source'};
@@ -94,6 +113,11 @@ webdriver.WebDriver.prototype.visualizerShowPoint = function() {
   return this.schedule(
     new webdriver.Command('visualizerShowPoint'),
     'WebDriver.visualizerShowPoint()');
+}
+
+window.onerror = function(errorMsg, url, lineNumber, columnNumber, error) {
+  console.log(error.stack);
+  return false;
 }
 
 var Util = function() {}
@@ -443,18 +467,10 @@ WebDriverJsController.prototype._constructWebDriver = function() {
     return;
 
   if (this.webDriverUrlPort != webDriverUrlPort) {
-    var capabilities = {'browserName': 'qtwebkit'};
-
-    var client = new webdriver.http.CorsClient(webDriverUrlPort);
-    var executor = new webdriver.http.Executor(client);
-    var session = webdriver.Session.getSessions(executor).then(function(sessions) {
-      if (sessions[0])
-        return sessions[0];
-      else
-        return webdriver.WebDriver.createSession(executor, capabilities).getSession();
-    });
-
-    this._driver = this.visualizer.driver = new webdriver.WebDriver(session, executor);
+    this._driver = this.visualizer.driver = new webdriver.FirstSessionBuilder().
+      usingServer(webDriverUrlPort).
+      withCapabilities({'browserName': 'qtwebkit'}).
+      build();
 
     this.webDriverUrlPort = webDriverUrlPort;
     if (localStorage)
