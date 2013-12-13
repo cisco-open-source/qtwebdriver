@@ -25,61 +25,6 @@ if (!String.prototype.endsWith) {
   });
 }
 
-function loadFile(url) {
-  var req = new XMLHttpRequest();
-  req.open('GET', url, false);
-  try {
-    req.send();
-    return req.responseText;
-  } catch (err) {
-    var message = 'Error at "' + err.filename + '" message "' + err.message +
-      '" name "' + err.name + '" result 0x' + Number(err.result).toString(16);
-    console.log(message);
-    return message;
-  }
-}
-
-function _getXPath(node, path) {
-  path = path || [];
-  if (node.parentNode) {
-    path = _getXPath(node.parentNode, path);
-  }
-
-  if (node.previousSibling) {
-    var count = 1;
-    var sibling = node.previousSibling
-    do {
-      if (sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {count++;}
-      sibling = sibling.previousSibling;
-    } while (sibling);
-    if (count == 1) {count = null;}
-  } else if (node.nextSibling) {
-    var sibling = node.nextSibling;
-    do {
-      if (sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {
-        var count = 1;
-        sibling = null;
-      } else {
-        var count = null;
-        sibling = sibling.previousSibling;
-      }
-    } while (sibling);
-  }
-
-  if (node.nodeType == 1) {
-    path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
-  }
-  return path;
-}
-
-function getXPath(node) {
-  if (node.hasAttribute('data-viz-id'))
-    return '//*[@data-viz-id=' + node.getAttribute('data-viz-id') + "]";
-
-  var path = _getXPath(node);
-  return '/' + path.join('/');
-}
-
 webdriver.FirstSessionBuilder = function() {
   webdriver.AbstractBuilder.call(this);
 };
@@ -120,8 +65,66 @@ window.onerror = function(errorMsg, url, lineNumber, columnNumber, error) {
   return false;
 };
 
-var Util = function() {};
-Util.WebDriverKeyFromJs = function(keyCode) {
+var Util = {};
+
+Util.loadFile = function(url) {
+  var req = new XMLHttpRequest();
+  req.open('GET', url, false);
+  try {
+    req.send();
+    return req.responseText;
+  } catch (err) {
+    var message = 'Error at "' + err.filename + '" message "' + err.message +
+      '" name "' + err.name + '" result 0x' + Number(err.result).toString(16);
+    console.log(message);
+    return message;
+  }
+};
+
+Util.getXPath = function() {
+  function getXPath(node, path) {
+    path = path || [];
+    if (node.parentNode) {
+      path = getXPath(node.parentNode, path);
+    }
+
+    if (node.previousSibling) {
+      var count = 1;
+      var sibling = node.previousSibling
+      do {
+        if (sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {count++;}
+        sibling = sibling.previousSibling;
+      } while (sibling);
+      if (count == 1) {count = null;}
+    } else if (node.nextSibling) {
+      var sibling = node.nextSibling;
+      do {
+        if (sibling.nodeType == 1 && sibling.nodeName == node.nodeName) {
+          var count = 1;
+          sibling = null;
+        } else {
+          var count = null;
+          sibling = sibling.previousSibling;
+        }
+      } while (sibling);
+    }
+
+    if (node.nodeType == 1) {
+      path.push(node.nodeName.toLowerCase() + (node.id ? "[@id='"+node.id+"']" : count > 0 ? "["+count+"]" : ''));
+    }
+    return path;
+  }
+
+  return function(node) {
+    if (node.hasAttribute('data-viz-id'))
+      return '//*[@data-viz-id=' + node.getAttribute('data-viz-id') + "]";
+
+    var path = getXPath(node);
+    return '/' + path.join('/');
+  }
+}();
+
+Util.webDriverKeyFromJs = function(keyCode) {
   switch (keyCode) {
     case  8: return webdriver.Key.BACK_SPACE;
     case  9: return webdriver.Key.TAB;
@@ -201,7 +204,7 @@ VisualizerXsltProcessors.prototype.get = function(webPage) {
 };
 
 VisualizerXsltProcessors.prototype._create = function(name) {
-  var stylesheet = loadFile(name);
+  var stylesheet = Util.loadFile(name);
   stylesheet = (new DOMParser()).parseFromString(stylesheet, 'application/xml');
   var processor = new XSLTProcessor();
   try {
@@ -262,7 +265,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   };
 
   win.document.onkeyup = function(event) {
-    var key = Util.WebDriverKeyFromJs(event.keyCode);
+    var key = Util.webDriverKeyFromJs(event.keyCode);
     if (!key)
       return true;
 
@@ -283,7 +286,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       return;
     }
 
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       mouseMove(target, {x: event.offsetX, y: event.offsetY}).
@@ -297,7 +300,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       return;
     }
 
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       mouseMove(target, {x: event.offsetX, y: event.offsetY}).
@@ -318,7 +321,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       return;
     }
 
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       mouseMove(target, {x: event.offsetX, y: event.offsetY}).
@@ -335,7 +338,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   var hammer = Hammer(win.document);
 
   hammer.on("tap", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       touchSingleTap(target).
@@ -343,7 +346,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("hold", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       touchLongPress(target).
@@ -351,7 +354,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("doubletap", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       touchDoubleTap(target).
@@ -377,7 +380,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("dragstart", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     self.dragstart = self.driver.findElement(webdriver.By.xpath(xpath));
   });
 
@@ -411,7 +414,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("rotate", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       touchPinchRotate(target, event.gesture.rotation).
@@ -419,7 +422,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("pinch", function(event) {
-    var xpath = getXPath(event.target);
+    var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
       touchPinchZoom(target, event.gesture.scale).
