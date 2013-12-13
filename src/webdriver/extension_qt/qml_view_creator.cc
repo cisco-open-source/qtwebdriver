@@ -8,6 +8,7 @@
 #include "extension_qt/widget_view_handle.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
+#include "base/string_number_conversions.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QString>
@@ -72,7 +73,8 @@ bool QQmlViewCreator::CreateViewByClassName(const Logger& logger, const std::str
                 int x_offset = widget->geometry().x() - widget->frameGeometry().x();
                 int y_offset = widget->geometry().y() - widget->frameGeometry().y();
                 widget->move(position->x() - x_offset, position->y() - y_offset);
-                logger.Log(kInfoLogLevel, "Applying desired position for qml.");
+                logger.Log(kInfoLogLevel, "Applying desired position (" + base::IntToString(position->x()) + ", "
+                           + base::IntToString(position->y())+") for qml.");
             }
 
             *view = handle;

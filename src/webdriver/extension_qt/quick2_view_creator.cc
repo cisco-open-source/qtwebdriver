@@ -8,6 +8,7 @@
 #include "extension_qt/qwindow_view_handle.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
+#include "base/string_number_conversions.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QString>
@@ -70,7 +71,8 @@ bool Quick2ViewCreator::CreateViewByClassName(const Logger& logger, const std::s
             if (NULL != position) {
                 pWindow->setX(position->x());
                 pWindow->setY(position->y());
-                logger.Log(kInfoLogLevel, "Applying desired position for quick2.");
+                logger.Log(kInfoLogLevel, "Applying desired position (" + base::IntToString(position->x()) + ", "
+                           + base::IntToString(position->y())+") for quick2.");
             }
 
             *view = handle;

@@ -6,6 +6,7 @@
 #include "widget_view_util.h"
 #include "extension_qt/widget_view_handle.h"
 #include "q_event_filter.h"
+#include "base/string_number_conversions.h"
 
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
@@ -73,7 +74,8 @@ bool QWidgetViewCreator::CreateViewByClassName(const Logger& logger, const std::
                 int x_offset = widget->geometry().x() - widget->frameGeometry().x();
                 int y_offset = widget->geometry().y() - widget->frameGeometry().y();
                 widget->move(position->x() - x_offset, position->y() - y_offset);
-                logger.Log(kInfoLogLevel, "Applying desired position for widget.");
+                logger.Log(kInfoLogLevel, "Applying desired position (" + base::IntToString(position->x()) + ", "
+                           + base::IntToString(position->y())+") for widget.");
             }
 
             *view = handle;

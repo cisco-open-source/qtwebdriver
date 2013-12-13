@@ -9,6 +9,7 @@
 #include "common_util.h"
 #include "q_content_type_resolver.h"
 #include "q_event_filter.h"
+#include "base/string_number_conversions.h"
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtCore/QString>
@@ -47,13 +48,20 @@ bool QWebViewCreator::CreateViewByClassName(const Logger& logger, const std::str
         if (NULL != size && NULL != position) {
             Rect* rect = new Rect(*position, *size);
             widget->setGeometry(QCommonUtil::ConvertRectToQRect(*rect));
+            logger.Log(kInfoLogLevel, "Applying desired position (" + base::IntToString(position->x()) + ", "
+                       + base::IntToString(position->y())+") and size (" + base::IntToString(size->width()) + ", "
+                       + base::IntToString(size->height())+") for webview.");
             delete rect;
         } else if (NULL != size) {
             widget->resize(QCommonUtil::ConvertSizeToQSize(*size));
+            logger.Log(kInfoLogLevel, "Applying desired size (" + base::IntToString(size->width()) + ", "
+                       + base::IntToString(size->height())+") for webview.");
         } else if (NULL != position) {
             int x_offset = widget->geometry().x() - widget->frameGeometry().x();
             int y_offset = widget->geometry().y() - widget->frameGeometry().y();
             widget->move(position->x() - x_offset, position->y() - y_offset);
+            logger.Log(kInfoLogLevel, "Applying desired position (" + base::IntToString(position->x()) + ", "
+                       + base::IntToString(position->y())+") for webview.");
         }
         *view = handle;
         return true;
