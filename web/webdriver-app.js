@@ -82,7 +82,7 @@ function getXPath(node) {
 
 webdriver.FirstSessionBuilder = function() {
   webdriver.AbstractBuilder.call(this);
-}
+};
 
 webdriver.FirstSessionBuilder.prototype = new webdriver.AbstractBuilder();
 
@@ -105,7 +105,7 @@ webdriver.WebDriver.prototype.visualizerGetSource = function() {
   return this.schedule(
     new webdriver.Command('visualizerGetSource'),
     'WebDriver.visualizerGetSource()');
-}
+};
 
 webdriver.WebDriver.prototype.visualizerShowPoint = function() {
   webdriver.http.Executor.COMMAND_MAP_['visualizerShowPoint'] = {
@@ -113,14 +113,14 @@ webdriver.WebDriver.prototype.visualizerShowPoint = function() {
   return this.schedule(
     new webdriver.Command('visualizerShowPoint'),
     'WebDriver.visualizerShowPoint()');
-}
+};
 
 window.onerror = function(errorMsg, url, lineNumber, columnNumber, error) {
   console.log(error.stack);
   return false;
-}
+};
 
-var Util = function() {}
+var Util = function() {};
 Util.WebDriverKeyFromJs = function(keyCode) {
   switch (keyCode) {
     case  8: return webdriver.Key.BACK_SPACE;
@@ -186,7 +186,7 @@ Util.WebDriverKeyFromJs = function(keyCode) {
     //case 221: return ]; // close bracket
     //case 222: return '; // single quote
   }
-}
+};
 
 function VisualizerXsltProcessors() {
   this.widget = this._create('widget_view_visualizer.xsl');
@@ -198,7 +198,7 @@ VisualizerXsltProcessors.prototype.get = function(webPage) {
     return this.widget;
   if (webPage.endsWith('.qml'))
     return this.qml;
-}
+};
 
 VisualizerXsltProcessors.prototype._create = function(name) {
   var stylesheet = loadFile(name);
@@ -210,7 +210,7 @@ VisualizerXsltProcessors.prototype._create = function(name) {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 function VisualizerController() {
   this.xsltProcessors = new VisualizerXsltProcessors();
@@ -224,7 +224,7 @@ VisualizerController.prototype.updateSource = function(webPage) {
       self.showVisualizationWindow(source, targetSize);
     });
   });
-}
+};
 
 VisualizerController.prototype.quit = function() {
   this.webPage = null;
@@ -232,16 +232,16 @@ VisualizerController.prototype.quit = function() {
     this.visualizationWin.close();
     this.visualizationWin = null;
   }
-}
+};
 
 VisualizerController.prototype.isVisualizerOpened = function() {
   return this.visualizationWin && !this.visualizationWin.closed && this.visualizationWin.innerHeight > 0;
-}
+};
 
 VisualizerController.prototype.openVisualizationWindow = function(size) {
   var winParams = 'width=' + size.width + ',height=' + size.height;
   this.visualizationWin = window.open('', '', winParams);
-}
+};
 
 VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   var self = this;
@@ -259,7 +259,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     }
 
     return true;
-  }
+  };
 
   win.document.onkeyup = function(event) {
     var key = Util.WebDriverKeyFromJs(event.keyCode);
@@ -275,7 +275,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     }
 
     return true;
-  }
+  };
 
   win.document.onmousedown = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
@@ -289,7 +289,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       mouseMove(target, {x: event.offsetX, y: event.offsetY}).
       mouseDown(event.button).
       perform();
-  }
+  };
 
   win.document.onmouseup = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
@@ -303,7 +303,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       mouseMove(target, {x: event.offsetX, y: event.offsetY}).
       mouseUp(event.button).
       perform();
-  }
+  };
 
   win.document.onclick = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
@@ -327,7 +327,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     then(function() {
       return self.driver.visualizerShowPoint();
     });
-  }
+  };
 
   Hammer.detection.gestures = [];
   Hammer.READY = false;
@@ -425,7 +425,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       touchPinchZoom(target, event.gesture.scale).
       perform();
   });
-}
+};
 
 VisualizerController.prototype.showVisualizationWindow = function(source, size) {
   var isQt = this.webPage.startsWith('qtwidget://') || this.webPage.endsWith('.qml');
@@ -452,7 +452,7 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
   }
 
   this.visualizerAssignEventHandlers();
-}
+};
 
 function WebDriverJsController() {
   this.visualizer = new VisualizerController();
@@ -485,23 +485,23 @@ WebDriverJsController.prototype._constructWebDriver = function() {
     if (localStorage)
       localStorage.webPage = webPage;
   }
-}
+};
 
 WebDriverJsController.prototype.driver = function() {
   if (this._driver === null)
     this._constructWebDriver();
   return this._driver;
-}
+};
 
 WebDriverJsController.prototype.get = function() {
   this.webPage = null;
   this._constructWebDriver();
-}
+};
 
 WebDriverJsController.prototype.source = function() {
   this._constructWebDriver();
   this.visualizer.updateSource(this.webPage);
-}
+};
 
 WebDriverJsController.prototype.screenshot = function() {
   this.driver().takeScreenshot().then(function(data) {
@@ -509,7 +509,7 @@ WebDriverJsController.prototype.screenshot = function() {
     data = new Blob([data], {type: 'image/png'});
     saveAs(data, 'screenshot.png');
   })
-}
+};
 
 WebDriverJsController.prototype.logs = function(type) {
   if (type === 'Logs')
@@ -525,7 +525,7 @@ WebDriverJsController.prototype.logs = function(type) {
     data = new Blob([lines.join('\n')], {type: 'text/plain'});
     saveAs(data, 'webdriver.log');
   })
-}
+};
 
 WebDriverJsController.prototype.findElement = function() {
   var criteria = document.getElementsByName('findElementCriteria')[0].value;
@@ -538,7 +538,7 @@ WebDriverJsController.prototype.findElement = function() {
     this.element = this.driver().findElement(webdriver.By.tagName(key));
   else if (criteria === 'xpath')
     this.element = this.driver().findElement(webdriver.By.xpath(key));
-}
+};
 
 WebDriverJsController.prototype.sendKeys = function(key) {
   if (this.element) {
@@ -546,11 +546,11 @@ WebDriverJsController.prototype.sendKeys = function(key) {
   } else {
     this.driver().actions().sendKeys(key).perform();
   }
-}
+};
 
 WebDriverJsController.prototype.click = function() {
   this.element.click();
-}
+};
 
 WebDriverJsController.prototype.listWindowHandles = function() {
   var select = document.getElementById('windowList');
@@ -564,12 +564,12 @@ WebDriverJsController.prototype.listWindowHandles = function() {
     document.getElementById('windowList').style.visibility = 'visible';
     document.getElementById('chooseWindow').style.visibility = 'visible';
   });
-}
+};
 
 WebDriverJsController.prototype.chooseWindow = function() {
   var handle = document.getElementById('windowList').value;
   this.driver().switchTo().window(handle);
-}
+};
 
 WebDriverJsController.prototype.setWindowSize = function() {
   var width = document.getElementsByName('windowSizeWidth')[0].value;
@@ -577,7 +577,7 @@ WebDriverJsController.prototype.setWindowSize = function() {
   width = parseInt(width);
   height = parseInt(height);
   this.driver().manage().window().setSize(width, height);
-}
+};
 
 WebDriverJsController.prototype.quit = function() {
   if (!this._driver)
@@ -587,7 +587,7 @@ WebDriverJsController.prototype.quit = function() {
   this.visualizer.quit();
   this.webDriverUrlPort = null;
   this.webPage = null;
-}
+};
 
 function init() {
   if (localStorage && localStorage.webDriverUrlPort) {
