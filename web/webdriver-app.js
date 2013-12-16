@@ -337,25 +337,26 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   win.document.onclick = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
     if (disableMouseEvents) {
-      return;
+      return false;
     }
 
     if (event.target.hasAttribute('elementId')) {
       var elementId = event.target.getAttribute('elementId');
       var element = new webdriver.WebElement(self.driver, elementId);
       element.click();
-      return;
+    } else {
+      var xpath = Util.getXPath(event.target);
+      var target = self.driver.findElement(webdriver.By.xpath(xpath));
+      self.driver.actions().
+        mouseMove(target, {x: event.offsetX, y: event.offsetY}).
+        click(event.button).
+        perform().
+      then(function() {
+        return self.driver.visualizerShowPoint();
+      });
     }
 
-    var xpath = Util.getXPath(event.target);
-    var target = self.driver.findElement(webdriver.By.xpath(xpath));
-    self.driver.actions().
-      mouseMove(target, {x: event.offsetX, y: event.offsetY}).
-      click(event.button).
-      perform().
-    then(function() {
-      return self.driver.visualizerShowPoint();
-    });
+    return false;
   };
 
   Hammer.detection.gestures = [];
