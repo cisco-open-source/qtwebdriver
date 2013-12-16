@@ -663,13 +663,11 @@ WebDriverJsController.prototype.onQuit = function() {
 };
 
 WebDriverJsController.prototype.onWebDriverUrlPortChange = function() {
-  var input = document.getElementsByName('webDriverUrlPort')[0];
-  this.view.setDriverUrlPort(input.value);
+  this.view.updateSessionDepControls();
 };
 
 WebDriverJsController.prototype.onWebPageChange = function() {
-  var input = document.getElementsByName('webPage')[0];
-  this.view.setWebPage(input.value);
+  this.view.updateSessionDepControls();
 };
 
 document.addEventListener("DOMContentLoaded", function(event) {
