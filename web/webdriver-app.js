@@ -484,9 +484,59 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
   this.visualizerAssignEventHandlers();
 };
 
+function WebDriverJsView() {
+  if (localStorage && localStorage.webDriverUrlPort) {
+    this.setDriverUrlPort(localStorage.webDriverUrlPort);
+  } else {
+    this.setDriverUrlPort('');
+  }
+
+  if (localStorage && localStorage.webPage) {
+    this.setWebPage(localStorage.webPage);
+  } else {
+    this.setWebPage('');
+  }
+}
+
+WebDriverJsView.prototype.getDriverUrlPort = function() {
+  var input = document.getElementsByName('webDriverUrlPort')[0];
+  return input.value;
+};
+
+WebDriverJsView.prototype.setDriverUrlPort = function(value) {
+  var input = document.getElementsByName('webDriverUrlPort')[0];
+  input.value = value;
+  this.updateSessionDepControls();
+};
+
+WebDriverJsView.prototype.getWebPage = function() {
+  var input = document.getElementsByName('webPage')[0];
+  return input.value;
+};
+
+WebDriverJsView.prototype.setWebPage = function(value) {
+  var input = document.getElementsByName('webPage')[0];
+  input.value = value;
+  this.updateSessionDepControls();
+};
+
+WebDriverJsView.prototype.updateSessionDepControls = function() {
+  var disable = this.getDriverUrlPort().trim() === '' ||
+                this.getWebPage().trim() === '';
+
+  var sessionDepControls = [];
+  sessionDepControls.push(document.getElementById('sourceButton'));
+  sessionDepControls.push(document.getElementById('screenshotButton'));
+  for (var controlIndex in sessionDepControls) {
+    var control = sessionDepControls[controlIndex];
+    control.disabled = disable;
+  }
+}
+
 function WebDriverJsController() {
   this.driver = new WebDriverProxy();
   this.visualizer = new VisualizerController(this.driver);
+  this.view = new WebDriverJsView();
 }
 
 WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
@@ -612,16 +662,16 @@ WebDriverJsController.prototype.onQuit = function() {
   this.webPage = null;
 };
 
-function init() {
-  if (localStorage && localStorage.webDriverUrlPort) {
-    var input = document.getElementsByName('webDriverUrlPort')[0];
-    input.value = localStorage.webDriverUrlPort;
-  }
+WebDriverJsController.prototype.onWebDriverUrlPortChange = function() {
+  var input = document.getElementsByName('webDriverUrlPort')[0];
+  this.view.setDriverUrlPort(input.value);
+};
 
-  if (localStorage && localStorage.webPage) {
-    var input = document.getElementsByName('webPage')[0];
-    input.value = localStorage.webPage;
-  }
-}
+WebDriverJsController.prototype.onWebPageChange = function() {
+  var input = document.getElementsByName('webPage')[0];
+  this.view.setWebPage(input.value);
+};
 
-var wd = new WebDriverJsController();
+document.addEventListener("DOMContentLoaded", function(event) {
+  window.wd = new WebDriverJsController();
+});

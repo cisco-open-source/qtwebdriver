@@ -22,21 +22,21 @@
     <script src="hammer.min.js"></script>
     <script src="webdriver-app.js"></script>
   </head>
-  <body onload="init()">
+  <body>
     <table border="0">
       <tr>
         <td>WebDriver url and port</td>
         <td>
-          <input name="webDriverUrlPort" type="text"/>
+          <input name="webDriverUrlPort" type="text" onchange="wd.onWebDriverUrlPortChange()" onkeyup="wd.onWebDriverUrlPortChange()"/>
         </td>
       </tr>
       <tr>
         <td>Web page</td>
         <td>
-          <input name="webPage" type="text"/>
+          <input name="webPage" type="text" onchange="wd.onWebPageChange()" onkeyup="wd.onWebPageChange()"/>
           <input type="button" value="GET" onclick="wd.onGet()"/>
-          <input type="button" value="Source" onclick="wd.onSource()"/>
-          <input type="button" value="Screenshot" onclick="wd.onScreenshot()"/>
+          <input id="sourceButton" type="button" value="Source" onclick="wd.onSource()"/>
+          <input id="screenshotButton" type="button" value="Screenshot" onclick="wd.onScreenshot()"/>
           <select onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
             <option>Logs</option>
             <option>browser</option>
