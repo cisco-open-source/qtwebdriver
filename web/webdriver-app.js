@@ -25,13 +25,13 @@ if (!String.prototype.endsWith) {
   });
 }
 
-webdriver.FirstSessionBuilder = function() {
+webdriver.ExistingSessionBuilder = function() {
   webdriver.AbstractBuilder.call(this);
 };
 
-webdriver.FirstSessionBuilder.prototype = new webdriver.AbstractBuilder();
+webdriver.ExistingSessionBuilder.prototype = Object.create(webdriver.AbstractBuilder.prototype);
 
-webdriver.FirstSessionBuilder.prototype.build = function() {
+webdriver.ExistingSessionBuilder.prototype.build = function() {
   var self = this;
   var client = new webdriver.http.CorsClient(this.getServerUrl());
   var executor = new webdriver.http.Executor(client);
@@ -58,6 +58,31 @@ webdriver.WebDriver.prototype.visualizerShowPoint = function() {
   return this.schedule(
     new webdriver.Command('visualizerShowPoint'),
     'WebDriver.visualizerShowPoint()');
+};
+
+function WebDriverProxy() {
+}
+
+WebDriverProxy.prototype.setServerUrl = function(serverUrl) {
+  var self = this;
+  this.driver_ = new webdriver.ExistingSessionBuilder().
+    usingServer(serverUrl).
+    withCapabilities({'browserName': 'qtwebkit'}).
+    build();
+
+  for (var propertyName in this.driver_) {
+    var property = this.driver_[propertyName];
+    if (typeof property === 'function') {
+      this[propertyName] = function(impl) {
+        return function() { 
+          return impl.apply(self.driver_, arguments);
+        };
+      }(property);
+    }
+  }
+};
+
+WebDriverProxy.prototype.quit = function() {
 };
 
 window.onerror = function(errorMsg, url, lineNumber, columnNumber, error) {
@@ -192,8 +217,8 @@ Util.webDriverKeyFromJs = function(keyCode) {
 };
 
 function VisualizerXsltProcessors() {
-  this.widget = this._create('widget_view_visualizer.xsl');
-  this.qml = this._create('qml_view_visualizer.xsl');
+  this.widget = this.create_('widget_view_visualizer.xsl');
+  this.qml = this.create_('qml_view_visualizer.xsl');
 }
 
 VisualizerXsltProcessors.prototype.get = function(webPage) {
@@ -203,7 +228,7 @@ VisualizerXsltProcessors.prototype.get = function(webPage) {
     return this.qml;
 };
 
-VisualizerXsltProcessors.prototype._create = function(name) {
+VisualizerXsltProcessors.prototype.create_ = function(name) {
   var stylesheet = Util.loadFile(name);
   stylesheet = (new DOMParser()).parseFromString(stylesheet, 'application/xml');
   var processor = new XSLTProcessor();
@@ -215,7 +240,8 @@ VisualizerXsltProcessors.prototype._create = function(name) {
   }
 };
 
-function VisualizerController() {
+function VisualizerController(driver) {
+  this.driver = driver;
   this.xsltProcessors = new VisualizerXsltProcessors();
 }
 
@@ -458,67 +484,63 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
 };
 
 function WebDriverJsController() {
-  this.visualizer = new VisualizerController();
+  this.driver = new WebDriverProxy();
+  this.visualizer = new VisualizerController(this.driver);
 }
 
-WebDriverJsController.prototype._constructWebDriver = function() {
+WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
+  this.driver.setServerUrl(serverUrl);
+
+  this.serverUrl = serverUrl;
+  if (localStorage)
+    localStorage.serverUrl = serverUrl;
+}
+
+WebDriverJsController.prototype.setWebPage = function(webPage) {
+  this.element = null;
+
+  this.driver.get(webPage);
+
+  this.webPage = webPage;
+  if (localStorage)
+    localStorage.webPage = webPage;
+};
+
+WebDriverJsController.prototype.updateDriver = function() {
   var webDriverUrlPort = document.getElementsByName('webDriverUrlPort')[0].value;
+  if (webDriverUrlPort !== this.webDriverUrlPort)
+    this.setServerUrl(webDriverUrlPort);
+
   var webPage = document.getElementsByName('webPage')[0].value;
-
-  if (this.webDriverUrlPort == webDriverUrlPort &&
-      this.webPage == webPage)
-    return;
-
-  if (this.webDriverUrlPort != webDriverUrlPort) {
-    this._driver = this.visualizer.driver = new webdriver.FirstSessionBuilder().
-      usingServer(webDriverUrlPort).
-      withCapabilities({'browserName': 'qtwebkit'}).
-      build();
-
-    this.webDriverUrlPort = webDriverUrlPort;
-    if (localStorage)
-      localStorage.webDriverUrlPort = webDriverUrlPort;
-  }
-
-  if (this.webPage != webPage) {
-    this._driver.get(webPage);
-    this.element = null;
-
-    this.webPage = webPage;
-    if (localStorage)
-      localStorage.webPage = webPage;
-  }
+  if (webPage !== this.webPage)
+    this.setWebPage(webPage);
 };
 
-WebDriverJsController.prototype.driver = function() {
-  if (this._driver === null)
-    this._constructWebDriver();
-  return this._driver;
-};
-
-WebDriverJsController.prototype.get = function() {
+WebDriverJsController.prototype.onGet = function() {
   this.webPage = null;
-  this._constructWebDriver();
+  this.updateDriver();
 };
 
-WebDriverJsController.prototype.source = function() {
-  this._constructWebDriver();
+WebDriverJsController.prototype.onSource = function() {
+  this.updateDriver();
   this.visualizer.updateSource(this.webPage);
 };
 
-WebDriverJsController.prototype.screenshot = function() {
-  this.driver().takeScreenshot().then(function(data) {
+WebDriverJsController.prototype.onScreenshot = function() {
+  this.updateDriver();
+  this.driver.takeScreenshot().then(function(data) {
     data = base64_arraybuffer.decode(data);
     data = new Blob([data], {type: 'image/png'});
     saveAs(data, 'screenshot.png');
   })
 };
 
-WebDriverJsController.prototype.logs = function(type) {
+WebDriverJsController.prototype.onLogs = function(type) {
   if (type === 'Logs')
     return;
 
-  this.driver().manage().logs().get(type).then(function(entries) {
+  this.updateDriver();
+  this.driver.manage().logs().get(type).then(function(entries) {
     var lines = [];
     for (var entryIndex in entries) {
       var entry = entries[entryIndex];
@@ -530,34 +552,34 @@ WebDriverJsController.prototype.logs = function(type) {
   })
 };
 
-WebDriverJsController.prototype.findElement = function() {
+WebDriverJsController.prototype.onFindElement = function() {
   var criteria = document.getElementsByName('findElementCriteria')[0].value;
   var key = document.getElementsByName('findElementKey')[0].value;
   if (criteria === 'id')
-    this.element = this.driver().findElement(webdriver.By.id(key));
+    this.element = this.driver.findElement(webdriver.By.id(key));
   else if (criteria === 'name')
-    this.element = this.driver().findElement(webdriver.By.name(key));
+    this.element = this.driver.findElement(webdriver.By.name(key));
   else if (criteria === 'tagName')
-    this.element = this.driver().findElement(webdriver.By.tagName(key));
+    this.element = this.driver.findElement(webdriver.By.tagName(key));
   else if (criteria === 'xpath')
-    this.element = this.driver().findElement(webdriver.By.xpath(key));
+    this.element = this.driver.findElement(webdriver.By.xpath(key));
 };
 
-WebDriverJsController.prototype.sendKeys = function(key) {
+WebDriverJsController.prototype.onSendKeys = function(key) {
   if (this.element) {
     this.element.sendKeys(key);
   } else {
-    this.driver().actions().sendKeys(key).perform();
+    this.driver.actions().sendKeys(key).perform();
   }
 };
 
-WebDriverJsController.prototype.click = function() {
+WebDriverJsController.prototype.onClick = function() {
   this.element.click();
 };
 
-WebDriverJsController.prototype.listWindowHandles = function() {
+WebDriverJsController.prototype.onListWindowHandles = function() {
   var select = document.getElementById('windowList');
-  this.driver().getAllWindowHandles().then(function(handles) {
+  this.driver.getAllWindowHandles().then(function(handles) {
     select.innerHTML = '';
     for (var handle in handles) {
       var item = document.createElement('option');
@@ -569,24 +591,21 @@ WebDriverJsController.prototype.listWindowHandles = function() {
   });
 };
 
-WebDriverJsController.prototype.chooseWindow = function() {
+WebDriverJsController.prototype.onChooseWindow = function() {
   var handle = document.getElementById('windowList').value;
-  this.driver().switchTo().window(handle);
+  this.driver.switchTo().window(handle);
 };
 
-WebDriverJsController.prototype.setWindowSize = function() {
+WebDriverJsController.prototype.onSetWindowSize = function() {
   var width = document.getElementsByName('windowSizeWidth')[0].value;
   var height = document.getElementsByName('windowSizeHeight')[0].value;
   width = parseInt(width);
   height = parseInt(height);
-  this.driver().manage().window().setSize(width, height);
+  this.driver.manage().window().setSize(width, height);
 };
 
-WebDriverJsController.prototype.quit = function() {
-  if (!this._driver)
-    return;
-
-  this._driver.quit();
+WebDriverJsController.prototype.onQuit = function() {
+  this.driver.quit();
   this.visualizer.quit();
   this.webDriverUrlPort = null;
   this.webPage = null;
