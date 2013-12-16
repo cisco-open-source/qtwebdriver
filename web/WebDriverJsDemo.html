@@ -34,7 +34,7 @@
         <td>Web page</td>
         <td>
           <input name="webPage" type="text" onchange="wd.onWebPageChange()" onkeyup="wd.onWebPageChange()"/>
-          <input type="button" value="GET" onclick="wd.onGet()"/>
+          <input id="getButton" type="button" value="GET" onclick="wd.onGet()"/>
           <input id="sourceButton" type="button" value="Source" onclick="wd.onSource()"/>
           <input id="screenshotButton" type="button" value="Screenshot" onclick="wd.onScreenshot()"/>
           <select onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
@@ -107,7 +107,7 @@
     </div>
 
     <div class="commandBlock">
-      <input type="submit" value="List window handles" onclick="wd.onListWindowHandles()"/>
+      <input id="listWindowButton" type="submit" value="List window handles" onclick="wd.onListWindowHandles()"/>
       <select id="windowList" style="visibility: hidden;">
       </select>
       <input id="chooseWindow" type="submit" value="Choose window" onclick="wd.onChooseWindow()" style="visibility: hidden;"/>

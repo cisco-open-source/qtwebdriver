@@ -632,8 +632,10 @@ WebDriverJsController.prototype.onListWindowHandles = function() {
   var select = document.getElementById('windowList');
   this.driver.getAllWindowHandles().then(function(handles) {
     select.innerHTML = '';
-    for (var handle in handles) {
+    for (var handleIndex in handles) {
+      var handle = handles[handleIndex];
       var item = document.createElement('option');
+      item.setAttribute('value', handle);
       item.innerHTML = handle;
       select.appendChild(item)
     }
