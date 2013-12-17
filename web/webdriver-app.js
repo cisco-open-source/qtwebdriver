@@ -542,6 +542,15 @@ WebDriverJsView.prototype.updateSessionDepControls = function() {
   }
 }
 
+WebDriverJsView.prototype.setSessionId = function(id) {
+  var element = document.getElementById('sessionIdLabel');
+  if (id != null) {
+    element.innerHTML = 'Session: ' + id;
+  } else {
+    element.innerHTML = '';
+  }
+}
+
 WebDriverJsView.prototype.setFoundElementId = function(id) {
   var element = document.getElementById('foundElement');
   if (typeof id.ELEMENT === 'string') {
@@ -571,11 +580,16 @@ function WebDriverJsController() {
 }
 
 WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
+  var self = this;
   this.driver.setServerUrl(serverUrl);
 
   this.serverUrl = serverUrl;
   if (localStorage)
     localStorage.serverUrl = serverUrl;
+
+  this.driver.getSession().then(function(session) {
+    self.view.setSessionId(session.getId());
+  });
 }
 
 WebDriverJsController.prototype.setWebPage = function(webPage) {
@@ -701,6 +715,7 @@ WebDriverJsController.prototype.onQuit = function() {
   this.visualizer.quit();
   this.webDriverUrlPort = null;
   this.webPage = null;
+  this.view.setSessionId(null);
 };
 
 WebDriverJsController.prototype.onWebDriverUrlPortChange = function() {
