@@ -37,25 +37,29 @@
           <input id="getButton" type="button" value="GET" onclick="wd.onGet()"/>
           <input id="sourceButton" type="button" value="Source" onclick="wd.onSource()"/>
           <input id="screenshotButton" type="button" value="Screenshot" onclick="wd.onScreenshot()"/>
-          <select onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
+          <select id="logsSelect" onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
             <option>Logs</option>
-            <option>browser</option>
-            <option>driver</option>
+            <option value="browser">browser</option>
+            <option value="driver">driver</option>
           </select>
         </td>
       </tr>
     </table>
 
+    <div id="error" class="commandBlock" style="display: none; color: red;">
+    </div>
+
     <div class="commandBlock">
       Find element by
       <select name="findElementCriteria">
-        <option>id</option>
-        <option>name</option>
-        <option>tag name</option>
-        <option>xpath</option>
+        <option value="id">id</option>
+        <option value="name">name</option>
+        <option value="tagName">tag name</option>
+        <option value="xpath">xpath</option>
       </select>
       <input name="findElementKey" type="text"/>
       <input type="submit" value="Find element" onclick="wd.onFindElement()">
+      <span id="foundElement" style="visibility: hidden;"></span>
     </div>
 
     <div class="commandBlock">

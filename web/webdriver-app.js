@@ -61,6 +61,14 @@ webdriver.WebDriver.prototype.visualizerShowPoint = function() {
 };
 
 function WebDriverProxy() {
+  for (var propertyName in webdriver.WebDriver.prototype) {
+    if (propertyName in this)
+      continue;
+
+    this[propertyName] = function() {
+      this.handleError('WebDriver is not connected!');
+    };
+  }
 }
 
 WebDriverProxy.prototype.setServerUrl = function(serverUrl) {
@@ -74,7 +82,8 @@ WebDriverProxy.prototype.setServerUrl = function(serverUrl) {
     var property = this.driver_[propertyName];
     if (typeof property === 'function') {
       this[propertyName] = function(impl) {
-        return function() { 
+        return function() {
+          self.handleError(null);
           return impl.apply(self.driver_, arguments);
         };
       }(property);
@@ -533,10 +542,32 @@ WebDriverJsView.prototype.updateSessionDepControls = function() {
   }
 }
 
+WebDriverJsView.prototype.setFoundElementId = function(id) {
+  var element = document.getElementById('foundElement');
+  if (typeof id.ELEMENT === 'string') {
+    element.innerHTML = 'Found element ' + id.ELEMENT;
+  } else {
+    element.innerHTML = id.ELEMENT.message;
+  }
+  element.style.visibility = 'visible';
+}
+
+WebDriverJsView.prototype.setError = function(message) {
+  var element = document.getElementById('error');
+  if (message != null) {
+    element.innerHTML = message;
+    element.style.display = 'block';
+  } else {
+    element.innerHTML = '';
+    element.style.display = 'none';
+  }
+}
+
 function WebDriverJsController() {
   this.driver = new WebDriverProxy();
   this.visualizer = new VisualizerController(this.driver);
   this.view = new WebDriverJsView();
+  this.driver.handleError = this.view.setError.bind(this.view);
 }
 
 WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
@@ -604,8 +635,12 @@ WebDriverJsController.prototype.onLogs = function(type) {
 };
 
 WebDriverJsController.prototype.onFindElement = function() {
+  var self = this;
   var criteria = document.getElementsByName('findElementCriteria')[0].value;
   var key = document.getElementsByName('findElementKey')[0].value;
+
+  this.element = null;
+
   if (criteria === 'id')
     this.element = this.driver.findElement(webdriver.By.id(key));
   else if (criteria === 'name')
@@ -614,6 +649,10 @@ WebDriverJsController.prototype.onFindElement = function() {
     this.element = this.driver.findElement(webdriver.By.tagName(key));
   else if (criteria === 'xpath')
     this.element = this.driver.findElement(webdriver.By.xpath(key));
+
+  this.element.toWireValue().then(function(value) {
+    self.view.setFoundElementId(value);
+  });
 };
 
 WebDriverJsController.prototype.onSendKeys = function(key) {
