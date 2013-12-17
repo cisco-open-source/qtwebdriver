@@ -682,24 +682,34 @@ WebDriverJsController.prototype.onClick = function() {
 };
 
 WebDriverJsController.prototype.onListWindowHandles = function() {
+  var self = this;
   var select = document.getElementById('windowList');
-  this.driver.getAllWindowHandles().then(function(handles) {
-    select.innerHTML = '';
-    for (var handleIndex in handles) {
-      var handle = handles[handleIndex];
-      var item = document.createElement('option');
-      item.setAttribute('value', handle);
-      item.innerHTML = handle;
-      select.appendChild(item)
-    }
-    document.getElementById('windowList').style.visibility = 'visible';
-    document.getElementById('chooseWindow').style.visibility = 'visible';
+  this.driver.getWindowHandle().then(function(activeWindowHandle) {
+    self.driver.getAllWindowHandles().then(function(handles) {
+      select.innerHTML = '';
+      for (var handleIndex in handles) {
+        var handle = handles[handleIndex];
+        var item = document.createElement('option');
+        item.setAttribute('value', handle);
+        item.innerHTML = handle;
+        if (activeWindowHandle == handle) {
+          item.innerHTML += ' (active)';
+          item.selected = true;
+        }
+        select.appendChild(item)
+      }
+      document.getElementById('windowList').style.visibility = 'visible';
+      document.getElementById('chooseWindow').style.visibility = 'visible';
+    });
   });
 };
 
 WebDriverJsController.prototype.onChooseWindow = function() {
+  var self = this;
   var handle = document.getElementById('windowList').value;
-  this.driver.switchTo().window(handle);
+  this.driver.switchTo().window(handle).then(function() {
+    self.onListWindowHandles();
+  });
 };
 
 WebDriverJsController.prototype.onSetWindowSize = function() {
