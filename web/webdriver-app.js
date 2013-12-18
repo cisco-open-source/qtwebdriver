@@ -555,10 +555,13 @@ WebDriverJsView.prototype.setFoundElementId = function(id) {
   var element = document.getElementById('foundElement');
   if (typeof id.ELEMENT === 'string') {
     element.innerHTML = 'Found element ' + id.ELEMENT;
+    element.style.visibility = 'visible';
+    document.getElementById('elementActions').style.visibility = 'visible';
   } else {
-    element.innerHTML = id.ELEMENT.message;
+    element.style.visibility = 'hidden';
+    this.setError(id.ELEMENT.message);
+    document.getElementById('elementActions').style.visibility = 'hidden';
   }
-  element.style.visibility = 'visible';
 }
 
 WebDriverJsView.prototype.setError = function(message) {
@@ -669,16 +672,66 @@ WebDriverJsController.prototype.onFindElement = function() {
   });
 };
 
+WebDriverJsController.prototype.onElementClick = function() {
+  this.element.click();
+};
+
+WebDriverJsController.prototype.onElementSubmit = function() {
+  this.element.submit();
+};
+
+WebDriverJsController.prototype.onElementClear = function() {
+  this.element.clear();
+};
+
+WebDriverJsController.prototype.onElementTagName = function() {
+  this.element.getTagName().then(function(value) {
+    alert('Element tag name: ' + value);
+  });
+};
+
+WebDriverJsController.prototype.onElementText = function() {
+  this.element.getText().then(function(value) {
+    alert('Element text: ' + value);
+  });
+};
+
+WebDriverJsController.prototype.onElementLocation = function() {
+  this.element.getLocation().then(function(value) {
+    alert('Element location: ' + JSON.stringify(value));
+  });
+};
+
+WebDriverJsController.prototype.onElementSize = function() {
+  this.element.getSize().then(function(value) {
+    alert('Element size: ' + JSON.stringify(value));
+  });
+};
+
+WebDriverJsController.prototype.onElementIsSelected = function() {
+  this.element.isSelected().then(function(value) {
+    alert('Element selection: ' + value);
+  });
+};
+
+WebDriverJsController.prototype.onElementIsEnabled = function() {
+  this.element.isEnabled().then(function(value) {
+    alert('Element enabled: ' + value);
+  });
+};
+
+WebDriverJsController.prototype.onElementIsDisplayed = function() {
+  this.element.isDisplayed().then(function(value) {
+    alert('Element displayed: ' + value);
+  });
+};
+
 WebDriverJsController.prototype.onSendKeys = function(key) {
   if (this.element) {
     this.element.sendKeys(key);
   } else {
     this.driver.actions().sendKeys(key).perform();
   }
-};
-
-WebDriverJsController.prototype.onClick = function() {
-  this.element.click();
 };
 
 WebDriverJsController.prototype.onListWindowHandles = function() {
