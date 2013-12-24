@@ -23,11 +23,9 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-              #'-L/opt/lib',
               '-lQt5OpenGL',
               '-lQt5PrintSupport',
               '-lQt5Network',
-              '-lQt5V8',
               '-lQt5Widgets',
               '-lQt5Quick',
               '-lQt5Qml',
@@ -44,6 +42,7 @@
               '-lQt5MultimediaWidgets',
               '-lQt5Sensors',
               '-lQt5Multimedia',
+              '-lQt5Positioning',
             ],
           } ],
           ['OS=="win"', {
