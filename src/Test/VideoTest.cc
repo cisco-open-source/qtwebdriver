@@ -65,6 +65,7 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
 
 VideoTestWidget::~VideoTestWidget()
 {
+    delete mediaPlayer;
 }
 
 void VideoTestWidget::play()
