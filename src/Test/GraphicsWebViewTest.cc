@@ -11,11 +11,12 @@ GraphicsWebViewTestWindows::GraphicsWebViewTestWindows(QWidget *parent) :
     this->setWindowTitle("Test Widget");
 
     QGraphicsScene *pScene = new QGraphicsScene();
-    QGraphicsWebView *pWebView = new QGraphicsWebView();
+    pWebView = new QGraphicsWebView();
     pScene->addItem(pWebView);
 
     this->setScene(pScene);
 }
 
-GraphicsWebViewTestWindows::~GraphicsWebViewTestWindows() {}
-
+GraphicsWebViewTestWindows::~GraphicsWebViewTestWindows() {
+    delete pWebView;
+}

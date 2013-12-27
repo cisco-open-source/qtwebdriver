@@ -17,6 +17,8 @@ class GraphicsWebViewTestWindows : public QGraphicsView
 public:
     explicit GraphicsWebViewTestWindows(QWidget *parent = 0);
     ~GraphicsWebViewTestWindows();
+private:
+    QGraphicsWebView *pWebView;
 };
 
 #endif // GRAPHICS_WEB_VIEW_TEST_H
