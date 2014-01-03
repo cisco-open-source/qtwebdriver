@@ -488,6 +488,7 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
   } else {
     var visualizerDoc = this.visualizationWin.document;
     visualizerDoc.write(source);
+    visualizerDoc.title += ' - Visualizer';
   }
 
   this.visualizerAssignEventHandlers();
