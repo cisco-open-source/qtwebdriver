@@ -82,10 +82,10 @@
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
               ],
-            }, 
-          } ], 
+            },
+          } ],
           ['OS=="android"', {
-            'libraries': [		
+            'libraries': [
               '-L<(QT_LIB_PATH)',
               '-lQt5Widgets',
               '-lQt5Network',
@@ -107,28 +107,19 @@
                 '<(QT_LIB_PATH)/libQt5Gui.a',
                 '<(QT_LIB_PATH)/libQt5Core.a',
                 '<(QT_LIB_PATH)/libQt5Widgets.a',
-                # Quick2 isn't supported in QT for iOS
-                #'<(QT_LIB_PATH)/libQt5Qml.a',
-                #'<(QT_LIB_PATH)/libQt5Quick.a',
+                '<(QT_LIB_PATH)/libQt5Qml.a',
+                '<(QT_LIB_PATH)/libQt5Quick.a',
                 '<(QT_LIB_PATH)/libQt5Xml.a',
-                #'<(QT_LIB_PATH)/libQt5MultimediaWidgets.a',
-                #'<(QT_LIB_PATH)/libQt5Multimedia.a',
-                #'<(QT_LIB_PATH)/libQt5V8.a',
-                #'<(QT_LIB_PATH)/libQt5XmlPatterns.a',
-                #'<(QT_LIB_PATH)/libQt5OpenGL.a',
-                #'<(QT_LIB_PATH)/libQt5OpenGLExtensions.a',
                 '<(QT_LIB_PATH)/libQt5PlatformSupport.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreText.framework',
                 '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
-                #'$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
-                #'$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
                 'libz.dylib',
               ],
-            }, 
-     
+            },
+
             'xcode_settings': {
               'TARGETED_DEVICE_FAMILY': '1,2',
               'CODE_SIGN_IDENTITY': 'iPhone Developer',
@@ -136,7 +127,7 @@
               'ARCHS': '$(ARCHS_STANDARD_32_BIT)',
               'CLANG_WARN_CXX0X_EXTENSIONS': 'NO',
             },
-          } ],      
+          } ],
         ],
       }, {
         'conditions': [

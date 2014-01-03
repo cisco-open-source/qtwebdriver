@@ -28,7 +28,7 @@
         '-g',
       ],
     } ],
-     
+
     [ 'mode == "release"', {
       'cflags': [
         '-O3',
@@ -79,7 +79,7 @@
           '--sysroot=<!(/bin/echo -n $ANDROID_NDK_ROOT)/platforms/android-9/arch-<!(/bin/echo -n $ANDROID_ARCH)',
         ],
     } ],
-     
+
     [ 'OS == "win"', {
       'defines': [
          '_WIN32',
@@ -105,12 +105,12 @@
         'outputs':     [],
         'action':      ['mkdir', '-p', '<(INTERMEDIATE_DIR)'],
        } ],
-       
-      'defines': [ 
+
+      'defines': [
          'OS_POSIX',
       ],
 
-      'xcode_settings': {	
+      'xcode_settings': {
         'GCC_SYMBOLS_PRIVATE_EXTERN': 'YES',
       },
     } ],

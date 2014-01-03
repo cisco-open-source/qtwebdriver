@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export QT_DIR=/Developer/Qt4iOS/qt-everywhere-ios-5.1.0
+export QT_DIR=/usr/local/opt/qt5_ios
 export PATH=$QT_DIR/bin:$PATH
 
 python generate_wdversion.py
@@ -14,9 +14,9 @@ xcodebuild -project out/wd_test.xcodeproj -target test_ios_WD -arch i386 -sdk ip
 
 cd ./platform/ios/wd
 qmake wd.pro -r -spec unsupported/macx-iossimulator-clang CONFIG+=x86
-make -release	
-	
-cd ../wd_test	
+make -release
+
+cd ../wd_test
 
 xcodebuild -project wd_test.xcodeproj -alltargets -arch i386 -sdk iphonesimulator -configuration Debug ONLY_ACTIVE_ARCH=NO VALID_ARCHS="armv7 i386" clean build
 
