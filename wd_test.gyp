@@ -163,11 +163,11 @@
           [ 'OS=="mac"', {
             'link_settings': {
               'libraries': [
-                '<(QT_LIB_PATH)/QtGui.framework',
-                '<(QT_LIB_PATH)/QtCore.framework',
-                '<(QT_LIB_PATH)/QtNetwork.framework',
-                '<(QT_LIB_PATH)/QtDeclarative.framework',
-                '<(QT_LIB_PATH)/QtXml.framework',
+                '<(QT_LIB_PATH)/libQtGui.a',
+                '<(QT_LIB_PATH)/libQtCore.a',
+                '<(QT_LIB_PATH)/libQtNetwork.a',
+                '<(QT_LIB_PATH)/libQtDeclarative.a',
+                '<(QT_LIB_PATH)/libQtXml.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
@@ -336,7 +336,7 @@
             } ],
             [ 'OS=="mac" or OS=="ios"', {
               'link_settings': {
-                'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
+                'libraries': ['<(QT_LIB_PATH)/libQtWebKit.a',],
               },
             } ],
           ],
