@@ -571,6 +571,10 @@ function VirtualKeyboardWidget() {
     },
 
     change: function(e, keyboard, el) {
+      // handle only left mouse button presses
+      if (event.button !== 0)
+        return;
+
       var key = keyboard.lastKey;
       if (key === KEY_SHIFT)
         return;
