@@ -6,5 +6,6 @@
     'QT_INC_PATH':    '/usr/local/opt/qt5_ios/include',
     'QT_LIB_PATH':    '/usr/local/opt/qt5_ios/lib',
     'QT_BIN_PATH':    '/usr/local/opt/qt5_ios/bin',
+    'INTERMEDIATE_DIR': 'mocs',
   },
 }
