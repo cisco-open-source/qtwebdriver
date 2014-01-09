@@ -505,11 +505,110 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
   this.visualizerAssignEventHandlers();
 };
 
+function VirtualKeyboardWidget() {
+  var self = this;
+
+  var KEY_ESC = 'Esc',
+      KEY_BKSP = 'Bksp',
+      KEY_TAB = '\u21e5 Tab',
+      KEY_ENTER = 'Enter',
+      KEY_SHIFT = 'Shift',
+      KEY_UP = '\u21d1',
+      KEY_DOWN = '\u21d3',
+      KEY_LEFT = '\u21d0',
+      KEY_RIGHT = '\u21d2';
+
+  var labelToKeyMap = {};
+  labelToKeyMap[KEY_ESC] = webdriver.Key.ESCAPE;
+  labelToKeyMap[KEY_BKSP] = webdriver.Key.BACK_SPACE;
+  labelToKeyMap[KEY_TAB] = webdriver.Key.TAB;
+  labelToKeyMap[KEY_ENTER] = webdriver.Key.ENTER;
+  labelToKeyMap[KEY_SHIFT] = webdriver.Key.SHIFT;
+  labelToKeyMap[KEY_UP] = webdriver.Key.UP;
+  labelToKeyMap[KEY_DOWN] = webdriver.Key.DOWN;
+  labelToKeyMap[KEY_LEFT] = webdriver.Key.LEFT;
+  labelToKeyMap[KEY_RIGHT] = webdriver.Key.RIGHT;
+
+  $.keyboard.keyaction.esc = function() {};
+  $.keyboard.keyaction.tab = function() {};
+  $.keyboard.keyaction.up = function() {};
+  $.keyboard.keyaction.down = function() {};
+
+  $('#keyboard').keyboard({
+    layout: 'custom',
+
+    customLayout: {
+      'default': [
+        '{esc} ` 1 2 3 4 5 6 7 8 9 0 - = {bksp}',
+        '{tab} q w e r t y u i o p [ ] \\',
+        'a s d f g h j k l ; \' {enter}',
+        '{shift} z x c v b n m , . / {shift}',
+        '{space} {left} {up} {down} {right}'
+      ],
+
+      'shift': [
+        '{esc} ~ ! @ # $ % ^ & * ( ) _ + {bksp}',
+        '{tab} Q W E R T Y U I O P { } |',
+        'A S D F G H J K L : " {enter}',
+        '{shift} Z X C V B N M < > ? {shift}',
+        '{space} {left} {up} {down} {right}'
+      ]
+    },
+
+    display: {
+      'esc': KEY_ESC,
+      'bksp': KEY_BKSP,
+      'enter': KEY_ENTER,
+      'space': ' ',
+      'up': KEY_UP,
+      'left': KEY_LEFT,
+      'right': KEY_RIGHT,
+      'down': KEY_DOWN
+    },
+
+    position: {
+      using: function(props, feedback) {}
+    },
+
+    change: function(e, keyboard, el) {
+      var key = keyboard.lastKey;
+      if (key === KEY_SHIFT)
+        return;
+      if (key in labelToKeyMap)
+        key = labelToKeyMap[key];
+      self.fireEvent(key);
+    },
+
+    appendLocally: true,
+    usePreview: false,
+    alwaysOpen: true,
+    initialFocus: false,
+    stayOpen: true,
+    useCombos: false,
+    repeatRate: 0
+  });
+  
+  $('.ui-keyboard').css({position: 'relative'});
+}
+
+VirtualKeyboardWidget.prototype.addEventListener = function(listener) {
+  if (typeof this.eventListeners === 'undefined')
+    this.eventListeners = [];
+  this.eventListeners.push(listener);
+};
+
+VirtualKeyboardWidget.prototype.fireEvent = function(key) {
+  for (var listenerIndex in this.eventListeners) {
+    var listener = this.eventListeners[listenerIndex];
+    listener(key);
+  }
+};
+
 function WebDriverJsView() {
   if (localStorage && localStorage.webDriverUrlPort) {
     this.setDriverUrlPort(localStorage.webDriverUrlPort);
   } else {
-    this.setDriverUrlPort('');
+    this.setDriverUrlPort(window.location.protocol + '//' + window.location.host);
   }
 
   if (localStorage && localStorage.webPage) {
@@ -517,6 +616,8 @@ function WebDriverJsView() {
   } else {
     this.setWebPage('');
   }
+
+  this.keyboard = new VirtualKeyboardWidget();
 }
 
 WebDriverJsView.prototype.getDriverUrlPort = function() {
@@ -585,13 +686,14 @@ WebDriverJsView.prototype.setError = function(message) {
     element.innerHTML = '';
     element.style.display = 'none';
   }
-}
+};
 
 function WebDriverJsController() {
   this.driver = new WebDriverProxy();
   this.visualizer = new VisualizerController(this.driver);
   this.view = new WebDriverJsView();
   this.driver.handleError = this.view.setError.bind(this.view);
+  this.view.keyboard.addEventListener(this.onSendKeys.bind(this));
 }
 
 WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
