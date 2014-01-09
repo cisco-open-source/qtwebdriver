@@ -450,10 +450,21 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
   });
 
   hammer.on("rotate", function(event) {
+    // get principal angle from the interval (-180, 180)
+    function toPrincipalAngle(angle) {
+      while (angle < 0) angle += 360;
+      angle = angle - Math.round(angle / 360) * 360;
+      if (angle > 180) angle -= 360;
+      return angle;
+    }
+
+    var angle = event.gesture.rotation;
+    angle = Math.round(toPrincipalAngle(angle));
+
     var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
     self.driver.actions().
-      touchPinchRotate(target, event.gesture.rotation).
+      touchPinchRotate(target, angle).
       perform();
   });
 
