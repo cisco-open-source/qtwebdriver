@@ -512,6 +512,7 @@ function VirtualKeyboardWidget() {
       KEY_BKSP = 'Bksp',
       KEY_TAB = '\u21e5 Tab',
       KEY_ENTER = 'Enter',
+      KEY_SPACE = '&nbsp;',
       KEY_SHIFT = 'Shift',
       KEY_UP = '\u21d1',
       KEY_DOWN = '\u21d3',
@@ -523,6 +524,7 @@ function VirtualKeyboardWidget() {
   labelToKeyMap[KEY_BKSP] = webdriver.Key.BACK_SPACE;
   labelToKeyMap[KEY_TAB] = webdriver.Key.TAB;
   labelToKeyMap[KEY_ENTER] = webdriver.Key.ENTER;
+  labelToKeyMap[KEY_SPACE] = ' ';
   labelToKeyMap[KEY_SHIFT] = webdriver.Key.SHIFT;
   labelToKeyMap[KEY_UP] = webdriver.Key.UP;
   labelToKeyMap[KEY_DOWN] = webdriver.Key.DOWN;
@@ -559,7 +561,7 @@ function VirtualKeyboardWidget() {
       'esc': KEY_ESC,
       'bksp': KEY_BKSP,
       'enter': KEY_ENTER,
-      'space': ' ',
+      'space': KEY_SPACE,
       'up': KEY_UP,
       'left': KEY_LEFT,
       'right': KEY_RIGHT,
