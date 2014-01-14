@@ -103,25 +103,31 @@
           [ 'OS=="ios"', {
             'link_settings': {
               'libraries': [
-                '<(QT_LIB_PATH)/libQt5Network.a',
-                '<(QT_LIB_PATH)/libQt5Gui.a',
-                '<(QT_LIB_PATH)/libQt5Core.a',
-                '<(QT_LIB_PATH)/libQt5Widgets.a',
-                '<(QT_LIB_PATH)/libQt5Qml.a',
-                '<(QT_LIB_PATH)/libQt5Quick.a',
-                '<(QT_LIB_PATH)/libQt5Xml.a',
-                '<(QT_LIB_PATH)/libQt5PlatformSupport.a',
+                '<(QT_LIB_PATH)/libQt5Network_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Gui_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Core_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Widgets_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5MultimediaWidgets_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Multimedia_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Qml_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5OpenGL_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Quick_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Xml_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5PlatformSupport_iphonesimulator.a',
+                '<(QT_LIB_PATH)/../plugins/platforms/libqios_iphonesimulator.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreText.framework',
+                '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
+                '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
                 '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
                 'libz.dylib',
               ],
             },
 
             'xcode_settings': {
-              'TARGETED_DEVICE_FAMILY': '1,2',
+              'TARGETED_DEVICE_FAMILY': '2',
               'CODE_SIGN_IDENTITY': 'iPhone Developer',
               'IPHONEOS_DEPLOYMENT_TARGET': '6.1',
               'ARCHS': '$(ARCHS_STANDARD_32_BIT)',
@@ -250,8 +256,7 @@
         '<(INTERMEDIATE_DIR)/moc_MenuTest.cc',
       ],
       'conditions': [
-        # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
-        [ 'OS != "ios" and <(QT5) == 1', {
+        [ '<(QT5) == 1', {
           'sources': [
             'src/Test/VideoTest.h',
             'src/Test/VideoTest.cc',
@@ -313,7 +318,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
-            [ 'OS=="mac" or OS=="ios"', {
+            [ 'OS=="mac"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/libQt5WebKit.a','<(QT_LIB_PATH)/libQt5WebKitWidgets.a',],
               },
@@ -334,7 +339,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
             } ],
-            [ 'OS=="mac" or OS=="ios"', {
+            [ 'OS=="mac"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/libQtWebKit.a',],
               },
@@ -434,6 +439,7 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
       
