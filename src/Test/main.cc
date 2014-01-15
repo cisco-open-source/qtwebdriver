@@ -16,10 +16,6 @@
 
 #include <iostream>
 
-#include "TestVariables.h"
-std::string tests::testDataFolder;
-
-
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -42,10 +38,10 @@ std::string tests::testDataFolder;
 #include "WindowWithDeclarativeViewTest.h"
 #endif
 
-// Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
 #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "VideoTest.h"
-#endif//WD_ENABLE_PLAYER
+extern std::string testDataFolder;
+#endif //WD_ENABLE_PLAYER
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -55,7 +51,6 @@ std::string tests::testDataFolder;
 #include "shutdown_command.h"
 #include "webdriver_route_patterns.h"
 
-#ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // headers for Quick2 extension
     #include "extension_qt/quick2_view_creator.h"
@@ -67,13 +62,12 @@ std::string tests::testDataFolder;
     #include "extension_qt/qml_view_creator.h"
     #include "extension_qt/qml_view_executor.h"
     #include "extension_qt/qml_view_enumerator.h"
-        #if (WD_TEST_ENABLE_WEB_VIEW == 1)
-            #include "extension_qt/qdeclarativewebview.h"
-            #include "extension_qt/qml_web_view_enumerator.h"
-            #include "extension_qt/qml_web_view_executor.h"
-        #endif
-#endif
-#endif //OS_IOS
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)
+    #include "extension_qt/qdeclarativewebview.h"
+    #include "extension_qt/qml_web_view_enumerator.h"
+    #include "extension_qt/qml_web_view_executor.h"
+#endif //WD_TEST_ENABLE_WEB_VIEW
+#endif //QT_VERSION
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -87,8 +81,8 @@ std::string tests::testDataFolder;
 #include "WidgetAndWebViewTest.h"
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
-#endif
-#endif
+#endif //QT_VERSION
+#endif //WD_TEST_ENABLE_WEB_VIEW
 
 #include "extension_qt/q_view_runner.h"
 #include "extension_qt/q_session_lifecycle_actions.h"
@@ -171,10 +165,9 @@ int main(int argc, char *argv[])
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
-#endif
-#endif
+#endif // QT_VERSION
+#endif // WD_TEST_ENABLE_WEB_VIEW
 
-#ifndef OS_IOS 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
@@ -205,8 +198,7 @@ int main(int argc, char *argv[])
     #endif
 
 #endif    
-#endif //OS_IOS
-    
+
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
@@ -232,14 +224,18 @@ int main(int argc, char *argv[])
       return 0;
     }
 
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // check if --test_data_folder CL argument is present
     std::string testDataFolderSwitch = "test_data_folder";
+
     if (cmd_line.HasSwitch(testDataFolderSwitch)) {
-      tests::testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
+      testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
     } else {
-        tests::testDataFolder = "./";
+      testDataFolder = "./";
     }
-    std::cout << "Using "<< tests::testDataFolder << " as test data folder" << std::endl;
+
+    std::cout << "Using "<< testDataFolder << " as test data folder" << std::endl;
+#endif //WD_ENABLE_PLAYER
 
 #if defined(OS_WIN)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))

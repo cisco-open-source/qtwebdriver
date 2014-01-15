@@ -22,7 +22,7 @@ SOURCES += \
     ../../../src/Test/BasicKeyboardInterfaceTest.cc \
     ../../../src/Test/TouchTest.cc \
     ../../../src/Test/MenuTest.cc \
-    #../../../src/Test/VideoTest.cc
+    ../../../src/Test/VideoTest.cc
 
 HEADERS += \
     ../../../src/Test/shutdown_command.h \
@@ -45,9 +45,8 @@ HEADERS += \
     ../../../src/Test/BasicMouseInterfaceTest.h \
     ../../../src/Test/BasicKeyboardInterfaceTest.h \
     ../../../src/Test/TouchTest.h \
-    ../../../src/Test/TestVariables.h \
     ../../../src/Test/MenuTest.h \
-    #../../../src/Test/VideoTest.h
+    ../../../src/Test/VideoTest.h
 
 INCLUDEPATH += ../../../inc
 
@@ -55,6 +54,7 @@ FORMS += \
     ../../../src/Test/ElementSelectingTest.ui \
     ../../../src/Test/ClickScrollingTest.ui
 
+DEFINES += WD_ENABLE_PLAYER="1"
 
 DESTDIR = build
 OBJECTS_DIR = build
