@@ -19,8 +19,7 @@
 */
  
 import QtQuick 2.1
-import QtQuick.Window 2.1
-import QtQuick.Controls 2.1
-import QtQuick.Layouts 2.1 
+import QtQuick.Controls 1.1
+import QtMultimedia 5.0
 
 QtObject {}

@@ -1,4 +1,8 @@
-QT       += core gui network widgets qml xml multimedia multimediawidgets quick
+QT += core gui network widgets qml xml multimedia multimediawidgets quick
+
+TEMPLATE = app
+QTPLUGIN += qtaudio_coreaudio qtmedia_audioengine qavfmediaplayer qavfcamera
+CONFIG += mobility
 
 SOURCES += \
     ../../../src/Test/shutdown_command.cc \
