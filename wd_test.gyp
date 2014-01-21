@@ -23,8 +23,6 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-              '-lQt5OpenGL',
-              '-lQt5PrintSupport',
               '-lQt5Network',
               '-lQt5Widgets',
               '-lQt5Quick',
