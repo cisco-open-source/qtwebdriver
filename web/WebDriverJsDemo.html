@@ -51,8 +51,8 @@
         <td>
           <input name="webPage" type="text" onchange="wd.onWebPageChange()" onkeyup="wd.onWebPageChange()"/>
           <input id="getButton" type="button" value="GET" onclick="wd.onGet()"/>
-          <input id="sourceButton" type="button" value="Source" onclick="wd.onSource()"/>
-          <input id="screenshotButton" type="button" value="Screenshot" onclick="wd.onScreenshot()"/>
+          <input id="sourceButton" type="button" value="Source" disabled="true" onclick="wd.onSource()"/>
+          <input id="screenshotButton" type="button" value="Screenshot" disabled="true" onclick="wd.onScreenshot()"/>
           <select id="logsSelect" onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
             <option>Logs</option>
             <option value="browser">browser</option>
