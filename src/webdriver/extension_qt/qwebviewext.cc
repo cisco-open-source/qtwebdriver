@@ -7,8 +7,10 @@
 #include "webdriver_switches.h"
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets/QWidget>
+#include <QtWebKitWidgets/QWebFrame>
 #else
 #include <QtGui/QWidget>
+#include <QtWebKit/QWebFrame>
 #endif
 
 QWebViewExt::QWebViewExt(QWidget *parent) :
@@ -16,6 +18,7 @@ QWebViewExt::QWebViewExt(QWidget *parent) :
 {
     setWebInspectorProperty(this);
     connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
+    connect(this, SIGNAL(titleChanged(QString)), this, SLOT(setWindowTitle(QString)));
 }
 
 QWebViewExt::~QWebViewExt()

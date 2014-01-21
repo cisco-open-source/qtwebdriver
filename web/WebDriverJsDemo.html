@@ -8,19 +8,30 @@
 
       .commandBlock {
         margin-top: 20px;
-        border-style: solid;
-        border-width: thin;
-        border-color: gray;
-      }
-
-      #keyboard input {
-        min-width: 30px;
       }
 
       #findElementPanel td {
         vertical-align: top;
       }
+
+      .ui-keyboard-keyset {
+        width: 600px;
+      }
+
+      .ui-keyboard-space {
+        margin-top: -100px;
+      }
     </style>
+
+    <!-- jQuery & jQuery UI + theme (required) -->
+    <link href="http://code.jquery.com/ui/1.9.0/themes/smoothness/jquery-ui.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+
+    <!-- keyboard widget css & script (required) -->
+    <link href="keyboard.css" rel="stylesheet">
+    <script src="jquery.keyboard.js"></script>
+
     <script src="webdriver.js"></script>
     <script src="base64-arraybuffer.js"></script>
     <script src="FileSaver.js"></script>
@@ -51,10 +62,10 @@
       </tr>
     </table>
 
-    <div id="error" class="commandBlock" style="display: none; color: red;">
+    <div id="error" class="commandBlock ui-widget-content ui-corner-all" style="display: none; color: red;">
     </div>
 
-    <div id="findElementPanel" class="commandBlock">
+    <div id="findElementPanel" class="commandBlock ui-widget-content ui-corner-all">
       <table>
         <tr>
           <td>
@@ -99,61 +110,17 @@
     </div>
 
     <div class="commandBlock">
-      <div style="position: absolute;">Key down:</div>
-      <div id="keyboard" style="margin-left: 80px;">
-        <div>
-          <input type="submit" value="ESC" onclick="wd.onSendKeys(webdriver.Key.ESCAPE)"/>
-          <input type="submit" value="Q" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="W" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="E" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="R" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="T" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="Y" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="U" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="I" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="O" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="P" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="←" onclick="wd.onSendKeys(webdriver.Key.BACK_SPACE)"/>
-        </div>
-        <div>
-          <input type="submit" value="A" onclick="wd.onSendKeys(this.value)" style="margin-left: 53px;"/>
-          <input type="submit" value="S" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="D" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="F" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="G" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="H" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="J" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="K" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="L" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="Enter" onclick="wd.onSendKeys(webdriver.Key.ENTER)"/>
-        </div>
-        <div>
-          <input type="submit" value="Z" onclick="wd.onSendKeys(this.value)" style="margin-left: 53px;"/>
-          <input type="submit" value="X" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="C" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="V" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="B" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="N" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="M" onclick="wd.onSendKeys(this.value)"/>
-          <input type="submit" value="&#8657;" onclick="wd.onSendKeys(webdriver.Key.UP)" style="margin-left: 45px;"/>
-        </div>
-        <div>
-          <input type="submit" value=" " onclick="wd.onSendKeys(this.value)" style="width: 129px; margin-left: 100px;"/>
-          <input type="submit" value="&#8656;" onclick="wd.onSendKeys(webdriver.Key.LEFT)" style="margin-left: 91px;"/>
-          <input type="submit" value="&#8659;" onclick="wd.onSendKeys(webdriver.Key.DOWN)"/>
-          <input type="submit" value="&#8658;" onclick="wd.onSendKeys(webdriver.Key.RIGHT)"/>
-        </div>
-      </div>
+      <input id="keyboard" type="text" style="display: none;"/>
     </div>
 
-    <div class="commandBlock">
+    <div class="commandBlock ui-widget-content ui-corner-all">
       <input id="listWindowButton" type="submit" value="List window handles" onclick="wd.onListWindowHandles()"/>
       <select id="windowList" style="visibility: hidden;">
       </select>
       <input id="chooseWindow" type="submit" value="Choose window" onclick="wd.onChooseWindow()" style="visibility: hidden;"/>
     </div>
 
-    <div class="commandBlock">
+    <div class="commandBlock ui-widget-content ui-corner-all">
       <input type="submit" value="Set window size" onclick="wd.onSetWindowSize()"/>
       <input name="windowSizeWidth" type="text" style="width: 50px"/>
       <span class="unitLabel">px</span> width and
@@ -161,7 +128,7 @@
       <span class="unitLabel">px</span> height.
     </div>
 
-    <div class="commandBlock">
+    <div class="commandBlock ui-widget-content ui-corner-all">
       <input name="disableMouseEvents" type="checkbox" style="width: 50px">Disable click events</input>
     </div>
 

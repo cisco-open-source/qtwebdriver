@@ -1,4 +1,7 @@
 #include "VideoTest.h"
+#include <string>
+
+std::string testDataFolder;
 
 VideoTestWidget::VideoTestWidget(QWidget *parent) :
     QMainWindow(parent)
@@ -42,7 +45,7 @@ VideoTestWidget::VideoTestWidget(QWidget *parent) :
     controlsLayout->addWidget(positionSlider);
     controlsLayout->addWidget(volumeSlider);
 
-    QString videoPath(tests::testDataFolder.c_str());
+    QString videoPath(testDataFolder.c_str());
     if(!videoPath.isEmpty()){
         if(!videoPath.endsWith("/"))
             videoPath.append("/");

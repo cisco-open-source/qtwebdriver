@@ -840,7 +840,6 @@ void QWebViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &
     float degree = angle;
     float rad = M_PI*degree/180;
 
-
     QTouchEvent *touchBeginEvent = create2PointTouchEvent(QEvent::TouchBegin, Qt::TouchPointPressed, startPoint, startPoint2);
     QApplication::postEvent(view_, touchBeginEvent);
 
@@ -908,7 +907,7 @@ void QWebViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double 
             point2.setX(startPoint2.x() + dx*i/stepCount);
         else
             point2.setX(startPoint2.x() - dx*i/stepCount);
-        qDebug()<<i<<point1<<point2;
+
         QTouchEvent *touchMoveEvent = create2PointTouchEvent(QEvent::TouchUpdate, Qt::TouchPointMoved, point1, point2);
         QApplication::postEvent(view_, touchMoveEvent);
 
