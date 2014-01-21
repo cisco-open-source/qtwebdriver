@@ -1,4 +1,8 @@
-QT       += core gui network
+QT += core gui network widgets qml xml multimedia multimediawidgets quick
+
+TEMPLATE = app
+QTPLUGIN += qtaudio_coreaudio qtmedia_audioengine qavfmediaplayer qavfcamera
+CONFIG += mobility
 
 SOURCES += \
     ../../../src/Test/shutdown_command.cc \
@@ -19,7 +23,10 @@ SOURCES += \
     ../../../src/Test/ClickTest.cc \
     ../../../src/Test/ClickScrollingTest.cc \
     ../../../src/Test/BasicMouseInterfaceTest.cc \
-    ../../../src/Test/BasicKeyboardInterfaceTest.cc
+    ../../../src/Test/BasicKeyboardInterfaceTest.cc \
+    ../../../src/Test/TouchTest.cc \
+    ../../../src/Test/MenuTest.cc \
+    ../../../src/Test/VideoTest.cc
 
 HEADERS += \
     ../../../src/Test/shutdown_command.h \
@@ -40,20 +47,34 @@ HEADERS += \
     ../../../src/Test/ClickTest.h \
     ../../../src/Test/ClickScrollingTest.h \
     ../../../src/Test/BasicMouseInterfaceTest.h \
-    ../../../src/Test/BasicKeyboardInterfaceTest.h
+    ../../../src/Test/BasicKeyboardInterfaceTest.h \
+    ../../../src/Test/TouchTest.h \
+    ../../../src/Test/MenuTest.h \
+    ../../../src/Test/VideoTest.h
 
 INCLUDEPATH += ../../../inc
-INCLUDEPATH += ../../../mocs
 
 FORMS += \
     ../../../src/Test/ElementSelectingTest.ui \
     ../../../src/Test/ClickScrollingTest.ui
 
+DEFINES += WD_ENABLE_PLAYER="1"
 
 DESTDIR = build
 OBJECTS_DIR = build
 MOC_DIR = build
 
-ios: include($$[QT_HOST_DATA/get]/mkspecs/common/ios/qiosapp.conf)
+INCLUDEPATH += $$PWD/../../../build/Default-iphonesimulator
+DEPENDPATH += $$PWD/../../../build/Default-iphonesimulator
 
+LIBS += -L$$PWD/../../../build/Default-iphonesimulator/ -lchromium_base
+PRE_TARGETDEPS += $$PWD/../../../build/Default-iphonesimulator/libchromium_base.a
 
+LIBS += -L$$PWD/../../../build/Default-iphonesimulator/ -lWebDriver_core
+PRE_TARGETDEPS += $$PWD/../../../build/Default-iphonesimulator/libWebDriver_core.a
+
+LIBS += -L$$PWD/../../../build/Default-iphonesimulator/ -lWebDriver_extension_qt_base
+PRE_TARGETDEPS += $$PWD/../../../build/Default-iphonesimulator/libWebDriver_extension_qt_base.a
+
+LIBS += -L$$PWD/../../../build/Default-iphonesimulator/ -lWebDriver_extension_qt_quick
+PRE_TARGETDEPS += $$PWD/../../../build/Default-iphonesimulator/libWebDriver_extension_qt_quick.a

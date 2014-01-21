@@ -1,12 +1,10 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef VIDEOTEST_H
+#define VIDEOTEST_H
 
 #include <QtWidgets/QtWidgets>
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
 #include <QtNetwork/QNetworkRequest>
-
-#include "TestVariables.h"
 
 class VideoTestWidget;
 class QAbstractButton;
@@ -36,4 +34,4 @@ public:
     
 };
 
-#endif // MAINWINDOW_H
+#endif // VIDEOTEST_H
