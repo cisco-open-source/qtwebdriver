@@ -19,7 +19,7 @@
 #ifdef OS_ANDROID
     #include <QtAndroidExtras/QtAndroidExtras>
     #include <qpa/qplatformnativeinterface.h>
-    #include <jni.h>
+    #include <jni.h> 
 #endif //OS_ANDROID
 #else
 #include <QtGui/QApplication>
@@ -110,10 +110,14 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     if (NULL == view)
         return;
     
+    QPixmap pixmap = QPixmap::grabWidget(view);
+
+    saveScreenshot(pixmap, png, error);
+}
+
+void QViewCmdExecutor::saveScreenshot(QPixmap& pixmap, std::string* png, Error** error) {
     const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
     FilePath path = session_->temp_dir().Append(kPngFileName);;
-
-    QPixmap pixmap = QPixmap::grabWidget(view);
 
 #if defined(OS_WIN)
     session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
@@ -132,7 +136,7 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     }
 
     if (!file_util::ReadFileToString(path, png))
-        *error = new Error(kUnknownError, "Could not read screenshot file");
+        *error = new Error(kUnknownError, "Could not read screenshot file");   
 }
 
 void QViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
@@ -290,12 +294,10 @@ void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **er
     }
 
 #ifdef OS_ANDROID
-
     QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
     jobject jactivity = (jobject)interface->nativeResourceForIntegration("QtActivity");
     QAndroidJniObject activity(jactivity);
     activity.callMethod<void>("setRequestedOrientation", "(I)V", screen_orientation);
-
 #else
     if (((screen_orientation == 0) && (view->height() > view->width())) || 
         ((screen_orientation == 1) && (view->height() < view->width()))) 
@@ -318,30 +320,6 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
     jobject jactivity = (jobject)interface->nativeResourceForIntegration("QtActivity");
     QAndroidJniObject activity(jactivity);
     android_orientation = activity.callMethod<jint>("setRequestedOrientation", "()I");
-
-//    QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
-//    JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
-
-//    JNIEnv * g_env = NULL;
-//    jint ret = currVM->AttachCurrentThread(&g_env, NULL);
-//    if (ret != JNI_OK)
-//    {
-//        *error = new Error(kUnknownError, "JNI error: AttachCurrentThread failed");
-//        return;
-//    }
-//    jobject activity = (jobject)interface->nativeResourceForIntegration("QtActivity");
-
-//    jclass cls = g_env->GetObjectClass(activity);
-//    jmethodID mid = g_env->GetMethodID(cls, "getRequestedOrientation", "()I");
-
-//    if (mid == 0)
-//    {
-//        *error = new Error(kUnknownError, "JNI error: Method getRequestedOrientation not found");
-//        return;
-//    }
-
-//    android_orientation = g_env->CallIntMethod(activity, mid);
-//    currVM->DetachCurrentThread();
 
     if (android_orientation == 0)
         *orientation = "LANDSCAPE";
