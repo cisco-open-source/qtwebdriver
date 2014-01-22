@@ -120,13 +120,12 @@ void QWindowViewCmdExecutor::Close(Error** error) {
     if (NULL == view)
         return;
 
-    // TODO: review this, check if we can close window
-
     session_->logger().Log(kInfoLogLevel, "close View("+view_id_.id()+")");
 
     session_->RemoveView(view_id_);
 
     view->close();
+    view->deleteLater();
 }
 
 void QWindowViewCmdExecutor::SwitchTo(Error** error) {
