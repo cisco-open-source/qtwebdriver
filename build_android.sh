@@ -5,30 +5,10 @@ archs=$1
 
 if [ -z $QT_DIR ]
 then
-  export QT_DIR=/opt/Qt5.1/5.1.0
+  export QT_DIR=/opt/Qt5.2/5.2.0
 fi
 
-if [ -z $QT_DESK_DIR ]
-then
-  export QT_DESK_DIR=/opt/Qt5.1/5.1.0/gcc
-fi
-
-echo "####################### Build androiddeployqt #######################"
-export QT_DESK_QMAKE=$QT_DESK_DIR/bin/qmake
-export ANDROID_DEPLOY_QT_PATH=./platform/android/androiddeployqt
-
-cd $ANDROID_DEPLOY_QT_PATH
-$QT_DESK_QMAKE androiddeployqt.pro -r -spec linux-g++
-make
-RETVAL=$?
-if [ $RETVAL -ne 0 ];
-then
-  echo "####################### Build androiddeployqt failed !!! #######################"
-  exit $RETVAL
-fi
-cd -
-
-export ANDROID_DEPLOY_QT=$ANDROID_DEPLOY_QT_PATH/androiddeployqt
+export QT_VERSION=5.2.0
 export ANDROID_PACKAGE=org.webdriver.qt
 export ANDROID_JAVA=`pwd`/platform/android/java/
 export ANDROID_APP_NAME=AndroidWD
@@ -91,6 +71,8 @@ do
   export LINK=$BIN/$ANDROID_TOOL_PREFIX-g++
   export AR=$BIN/$ANDROID_TOOL_PREFIX-ar
 
+  export ANDROID_DEPLOY_QT=$QT_DIR/android_$arch/bin/androiddeployqt
+
 
   export GYP_DEFINES="OS=android"
 
@@ -115,7 +97,7 @@ fi
     fi
     
     dist_dir=`pwd`/out/bin/$platform/$mode
-    export BINARY_PATH=$dist_dir/libWebDriver_noWebkit_android.so
+    export BINARY_PATH=$dist_dir/libAndroidWD.so
 
     #clean android directory
     rm -rf $dist_dir/android
@@ -144,7 +126,7 @@ fi
     fi
 
     cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD.apk
-    rm -rf $dist_dir/android
+    # rm -rf $dist_dir/android
 
   done
 

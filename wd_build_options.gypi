@@ -73,7 +73,7 @@
           '<(ANDROID_INC)',
           '<(ANDROID_LIB_INC)',
           '<(ANDROID_PLATFORM_INC)',
-          '<(QT_INC_PATH)/QtGui/5.1.0/QtGui'
+          '<(QT_INC_PATH)/QtGui/<!(/bin/echo -n $QT_VERSION)/QtGui'
         ],
         'ldflags': [
           '--sysroot=<!(/bin/echo -n $ANDROID_NDK_ROOT)/platforms/android-9/arch-<!(/bin/echo -n $ANDROID_ARCH)',

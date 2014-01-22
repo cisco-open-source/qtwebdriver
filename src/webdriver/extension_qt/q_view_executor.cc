@@ -17,6 +17,7 @@
 #include <QtWidgets/QInputDialog>
 #include <QtCore/QDateTime>
 #ifdef OS_ANDROID
+    #include <QtAndroidExtras/QtAndroidExtras>
     #include <qpa/qplatformnativeinterface.h>
     #include <jni.h> 
 #endif //OS_ANDROID
@@ -294,28 +295,9 @@ void QViewCmdExecutor::SetOrientation(const std::string &orientation, Error **er
 
 #ifdef OS_ANDROID
     QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
-    JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
-
-    JNIEnv * g_env = NULL;
-    jint ret = currVM->AttachCurrentThread(&g_env, NULL);
-    if (ret != JNI_OK)
-    {
-        *error = new Error(kUnknownError, "JNI error: AttachCurrentThread failed");
-        return;
-    }
-    jobject activity = (jobject)interface->nativeResourceForIntegration("QtActivity");
-
-    jclass cls = g_env->GetObjectClass(activity);
-    jmethodID mid = g_env->GetMethodID(cls, "setRequestedOrientation", "(I)V");
-
-    if (mid == 0)
-    {
-        *error = new Error(kUnknownError, "JNI error: Method getRequestedOrientation not found");
-        return;
-    }
-
-    g_env->CallVoidMethod(activity, mid,screen_orientation);
-    currVM->DetachCurrentThread();
+    jobject jactivity = (jobject)interface->nativeResourceForIntegration("QtActivity");
+    QAndroidJniObject activity(jactivity);
+    activity.callMethod<void>("setRequestedOrientation", "(I)V", screen_orientation);
 #else
     if (((screen_orientation == 0) && (view->height() > view->width())) || 
         ((screen_orientation == 1) && (view->height() < view->width()))) 
@@ -335,28 +317,9 @@ void QViewCmdExecutor::GetOrientation(std::string *orientation, Error **error)
     int android_orientation;
 
     QPlatformNativeInterface *interface = QApplication::platformNativeInterface();
-    JavaVM *currVM = (JavaVM *)interface->nativeResourceForIntegration("JavaVM");
-
-    JNIEnv * g_env = NULL;
-    jint ret = currVM->AttachCurrentThread(&g_env, NULL);
-    if (ret != JNI_OK)
-    {
-        *error = new Error(kUnknownError, "JNI error: AttachCurrentThread failed");
-        return;
-    }
-    jobject activity = (jobject)interface->nativeResourceForIntegration("QtActivity");
-
-    jclass cls = g_env->GetObjectClass(activity);
-    jmethodID mid = g_env->GetMethodID(cls, "getRequestedOrientation", "()I");
-
-    if (mid == 0)
-    {
-        *error = new Error(kUnknownError, "JNI error: Method getRequestedOrientation not found");
-        return;
-    }
-
-    android_orientation = g_env->CallIntMethod(activity, mid);
-    currVM->DetachCurrentThread();
+    jobject jactivity = (jobject)interface->nativeResourceForIntegration("QtActivity");
+    QAndroidJniObject activity(jactivity);
+    android_orientation = activity.callMethod<jint>("setRequestedOrientation", "()I");
 
     if (android_orientation == 0)
         *orientation = "LANDSCAPE";
