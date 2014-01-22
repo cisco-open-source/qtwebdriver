@@ -30,6 +30,8 @@
               '-lQt5Sql',
               '-lQt5Gui',
               '-lQt5Xml',
+              '-lQt5OpenGL',
+              '-lQt5PrintSupport',
               '-lQt5Core',
               '-lpthread',
               '-lrt',
