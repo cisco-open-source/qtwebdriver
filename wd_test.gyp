@@ -93,6 +93,7 @@
               '-lQt5Qml',
               '-lQt5Multimedia',
               '-lQt5MultimediaWidgets',
+              '-lQt5AndroidExtras',
               '-L<(ANDROID_LIB)',
               '-lgnustl_shared',
               '-llog',
@@ -403,7 +404,7 @@
       'target_name': 'test_android_WD_noWebkit',
       'type': 'shared_library',
 
-      'product_name': 'WebDriver_noWebkit_android',
+      'product_name': 'AndroidWD',
 
       'dependencies': [
         'base.gyp:chromium_base',
