@@ -791,8 +791,7 @@ static int should_keep_alive(const struct mg_connection *conn) {
 }
 
 static const char *suggest_connection_header(const struct mg_connection *conn) {
-  int keep_alive_enabled = !strcmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes");
-  return keep_alive_enabled && should_keep_alive(conn) ? "keep-alive" : "close";
+  return should_keep_alive(conn) ? "keep-alive" : "close";
 }
 
 static void send_http_error(struct mg_connection *conn, int status,
