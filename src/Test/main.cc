@@ -368,7 +368,17 @@ void PrintHelp() {
                 << "                                  format: login:password@ip:port"                 << std::endl
                 << "uinput         false              If option set, user input device"               << std::endl
                 << "                                  will be registered in the system"               << std::endl
-                << "test_data      ./                 Specifies where to look for test specific data" << std::endl;
+                << "test_data      ./                 Specifies where to look for test specific data" << std::endl
+                << "whitelist                         The path to whitelist file (e.g. whitelist.xml)"<< std::endl
+                << "                                  in XML format with specified list of IP with"   << std::endl
+                << "                                  allowed/denied commands for each of them."      << std::endl
+                << "webserver-cfg                     The path to mongoose config file"               << std::endl
+                << "                                  (e.g. /path/to/config.json) in JSON format with"<< std::endl
+                << "                                  specified mongoose start option"                << std::endl
+                << "                                  (extra-mime-types, listening_ports, etc.)"      << std::endl
+                << "                                  Option from webserver config file will have"    << std::endl
+                << "                                  more priority than commandline param"           << std::endl
+                << "                                  that specify the same option."                  << std::endl;
 }
 
 
