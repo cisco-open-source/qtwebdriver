@@ -9,6 +9,7 @@
 #include "q_proxy_parser.h"
 #include "common_util.h"
 #include "base/string_util.h"
+#include "base/memory/scoped_ptr.h"
 
 namespace webdriver {
 
@@ -34,9 +35,9 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 	} else {
 		session_->logger().Log(kInfoLogLevel, "no proxy settings requsted.");
         session_->logger().Log(kInfoLogLevel, "Applying system proxy by default.");
-        DictionaryValue* proxy_system = new DictionaryValue();
-        proxy_system->SetString("proxyType", "SYSTEM");
-        error = ParseAndApplyProxySettings(proxy_system);
+        scoped_ptr<DictionaryValue> proxy_system(new DictionaryValue());
+        proxy_system.get()->SetString("proxyType", "SYSTEM");
+        error = ParseAndApplyProxySettings(proxy_system.get());
     }
     if (error)
         return error;
