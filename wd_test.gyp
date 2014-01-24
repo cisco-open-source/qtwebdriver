@@ -180,6 +180,9 @@
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
               ],
+              'xcode_settings': {
+                'FRAMEWORK_SEARCH_PATHS': '<(QT_LIB_PATH)',
+              },
             },
           } ],
         ],
