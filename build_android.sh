@@ -97,7 +97,8 @@ fi
     fi
     
     dist_dir=`pwd`/out/bin/$platform/$mode
-    export BINARY_PATH=$dist_dir/libAndroidWD.so
+    export BINARY_PATH_WIDGETS=$dist_dir/libAndroidWD_Widgets.so
+    export BINARY_PATH_QML=$dist_dir/libAndroidWD_QML.so
 
     #clean android directory
     rm -rf $dist_dir/android
@@ -105,10 +106,7 @@ fi
     
     echo "####################### Create apk "$arch" "$mode" #######################"
     mkdir -p $dist_dir/android/libs/$ANDROID_LIB_ARCH
-    cp $BINARY_PATH $dist_dir/android/libs/$ANDROID_LIB_ARCH
-
-    export ANDROID_JSON_CONFIG=$dist_dir/android/android_config.json 
-    python generate_android_json.py
+    cp $BINARY_PATH_WIDGETS $dist_dir/android/libs/$ANDROID_LIB_ARCH
 
     if [ $mode = "release" ]
     then
@@ -116,17 +114,43 @@ fi
       echo $RELEASE_ARG
     fi
 
+    export ANDROID_JSON_CONFIG=$dist_dir/android/android_config.json 
+
+
+    echo "####################### Widgets #######################"
+    export BINARY_PATH=$BINARY_PATH_WIDGETS
+    python generate_android_json.py
+
     $ANDROID_DEPLOY_QT --output $dist_dir/android --input $ANDROID_JSON_CONFIG --verbose $MINISTRO $RELEASE_ARG 
     RETVAL=$?
     if [ $RETVAL -ne 0 ];
     then
-      echo "####################### androiddeployqt error!!! #######################"
+      echo "####################### androiddeployqt widgets error!!! #######################"
       echo $RETVAL
       exit $RETVAL
     fi
 
-    cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD.apk
-    # rm -rf $dist_dir/android
+    cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD_Widgets.apk
+    rm -rf $dist_dir/android
+
+
+    echo "####################### QML #######################"
+    mkdir -p $dist_dir/android/libs/$ANDROID_LIB_ARCH
+    cp $BINARY_PATH_QML $dist_dir/android/libs/$ANDROID_LIB_ARCH
+    export BINARY_PATH=$BINARY_PATH_QML
+    python generate_android_json.py
+
+    $ANDROID_DEPLOY_QT --output $dist_dir/android --input $ANDROID_JSON_CONFIG --verbose $MINISTRO $RELEASE_ARG 
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ];
+    then
+      echo "####################### androiddeployqt qml error!!! #######################"
+      echo $RETVAL
+      exit $RETVAL
+    fi
+
+    cp $dist_dir/android/bin/QtApp-release.apk $dist_dir/AndroidWD_QML.apk
+    rm -rf $dist_dir/android
 
   done
 

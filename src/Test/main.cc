@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 #endif // QT_VERSION
 #endif // WD_TEST_ENABLE_WEB_VIEW
 
+#ifndef QT_NO_QML
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
@@ -197,7 +198,8 @@ int main(int argc, char *argv[])
     //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
-#endif    
+#endif
+#endif //QT_NO_QML
 
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
