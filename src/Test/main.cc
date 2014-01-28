@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 #endif // QT_VERSION
 #endif // WD_TEST_ENABLE_WEB_VIEW
 
+#ifndef QT_NO_QML
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
@@ -197,7 +198,8 @@ int main(int argc, char *argv[])
     //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
-#endif    
+#endif
+#endif //QT_NO_QML
 
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
@@ -368,7 +370,17 @@ void PrintHelp() {
                 << "                                  format: login:password@ip:port"                 << std::endl
                 << "uinput         false              If option set, user input device"               << std::endl
                 << "                                  will be registered in the system"               << std::endl
-                << "test_data      ./                 Specifies where to look for test specific data" << std::endl;
+                << "test_data      ./                 Specifies where to look for test specific data" << std::endl
+                << "whitelist                         The path to whitelist file (e.g. whitelist.xml)"<< std::endl
+                << "                                  in XML format with specified list of IP with"   << std::endl
+                << "                                  allowed/denied commands for each of them."      << std::endl
+                << "webserver-cfg                     The path to mongoose config file"               << std::endl
+                << "                                  (e.g. /path/to/config.json) in JSON format with"<< std::endl
+                << "                                  specified mongoose start option"                << std::endl
+                << "                                  (extra-mime-types, listening_ports, etc.)"      << std::endl
+                << "                                  Option from webserver config file will have"    << std::endl
+                << "                                  more priority than commandline param"           << std::endl
+                << "                                  that specify the same option."                  << std::endl;
 }
 
 

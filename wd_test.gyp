@@ -91,10 +91,6 @@
               '-lQt5Network',
               '-lQt5Gui',
               '-lQt5Core',
-              '-lQt5Quick',
-              '-lQt5Qml',
-              '-lQt5Multimedia',
-              '-lQt5MultimediaWidgets',
               '-lQt5AndroidExtras',
               '-L<(ANDROID_LIB)',
               '-lgnustl_shared',
@@ -170,16 +166,19 @@
           [ 'OS=="mac"', {
             'link_settings': {
               'libraries': [
-                '<(QT_LIB_PATH)/libQtGui.a',
-                '<(QT_LIB_PATH)/libQtCore.a',
-                '<(QT_LIB_PATH)/libQtNetwork.a',
-                '<(QT_LIB_PATH)/libQtDeclarative.a',
-                '<(QT_LIB_PATH)/libQtXml.a',
+                '<(QT_LIB_PATH)/QtGui.framework',
+                '<(QT_LIB_PATH)/QtCore.framework',
+                '<(QT_LIB_PATH)/QtNetwork.framework',
+                '<(QT_LIB_PATH)/QtDeclarative.framework',
+                '<(QT_LIB_PATH)/QtXml.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
               ],
+              'xcode_settings': {
+                'FRAMEWORK_SEARCH_PATHS': '<(QT_LIB_PATH)',
+              },
             },
           } ],
         ],
@@ -257,7 +256,7 @@
         '<(INTERMEDIATE_DIR)/moc_MenuTest.cc',
       ],
       'conditions': [
-        [ '<(QT5) == 1', {
+        [ '<(QT5) == 1 and <(WD_CONFIG_PLAYER) == 1', {
           'sources': [
             'src/Test/VideoTest.h',
             'src/Test/VideoTest.cc',
@@ -342,7 +341,7 @@
             } ],
             [ 'OS=="mac"', {
               'link_settings': {
-                'libraries': ['<(QT_LIB_PATH)/libQtWebKit.a',],
+                'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
               },
             } ],
           ],
@@ -403,10 +402,10 @@
         } ],
       ],
     }, {
-      'target_name': 'test_android_WD_noWebkit',
+      'target_name': 'test_android_WD_QML',
       'type': 'shared_library',
 
-      'product_name': 'AndroidWD',
+      'product_name': 'AndroidWD_QML',
 
       'dependencies': [
         'base.gyp:chromium_base',
@@ -415,6 +414,43 @@
         'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
+      'libraries': [
+        '-lQt5Multimedia',
+        '-lQt5MultimediaWidgets', 
+        '-lQt5Quick',
+        '-lQt5Qml',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
+
+    },
+    {
+      'target_name': 'test_android_WD_Widgets',
+      'type': 'shared_library',
+
+      'product_name': 'AndroidWD_Widgets',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'test_widgets',
+      ],
+
+      'defines': [ 
+         'QT_NO_QML',
+       ],
       
       'sources': [
         'src/Test/main.cc',

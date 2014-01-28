@@ -477,6 +477,9 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
     //     the body, sometimes we still need to focus the body element for send
     //     keys to work. Not sure why
     //   - You cannot focus a descendant of a content editable node
+    //   - V8 throws a TypeError when calling setSelectionRange for a non-text
+    //     input, which still have setSelectionRange defined. For chrome 29+, V8
+    //     throws a DOMException with code InvalidStateError.
     // TODO(jleyba): Update this to use the correct atom.
     const char* kFocusScript =
         "function(elem) {"
@@ -487,10 +490,16 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
         "  elem.focus();"
         "  if (elem != prevActiveElem && elem.value && elem.value.length &&"
         "      elem.setSelectionRange) {"
-        "    elem.setSelectionRange(elem.value.length, elem.value.length);"
+        "    try {"
+        "      elem.setSelectionRange(elem.value.length, elem.value.length);"
+        "    } catch (error) {"
+        "      if (!(error instanceof TypeError) && !(error instanceof DOMException &&"
+        "          error.code == DOMException.INVALID_STATE_ERR))"
+        "        throw error;"
+        "    }"
         "  }"
         "  if (elem != doc.activeElement)"
-        "    throw new Error('Failed to send keys because cannot focus element');"
+        "    throw new Error('cannot focus element');"
         "}";
     return ExecuteScriptAndParse(GetFrame(session_->current_frame()),
                                 kFocusScript,

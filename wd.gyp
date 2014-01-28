@@ -70,7 +70,8 @@
         [ 'OS == "android"', {
           'dependencies': [
             'wd_ext_qt.gyp:WebDriver_extension_qt_base',
-            'wd_test.gyp:test_android_WD_noWebkit',
+            'wd_test.gyp:test_android_WD_Widgets',
+            'wd_test.gyp:test_android_WD_QML',
           ],
         } ],
 
