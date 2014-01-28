@@ -258,7 +258,8 @@ void QViewCmdExecutor::AcceptOrDismissAlert(bool accept, Error** error) {
 
     if(NULL != msgBox) {
         if(accept) {
-            msgBox->accept();
+
+            msgBox->done(QMessageBox::Ok);
         } else {
             msgBox->close();
         }
