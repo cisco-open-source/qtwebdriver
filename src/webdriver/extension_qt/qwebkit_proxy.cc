@@ -24,6 +24,8 @@
 #include "frame_path.h"
 #include "value_conversion_util.h"
 #include "webdriver_logging.h"
+#include "webdriver_server.h"
+#include "webdriver_switches.h"
 
 #include "third_party/webdriver/atoms.h"
 
@@ -510,6 +512,8 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
 
 Error* QWebkitProxy::SwitchTo() {
     AddBrowserLoggerToView();
+
+    SetWebInspectorSupport(page_);
 
     // reset frame path
     session_->frame_elements_.clear();
@@ -1859,6 +1863,26 @@ void QWebkitProxy::AddBrowserLoggerToView() {
     QObject::connect(page_, SIGNAL(loadFinished(bool)),logHandler, SLOT(loadConsoleJS()), Qt::QueuedConnection);
     logHandler->loadJSLogObject(page_->mainFrame());
     logHandler->loadConsoleJS(page_);
+}
+
+void QWebkitProxy::SetWebInspectorSupport(QWebPage *page)
+{
+    page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch(webdriver::Switches::kWIServer))
+    {
+        if (cmdLine.HasSwitch(webdriver::Switches::kWIPort))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII(webdriver::Switches::kWIPort);
+            int port = QString(wiPort.c_str()).toInt();
+            page->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            page->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 

@@ -273,6 +273,7 @@ protected:
                                 base::ListValue* args);
 
     void AddBrowserLoggerToView();
+    void SetWebInspectorSupport(QWebPage *page);
 
 
 private:
