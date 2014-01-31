@@ -14,7 +14,7 @@ class QWebViewExt : public QWebView
     Q_OBJECT
 public:
     explicit QWebViewExt(QWidget *parent = 0);
-    ~QWebViewExt();
+    virtual ~QWebViewExt();
 
 
 protected:
