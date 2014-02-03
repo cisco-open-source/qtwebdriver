@@ -143,9 +143,11 @@ void UrlCommandWrapper::ExecutePost(Response* const response) {
                     &viewHandle));
 
             if (NULL == viewHandle) {
-			    session->logger().Log(kSevereLogLevel, "cant create view able to handle url.");
-			    break;
-    		}
+                const std::string message = "cant create view able to handle url.";
+                session->logger().Log(kSevereLogLevel, message);
+                response->SetError(new Error(kUnknownError, message));
+                return;
+            }
 
             session->AddNewView(viewHandle, &viewId);
             if (!viewId.is_valid()) {
