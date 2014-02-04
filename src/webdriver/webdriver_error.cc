@@ -33,6 +33,8 @@ const char* DefaultMessageForErrorCode(ErrorCode code) {
       return "Element is not selectable";
     case kXPathLookupError:
       return "XPath lookup error";
+    case kTimeout:
+      return "Timed out error";
     case kNoSuchWindow:
       return "The window could not be found";
     case kInvalidCookieDomain:
@@ -43,6 +45,8 @@ const char* DefaultMessageForErrorCode(ErrorCode code) {
       return "An open modal dialog blocked the operation";
     case kNoAlertOpenError:
       return "No JavaScript modal dialog is open";
+    case kScriptTimeout:
+      return "Timed out waiting for asyncrhonous script";
     default:
       return "<unknown>";
   }
