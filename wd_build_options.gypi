@@ -11,7 +11,6 @@
     '-Wall',
     '-W',
     '-Wno-unused-parameter',
-    '-Wno-unused-local-typedefs',
   ],
 
   'defines': [
