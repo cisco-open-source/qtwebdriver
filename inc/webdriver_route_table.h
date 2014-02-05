@@ -37,6 +37,7 @@
 /// - kNewSession[]                 = "/session";
 /// - kSession[]                    = "/session/*";
 /// - kSessions[]                   = "/sessions";
+/// - kTimeOuts[]                   = "/session/*/timeouts";
 /// - kImplicitlyWait[]             = "/session/*/timeouts/implicit_wait";
 /// - kSetScriptTimeout[]           = "/session/*/timeouts/async_script";
 /// - kGetAvailableLogTypes[]       = "/session/*/log/types";

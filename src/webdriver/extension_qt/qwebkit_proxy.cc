@@ -623,6 +623,7 @@ Error* QWebkitProxy::SwitchToTopFrameIfCurrentFrameInvalid() {
 Error* QWebkitProxy::NavigateToURL(const std::string& url, bool sync) {
 	QUrl address(QString(url.c_str()));
 
+    base::Time start_time = base::Time::Now();
     if (sync) {
         QPageLoader pageLoader(page_);
         QEventLoop loop;
@@ -636,6 +637,10 @@ Error* QWebkitProxy::NavigateToURL(const std::string& url, bool sync) {
     } else {
         page_->mainFrame()->load(address);
     }
+    if ((base::Time::Now() - start_time).InMilliseconds() > session_->page_load_timeout()) {
+        return new Error(kTimeout, "page loading timed out");
+    }
+
 
     return NULL;
 }

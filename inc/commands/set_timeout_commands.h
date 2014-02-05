@@ -18,6 +18,12 @@ namespace webdriver {
 
 class Response;
 
+/// Set the amount of time that a particular type of operation can execute (/session/*/timeouts").
+/// Valid values are: "script" for script timeouts,
+/// "implicit" for modifying the implicit wait timeout
+/// and "page load" for setting a page load timeout.
+/// E.g. - {"ms": 2000, "type": "page load"}
+
 class SetTimeoutCommand : public WebDriverCommand {
 public:
     SetTimeoutCommand(const std::vector<std::string>& path_segments,
@@ -26,9 +32,13 @@ public:
 
     virtual bool DoesPost() const OVERRIDE;
     virtual void ExecutePost(Response* const response) OVERRIDE;
-    virtual void SetTimeout(int timeout_ms) = 0;
+    virtual Error* SetTimeout(int timeout_ms);
+
+    /// Amount of time of operation can execute (/session/*/timeouts") by default, in ms.
+    static const int DEFAULT_TIMEOUT;
 
 private:
+    Error* SetTimeout(int timeout_ms, std::string type);
     DISALLOW_COPY_AND_ASSIGN(SetTimeoutCommand);
 };
 
@@ -38,7 +48,7 @@ public:
     SetAsyncScriptTimeoutCommand(const std::vector<std::string>& path_segments,
                                const base::DictionaryValue* const parameters);
     virtual ~SetAsyncScriptTimeoutCommand();
-    virtual void SetTimeout(int timeout_ms) OVERRIDE;
+    virtual Error* SetTimeout(int timeout_ms) OVERRIDE;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(SetAsyncScriptTimeoutCommand);
@@ -50,7 +60,7 @@ public:
     ImplicitWaitCommand(const std::vector<std::string>& path_segments,
                       const base::DictionaryValue* const parameters);
     virtual ~ImplicitWaitCommand();
-    virtual void SetTimeout(int timeout_ms) OVERRIDE;
+    virtual Error* SetTimeout(int timeout_ms) OVERRIDE;
 
 private:
     DISALLOW_COPY_AND_ASSIGN(ImplicitWaitCommand);

@@ -30,6 +30,7 @@
 #include "webdriver_view_runner.h"
 #include "webdriver_util.h"
 #include "webdriver_view_executor.h"
+#include "commands/set_timeout_commands.h"
 
 #if !defined(OS_WIN)
 #include <sys/types.h>
@@ -45,6 +46,7 @@ Session::Session()
       current_view_id_(ViewId()),
       current_frame_path_(FramePath()),
       thread_(id_.c_str()),
+      page_load_timeout_(SetTimeoutCommand::DEFAULT_TIMEOUT),
       async_script_timeout_(0),
       implicit_wait_(0),
       desired_caps_(NULL),
@@ -346,6 +348,14 @@ const ViewId& Session::current_view() const {
 
 void Session::set_current_view(const ViewId& viewId) {
     current_view_id_ = viewId;
+}
+
+void Session::set_page_load_timeout(int timeout_ms) {
+    page_load_timeout_ = timeout_ms;
+}
+
+int Session::page_load_timeout() const {
+    return page_load_timeout_;
 }
 
 void Session::set_async_script_timeout(int timeout_ms) {
