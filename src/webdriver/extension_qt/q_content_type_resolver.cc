@@ -51,6 +51,10 @@ Error* QContentTypeResolver::resolveContentType(const std::string& url, std::str
         QNetworkReply::NetworkError err = reply->error();
         if (err) {
             GlobalLogger::Log(kWarningLogLevel, "QContentTypeResolver::resolveContentType() : NetworkError : " + QString::number(err).toStdString());
+
+            // network-related error was detected
+            if (err == QNetworkReply::UnknownNetworkError)
+                return error;
             return new Error(kBadRequest);
         }
 
