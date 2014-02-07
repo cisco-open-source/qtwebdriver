@@ -659,7 +659,7 @@ WebDriverJsView.prototype.updateSessionDepControls = function() {
     var control = sessionDepControls[controlIndex];
     control.disabled = disable;
   }
-}
+};
 
 WebDriverJsView.prototype.setSessionId = function(id) {
   var element = document.getElementById('sessionIdLabel');
@@ -668,7 +668,7 @@ WebDriverJsView.prototype.setSessionId = function(id) {
   } else {
     element.innerHTML = '';
   }
-}
+};
 
 WebDriverJsView.prototype.setFoundElementId = function(id) {
   var element = document.getElementById('foundElement');
@@ -681,7 +681,25 @@ WebDriverJsView.prototype.setFoundElementId = function(id) {
     this.setError(id.ELEMENT.message);
     document.getElementById('elementActions').style.visibility = 'hidden';
   }
-}
+};
+
+WebDriverJsView.prototype.setWindowList = function(handles, activeWindowHandle) {
+  var select = document.getElementById('windowList');
+  select.innerHTML = '';
+  for (var handleIndex in handles) {
+    var handle = handles[handleIndex];
+    var item = document.createElement('option');
+    item.setAttribute('value', handle);
+    item.innerHTML = handle;
+    if (activeWindowHandle == handle) {
+      item.innerHTML += ' (active)';
+      item.selected = true;
+    }
+    select.appendChild(item)
+  }
+  document.getElementById('windowList').style.visibility = 'visible';
+  document.getElementById('chooseWindow').style.visibility = 'visible';
+};
 
 WebDriverJsView.prototype.setError = function(message) {
   var element = document.getElementById('error');
@@ -716,9 +734,9 @@ WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
 }
 
 WebDriverJsController.prototype.setWebPage = function(webPage) {
-  this.element = null;
-
-  this.driver.get(webPage);
+  if (webPage !== this.webPage) {
+    this.element = null;
+  }
 
   this.webPage = webPage;
   if (localStorage)
@@ -739,6 +757,7 @@ WebDriverJsController.prototype.updateDriver = function() {
     });
   } else if (webPage !== this.webPage) {
     this.setWebPage(webPage);
+    this.driver.get(webPage);
   }
 };
 
@@ -863,23 +882,9 @@ WebDriverJsController.prototype.onSendKeys = function(key) {
 
 WebDriverJsController.prototype.onListWindowHandles = function() {
   var self = this;
-  var select = document.getElementById('windowList');
   this.driver.getWindowHandle().then(function(activeWindowHandle) {
     self.driver.getAllWindowHandles().then(function(handles) {
-      select.innerHTML = '';
-      for (var handleIndex in handles) {
-        var handle = handles[handleIndex];
-        var item = document.createElement('option');
-        item.setAttribute('value', handle);
-        item.innerHTML = handle;
-        if (activeWindowHandle == handle) {
-          item.innerHTML += ' (active)';
-          item.selected = true;
-        }
-        select.appendChild(item)
-      }
-      document.getElementById('windowList').style.visibility = 'visible';
-      document.getElementById('chooseWindow').style.visibility = 'visible';
+      self.view.setWindowList(handles, activeWindowHandle);
     });
   });
 };
@@ -889,6 +894,9 @@ WebDriverJsController.prototype.onChooseWindow = function() {
   var handle = document.getElementById('windowList').value;
   this.driver.switchTo().window(handle).then(function() {
     self.onListWindowHandles();
+    return self.driver.getCurrentUrl();
+  }).then(function(url) {
+    self.setWebPage(url);
   });
 };
 
