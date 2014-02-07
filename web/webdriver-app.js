@@ -628,7 +628,7 @@ function WebDriverJsView() {
 
 WebDriverJsView.prototype.getDriverUrlPort = function() {
   var input = document.getElementsByName('webDriverUrlPort')[0];
-  return input.value;
+  return input.value.trim();
 };
 
 WebDriverJsView.prototype.setDriverUrlPort = function(value) {
@@ -639,7 +639,7 @@ WebDriverJsView.prototype.setDriverUrlPort = function(value) {
 
 WebDriverJsView.prototype.getWebPage = function() {
   var input = document.getElementsByName('webPage')[0];
-  return input.value;
+  return input.value.trim();
 };
 
 WebDriverJsView.prototype.setWebPage = function(value) {
@@ -649,8 +649,8 @@ WebDriverJsView.prototype.setWebPage = function(value) {
 };
 
 WebDriverJsView.prototype.updateSessionDepControls = function() {
-  var disable = this.getDriverUrlPort().trim() === '' ||
-                this.getWebPage().trim() === '';
+  var disable = this.getDriverUrlPort() === '' ||
+                this.getWebPage() === '';
 
   var sessionDepControls = [];
   sessionDepControls.push(document.getElementById('sourceButton'));
@@ -723,16 +723,23 @@ WebDriverJsController.prototype.setWebPage = function(webPage) {
   this.webPage = webPage;
   if (localStorage)
     localStorage.webPage = webPage;
+  this.view.setWebPage(webPage);
 };
 
 WebDriverJsController.prototype.updateDriver = function() {
-  var webDriverUrlPort = document.getElementsByName('webDriverUrlPort')[0].value;
+  var self = this;
+  var webDriverUrlPort = this.view.getDriverUrlPort();
   if (webDriverUrlPort !== this.webDriverUrlPort)
     this.setServerUrl(webDriverUrlPort);
 
-  var webPage = document.getElementsByName('webPage')[0].value;
-  if (webPage !== this.webPage)
+  var webPage = this.view.getWebPage();
+  if (webPage === '') {
+    this.driver.getCurrentUrl().then(function(url) {
+      self.setWebPage(url);
+    });
+  } else if (webPage !== this.webPage) {
     this.setWebPage(webPage);
+  }
 };
 
 WebDriverJsController.prototype.onGet = function() {
