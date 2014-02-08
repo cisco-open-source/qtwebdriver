@@ -320,6 +320,9 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (disableMouseEvents) {
       return;
     }
+    if (event.button != 0) {
+      return;
+    }
 
     var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
@@ -334,6 +337,9 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (disableMouseEvents) {
       return;
     }
+    if (event.button != 0) {
+      return;
+    }
 
     var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
@@ -343,7 +349,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       perform();
   };
 
-  win.document.onclick = function(event) {
+  win.document.onclick = win.document.oncontextmenu = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
     if (disableMouseEvents) {
       return false;
@@ -352,7 +358,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (event.target.hasAttribute('elementId')) {
       var elementId = event.target.getAttribute('elementId');
       var element = new webdriver.WebElement(self.driver, elementId);
-      element.click();
+      element.click(event.button);
     } else {
       var xpath = Util.getXPath(event.target);
       var target = self.driver.findElement(webdriver.By.xpath(xpath));
