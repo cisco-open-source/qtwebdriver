@@ -1758,8 +1758,13 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
     // client rect, and lastly the size of the element (via closure).
     // SVG is one case that doesn't have a first client rect.
     Rect rect;
+
     scoped_ptr<Error> ignore_error(GetElementFirstClientRect(GetFrame(session_->current_frame()),element, &rect));
-    if (ignore_error.get()) {
+
+    // getFirstClientRect by atoms sometimes doesn't throw Error but returns invalid position outside element.
+    bool invalid_pos = (int)rect.y() < 0 || (int)rect.x() < 0;
+
+    if (ignore_error.get() || invalid_pos) {
         Rect client_rect;
 
         ignore_error.reset(ExecuteScriptAndParse(
@@ -1790,6 +1795,7 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
         return error;
 
     location->Offset(rect.width() / 2, rect.height() / 2);
+
     return NULL;
 }   
 
