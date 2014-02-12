@@ -98,6 +98,13 @@
 
     } ],
 
+    [ 'OS == "mac"', {
+      'xcode_settings': {
+        'CODE_SIGN_IDENTITY': 'Developer ID Application: Mykola Tryshnivskyy (3QWMV2L87Z)',
+        'SDKROOT': 'macosx10.8',
+      },
+    } ],
+
     [ 'OS == "mac" or OS == "ios"', {
       'actions': [ {
         'action_name': 'create_input_dir',

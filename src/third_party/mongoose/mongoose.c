@@ -786,9 +786,12 @@ static int match_extension(const char *path, const char *ext_list) {
 static int should_keep_alive(const struct mg_connection *conn) {
   const char *http_version = conn->request_info.http_version;
   const char *header = mg_get_header(conn, "Connection");
-  return (!mg_strcasecmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes") &&
-          (header == NULL && http_version && !strcmp(http_version, "1.1"))) ||
-          (header != NULL && !mg_strcasecmp(header, "keep-alive"));
+
+  if (mg_strcasecmp(conn->ctx->config[ENABLE_KEEP_ALIVE], "yes") != 0)
+    return 0;
+
+  return (header == NULL && http_version && !strcmp(http_version, "1.1")) ||
+      (header != NULL && !mg_strcasecmp(header, "keep-alive"));
 }
 
 static const char *suggest_connection_header(const struct mg_connection *conn) {

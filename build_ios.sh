@@ -27,10 +27,10 @@ if [ "$1" == "-all" ]
 then
 
 #xcodebuild -project out/wd_test.xcodeproj -target test_ios_WD -arch i386 -sdk iphonesimulator #clean build
-xcodebuild -project out/base.xcodeproj -target chromium_base -arch i386 -sdk iphonesimulator clean build
-xcodebuild -project out/wd_core.xcodeproj -target WebDriver_core -arch i386 -sdk iphonesimulator clean build
-xcodebuild -project out/wd_ext_qt.xcodeproj -target WebDriver_extension_qt_base -arch i386 -sdk iphonesimulator clean build
-xcodebuild -project out/wd_ext_qt.xcodeproj -target WebDriver_extension_qt_quick -arch i386 -sdk iphonesimulator clean build
+xcodebuild -project out/base.xcodeproj -target chromium_base -arch i386 -sdk iphonesimulator6.0 clean build
+xcodebuild -project out/wd_core.xcodeproj -target WebDriver_core -arch i386 -sdk iphonesimulator6.0 clean build
+xcodebuild -project out/wd_ext_qt.xcodeproj -target WebDriver_extension_qt_base -arch i386 -sdk iphonesimulator6.0 clean build
+xcodebuild -project out/wd_ext_qt.xcodeproj -target WebDriver_extension_qt_quick -arch i386 -sdk iphonesimulator6.0 clean build
 
 
 cd ./platform/ios/wd
