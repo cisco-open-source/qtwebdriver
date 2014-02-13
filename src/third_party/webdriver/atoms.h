@@ -23,23 +23,28 @@
 namespace webdriver {
 namespace atoms {
 
-extern const char* const GET_FIRST_CLIENT_RECT[];
-extern const char* const GET_LOCATION_IN_VIEW[];
-extern const char* const GET_PAGE_ZOOM[];
-extern const char* const IS_ELEMENT_CLICKABLE[];
 extern const char* const CLEAR[];
-extern const char* const CLEAR_LOCAL_STORAGE[];
-extern const char* const CLEAR_SESSION_STORAGE[];
 extern const char* const CLICK[];
 extern const char* const EXECUTE_ASYNC_SCRIPT[];
 extern const char* const EXECUTE_SCRIPT[];
 extern const char* const EXECUTE_SQL[];
 extern const char* const FIND_ELEMENT[];
 extern const char* const FIND_ELEMENTS[];
+extern const char* const GET_EFFECTIVE_STYLE[];
+extern const char* const GET_LOCATION[];
+extern const char* const GET_SIZE[];
+extern const char* const IS_DISPLAYED[];
+extern const char* const IS_ENABLED[];
+extern const char* const IS_ONLINE[];
+extern const char* const SUBMIT[];
+extern const char* const GET_FIRST_CLIENT_RECT[];
+extern const char* const GET_LOCATION_IN_VIEW[];
+extern const char* const GET_PAGE_ZOOM[];
+extern const char* const IS_ELEMENT_CLICKABLE[];
+extern const char* const CLEAR_LOCAL_STORAGE[];
+extern const char* const CLEAR_SESSION_STORAGE[];
 extern const char* const GET_APPCACHE_STATUS[];
 extern const char* const GET_ATTRIBUTE[];
-extern const char* const GET_EFFECTIVE_STYLE[];
-extern const char* const GET_IN_VIEW_LOCATION[];
 extern const char* const GET_LOCAL_STORAGE_ITEM[];
 extern const char* const GET_LOCAL_STORAGE_KEY[];
 extern const char* const GET_LOCAL_STORAGE_KEYS[];
@@ -48,18 +53,12 @@ extern const char* const GET_SESSION_STORAGE_ITEM[];
 extern const char* const GET_SESSION_STORAGE_KEY[];
 extern const char* const GET_SESSION_STORAGE_KEYS[];
 extern const char* const GET_SESSION_STORAGE_SIZE[];
-extern const char* const GET_LOCATION[];
-extern const char* const GET_SIZE[];
 extern const char* const GET_TEXT[];
-extern const char* const IS_DISPLAYED[];
-extern const char* const IS_ENABLED[];
-extern const char* const IS_ONLINE[];
 extern const char* const IS_SELECTED[];
 extern const char* const REMOVE_LOCAL_STORAGE_ITEM[];
 extern const char* const REMOVE_SESSION_STORAGE_ITEM[];
 extern const char* const SET_LOCAL_STORAGE_ITEM[];
 extern const char* const SET_SESSION_STORAGE_ITEM[];
-extern const char* const SUBMIT[];
 
 static inline std::string asString(const char* const atom[]) {
   std::string source;
