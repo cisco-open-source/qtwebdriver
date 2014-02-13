@@ -1080,7 +1080,7 @@ Error* QWebkitProxy::GetPlayingPosition(const ElementId& element, double* releti
     return NULL;
 }
 
-Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double reletivePos) {
+Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double pos) {
 	Value* value = NULL;
 
     std::string tagName;
@@ -1098,7 +1098,7 @@ Error* QWebkitProxy::SetPlayingPosition(const ElementId& element, const double r
                 GetFrame(session_->current_frame()),
                 "function(elem, time) { elem.currentTime = time; }",
                 "setPosition",
-                CreateListValueFrom(element, reletivePos),
+                CreateListValueFrom(element, pos),
                 CreateDirectValueParser(&value));
     scoped_ptr<Value> scoped_value(value);
 
