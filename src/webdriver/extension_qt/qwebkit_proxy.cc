@@ -24,6 +24,8 @@
 #include "frame_path.h"
 #include "value_conversion_util.h"
 #include "webdriver_logging.h"
+#include "webdriver_server.h"
+#include "webdriver_switches.h"
 
 #include "third_party/webdriver/atoms.h"
 
@@ -477,6 +479,9 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
     //     the body, sometimes we still need to focus the body element for send
     //     keys to work. Not sure why
     //   - You cannot focus a descendant of a content editable node
+    //   - V8 throws a TypeError when calling setSelectionRange for a non-text
+    //     input, which still have setSelectionRange defined. For chrome 29+, V8
+    //     throws a DOMException with code InvalidStateError.
     // TODO(jleyba): Update this to use the correct atom.
     const char* kFocusScript =
         "function(elem) {"
@@ -487,10 +492,16 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
         "  elem.focus();"
         "  if (elem != prevActiveElem && elem.value && elem.value.length &&"
         "      elem.setSelectionRange) {"
-        "    elem.setSelectionRange(elem.value.length, elem.value.length);"
+        "    try {"
+        "      elem.setSelectionRange(elem.value.length, elem.value.length);"
+        "    } catch (error) {"
+        "      if (!(error instanceof TypeError) && !(error instanceof DOMException &&"
+        "          error.code == DOMException.INVALID_STATE_ERR))"
+        "        throw error;"
+        "    }"
         "  }"
         "  if (elem != doc.activeElement)"
-        "    throw new Error('Failed to send keys because cannot focus element');"
+        "    throw new Error('cannot focus element');"
         "}";
     return ExecuteScriptAndParse(GetFrame(session_->current_frame()),
                                 kFocusScript,
@@ -501,6 +512,8 @@ Error* QWebkitProxy::SetActiveElement(const ElementId& element) {
 
 Error* QWebkitProxy::SwitchTo() {
     AddBrowserLoggerToView();
+
+    SetWebInspectorSupport(page_);
 
     // reset frame path
     session_->frame_elements_.clear();
@@ -610,6 +623,7 @@ Error* QWebkitProxy::SwitchToTopFrameIfCurrentFrameInvalid() {
 Error* QWebkitProxy::NavigateToURL(const std::string& url, bool sync) {
 	QUrl address(QString(url.c_str()));
 
+    base::Time start_time = base::Time::Now();
     if (sync) {
         QPageLoader pageLoader(page_);
         QEventLoop loop;
@@ -623,6 +637,10 @@ Error* QWebkitProxy::NavigateToURL(const std::string& url, bool sync) {
     } else {
         page_->mainFrame()->load(address);
     }
+    if ((base::Time::Now() - start_time).InMilliseconds() > session_->page_load_timeout()) {
+        return new Error(kTimeout, "page loading timed out");
+    }
+
 
     return NULL;
 }
@@ -1740,8 +1758,13 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
     // client rect, and lastly the size of the element (via closure).
     // SVG is one case that doesn't have a first client rect.
     Rect rect;
+
     scoped_ptr<Error> ignore_error(GetElementFirstClientRect(GetFrame(session_->current_frame()),element, &rect));
-    if (ignore_error.get()) {
+
+    // getFirstClientRect by atoms sometimes doesn't throw Error but returns invalid position outside element.
+    bool invalid_pos = (int)rect.y() < 0 || (int)rect.x() < 0;
+
+    if (ignore_error.get() || invalid_pos) {
         Rect client_rect;
 
         ignore_error.reset(ExecuteScriptAndParse(
@@ -1772,6 +1795,7 @@ Error* QWebkitProxy::GetClickableLocation(const ElementId& element, Point* locat
         return error;
 
     location->Offset(rect.width() / 2, rect.height() / 2);
+
     return NULL;
 }   
 
@@ -1850,6 +1874,26 @@ void QWebkitProxy::AddBrowserLoggerToView() {
     QObject::connect(page_, SIGNAL(loadFinished(bool)),logHandler, SLOT(loadConsoleJS()), Qt::QueuedConnection);
     logHandler->loadJSLogObject(page_->mainFrame());
     logHandler->loadConsoleJS(page_);
+}
+
+void QWebkitProxy::SetWebInspectorSupport(QWebPage *page)
+{
+    page->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
+
+    if (cmdLine.HasSwitch(webdriver::Switches::kWIServer))
+    {
+        if (cmdLine.HasSwitch(webdriver::Switches::kWIPort))
+        {
+            std::string wiPort = cmdLine.GetSwitchValueASCII(webdriver::Switches::kWIPort);
+            int port = QString(wiPort.c_str()).toInt();
+            page->setProperty("_q_webInspectorServerPort", port);
+        }
+        else
+        {
+            page->setProperty("_q_webInspectorServerPort", 9222);
+        }
+    }
 }
 
 

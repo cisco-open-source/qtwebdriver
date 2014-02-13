@@ -125,6 +125,9 @@ public:
 
     void set_current_view(const ViewId& viewId);
 
+    void set_page_load_timeout(int timeout_ms);
+    int page_load_timeout() const;
+
     void set_async_script_timeout(int timeout_ms);
     int async_script_timeout() const;
 
@@ -239,6 +242,9 @@ private:
     ViewsMap views_;
 
     base::Thread thread_;
+
+    // Timeout (in ms) for page loads.
+    int page_load_timeout_;
 
     // Timeout (in ms) for asynchronous script execution.
     int async_script_timeout_;

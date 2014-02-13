@@ -111,6 +111,13 @@ void QWebViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Error 
 void QWebViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
     CHECK_VIEW_EXISTANCE
 
+    bool is_displayed = false;
+    *error = webkitProxy_->IsElementDisplayed(element, true, &is_displayed);
+    if (!is_displayed) {
+        *error = new Error(kElementNotVisible);
+        return;
+    }
+
     Point location;
     *error = webkitProxy_->GetElementLocationInView(element, &location);
     if (*error)

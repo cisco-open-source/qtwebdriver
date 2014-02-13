@@ -25,11 +25,13 @@ enum ErrorCode {
     kElementNotSelectable = 15,
     kJavaScriptError = 17,
     kXPathLookupError = 19,
+    kTimeout = 21,
     kNoSuchWindow = 23,
     kInvalidCookieDomain = 24,
     kUnableToSetCookie = 25,
     kUnexpectedAlertOpen = 26,
     kNoAlertOpenError = 27,
+    kScriptTimeout = 28,
     kMoveTargetOutOfBounds = 34,
     kCommandNotSupported = 50,
 

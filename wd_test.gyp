@@ -23,8 +23,6 @@
           ['OS=="linux"', {
             'libraries': [
               '-L<(QT_LIB_PATH)',
-              '-lQt5OpenGL',
-              '-lQt5PrintSupport',
               '-lQt5Network',
               '-lQt5Widgets',
               '-lQt5Quick',
@@ -32,6 +30,8 @@
               '-lQt5Sql',
               '-lQt5Gui',
               '-lQt5Xml',
+              '-lQt5OpenGL',
+              '-lQt5PrintSupport',
               '-lQt5Core',
               '-lpthread',
               '-lrt',
@@ -91,10 +91,7 @@
               '-lQt5Network',
               '-lQt5Gui',
               '-lQt5Core',
-              '-lQt5Quick',
-              '-lQt5Qml',
-              '-lQt5Multimedia',
-              '-lQt5MultimediaWidgets',
+              '-lQt5AndroidExtras',
               '-L<(ANDROID_LIB)',
               '-lgnustl_shared',
               '-llog',
@@ -103,25 +100,31 @@
           [ 'OS=="ios"', {
             'link_settings': {
               'libraries': [
-                '<(QT_LIB_PATH)/libQt5Network.a',
-                '<(QT_LIB_PATH)/libQt5Gui.a',
-                '<(QT_LIB_PATH)/libQt5Core.a',
-                '<(QT_LIB_PATH)/libQt5Widgets.a',
-                '<(QT_LIB_PATH)/libQt5Qml.a',
-                '<(QT_LIB_PATH)/libQt5Quick.a',
-                '<(QT_LIB_PATH)/libQt5Xml.a',
-                '<(QT_LIB_PATH)/libQt5PlatformSupport.a',
+                '<(QT_LIB_PATH)/libQt5Network_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Gui_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Core_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Widgets_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5MultimediaWidgets_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Multimedia_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Qml_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5OpenGL_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Quick_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5Xml_iphonesimulator.a',
+                '<(QT_LIB_PATH)/libQt5PlatformSupport_iphonesimulator.a',
+                '<(QT_LIB_PATH)/../plugins/platforms/libqios_iphonesimulator.a',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreText.framework',
+                '$(SDKROOT)/System/Library/Frameworks/OpenGLES.framework',
+                '$(SDKROOT)/System/Library/Frameworks/QuartzCore.framework',
                 '$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
                 'libz.dylib',
               ],
             },
 
             'xcode_settings': {
-              'TARGETED_DEVICE_FAMILY': '1,2',
+              'TARGETED_DEVICE_FAMILY': '2',
               'CODE_SIGN_IDENTITY': 'iPhone Developer',
               'IPHONEOS_DEPLOYMENT_TARGET': '6.1',
               'ARCHS': '$(ARCHS_STANDARD_32_BIT)',
@@ -163,16 +166,19 @@
           [ 'OS=="mac"', {
             'link_settings': {
               'libraries': [
-                '<(QT_LIB_PATH)/libQtGui.a',
-                '<(QT_LIB_PATH)/libQtCore.a',
-                '<(QT_LIB_PATH)/libQtNetwork.a',
-                '<(QT_LIB_PATH)/libQtDeclarative.a',
-                '<(QT_LIB_PATH)/libQtXml.a',
+                '<(QT_LIB_PATH)/QtGui.framework',
+                '<(QT_LIB_PATH)/QtCore.framework',
+                '<(QT_LIB_PATH)/QtNetwork.framework',
+                '<(QT_LIB_PATH)/QtDeclarative.framework',
+                '<(QT_LIB_PATH)/QtXml.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/CoreFoundation.framework',
                 '$(SDKROOT)/System/Library/Frameworks/ApplicationServices.framework',
                 '$(SDKROOT)/System/Library/Frameworks/Security.framework',
               ],
+              'xcode_settings': {
+                'FRAMEWORK_SEARCH_PATHS': '<(QT_LIB_PATH)',
+              },
             },
           } ],
         ],
@@ -250,8 +256,7 @@
         '<(INTERMEDIATE_DIR)/moc_MenuTest.cc',
       ],
       'conditions': [
-        # IGNORE VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
-        [ 'OS != "ios" and <(QT5) == 1', {
+        [ '<(QT5) == 1 and <(WD_CONFIG_PLAYER) == 1', {
           'sources': [
             'src/Test/VideoTest.h',
             'src/Test/VideoTest.cc',
@@ -313,7 +318,7 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/Qt5WebKit', '-l<(QT_LIB_PATH)/Qt5WebKitWidgets'],
             } ],
-            [ 'OS=="mac" or OS=="ios"', {
+            [ 'OS=="mac"', {
               'link_settings': {
                 'libraries': ['<(QT_LIB_PATH)/libQt5WebKit.a','<(QT_LIB_PATH)/libQt5WebKitWidgets.a',],
               },
@@ -334,9 +339,9 @@
             [ 'OS=="win"', {
               'libraries': ['-l<(QT_LIB_PATH)/QtWebKit4',],
             } ],
-            [ 'OS=="mac" or OS=="ios"', {
+            [ 'OS=="mac"', {
               'link_settings': {
-                'libraries': ['<(QT_LIB_PATH)/libQtWebKit.a',],
+                'libraries': ['<(QT_LIB_PATH)/QtWebKit.framework',],
               },
             } ],
           ],
@@ -397,10 +402,10 @@
         } ],
       ],
     }, {
-      'target_name': 'test_android_WD_noWebkit',
+      'target_name': 'test_android_WD_QML',
       'type': 'shared_library',
 
-      'product_name': 'WebDriver_noWebkit_android',
+      'product_name': 'AndroidWD_QML',
 
       'dependencies': [
         'base.gyp:chromium_base',
@@ -409,6 +414,43 @@
         'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
+      'libraries': [
+        '-lQt5Multimedia',
+        '-lQt5MultimediaWidgets', 
+        '-lQt5Quick',
+        '-lQt5Qml',
+      ],
+      
+      'sources': [
+        'src/Test/main.cc',
+        'src/Test/shutdown_command.cc',
+      ],
+
+      'conditions': [
+        [ '<(WD_BUILD_MONGOOSE) == 0', {
+          'sources': [
+            'src/third_party/mongoose/mongoose.c',
+          ],
+        } ],
+      ],
+
+    },
+    {
+      'target_name': 'test_android_WD_Widgets',
+      'type': 'shared_library',
+
+      'product_name': 'AndroidWD_Widgets',
+
+      'dependencies': [
+        'base.gyp:chromium_base',
+        'wd_core.gyp:WebDriver_core',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'test_widgets',
+      ],
+
+      'defines': [ 
+         'QT_NO_QML',
+       ],
       
       'sources': [
         'src/Test/main.cc',
@@ -434,6 +476,7 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
+        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
       

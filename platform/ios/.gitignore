@@ -18,13 +18,17 @@ xcuserdata/
 #Python modules
 MANIFEST
 dist/
-build/
+build*
 
 # Backup files
 *~.nib
 
 DerivedData/
-build*/
-
-Makefile
+ui_*
+Release*
+Debug*
+*.xcodeproj
+Makefile*
+Info.plist
+*stash
 

@@ -16,10 +16,6 @@
 
 #include <iostream>
 
-#include "TestVariables.h"
-std::string tests::testDataFolder;
-
-
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -42,10 +38,10 @@ std::string tests::testDataFolder;
 #include "WindowWithDeclarativeViewTest.h"
 #endif
 
-// Commented VideoTest due to error https://bugreports.qt-project.org/browse/QTBUG-32949
 #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "VideoTest.h"
-#endif//WD_ENABLE_PLAYER
+extern std::string testDataFolder;
+#endif //WD_ENABLE_PLAYER
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -55,7 +51,6 @@ std::string tests::testDataFolder;
 #include "shutdown_command.h"
 #include "webdriver_route_patterns.h"
 
-#ifndef OS_IOS
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // headers for Quick2 extension
     #include "extension_qt/quick2_view_creator.h"
@@ -67,13 +62,12 @@ std::string tests::testDataFolder;
     #include "extension_qt/qml_view_creator.h"
     #include "extension_qt/qml_view_executor.h"
     #include "extension_qt/qml_view_enumerator.h"
-        #if (WD_TEST_ENABLE_WEB_VIEW == 1)
-            #include "extension_qt/qdeclarativewebview.h"
-            #include "extension_qt/qml_web_view_enumerator.h"
-            #include "extension_qt/qml_web_view_executor.h"
-        #endif
-#endif
-#endif //OS_IOS
+#if (WD_TEST_ENABLE_WEB_VIEW == 1)
+    #include "extension_qt/qdeclarativewebview.h"
+    #include "extension_qt/qml_web_view_enumerator.h"
+    #include "extension_qt/qml_web_view_executor.h"
+#endif //WD_TEST_ENABLE_WEB_VIEW
+#endif //QT_VERSION
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
 #include "extension_qt/web_view_creator.h"
@@ -87,8 +81,8 @@ std::string tests::testDataFolder;
 #include "WidgetAndWebViewTest.h"
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
-#endif
-#endif
+#endif //QT_VERSION
+#endif //WD_TEST_ENABLE_WEB_VIEW
 
 #include "extension_qt/q_view_runner.h"
 #include "extension_qt/q_session_lifecycle_actions.h"
@@ -171,10 +165,10 @@ int main(int argc, char *argv[])
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
-#endif
-#endif
+#endif // QT_VERSION
+#endif // WD_TEST_ENABLE_WEB_VIEW
 
-#ifndef OS_IOS 
+#ifndef QT_NO_QML
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
     webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
@@ -204,9 +198,9 @@ int main(int argc, char *argv[])
     //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
-#endif    
-#endif //OS_IOS
-    
+#endif
+#endif //QT_NO_QML
+
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
@@ -232,14 +226,18 @@ int main(int argc, char *argv[])
       return 0;
     }
 
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // check if --test_data_folder CL argument is present
     std::string testDataFolderSwitch = "test_data_folder";
+
     if (cmd_line.HasSwitch(testDataFolderSwitch)) {
-      tests::testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
+      testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
     } else {
-        tests::testDataFolder = "./";
+      testDataFolder = "./";
     }
-    std::cout << "Using "<< tests::testDataFolder << " as test data folder" << std::endl;
+
+    std::cout << "Using "<< testDataFolder << " as test data folder" << std::endl;
+#endif //WD_ENABLE_PLAYER
 
 #if defined(OS_WIN)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -372,7 +370,17 @@ void PrintHelp() {
                 << "                                  format: login:password@ip:port"                 << std::endl
                 << "uinput         false              If option set, user input device"               << std::endl
                 << "                                  will be registered in the system"               << std::endl
-                << "test_data      ./                 Specifies where to look for test specific data" << std::endl;
+                << "test_data      ./                 Specifies where to look for test specific data" << std::endl
+                << "whitelist                         The path to whitelist file (e.g. whitelist.xml)"<< std::endl
+                << "                                  in XML format with specified list of IP with"   << std::endl
+                << "                                  allowed/denied commands for each of them."      << std::endl
+                << "webserver-cfg                     The path to mongoose config file"               << std::endl
+                << "                                  (e.g. /path/to/config.json) in JSON format with"<< std::endl
+                << "                                  specified mongoose start option"                << std::endl
+                << "                                  (extra-mime-types, listening_ports, etc.)"      << std::endl
+                << "                                  Option from webserver config file will have"    << std::endl
+                << "                                  more priority than commandline param"           << std::endl
+                << "                                  that specify the same option."                  << std::endl;
 }
 
 

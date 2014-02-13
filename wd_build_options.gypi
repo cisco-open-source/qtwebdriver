@@ -73,7 +73,7 @@
           '<(ANDROID_INC)',
           '<(ANDROID_LIB_INC)',
           '<(ANDROID_PLATFORM_INC)',
-          '<(QT_INC_PATH)/QtGui/5.1.0/QtGui'
+          '<(QT_INC_PATH)/QtGui/<!(/bin/echo -n $QT_VERSION)/QtGui'
         ],
         'ldflags': [
           '--sysroot=<!(/bin/echo -n $ANDROID_NDK_ROOT)/platforms/android-9/arch-<!(/bin/echo -n $ANDROID_ARCH)',
@@ -96,6 +96,13 @@
         },
       },
 
+    } ],
+
+    [ 'OS == "mac"', {
+      'xcode_settings': {
+        'CODE_SIGN_IDENTITY': 'Developer ID Application: Mykola Tryshnivskyy (3QWMV2L87Z)',
+        'SDKROOT': 'macosx10.8',
+      },
     } ],
 
     [ 'OS == "mac" or OS == "ios"', {

@@ -16,7 +16,7 @@ bool QWebViewUtil::isUrlSupported(QWebPage* pWebPage, const std::string& url, Er
         return false;
     }
 
-    QNetworkAccessManager *pmanager =  pWebPage->networkAccessManager();
+    QNetworkAccessManager *pmanager = pWebPage->networkAccessManager();
     if (NULL == pmanager) {
         //*error = new Error(kBadRequest);
         GlobalLogger::Log(kWarningLogLevel, " Invalid QNetworkAccessManager* ");
@@ -27,8 +27,8 @@ bool QWebViewUtil::isUrlSupported(QWebPage* pWebPage, const std::string& url, Er
 
     std::string mimeType;
 
-    scoped_ptr<Error> ignore_error(presolver->resolveContentType(url, mimeType));
-    if (ignore_error != NULL) {
+    *error = presolver->resolveContentType(url, mimeType);
+    if (NULL != *error) {
         return false;
     }
 
@@ -36,6 +36,11 @@ bool QWebViewUtil::isUrlSupported(QWebPage* pWebPage, const std::string& url, Er
 }	
 
 bool QWebViewUtil::isUrlSupported(const std::string& url, Error **error) {
+    // support blank page
+    const std::string BLANK = "about:blank";
+    if (!url.compare(BLANK))
+        return true;
+
     scoped_ptr<QNetworkAccessManager> pmanager(new QNetworkAccessManager());
     scoped_ptr<QContentTypeResolver> presolver(new QContentTypeResolver(pmanager.get()));
 

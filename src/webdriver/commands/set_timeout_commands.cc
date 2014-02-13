@@ -14,6 +14,8 @@
 
 namespace webdriver {
 
+const int SetTimeoutCommand::DEFAULT_TIMEOUT = 60000;
+
 SetTimeoutCommand::SetTimeoutCommand(
         const std::vector<std::string>& path_segments,
         const DictionaryValue* const parameters) :
@@ -49,13 +51,53 @@ void SetTimeoutCommand::ExecutePost(Response* const response) {
         ms_to_wait = static_cast<int>(ms);
     }
 
-    // Validate the wait time before setting it to the session.
-    if (ms_to_wait < 0) {
-        response->SetError(new Error(kBadRequest, "Timeout must be non-negative"));
+    Error* error = NULL;
+    scoped_ptr<Error> err(error);
+
+    // Timeout type as string
+    const char kTimeoutTypeKey[] = "type";
+    std::string type_of_operation;
+    if (!HasParameter(kTimeoutTypeKey)) {
+        error = SetTimeout(ms_to_wait);
+        if (error)
+            response->SetError(error);
         return;
     }
+    if (!GetStringParameter(kTimeoutTypeKey, &type_of_operation)) {
+        response->SetError(new Error(
+            kBadRequest, "'type' parameter must be a string"));
+        return;
+    }
+    error = SetTimeout(ms_to_wait, type_of_operation);
+    if (error)
+        response->SetError(error);
+}
 
-    SetTimeout(ms_to_wait);
+Error* SetTimeoutCommand::SetTimeout(int timeout_ms) {
+    return new Error(kUnknownError, "Request missing 'type' parameter");
+}
+
+Error* SetTimeoutCommand::SetTimeout(int timeout_ms, std::string type) {
+    if (!type.compare("implicit")) {
+        // timeouts value has a lower bound of 0 for implicit wait.
+        if (timeout_ms < 0)
+            return new Error(kUnknownError, "Timeout for implicit wait must be non-negative");
+        session_->set_implicit_wait(timeout_ms);
+        return NULL;
+    } else {
+        // Validate the wait time before setting it to the session.
+        if (timeout_ms < 0)
+            timeout_ms = DEFAULT_TIMEOUT;
+        if (!type.compare("page load")) {
+            session_->set_page_load_timeout(timeout_ms);
+            return NULL;
+        } else if (!type.compare("script")) {
+            session_->set_async_script_timeout(timeout_ms);
+            return NULL;
+        } else {
+            return new Error(kUnknownError, "Unknown type of timeout:" + type);
+        }
+    }
 }
 
 SetAsyncScriptTimeoutCommand::SetAsyncScriptTimeoutCommand(
@@ -65,8 +107,11 @@ SetAsyncScriptTimeoutCommand::SetAsyncScriptTimeoutCommand(
 
 SetAsyncScriptTimeoutCommand::~SetAsyncScriptTimeoutCommand() {}
 
-void SetAsyncScriptTimeoutCommand::SetTimeout(int timeout_ms) {
+Error* SetAsyncScriptTimeoutCommand::SetTimeout(int timeout_ms) {
+    if (timeout_ms < 0)
+        timeout_ms = DEFAULT_TIMEOUT;
     session_->set_async_script_timeout(timeout_ms);
+    return NULL;
 }
 
 ImplicitWaitCommand::ImplicitWaitCommand(
@@ -76,8 +121,12 @@ ImplicitWaitCommand::ImplicitWaitCommand(
 
 ImplicitWaitCommand::~ImplicitWaitCommand() {}
 
-void ImplicitWaitCommand::SetTimeout(int timeout_ms) {
+Error* ImplicitWaitCommand::SetTimeout(int timeout_ms) {
+    // timeouts value has a lower bound of 0 for implicit wait.
+    if (timeout_ms < 0)
+        return new Error(kUnknownError, "Timeout for implicit wait must be non-negative");
     session_->set_implicit_wait(timeout_ms);
+    return NULL;
 }
 
 }  // namespace webdriver

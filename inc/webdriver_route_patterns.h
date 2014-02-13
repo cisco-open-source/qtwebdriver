@@ -23,6 +23,7 @@ public:
     static const char kNewSession[];
     static const char kSession[];
     static const char kSessions[];
+    static const char kTimeOuts[];
     static const char kImplicitlyWait[];
     static const char kSetScriptTimeout[];
     static const char kGetAvailableLogTypes[];

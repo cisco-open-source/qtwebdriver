@@ -238,6 +238,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<CreateSession>                  (CommandRoutes::kNewSession);
     Add<SessionWithID>                  (CommandRoutes::kSession);
     Add<Sessions>                       (CommandRoutes::kSessions);
+    Add<SetTimeoutCommand>              (CommandRoutes::kTimeOuts);
     Add<SetAsyncScriptTimeoutCommand>   (CommandRoutes::kSetScriptTimeout);
     Add<ImplicitWaitCommand>            (CommandRoutes::kImplicitlyWait);
     Add<LogTypesCommand>                (CommandRoutes::kGetAvailableLogTypes);

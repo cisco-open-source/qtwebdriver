@@ -320,6 +320,9 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (disableMouseEvents) {
       return;
     }
+    if (event.button != 0) {
+      return;
+    }
 
     var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
@@ -334,6 +337,9 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (disableMouseEvents) {
       return;
     }
+    if (event.button != 0) {
+      return;
+    }
 
     var xpath = Util.getXPath(event.target);
     var target = self.driver.findElement(webdriver.By.xpath(xpath));
@@ -343,7 +349,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
       perform();
   };
 
-  win.document.onclick = function(event) {
+  win.document.onclick = win.document.oncontextmenu = function(event) {
     var disableMouseEvents = document.getElementsByName('disableMouseEvents')[0].checked;
     if (disableMouseEvents) {
       return false;
@@ -352,7 +358,7 @@ VisualizerController.prototype.visualizerAssignEventHandlers = function() {
     if (event.target.hasAttribute('elementId')) {
       var elementId = event.target.getAttribute('elementId');
       var element = new webdriver.WebElement(self.driver, elementId);
-      element.click();
+      element.click(event.button);
     } else {
       var xpath = Util.getXPath(event.target);
       var target = self.driver.findElement(webdriver.By.xpath(xpath));
@@ -505,11 +511,116 @@ VisualizerController.prototype.showVisualizationWindow = function(source, size) 
   this.visualizerAssignEventHandlers();
 };
 
+function VirtualKeyboardWidget() {
+  var self = this;
+
+  var KEY_ESC = 'Esc',
+      KEY_BKSP = 'Bksp',
+      KEY_TAB = '\u21e5 Tab',
+      KEY_ENTER = 'Enter',
+      KEY_SPACE = '&nbsp;',
+      KEY_SHIFT = 'Shift',
+      KEY_UP = '\u21d1',
+      KEY_DOWN = '\u21d3',
+      KEY_LEFT = '\u21d0',
+      KEY_RIGHT = '\u21d2';
+
+  var labelToKeyMap = {};
+  labelToKeyMap[KEY_ESC] = webdriver.Key.ESCAPE;
+  labelToKeyMap[KEY_BKSP] = webdriver.Key.BACK_SPACE;
+  labelToKeyMap[KEY_TAB] = webdriver.Key.TAB;
+  labelToKeyMap[KEY_ENTER] = webdriver.Key.ENTER;
+  labelToKeyMap[KEY_SPACE] = ' ';
+  labelToKeyMap[KEY_SHIFT] = webdriver.Key.SHIFT;
+  labelToKeyMap[KEY_UP] = webdriver.Key.UP;
+  labelToKeyMap[KEY_DOWN] = webdriver.Key.DOWN;
+  labelToKeyMap[KEY_LEFT] = webdriver.Key.LEFT;
+  labelToKeyMap[KEY_RIGHT] = webdriver.Key.RIGHT;
+
+  $.keyboard.keyaction.esc = function() {};
+  $.keyboard.keyaction.tab = function() {};
+  $.keyboard.keyaction.up = function() {};
+  $.keyboard.keyaction.down = function() {};
+
+  $('#keyboard').keyboard({
+    layout: 'custom',
+
+    customLayout: {
+      'default': [
+        '{esc} ` 1 2 3 4 5 6 7 8 9 0 - = {bksp}',
+        '{tab} q w e r t y u i o p [ ] \\',
+        'a s d f g h j k l ; \' {enter}',
+        '{shift} z x c v b n m , . / {shift}',
+        '{space} {left} {up} {down} {right}'
+      ],
+
+      'shift': [
+        '{esc} ~ ! @ # $ % ^ & * ( ) _ + {bksp}',
+        '{tab} Q W E R T Y U I O P { } |',
+        'A S D F G H J K L : " {enter}',
+        '{shift} Z X C V B N M < > ? {shift}',
+        '{space} {left} {up} {down} {right}'
+      ]
+    },
+
+    display: {
+      'esc': KEY_ESC,
+      'bksp': KEY_BKSP,
+      'enter': KEY_ENTER,
+      'space': KEY_SPACE,
+      'up': KEY_UP,
+      'left': KEY_LEFT,
+      'right': KEY_RIGHT,
+      'down': KEY_DOWN
+    },
+
+    position: {
+      using: function(props, feedback) {}
+    },
+
+    change: function(e, keyboard, el) {
+      // handle only left mouse button presses
+      if (event.button !== 0)
+        return;
+
+      var key = keyboard.lastKey;
+      if (key === KEY_SHIFT)
+        return;
+      if (key in labelToKeyMap)
+        key = labelToKeyMap[key];
+      self.fireEvent(key);
+    },
+
+    appendLocally: true,
+    usePreview: false,
+    alwaysOpen: true,
+    initialFocus: false,
+    stayOpen: true,
+    useCombos: false,
+    repeatRate: 0
+  });
+  
+  $('.ui-keyboard').css({position: 'relative'});
+}
+
+VirtualKeyboardWidget.prototype.addEventListener = function(listener) {
+  if (typeof this.eventListeners === 'undefined')
+    this.eventListeners = [];
+  this.eventListeners.push(listener);
+};
+
+VirtualKeyboardWidget.prototype.fireEvent = function(key) {
+  for (var listenerIndex in this.eventListeners) {
+    var listener = this.eventListeners[listenerIndex];
+    listener(key);
+  }
+};
+
 function WebDriverJsView() {
   if (localStorage && localStorage.webDriverUrlPort) {
     this.setDriverUrlPort(localStorage.webDriverUrlPort);
   } else {
-    this.setDriverUrlPort('');
+    this.setDriverUrlPort(window.location.protocol + '//' + window.location.host);
   }
 
   if (localStorage && localStorage.webPage) {
@@ -517,11 +628,13 @@ function WebDriverJsView() {
   } else {
     this.setWebPage('');
   }
+
+  this.keyboard = new VirtualKeyboardWidget();
 }
 
 WebDriverJsView.prototype.getDriverUrlPort = function() {
   var input = document.getElementsByName('webDriverUrlPort')[0];
-  return input.value;
+  return input.value.trim();
 };
 
 WebDriverJsView.prototype.setDriverUrlPort = function(value) {
@@ -532,7 +645,7 @@ WebDriverJsView.prototype.setDriverUrlPort = function(value) {
 
 WebDriverJsView.prototype.getWebPage = function() {
   var input = document.getElementsByName('webPage')[0];
-  return input.value;
+  return input.value.trim();
 };
 
 WebDriverJsView.prototype.setWebPage = function(value) {
@@ -542,8 +655,8 @@ WebDriverJsView.prototype.setWebPage = function(value) {
 };
 
 WebDriverJsView.prototype.updateSessionDepControls = function() {
-  var disable = this.getDriverUrlPort().trim() === '' ||
-                this.getWebPage().trim() === '';
+  var disable = this.getDriverUrlPort() === '' ||
+                this.getWebPage() === '';
 
   var sessionDepControls = [];
   sessionDepControls.push(document.getElementById('sourceButton'));
@@ -552,7 +665,7 @@ WebDriverJsView.prototype.updateSessionDepControls = function() {
     var control = sessionDepControls[controlIndex];
     control.disabled = disable;
   }
-}
+};
 
 WebDriverJsView.prototype.setSessionId = function(id) {
   var element = document.getElementById('sessionIdLabel');
@@ -561,7 +674,7 @@ WebDriverJsView.prototype.setSessionId = function(id) {
   } else {
     element.innerHTML = '';
   }
-}
+};
 
 WebDriverJsView.prototype.setFoundElementId = function(id) {
   var element = document.getElementById('foundElement');
@@ -574,7 +687,25 @@ WebDriverJsView.prototype.setFoundElementId = function(id) {
     this.setError(id.ELEMENT.message);
     document.getElementById('elementActions').style.visibility = 'hidden';
   }
-}
+};
+
+WebDriverJsView.prototype.setWindowList = function(handles, activeWindowHandle) {
+  var select = document.getElementById('windowList');
+  select.innerHTML = '';
+  for (var handleIndex in handles) {
+    var handle = handles[handleIndex];
+    var item = document.createElement('option');
+    item.setAttribute('value', handle);
+    item.innerHTML = handle;
+    if (activeWindowHandle == handle) {
+      item.innerHTML += ' (active)';
+      item.selected = true;
+    }
+    select.appendChild(item)
+  }
+  document.getElementById('windowList').style.visibility = 'visible';
+  document.getElementById('chooseWindow').style.visibility = 'visible';
+};
 
 WebDriverJsView.prototype.setError = function(message) {
   var element = document.getElementById('error');
@@ -585,13 +716,14 @@ WebDriverJsView.prototype.setError = function(message) {
     element.innerHTML = '';
     element.style.display = 'none';
   }
-}
+};
 
 function WebDriverJsController() {
   this.driver = new WebDriverProxy();
   this.visualizer = new VisualizerController(this.driver);
   this.view = new WebDriverJsView();
   this.driver.handleError = this.view.setError.bind(this.view);
+  this.view.keyboard.addEventListener(this.onSendKeys.bind(this));
 }
 
 WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
@@ -608,23 +740,31 @@ WebDriverJsController.prototype.setServerUrl = function(serverUrl) {
 }
 
 WebDriverJsController.prototype.setWebPage = function(webPage) {
-  this.element = null;
-
-  this.driver.get(webPage);
+  if (webPage !== this.webPage) {
+    this.element = null;
+  }
 
   this.webPage = webPage;
   if (localStorage)
     localStorage.webPage = webPage;
+  this.view.setWebPage(webPage);
 };
 
 WebDriverJsController.prototype.updateDriver = function() {
-  var webDriverUrlPort = document.getElementsByName('webDriverUrlPort')[0].value;
+  var self = this;
+  var webDriverUrlPort = this.view.getDriverUrlPort();
   if (webDriverUrlPort !== this.webDriverUrlPort)
     this.setServerUrl(webDriverUrlPort);
 
-  var webPage = document.getElementsByName('webPage')[0].value;
-  if (webPage !== this.webPage)
+  var webPage = this.view.getWebPage();
+  if (webPage === '') {
+    this.driver.getCurrentUrl().then(function(url) {
+      self.setWebPage(url);
+    });
+  } else if (webPage !== this.webPage) {
     this.setWebPage(webPage);
+    this.driver.get(webPage);
+  }
 };
 
 WebDriverJsController.prototype.onGet = function() {
@@ -748,23 +888,9 @@ WebDriverJsController.prototype.onSendKeys = function(key) {
 
 WebDriverJsController.prototype.onListWindowHandles = function() {
   var self = this;
-  var select = document.getElementById('windowList');
   this.driver.getWindowHandle().then(function(activeWindowHandle) {
     self.driver.getAllWindowHandles().then(function(handles) {
-      select.innerHTML = '';
-      for (var handleIndex in handles) {
-        var handle = handles[handleIndex];
-        var item = document.createElement('option');
-        item.setAttribute('value', handle);
-        item.innerHTML = handle;
-        if (activeWindowHandle == handle) {
-          item.innerHTML += ' (active)';
-          item.selected = true;
-        }
-        select.appendChild(item)
-      }
-      document.getElementById('windowList').style.visibility = 'visible';
-      document.getElementById('chooseWindow').style.visibility = 'visible';
+      self.view.setWindowList(handles, activeWindowHandle);
     });
   });
 };
@@ -774,6 +900,9 @@ WebDriverJsController.prototype.onChooseWindow = function() {
   var handle = document.getElementById('windowList').value;
   this.driver.switchTo().window(handle).then(function() {
     self.onListWindowHandles();
+    return self.driver.getCurrentUrl();
+  }).then(function(url) {
+    self.setWebPage(url);
   });
 };
 

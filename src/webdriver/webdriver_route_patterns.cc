@@ -14,6 +14,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kNewSession);
 		standardCommandRoutes.insert(kSession);
 		standardCommandRoutes.insert(kSessions);
+		standardCommandRoutes.insert(kTimeOuts);
 		standardCommandRoutes.insert(kImplicitlyWait);
 		standardCommandRoutes.insert(kSetScriptTimeout);
 		standardCommandRoutes.insert(kGetAvailableLogTypes);
@@ -76,20 +77,20 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kSessionStorageKey);
 		standardCommandRoutes.insert(kSessionStorageSize);
 		standardCommandRoutes.insert(kGetLocation);
-        standardCommandRoutes.insert(kTouchClick);
-        standardCommandRoutes.insert(kTouchDown);
-        standardCommandRoutes.insert(kTouchUp);
-        standardCommandRoutes.insert(kTouchMove);
-        standardCommandRoutes.insert(kTouchScroll);
-        standardCommandRoutes.insert(kTouchDoubleClick);
-        standardCommandRoutes.insert(kTouchLongClick);
-        standardCommandRoutes.insert(kTouchFlick);
-        standardCommandRoutes.insert(kOrientation);
+		standardCommandRoutes.insert(kTouchClick);
+		standardCommandRoutes.insert(kTouchDown);
+		standardCommandRoutes.insert(kTouchUp);
+		standardCommandRoutes.insert(kTouchMove);
+		standardCommandRoutes.insert(kTouchScroll);
+		standardCommandRoutes.insert(kTouchDoubleClick);
+		standardCommandRoutes.insert(kTouchLongClick);
+		standardCommandRoutes.insert(kTouchFlick);
+		standardCommandRoutes.insert(kOrientation);
 		standardCommandRoutes.insert(kXdrpc);
-        standardCommandRoutes.insert(kCiscoPlayerState);
-        standardCommandRoutes.insert(kCiscoPlayerVolume);
-        standardCommandRoutes.insert(kCiscoPlayingPosition);
-        standardCommandRoutes.insert(kShutdown);
+		standardCommandRoutes.insert(kCiscoPlayerState);
+		standardCommandRoutes.insert(kCiscoPlayerVolume);
+		standardCommandRoutes.insert(kCiscoPlayingPosition);
+		standardCommandRoutes.insert(kShutdown);
 	}
 
 	// check if paatern is presence in set
@@ -103,6 +104,7 @@ const char CommandRoutes::kGetLog[] 					= "/log";
 const char CommandRoutes::kNewSession[] 				= "/session";
 const char CommandRoutes::kSession[] 					= "/session/*";
 const char CommandRoutes::kSessions[] 					= "/sessions";
+const char CommandRoutes::kTimeOuts[]					= "/session/*/timeouts";
 const char CommandRoutes::kImplicitlyWait[] 			= "/session/*/timeouts/implicit_wait";
 const char CommandRoutes::kSetScriptTimeout[] 			= "/session/*/timeouts/async_script";
 const char CommandRoutes::kGetAvailableLogTypes[] 		= "/session/*/log/types";

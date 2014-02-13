@@ -199,6 +199,11 @@ Error* QProxyCapabilitiesParser::ParseNoProxy(const base::Value* option){
 Error* QProxyCapabilitiesParser::ParseSystemProxy(const base::DictionaryValue *options) {
 
     QString urlString(qgetenv("http_proxy"));
+    if (urlString == NULL) {
+        logger_.Log(kInfoLogLevel,"system proxy configuration not found");
+        return NULL;
+    }
+
     if (!urlString.startsWith("http://"))
         urlString.insert(0, "http://");
     QUrl proxyUrl(urlString);

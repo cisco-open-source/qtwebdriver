@@ -16,6 +16,7 @@
 QWebViewExt::QWebViewExt(QWidget *parent) :
     QWebView(parent)
 {
+    setVisible(false);
     setWebInspectorProperty(this);
     connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
     connect(this, SIGNAL(titleChanged(QString)), this, SLOT(setWindowTitle(QString)));

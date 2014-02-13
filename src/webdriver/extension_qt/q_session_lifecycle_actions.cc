@@ -9,6 +9,7 @@
 #include "q_proxy_parser.h"
 #include "common_util.h"
 #include "base/string_util.h"
+#include "base/memory/scoped_ptr.h"
 
 namespace webdriver {
 
@@ -21,7 +22,7 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 	Error* error = NULL;
 	session_->logger().Log(kInfoLogLevel, "Custom QT PostInit action.");
 
-	const DictionaryValue* proxy_settings = NULL;
+    const DictionaryValue* proxy_settings = NULL;
 	if (required_capabilities_dict) 
 		required_capabilities_dict->GetDictionary(Capabilities::kProxy, &proxy_settings);
 
@@ -29,13 +30,17 @@ Error* QSessionLifeCycleActions::PostInit(const base::DictionaryValue* desired_c
 		desired_capabilities_dict->GetDictionary(Capabilities::kProxy, &proxy_settings);
 
 	if (proxy_settings) {
-		session_->logger().Log(kInfoLogLevel, "proxy settings requsted, aplying...");
-		error = ParseAndApplyProxySettings(proxy_settings);
-		if (error)
-			return error;
+        session_->logger().Log(kInfoLogLevel, "proxy settings requsted, aplying...");
+        error = ParseAndApplyProxySettings(proxy_settings);
 	} else {
 		session_->logger().Log(kInfoLogLevel, "no proxy settings requsted.");
-	}
+        session_->logger().Log(kInfoLogLevel, "Applying system proxy by default.");
+        scoped_ptr<DictionaryValue> proxy_system(new DictionaryValue());
+        proxy_system.get()->SetString("proxyType", "SYSTEM");
+        error = ParseAndApplyProxySettings(proxy_system.get());
+    }
+    if (error)
+        return error;
 
     AddActualQtVersion();
     if (required_capabilities_dict)
