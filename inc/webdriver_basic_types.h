@@ -40,6 +40,8 @@ public:
     ~Point();
 
     void Offset(double x, double y);
+    void setX(double x);
+    void setY(double y);
 
     double x() const;
     double y() const;

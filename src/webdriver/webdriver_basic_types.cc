@@ -23,6 +23,14 @@ void Point::Offset(double x, double y) {
   	y_ += y;
 }
 
+void Point::setX(double x) {
+    x_ = x;
+}
+
+void Point::setY(double y) {
+    y_ = y;
+}
+
 double Point::x() const {
   	return x_;
 }
