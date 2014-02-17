@@ -32,7 +32,7 @@
 #endif
 
 #define _USE_MATH_DEFINES
-#include <cmath>
+#include <math.h>
 
 class QNetworkCookie;
 namespace webdriver {
@@ -397,8 +397,8 @@ void QWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error) 
         *error = webkitProxy_->GetClickableLocation(element, &location);
         if (!(*error)) {
             // consider truncation, round up value
-            location.setX(std::ceil(location.x()));
-            location.setY(std::ceil(location.y()));
+            location.setX(ceil(location.x()));
+            location.setY(ceil(location.y()));
 
             session_->logger().Log(kFineLogLevel,
                 base::StringPrintf("ClickElement at pos (%f, %f).", location.x(), location.y()));
