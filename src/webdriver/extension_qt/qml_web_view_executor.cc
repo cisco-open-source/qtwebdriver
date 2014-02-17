@@ -16,6 +16,8 @@
 #include <QtGui/QStyleOptionGraphicsItem>
 #include <QtGui/QApplication>
 
+#include <cmath>
+
 namespace webdriver {
 
 #define CHECK_VIEW_EXISTANCE    \
@@ -408,6 +410,10 @@ void QmlWebViewCmdExecutor::ClickElement(const ElementId& element, Error** error
 
         *error = webkitProxy_->GetClickableLocation(element, &location);
         if (!(*error)) {
+            // consider truncation, round up value
+            location.setX(std::ceil(location.x()));
+            location.setY(std::ceil(location.y()));
+
             session_->logger().Log(kFineLogLevel,
                 base::StringPrintf("ClickElement at pos (%f, %f).", location.x(), location.y()));
             session_->set_mouse_position(location);
