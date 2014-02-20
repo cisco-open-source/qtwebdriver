@@ -39,7 +39,7 @@ webdriver.ExistingSessionBuilder.prototype.build = function() {
     if (sessions[0])
       return sessions[0];
     else
-      return webdriver.WebDriver.createSession(executor, self.getCapabilities()).getSession();
+      return webdriver.WebDriver.createSession(executor, self.getCapabilities().toJSON()).getSession();
   });
   return new webdriver.WebDriver(session, executor);
 };
