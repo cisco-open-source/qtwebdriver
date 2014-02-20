@@ -75,7 +75,7 @@ WebDriverProxy.prototype.setServerUrl = function(serverUrl) {
   var self = this;
   this.driver_ = new webdriver.ExistingSessionBuilder().
     usingServer(serverUrl).
-    withCapabilities({'browserName': 'qtwebkit'}).
+    withCapabilities({'browserName': 'qtwebkit', 'browserStartWindow': '*'}).
     build();
 
   for (var propertyName in this.driver_) {
