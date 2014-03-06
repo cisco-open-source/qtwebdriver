@@ -109,8 +109,13 @@ void QViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
     QWidget* view = getView(view_id_, error);
     if (NULL == view)
         return;
-    
-    QPixmap pixmap = QPixmap::grabWidget(view);
+
+    QPixmap pixmap;
+    if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)) {
+        pixmap = view->grab();
+    } else {
+        pixmap = QPixmap::grabWidget(view);
+    }
 
     saveScreenshot(pixmap, png, error);
 }

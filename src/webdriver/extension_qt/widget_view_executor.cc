@@ -200,7 +200,12 @@ void QWidgetViewCmdExecutor::GetElementScreenShot(const ElementId& element, std:
     const FilePath::CharType kPngFileName[] = FILE_PATH_LITERAL("./screen.png");
     FilePath path = session_->temp_dir().Append(kPngFileName);;
 
-    QPixmap pixmap = QPixmap::grabWidget(pWidget);
+    QPixmap pixmap;
+    if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)) {
+        pixmap = pWidget->grab();
+    } else {
+        pixmap = QPixmap::grabWidget(pWidget);
+    }
 
 #if defined(OS_WIN)
     session_->logger().Log(kInfoLogLevel, "Save screenshot to - " + path.MaybeAsASCII());
