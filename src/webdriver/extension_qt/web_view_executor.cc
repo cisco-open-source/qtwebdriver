@@ -131,11 +131,11 @@ void QWebViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::st
 
     QPixmap pixmap;
 
-    if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)) {
-        pixmap = view_->grab();
-    } else {
-        pixmap = QPixmap::grabWidget(view_);
-    }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    pixmap = view_->grab();
+#else
+    pixmap = QPixmap::grabWidget(view_);
+#endif
 
     QRect viewRect = pixmap.rect();
     QRect elementRect(location.x(), location.y(), size.width(), size.height());
