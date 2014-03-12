@@ -354,7 +354,7 @@ DictionaryValue::DictionaryValue()
 }
 
 DictionaryValue::~DictionaryValue() {
-    std::cout<< "\n********** DictionaryValue::~DictionaryValue()\n";
+    std::cout<< "\n********** DictionaryValue::~DictionaryValue() = "<<this<<"\n";
   Clear();
 }
 
@@ -381,6 +381,9 @@ void DictionaryValue::Clear() {
     std::cout << "*********** DictionaryValue::Clear()\n";
   ValueMap::iterator dict_iterator = dictionary_.begin();
   while (dict_iterator != dictionary_.end()) {
+      if (dict_iterator->first == "message") {
+          std::cout<< "******** "<<dict_iterator->first <<" = "<< dict_iterator->second<< " = { "<< *(dict_iterator->second)<< " }";
+      } else
       std::cout<<"******** "<<dict_iterator->first <<" = "<< dict_iterator->second<<std::endl;
     delete dict_iterator->second;
     ++dict_iterator;
