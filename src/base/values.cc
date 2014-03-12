@@ -354,7 +354,6 @@ DictionaryValue::DictionaryValue()
 }
 
 DictionaryValue::~DictionaryValue() {
-    std::cout<< "\n********** DictionaryValue::~DictionaryValue() = "<<this<<"\n";
   Clear();
 }
 
