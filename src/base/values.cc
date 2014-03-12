@@ -12,7 +12,7 @@
 #include "base/logging.h"
 #include "base/string_util.h"
 #include "base/utf_string_conversions.h"
-#include <iostream>
+
 namespace {
 
 // Make a deep copy of |node|, but don't include empty lists or dictionaries
@@ -378,18 +378,13 @@ bool DictionaryValue::HasKey(const std::string& key) const {
 }
 
 void DictionaryValue::Clear() {
-    std::cout << "*********** DictionaryValue::Clear()\n";
   ValueMap::iterator dict_iterator = dictionary_.begin();
   while (dict_iterator != dictionary_.end()) {
-      if (dict_iterator->first == "message") {
-          std::cout<< "******** "<<dict_iterator->first <<" = "<< dict_iterator->second<< " = { "<< *(dict_iterator->second)<< " }";
-      } else
-      std::cout<<"******** "<<dict_iterator->first <<" = "<< dict_iterator->second<<std::endl;
+
     delete dict_iterator->second;
     ++dict_iterator;
   }
 
-  std::cout << "*********** finish: DictionaryValue::Clear()\n\n";
   dictionary_.clear();
 }
 

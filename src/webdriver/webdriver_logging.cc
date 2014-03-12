@@ -277,7 +277,6 @@ const ListValue* InMemoryLog::entries_list() const {
 
 void InMemoryLog::clear_entries_list() {
     base::AutoLock auto_lock(entries_lock_);
-    std::cout<<"********** InMemoryLog::clear_entries_list()\n";
     entries_list_.Clear();
 }
 
