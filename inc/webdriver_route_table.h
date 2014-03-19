@@ -59,6 +59,7 @@
 /// - kMouseButtonDown[]            = "/session/*/buttondown";
 /// - kMouseButtonUp[]              = "/session/*/buttonup";
 /// - kMouseMoveTo[]                = "/session/*/moveto";
+/// - kMouseWheel[]                 = "/session/*/wheel";
 /// - kFindElement[]                = "/session/*/element";
 /// - kFindElements[]               = "/session/*/elements";
 /// - kClearElement[]               = "/session/*/element/*/clear";

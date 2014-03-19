@@ -256,4 +256,43 @@ void DoubleClickCommand::ExecutePost(Response* const response) {
     }
 }
 
+WheelCommand::WheelCommand(
+    const std::vector<std::string> &path_segments,
+    const base::DictionaryValue * const parameters)
+    : AdvancedMouseCommand(path_segments, parameters) {}
+
+WheelCommand::~WheelCommand() {}
+
+bool WheelCommand::Init(Response* const response) {
+    if (!AdvancedMouseCommand::Init(response))
+        return false;
+
+    if (!GetIntegerParameter("ticks", &ticks_)) {
+        response->SetError(new Error(kBadRequest, "Missing ticks argument"));
+        return false;
+    }
+
+    return true;
+}
+
+void WheelCommand::ExecutePost(Response * const response) {
+    Error* error = NULL;
+
+    // Most mouse types work in steps of 15 degrees,
+    // in which case the delta value is a multiple of 15 * 8 = 120;
+    const int STEP_WHEEL = 120;
+    int delta = ticks_ * STEP_WHEEL;
+
+    session_->RunSessionTask(base::Bind(
+            &ViewCmdExecutor::MouseWheel,
+            base::Unretained(executor_.get()),
+            delta,
+            &error));
+
+    if (error) {
+        response->SetError(error);
+        return;
+    }
+}
+
 }  // namespace webdriver

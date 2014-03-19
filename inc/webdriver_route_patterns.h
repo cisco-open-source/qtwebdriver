@@ -45,6 +45,7 @@ public:
     static const char kMouseButtonDown[];
     static const char kMouseButtonUp[];
     static const char kMouseMoveTo[];
+    static const char kMouseWheel[];
     static const char kClearElement[];
     static const char kSendKeysToElement[];
     static const char kSubmitElement[];

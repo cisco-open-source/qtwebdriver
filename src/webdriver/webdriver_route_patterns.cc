@@ -36,6 +36,7 @@ bool CommandRoutes::IsStandardRoute(const std::string& pattern) {
 		standardCommandRoutes.insert(kMouseButtonDown);
 		standardCommandRoutes.insert(kMouseButtonUp);
 		standardCommandRoutes.insert(kMouseMoveTo);
+		standardCommandRoutes.insert(kMouseWheel);
 		standardCommandRoutes.insert(kFindElement);
 		standardCommandRoutes.insert(kFindElements);
 		standardCommandRoutes.insert(kClearElement);
@@ -126,6 +127,7 @@ const char CommandRoutes::kMouseDoubleClick[] 			= "/session/*/doubleclick";
 const char CommandRoutes::kMouseButtonDown[]			= "/session/*/buttondown";
 const char CommandRoutes::kMouseButtonUp[] 				= "/session/*/buttonup";
 const char CommandRoutes::kMouseMoveTo[] 				= "/session/*/moveto";
+const char CommandRoutes::kMouseWheel[] 				= "/session/*/wheel";
 const char CommandRoutes::kFindElement[] 				= "/session/*/element";
 const char CommandRoutes::kFindElements[] 				= "/session/*/elements";
 const char CommandRoutes::kClearElement[] 				= "/session/*/element/*/clear";

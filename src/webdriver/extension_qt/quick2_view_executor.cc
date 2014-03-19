@@ -321,6 +321,35 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QGuiApplication::postEvent(view, releaseEvent);
 }
 
+void Quick2ViewCmdExecutor::MouseWheel(const int delta, Error **error) {
+    QQuickView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint(point.x(), point.y());
+    QPointF screenPos(view->x() + scenePoint.x(), view->y() + scenePoint.y());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel, screen: (%4d, %4d)", (int)screenPos.x(), (int)screenPos.y()));
+
+    // ignore scrolling distance in pixels on screen,
+    QPoint pixelDelta(0, 0);
+
+    QPoint angleDelta(0, delta);
+
+    QWheelEvent *wheelEvent = new QWheelEvent(scenePoint,
+                                              screenPos,
+                                              pixelDelta,
+                                              angleDelta,
+                                              delta,
+                                              Qt::Vertical,
+                                              Qt::NoButton,
+                                              Qt::NoModifier);
+
+    QGuiApplication::postEvent(view, wheelEvent);
+}
+
 void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
 	QQuickView* view = getView(view_id_, error);
     if (NULL == view)

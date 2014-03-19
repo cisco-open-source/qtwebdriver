@@ -304,6 +304,27 @@ void QQmlViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QApplication::postEvent(view->viewport(), releaseEvent);
 }
 
+void QQmlViewCmdExecutor::MouseWheel(const int delta, Error **error) {
+    QDeclarativeView* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPointF scenePoint(point.x(), point.y());
+    QPoint viewPos = view->mapFromScene(scenePoint);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel,  scene: (%4d, %4d)", (int)scenePoint.x(), (int)scenePoint.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel,   view: (%4d, %4d)", viewPos.x(), viewPos.y()));
+
+    QPoint screenPos = view->mapToGlobal(viewPos);
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel, screen: (%4d, %4d)", screenPos.x(), screenPos.y()));
+
+    QWheelEvent *wheelEvent = new QWheelEvent(viewPos, screenPos, delta, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view->viewport(), wheelEvent);
+}
+
 void QQmlViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
 	QDeclarativeView* view = getView(view_id_, error);
     if (NULL == view)

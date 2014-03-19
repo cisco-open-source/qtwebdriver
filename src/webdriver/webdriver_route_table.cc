@@ -260,6 +260,7 @@ DefaultRouteTable::DefaultRouteTable()
     Add<ButtonDownCommand>              (CommandRoutes::kMouseButtonDown);
     Add<ButtonUpCommand>                (CommandRoutes::kMouseButtonUp);
     Add<MoveToCommand>                  (CommandRoutes::kMouseMoveTo);
+    Add<WheelCommand>                   (CommandRoutes::kMouseWheel);
     Add<ElementClearCommand>            (CommandRoutes::kClearElement);
     Add<ElementValueCommand>            (CommandRoutes::kSendKeysToElement);
     Add<ElementSubmitCommand>           (CommandRoutes::kSubmitElement);

@@ -83,6 +83,7 @@ public:
     virtual void MouseButtonUp(Error** error) = 0;
     virtual void MouseButtonDown(Error** error) = 0;
     virtual void MouseClick(MouseButton button, Error** error) = 0;
+    virtual void MouseWheel(const int delta, Error** error) = 0;
     /// move mouse to position: cur_point + offset
     virtual void MouseMove(const int x_offset, const int y_offset, Error** error) = 0;
     /// Move the mouse by an offset of the specificed element

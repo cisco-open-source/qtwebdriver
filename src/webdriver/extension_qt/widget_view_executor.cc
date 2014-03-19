@@ -334,6 +334,32 @@ void QWidgetViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     }
 }
 
+void QWidgetViewCmdExecutor::MouseWheel(const int delta, Error **error){
+    QWidget* view = getView(view_id_, error);
+    if (NULL == view)
+        return;
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel start from : (%4d, %4d) on view", point.x(), point.y()));
+
+    // Find child widget that will receive event
+    QWidget *receiverWidget = view->childAt(point);
+    if (NULL != receiverWidget) {
+        point = receiverWidget->mapFrom(view, point);
+        session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel, rel: (%4d, %4d)", point.x(), point.y()));
+    } else {
+        receiverWidget = view;
+    }
+
+    QPoint globalPos = receiverWidget->mapToGlobal(point);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+    QWheelEvent *wheelEvent = new QWheelEvent(point, globalPos, delta, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(receiverWidget, wheelEvent);
+}
+
 void QWidgetViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
 	QWidget* view = getView(view_id_, error);
     if (NULL == view)

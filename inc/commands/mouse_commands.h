@@ -55,6 +55,7 @@ private:
 /// - /session/:sessionId/buttondown
 /// - /session/:sessionId/buttonup
 /// - /session/:sessionId/doubleclick
+/// - /session/:sessionId/wheel
 class AdvancedMouseCommand : public ViewCommand {
 public:
     AdvancedMouseCommand(const std::vector<std::string>& path_segments,
@@ -156,6 +157,25 @@ public:
 
 private:
     DISALLOW_COPY_AND_ASSIGN(DoubleClickCommand);
+};
+
+/// Scrolls the wheel of the mouse by the given number of ticks, where a positive
+/// number indicates a downward scroll (wheel was rotated forwards away from the user)
+/// and a negative is upward scroll (wheel was rotated backwards toward the user).
+
+class WheelCommand : public AdvancedMouseCommand {
+public:
+    WheelCommand(const std::vector<std::string>& path_segments,
+               const base::DictionaryValue* const parameters);
+    virtual ~WheelCommand();
+
+    virtual bool Init(Response* const response) OVERRIDE;
+    virtual void ExecutePost(Response* const response) OVERRIDE;
+
+private:
+    int ticks_;
+
+    DISALLOW_COPY_AND_ASSIGN(WheelCommand);
 };
 
 }  // namespace webdriver

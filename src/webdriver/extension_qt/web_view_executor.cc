@@ -311,6 +311,20 @@ void QWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     }
 }
 
+void QWebViewCmdExecutor::MouseWheel(const int delta, Error **error) {
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+    QPoint globalPos = view_->mapToGlobal(point);
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel start from : (%4d, %4d) on view", point.x(), point.y()));
+    session_->logger().Log(kFineLogLevel, base::StringPrintf("MouseWheel, screen: (%4d, %4d)", globalPos.x(), globalPos.y()));
+
+
+    QWheelEvent *wheelEvent = new QWheelEvent(point, globalPos, delta, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view_, wheelEvent);
+}
+
 void QWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
     CHECK_VIEW_EXISTANCE
 
