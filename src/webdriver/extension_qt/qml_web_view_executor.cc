@@ -317,6 +317,16 @@ void QmlWebViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
     QApplication::postEvent(view_->page(), releaseEvent);
 }
 
+void QmlWebViewCmdExecutor::MouseWheel(const int delta, Error **error) {
+    CHECK_VIEW_EXISTANCE
+
+    QPoint point = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
+
+    QWheelEvent *wheelEvent = new QWheelEvent(point, delta, Qt::NoButton, Qt::NoModifier);
+
+    QApplication::postEvent(view_->page(), wheelEvent);
+}
+
 void QmlWebViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
     CHECK_VIEW_EXISTANCE
 

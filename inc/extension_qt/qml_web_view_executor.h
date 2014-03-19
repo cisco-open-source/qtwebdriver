@@ -59,7 +59,8 @@ public:
     virtual void MouseDoubleClick(Error** error);
     virtual void MouseButtonUp(Error** error);
     virtual void MouseButtonDown(Error** error);
-    virtual void MouseClick(MouseButton button, Error** error);
+    virtual void MouseClick(MouseButton button, Error** error); 
+    virtual void MouseWheel(const int delta, Error **error);
     virtual void MouseMove(const int x_offset, const int y_offset, Error** error);
     virtual void MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error);
     virtual void MouseMove(const ElementId& element, Error** error);
