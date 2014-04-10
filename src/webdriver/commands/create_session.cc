@@ -48,7 +48,7 @@ void CreateSession::ExecutePost(Response* const response) {
     if (sessionMap.size() > 0) {
         // session map can consist only single session at the moment
         Session* prev_session = sessionMap.begin()->second;
-        bool reuse_ui;
+        bool reuse_ui = false;
         if (required_caps_dict) {
             if (!required_caps_dict->GetBoolean(Capabilities::kReuseUI, &reuse_ui))
                 desired_caps_dict->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
