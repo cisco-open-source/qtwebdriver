@@ -7,10 +7,9 @@ There are two capabilities which define strategy what view will be current after
 - "windowsize" - HWD will be try create window with given size, as a string (e.g. - "600, 600")
 - "windowposition" - HWD will be try start window with desired position, as a string (e.g. - "80, 60")
 - "maximize" - HWD will be try start window with maximum size
-- "reuseUI" - HWD checks it of prev session, if those caps not specified,
+- "reuseUI" - HWD checks this caps, if it is not specified,
 in case of attempt to create second session we get exeception of "one session only",<br/>
-otherwise first session will be terminated without closing windows and new session can reuse that windows
-
+otherwise prev session will be terminated without closing windows and new session can reuse those windows
 
 For browserClass customizer can define some generic classes. In example in default 
 QT extension there is handling of "WidgetView" and "WebView" values for this capability.

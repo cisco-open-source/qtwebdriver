@@ -101,7 +101,8 @@ bool Session::InitActualCapabilities() {
 
     bool reuse_ui;
     if (required_caps_.get()) {
-        required_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
+        if (!required_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui))
+            desired_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
     } else if (desired_caps_.get()) {
         desired_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
     } else {
