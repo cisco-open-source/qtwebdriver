@@ -48,9 +48,9 @@ void CreateSession::ExecutePost(Response* const response) {
     if (sessionMap.size() > 0) {
         // session map can consist only single session at the moment
         Session* prev_session = sessionMap.begin()->second;
-        bool reuse_ua;
-        prev_session->capabilities().caps->GetBoolean(Capabilities::kReuseUI, &reuse_ua);
-        if (reuse_ua) {
+        bool reuse_ui;
+        prev_session->capabilities().caps->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
+        if (reuse_ui) {
             prev_session->Terminate();
         } else {
             response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
