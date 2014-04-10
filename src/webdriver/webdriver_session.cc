@@ -98,6 +98,17 @@ bool Session::InitActualCapabilities() {
         hybrid->SetBoolean(*iter, true);
     }
     capabilities_.caps->Set(Capabilities::kHybrid, hybrid);
+
+    bool reuse_ui;
+    if (required_caps_.get()) {
+        required_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
+    } else if (desired_caps_.get()) {
+        desired_caps_->GetBoolean(Capabilities::kReuseUI, &reuse_ui);
+    } else {
+        reuse_ui = false;
+    }
+    capabilities_.caps->SetBoolean(Capabilities::kReuseUI, reuse_ui);
+
     return true;
 }
 

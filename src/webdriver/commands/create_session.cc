@@ -44,9 +44,18 @@ void CreateSession::ExecutePost(Response* const response) {
     // get optional required capabilities
     (void)GetDictionaryParameter("requiredCapabilities", &required_caps_dict);
 
-    if (SessionManager::GetInstance()->GetSessions().size() > 0) {
-        response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
-        return;
+    std::map<std::string, Session*> sessionMap = SessionManager::GetInstance()->GetSessions();
+    if (sessionMap.size() > 0) {
+        // session map can consist only single session at the moment
+        Session* prev_session = sessionMap.begin()->second;
+        bool reuse_ua;
+        prev_session->capabilities().caps->GetBoolean(Capabilities::kReuseUI, &reuse_ua);
+        if (reuse_ua) {
+            prev_session->Terminate();
+        } else {
+            response->SetError(new Error(kUnknownError, "Cannot start session. WD support only one session at the moment"));
+            return;
+        }
     }
 
     // Session manages its own liftime, so do not call delete.
