@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 WebDriver committers
+ * Copyright 2011-2014 Software Freedom Conservancy
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ extern const char* const GET_LOCATION[];
 extern const char* const GET_SIZE[];
 extern const char* const IS_DISPLAYED[];
 extern const char* const IS_ENABLED[];
-extern const char* const IS_ONLINE[];
 extern const char* const SUBMIT[];
 extern const char* const GET_FIRST_CLIENT_RECT[];
 extern const char* const GET_LOCATION_IN_VIEW[];
