@@ -8,7 +8,8 @@ See out test application in src/Test/main.cc
 # Build and run
 To build WD you need:
 * Install Qt (4 or 5)
-* Create wd.gypi file, our current wd.gypi looks like: ```
+* Create wd.gypi file, our current wd.gypi looks like: 
+```
 {
   'variables': {
     'QT5': '0', # change to '1' for enabling Qt5
