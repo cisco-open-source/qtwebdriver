@@ -21,11 +21,8 @@ To build WD you need:
 
 ```
 # API Reference
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
-# Tests
-Describe and show how to run the tests with code examples.
-# Contributors
-Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.
+All API is defined in inc/WebDriver.h and inc/viewfactory.h
 # License
-Classic LGPL License. This means that you can’t ship this your product with QtWD unlees it’s an LGPL product, but you can free test it in your local enviroment and just doesn’t ship 
+Classic LGPL License. This means that you can’t ship this your product with QtWD unlees it’s an LGPL product, but you can free test it in your local enviroment and just doesn’t ship it.
 
+For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/
