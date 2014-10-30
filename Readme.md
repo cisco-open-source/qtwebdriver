@@ -12,7 +12,7 @@ To build WD you need:
 ```
 {
   'variables': {
-    'QT5': '0', # change to '1' for enabling Qt5
+    'QT5': '1', # change to '1' for enabling Qt5, '0' for Qt4
     'QT_BIN_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/bin/',
     'QT_INC_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/include/',
     'QT_LIB_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/lib/',
@@ -27,6 +27,6 @@ To build WD you need:
 Look at our test application in *src/Test/main.cc* and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html
 
 # License
-Classic LGPL License. 
+LGPLv2.1 
 
 For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/
