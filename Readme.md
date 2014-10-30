@@ -22,8 +22,10 @@ To build WD you need:
 ```
 * run *build.sh* for basic build(output is in out folder)
 * you can find builded libs and test app in out/bin/desktop/release
+
 # Where to start
 Look at our test application in *src/Test/main.cc* and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html
+
 # License
 Classic LGPL License. This means that you can’t ship this your product with QtWD unlees it’s an LGPL product, but you can free test it in your local enviroment and just doesn’t ship it.
 
