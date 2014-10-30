@@ -1,7 +1,7 @@
 # Synopsis
 QtWebDriver (QtWD) is a library based on Google ChromeDriver and intended for automated testing. At the momemnt, you can use it to test many kinds of Qt application - QWidget, QwebView and QQuick1 (Qt4) or QQuick2 (Qt5) based applications. If you hadn't used Selenium for automated testing, you may also find this links helpfull:
-http://code.google.com/p/selenium/w/list
-http://docs.seleniumhq.org/
+* http://code.google.com/p/selenium/w/list
+* http://docs.seleniumhq.org/
 # Code Example
 See out test application in src/Test/main.cc
 
@@ -20,8 +20,10 @@ To build WD you need:
 }
 
 ```
-# API Reference
-All API is defined in inc/WebDriver.h and inc/viewfactory.h
+* run *build.sh* for basic build(output is in out folder)
+* you can find builded libs and test app in out/bin/desktop/release
+# Where to start
+Look at our test application in *src/Test/main.cc* and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html
 # License
 Classic LGPL License. This means that you can’t ship this your product with QtWD unlees it’s an LGPL product, but you can free test it in your local enviroment and just doesn’t ship it.
 
