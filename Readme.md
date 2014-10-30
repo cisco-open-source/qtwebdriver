@@ -4,8 +4,6 @@ At the moment, you can use it to test many kinds of Qt application - QWidget, Qw
 If you hadn't used Selenium for automated testing, you may also find this links helpful:
 * http://code.google.com/p/selenium/w/list
 * http://docs.seleniumhq.org/  
-# Code Example
-See out test application in src/Test/main.cc
 
 # Build and run
 To build WD you need:
@@ -26,7 +24,9 @@ To build WD you need:
 * you can find builded libs and test app in out/bin/desktop/release
 
 # Where to start
-Look at our test application in *src/Test/main.cc* and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html
+* Test application in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html   
+* [Doxygen](http://cisco-open-source.github.io/qtwebdriver/)  
+* [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
 
 # License
 LGPLv2.1 
