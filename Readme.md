@@ -27,6 +27,6 @@ To build WD you need:
 Look at our test application in *src/Test/main.cc* and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html
 
 # License
-Classic LGPL License. This means that you can’t ship this your product with QtWD unlees it’s an LGPL product, but you can free test it in your local enviroment and just doesn’t ship it.
+Classic LGPL License. 
 
 For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/
