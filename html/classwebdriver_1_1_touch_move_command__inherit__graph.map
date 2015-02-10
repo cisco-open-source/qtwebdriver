@@ -1,0 +1,7 @@
+<map id="webdriver::TouchMoveCommand" name="webdriver::TouchMoveCommand">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_touch_command.html" title="webdriver::TouchCommand" alt="" coords="21,304,203,331"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_element_command.html" title="webdriver::ElementCommand" alt="" coords="15,229,209,256"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="25,155,199,181"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="8,80,216,107"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="39,5,185,32"/>
+</map>

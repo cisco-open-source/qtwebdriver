@@ -1,0 +1,6 @@
+<map id="webdriver::ViewHandle" name="webdriver::ViewHandle">
+<area shape="rect" id="node3" href="$classwebdriver_1_1_graphics_web_view_handle.html" title="webdriver::GraphicsWebView\lHandle" alt="" coords="492,5,687,46"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_q_declarative_item_view_handle.html" title="webdriver::QDeclarativeItem\lViewHandle" alt="" coords="495,70,683,111"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_q_view_handle.html" title="webdriver::QViewHandle" alt="" coords="506,136,673,163"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_q_window_view_handle.html" title="webdriver::QWindowViewHandle" alt="" coords="483,187,696,213"/>
+</map>

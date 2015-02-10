@@ -1,0 +1,6 @@
+<map id="webdriver::LogHandler" name="webdriver::LogHandler">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_file_log.html" title="file log handler" alt="" coords="5,80,133,107"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_in_memory_log.html" title="webdriver::InMemoryLog" alt="" coords="157,80,323,107"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_std_out_log.html" title="stdout log handler" alt="" coords="347,80,495,107"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_perf_log.html" title="webdriver::PerfLog" alt="" coords="175,155,305,181"/>
+</map>

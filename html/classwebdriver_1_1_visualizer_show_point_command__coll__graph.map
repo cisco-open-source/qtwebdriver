@@ -1,0 +1,6 @@
+<map id="webdriver::VisualizerShowPointCommand" name="webdriver::VisualizerShowPointCommand">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="426,309,600,336"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="256,211,464,237"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="161,112,308,139"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_session.html" title="webdriver::Session" alt="" coords="412,112,545,139"/>
+</map>

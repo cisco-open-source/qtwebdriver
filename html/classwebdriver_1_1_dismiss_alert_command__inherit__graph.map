@@ -1,0 +1,5 @@
+<map id="webdriver::DismissAlertCommand" name="webdriver::DismissAlertCommand">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="29,155,203,181"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="12,80,220,107"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="43,5,189,32"/>
+</map>

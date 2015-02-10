@@ -1,0 +1,6 @@
+<map id="webdriver::SetTimeoutCommand" name="webdriver::SetTimeoutCommand">
+<area shape="rect" id="node4" href="$classwebdriver_1_1_implicit_wait_command.html" title="Set the amount of time the driver should wait when searching for elements." alt="" coords="5,237,219,264"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_set_async_script_timeout_command.html" title="Set timeout for asynchronous script execution (/session/*/execute_async)." alt="" coords="243,230,420,271"/>
+<area shape="rect" id="node2" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="117,80,325,107"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="148,5,295,32"/>
+</map>

@@ -1,0 +1,50 @@
+<map id="webdriver::WebDriverCommand" name="webdriver::WebDriverCommand">
+<area shape="rect" id="node3" href="$classwebdriver_1_1_browser_connection_command.html" title="webdriver::BrowserConnection\lCommand" alt="" coords="473,642,673,683"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_log_types_command.html" title="webdriver::LogTypesCommand" alt="" coords="472,708,675,735"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_session_with_i_d.html" title="webdriver::SessionWithID" alt="" coords="486,759,661,785"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_set_timeout_command.html" title="webdriver::SetTimeoutCommand" alt="" coords="467,809,680,836"/>
+<area shape="rect" id="node9" href="$classwebdriver_1_1_u_r_l_command.html" title="webdriver::URLCommand" alt="" coords="487,860,660,887"/>
+<area shape="rect" id="node10" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="486,911,661,937"/>
+<area shape="rect" id="node44" href="$classwebdriver_1_1_window_command.html" title="webdriver::WindowCommand" alt="" coords="477,961,670,988"/>
+<area shape="rect" id="node45" href="$classwebdriver_1_1_window_handle_command.html" title="webdriver::WindowHandleCommand" alt="" coords="456,1012,691,1039"/>
+<area shape="rect" id="node46" href="$classwebdriver_1_1_window_handles_command.html" title="webdriver::WindowHandles\lCommand" alt="" coords="483,1063,664,1105"/>
+<area shape="rect" id="node47" href="$classwebdriver_1_1_window_maximize_command.html" title="webdriver::WindowMaximize\lCommand" alt="" coords="479,1129,668,1170"/>
+<area shape="rect" id="node48" href="$classwebdriver_1_1_window_position_command.html" title="webdriver::WindowPosition\lCommand" alt="" coords="483,1194,663,1235"/>
+<area shape="rect" id="node49" href="$classwebdriver_1_1_window_size_command.html" title="webdriver::WindowSizeCommand" alt="" coords="464,1260,683,1287"/>
+<area shape="rect" id="node2" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="5,936,152,963"/>
+<area shape="rect" id="node7" href="$classwebdriver_1_1_implicit_wait_command.html" title="Set the amount of time the driver should wait when searching for elements." alt="" coords="746,5,961,32"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_set_async_script_timeout_command.html" title="Set timeout for asynchronous script execution (/session/*/execute_async)." alt="" coords="765,57,942,98"/>
+<area shape="rect" id="node11" href="$classwebdriver_1_1_accept_alert_command.html" title="webdriver::AcceptAlertCommand" alt="" coords="746,123,961,149"/>
+<area shape="rect" id="node12" href="$classwebdriver_1_1_active_element_command.html" title="Retrieves the active element on the current page." alt="" coords="768,174,939,215"/>
+<area shape="rect" id="node13" href="$classwebdriver_1_1_advanced_mouse_command.html" title="webdriver::AdvancedMouse\lCommand" alt="" coords="762,239,945,281"/>
+<area shape="rect" id="node16" href="$classwebdriver_1_1_alert_text_command.html" title="Gets the message of the JavaScript modal dialog, or sets the prompt text." alt="" coords="754,305,953,332"/>
+<area shape="rect" id="node17" href="$classwebdriver_1_1_app_cache_status_command.html" title="webdriver::AppCacheStatus\lCommand" alt="" coords="761,357,946,398"/>
+<area shape="rect" id="node18" href="$classwebdriver_1_1_back_command.html" title="webdriver::BackCommand" alt="" coords="765,423,941,449"/>
+<area shape="rect" id="node19" href="$classwebdriver_1_1_cookie_command.html" title="webdriver::CookieCommand" alt="" coords="760,473,947,500"/>
+<area shape="rect" id="node20" href="$classwebdriver_1_1_dismiss_alert_command.html" title="webdriver::DismissAlertCommand" alt="" coords="743,524,964,551"/>
+<area shape="rect" id="node21" href="$classwebdriver_1_1_element_command.html" title="webdriver::ElementCommand" alt="" coords="756,575,951,601"/>
+<area shape="rect" id="node22" href="$classwebdriver_1_1_execute_async_script_command.html" title="webdriver::ExecuteAsyncScript\lCommand" alt="" coords="751,626,956,667"/>
+<area shape="rect" id="node23" href="$classwebdriver_1_1_execute_command.html" title="webdriver::ExecuteCommand" alt="" coords="756,692,951,719"/>
+<area shape="rect" id="node24" href="$classwebdriver_1_1_find_element_command.html" title="webdriver::FindElementCommand" alt="" coords="744,743,963,769"/>
+<area shape="rect" id="node25" href="$classwebdriver_1_1_forward_command.html" title="webdriver::ForwardCommand" alt="" coords="757,793,950,820"/>
+<area shape="rect" id="node26" href="$classwebdriver_1_1_h_t_m_l5_location_command.html" title="webdriver::HTML5Location\lCommand" alt="" coords="764,845,943,886"/>
+<area shape="rect" id="node27" href="$classwebdriver_1_1_keys_command.html" title="Send a sequence of key strokes to the page." alt="" coords="765,911,941,937"/>
+<area shape="rect" id="node28" href="$classwebdriver_1_1_local_storage_command.html" title="webdriver::LocalStorageCommand" alt="" coords="742,961,965,988"/>
+<area shape="rect" id="node29" href="$classwebdriver_1_1_local_storage_key_command.html" title="webdriver::LocalStorageKey\lCommand" alt="" coords="761,1013,946,1054"/>
+<area shape="rect" id="node30" href="$classwebdriver_1_1_local_storage_size_command.html" title="webdriver::LocalStorageSize\lCommand" alt="" coords="759,1078,947,1119"/>
+<area shape="rect" id="node31" href="$classwebdriver_1_1_log_command.html" title="webdriver::LogCommand" alt="" coords="770,1144,937,1171"/>
+<area shape="rect" id="node32" href="$classwebdriver_1_1_named_cookie_command.html" title="webdriver::NamedCookieCommand" alt="" coords="739,1195,968,1221"/>
+<area shape="rect" id="node33" href="$classwebdriver_1_1_orientation_command.html" title="webdriver::OrientationCommand" alt="" coords="749,1245,958,1272"/>
+<area shape="rect" id="node34" href="$classwebdriver_1_1_refresh_command.html" title="webdriver::RefreshCommand" alt="" coords="757,1296,949,1323"/>
+<area shape="rect" id="node35" href="$classwebdriver_1_1_screenshot_command.html" title="webdriver::ScreenshotCommand" alt="" coords="747,1347,959,1373"/>
+<area shape="rect" id="node36" href="$classwebdriver_1_1_session_storage_command.html" title="webdriver::SessionStorage\lCommand" alt="" coords="764,1398,943,1439"/>
+<area shape="rect" id="node37" href="$classwebdriver_1_1_session_storage_key_command.html" title="webdriver::SessionStorage\lKeyCommand" alt="" coords="764,1463,943,1505"/>
+<area shape="rect" id="node38" href="$classwebdriver_1_1_session_storage_size_command.html" title="webdriver::SessionStorage\lSizeCommand" alt="" coords="764,1529,943,1570"/>
+<area shape="rect" id="node39" href="$classwebdriver_1_1_source_command.html" title="webdriver::SourceCommand" alt="" coords="760,1595,947,1621"/>
+<area shape="rect" id="node40" href="$classwebdriver_1_1_switch_frame_command.html" title="webdriver::SwitchFrameCommand" alt="" coords="742,1645,965,1672"/>
+<area shape="rect" id="node41" href="$classwebdriver_1_1_title_command.html" title="webdriver::TitleCommand" alt="" coords="768,1696,939,1723"/>
+<area shape="rect" id="node42" href="$classwebdriver_1_1_visualizer_show_point_command.html" title="webdriver::VisualizerShow\lPointCommand" alt="" coords="765,1747,941,1789"/>
+<area shape="rect" id="node43" href="$classwebdriver_1_1_visualizer_source_command.html" title="Get the page source with reference artifacts assembled inside." alt="" coords="761,1813,945,1854"/>
+<area shape="rect" id="node14" href="$classwebdriver_1_1_button_down_command.html" title="webdriver::ButtonDownCommand" alt="" coords="1016,221,1235,248"/>
+<area shape="rect" id="node15" href="$classwebdriver_1_1_button_up_command.html" title="webdriver::ButtonUpCommand" alt="" coords="1025,272,1226,299"/>
+</map>

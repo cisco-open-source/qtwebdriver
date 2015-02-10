@@ -1,0 +1,38 @@
+<map id="webdriver::ElementCommand" name="webdriver::ElementCommand">
+<area shape="rect" id="node5" href="$classwebdriver_1_1_c_i_s_c_o___mute_command.html" title="webdriver::CISCO_MuteCommand" alt="" coords="930,5,1155,32"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_c_i_s_c_o___playback_speed_command.html" title="webdriver::CISCO_Playback\lSpeedCommand" alt="" coords="947,57,1138,98"/>
+<area shape="rect" id="node7" href="$classwebdriver_1_1_c_i_s_c_o___seek_command.html" title="webdriver::CISCO_SeekCommand" alt="" coords="929,123,1156,149"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_c_i_s_c_o___state_command.html" title="webdriver::CISCO_StateCommand" alt="" coords="929,173,1156,200"/>
+<area shape="rect" id="node9" href="$classwebdriver_1_1_c_i_s_c_o___volume_command.html" title="webdriver::CISCO_VolumeCommand" alt="" coords="923,224,1163,251"/>
+<area shape="rect" id="node10" href="$classwebdriver_1_1_element_attribute_command.html" title="webdriver::ElementAttribute\lCommand" alt="" coords="951,275,1134,317"/>
+<area shape="rect" id="node11" href="$classwebdriver_1_1_element_clear_command.html" title="webdriver::ElementClearCommand" alt="" coords="930,341,1155,368"/>
+<area shape="rect" id="node12" href="$classwebdriver_1_1_element_css_command.html" title="webdriver::ElementCssCommand" alt="" coords="933,392,1152,419"/>
+<area shape="rect" id="node13" href="$classwebdriver_1_1_element_displayed_command.html" title="webdriver::ElementDisplayed\lCommand" alt="" coords="947,443,1139,485"/>
+<area shape="rect" id="node14" href="$classwebdriver_1_1_element_enabled_command.html" title="webdriver::ElementEnabled\lCommand" alt="" coords="952,509,1133,550"/>
+<area shape="rect" id="node15" href="$classwebdriver_1_1_element_equals_command.html" title="webdriver::ElementEquals\lCommand" alt="" coords="955,574,1130,615"/>
+<area shape="rect" id="node16" href="$classwebdriver_1_1_element_location_command.html" title="webdriver::ElementLocation\lCommand" alt="" coords="951,639,1134,681"/>
+<area shape="rect" id="node17" href="$classwebdriver_1_1_element_location_in_view_command.html" title="webdriver::ElementLocation\lInViewCommand" alt="" coords="951,705,1134,746"/>
+<area shape="rect" id="node18" href="$classwebdriver_1_1_element_name_command.html" title="webdriver::ElementNameCommand" alt="" coords="928,771,1157,797"/>
+<area shape="rect" id="node19" href="$classwebdriver_1_1_element_screenshot_command.html" title="webdriver::ElementScreenshot\lCommand" alt="" coords="943,822,1143,863"/>
+<area shape="rect" id="node20" href="$classwebdriver_1_1_element_selected_command.html" title="webdriver::ElementSelected\lCommand" alt="" coords="950,887,1135,929"/>
+<area shape="rect" id="node21" href="$classwebdriver_1_1_element_size_command.html" title="webdriver::ElementSizeCommand" alt="" coords="933,953,1153,980"/>
+<area shape="rect" id="node22" href="$classwebdriver_1_1_element_submit_command.html" title="webdriver::ElementSubmit\lCommand" alt="" coords="955,1005,1130,1046"/>
+<area shape="rect" id="node23" href="$classwebdriver_1_1_element_text_command.html" title="webdriver::ElementTextCommand" alt="" coords="933,1071,1153,1097"/>
+<area shape="rect" id="node24" href="$classwebdriver_1_1_element_value_command.html" title="webdriver::ElementValueCommand" alt="" coords="929,1121,1156,1148"/>
+<area shape="rect" id="node25" href="$classwebdriver_1_1_hover_command.html" title="webdriver::HoverCommand" alt="" coords="952,1172,1133,1199"/>
+<area shape="rect" id="node26" href="$classwebdriver_1_1_move_and_click_command.html" title="webdriver::MoveAndClickCommand" alt="" coords="927,1223,1158,1249"/>
+<area shape="rect" id="node27" href="$classwebdriver_1_1_touch_command.html" title="webdriver::TouchCommand" alt="" coords="951,1273,1134,1300"/>
+<area shape="rect" id="node2" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="457,647,631,673"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="200,647,408,673"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="5,647,152,673"/>
+<area shape="rect" id="node28" href="$classwebdriver_1_1_touch_click_command.html" title="webdriver::TouchClickCommand" alt="" coords="1213,1017,1425,1044"/>
+<area shape="rect" id="node29" href="$classwebdriver_1_1_touch_double_click_command.html" title="webdriver::TouchDoubleClick\lCommand" alt="" coords="1222,1069,1415,1110"/>
+<area shape="rect" id="node30" href="$classwebdriver_1_1_touch_down_command.html" title="webdriver::TouchDownCommand" alt="" coords="1211,1135,1427,1161"/>
+<area shape="rect" id="node31" href="$classwebdriver_1_1_touch_flick_command.html" title="webdriver::TouchFlickCommand" alt="" coords="1213,1185,1424,1212"/>
+<area shape="rect" id="node32" href="$classwebdriver_1_1_touch_long_click_command.html" title="webdriver::TouchLongClick\lCommand" alt="" coords="1229,1237,1409,1278"/>
+<area shape="rect" id="node33" href="$classwebdriver_1_1_touch_move_command.html" title="webdriver::TouchMoveCommand" alt="" coords="1211,1303,1426,1329"/>
+<area shape="rect" id="node34" href="$classwebdriver_1_1_touch_pinch_rotate_command.html" title="Rotate element using pinch rotate fingers motion events." alt="" coords="1221,1354,1416,1395"/>
+<area shape="rect" id="node35" href="$classwebdriver_1_1_touch_pinch_zoom_command.html" title="Rotate element using pinch zoom fingers motion events." alt="" coords="1225,1419,1413,1461"/>
+<area shape="rect" id="node36" href="$classwebdriver_1_1_touch_scroll_command.html" title="webdriver::TouchScrollCommand" alt="" coords="1211,1485,1426,1512"/>
+<area shape="rect" id="node37" href="$classwebdriver_1_1_touch_up_command.html" title="webdriver::TouchUpCommand" alt="" coords="1219,1536,1418,1563"/>
+</map>

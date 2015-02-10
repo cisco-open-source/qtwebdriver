@@ -1,0 +1,11 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_abstract_command_creator.html" title="base class for command creator" alt="" coords="147,5,341,46"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_element_handle.html" title="This class represents a Webdriver Element handle. Custom implementation should inherit and implement..." alt="" coords="157,71,331,97"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_view_handle.html" title="webdriver::ViewHandle" alt="" coords="166,191,322,217"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_command_creator.html" title="webdriver::CommandCreator\&lt; C \&gt;" alt="" coords="390,12,613,39"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_q_element_handle.html" title="webdriver::QElementHandle" alt="" coords="409,67,594,93"/>
+<area shape="rect" id="node7" href="$classwebdriver_1_1_graphics_web_view_handle.html" title="webdriver::GraphicsWebView\lHandle" alt="" coords="404,118,599,159"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_q_declarative_item_view_handle.html" title="webdriver::QDeclarativeItem\lViewHandle" alt="" coords="407,183,595,225"/>
+<area shape="rect" id="node9" href="$classwebdriver_1_1_q_view_handle.html" title="webdriver::QViewHandle" alt="" coords="418,249,585,276"/>
+<area shape="rect" id="node10" href="$classwebdriver_1_1_q_window_view_handle.html" title="webdriver::QWindowViewHandle" alt="" coords="395,300,608,327"/>
+</map>

@@ -1,0 +1,33 @@
+<map id="inc/commands/command.h" name="inc/commands/command.h">
+<area shape="rect" id="node2" href="$create__session_8h.html" title="inc/commands/create\l_session.h" alt="" coords="1273,81,1420,122"/>
+<area shape="rect" id="node3" href="$non__session__commands_8h.html" title="inc/commands/non_session\l_commands.h" alt="" coords="1444,81,1628,122"/>
+<area shape="rect" id="node4" href="$session__with__id_8h.html" title="inc/commands/session\l_with_id.h" alt="" coords="5,171,160,213"/>
+<area shape="rect" id="node5" href="$sessions_8h.html" title="inc/commands/sessions.h" alt="" coords="1703,88,1877,115"/>
+<area shape="rect" id="node6" href="$webdriver__command_8h.html" title="inc/commands/webdriver\l_command.h" alt="" coords="1902,81,2068,122"/>
+<area shape="rect" id="node32" href="$xdrpc__command_8h.html" title="inc/commands/xdrpc\l_command.h" alt="" coords="2093,81,2235,122"/>
+<area shape="rect" id="node7" href="$alert__commands_8h.html" title="inc/commands/alert\l_commands.h" alt="" coords="185,171,321,213"/>
+<area shape="rect" id="node8" href="$appcache__status__command_8h.html" title="inc/commands/appcache\l_status_command.h" alt="" coords="346,171,512,213"/>
+<area shape="rect" id="node9" href="$browser__connection__command_8h.html" title="inc/commands/browser\l_connection_command.h" alt="" coords="537,171,703,213"/>
+<area shape="rect" id="node10" href="$cisco__player__commands_8h.html" title="inc/commands/cisco\l_player_commands.h" alt="" coords="697,262,844,303"/>
+<area shape="rect" id="node11" href="$cookie__commands_8h.html" title="inc/commands/cookie\l_commands.h" alt="" coords="779,171,928,213"/>
+<area shape="rect" id="node12" href="$element__commands_8h.html" title="inc/commands/element\l_commands.h" alt="" coords="952,171,1109,213"/>
+<area shape="rect" id="node15" href="$execute__async__script__command_8h.html" title="inc/commands/execute\l_async_script_command.h" alt="" coords="1133,171,1312,213"/>
+<area shape="rect" id="node16" href="$execute__command_8h.html" title="inc/commands/execute\l_command.h" alt="" coords="1336,171,1493,213"/>
+<area shape="rect" id="node17" href="$find__element__commands_8h.html" title="inc/commands/find_element\l_commands.h" alt="" coords="1518,171,1703,213"/>
+<area shape="rect" id="node18" href="$html5__location__commands_8h.html" title="inc/commands/html5\l_location_commands.h" alt="" coords="1727,171,1883,213"/>
+<area shape="rect" id="node19" href="$html5__storage__commands_8h.html" title="inc/commands/html5\l_storage_commands.h" alt="" coords="1908,171,2063,213"/>
+<area shape="rect" id="node20" href="$keys__command_8h.html" title="inc/commands/keys_command.h" alt="" coords="2087,179,2301,205"/>
+<area shape="rect" id="node21" href="$log__command_8h.html" title="inc/commands/log_command.h" alt="" coords="2327,179,2529,205"/>
+<area shape="rect" id="node22" href="$navigate__commands_8h.html" title="inc/commands/navigate\l_commands.h" alt="" coords="2553,171,2713,213"/>
+<area shape="rect" id="node23" href="$orientation__command_8h.html" title="inc/commands/orientation\l_command.h" alt="" coords="2737,171,2908,213"/>
+<area shape="rect" id="node24" href="$screenshot__command_8h.html" title="inc/commands/screenshot\l_command.h" alt="" coords="2933,171,3107,213"/>
+<area shape="rect" id="node25" href="$set__timeout__commands_8h.html" title="inc/commands/set_timeout\l_commands.h" alt="" coords="3132,171,3311,213"/>
+<area shape="rect" id="node26" href="$source__command_8h.html" title="inc/commands/source\l_command.h" alt="" coords="3335,171,3485,213"/>
+<area shape="rect" id="node27" href="$target__locator__commands_8h.html" title="inc/commands/target\l_locator_commands.h" alt="" coords="3510,171,3660,213"/>
+<area shape="rect" id="node28" href="$title__command_8h.html" title="inc/commands/title\l_command.h" alt="" coords="3685,171,3816,213"/>
+<area shape="rect" id="node29" href="$url__command_8h.html" title="inc/commands/url_command.h" alt="" coords="3841,179,4041,205"/>
+<area shape="rect" id="node30" href="$visualizer__commands_8h.html" title="inc/commands/visualizer\l_commands.h" alt="" coords="4066,171,4232,213"/>
+<area shape="rect" id="node31" href="$window__commands_8h.html" title="inc/commands/window\l_commands.h" alt="" coords="4257,171,4412,213"/>
+<area shape="rect" id="node13" href="$mouse__commands_8h.html" title="inc/commands/mouse\l_commands.h" alt="" coords="926,262,1076,303"/>
+<area shape="rect" id="node14" href="$touch__commands_8h.html" title="inc/commands/touch\l_commands.h" alt="" coords="1101,262,1243,303"/>
+</map>

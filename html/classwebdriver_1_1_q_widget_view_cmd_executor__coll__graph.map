@@ -1,0 +1,6 @@
+<map id="webdriver::QWidgetViewCmdExecutor" name="webdriver::QWidgetViewCmdExecutor">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_q_view_cmd_executor.html" title="base class for QT based view&#39;s implementation" alt="" coords="212,293,417,320"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_view_cmd_executor.html" title="base class for custom view&#39;s executors" alt="" coords="85,203,280,229"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_session.html" title="webdriver::Session" alt="" coords="5,112,139,139"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_view_id.html" title="This class represents a Webdriver View ID. These IDs are mapped to objects in a page." alt="" coords="163,112,289,139"/>
+</map>

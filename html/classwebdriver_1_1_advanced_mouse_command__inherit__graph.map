@@ -1,0 +1,11 @@
+<map id="webdriver::AdvancedMouseCommand" name="webdriver::AdvancedMouseCommand">
+<area shape="rect" id="node5" href="$classwebdriver_1_1_button_down_command.html" title="webdriver::ButtonDownCommand" alt="" coords="912,5,1131,32"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_button_up_command.html" title="webdriver::ButtonUpCommand" alt="" coords="921,56,1122,83"/>
+<area shape="rect" id="node7" href="$classwebdriver_1_1_click_command.html" title="webdriver::ClickCommand" alt="" coords="933,107,1109,133"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_double_click_command.html" title="webdriver::DoubleClickCommand" alt="" coords="913,157,1130,184"/>
+<area shape="rect" id="node9" href="$classwebdriver_1_1_move_to_command.html" title="webdriver::MoveToCommand" alt="" coords="925,208,1118,235"/>
+<area shape="rect" id="node10" href="$classwebdriver_1_1_wheel_command.html" title="webdriver::WheelCommand" alt="" coords="930,259,1113,285"/>
+<area shape="rect" id="node2" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="457,132,631,159"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="200,132,408,159"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="5,132,152,159"/>
+</map>

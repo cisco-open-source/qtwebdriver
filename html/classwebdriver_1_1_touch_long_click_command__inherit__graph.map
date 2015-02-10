@@ -1,0 +1,7 @@
+<map id="webdriver::TouchLongClickCommand" name="webdriver::TouchLongClickCommand">
+<area shape="rect" id="node2" href="$classwebdriver_1_1_touch_command.html" title="webdriver::TouchCommand" alt="" coords="18,304,200,331"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_element_command.html" title="webdriver::ElementCommand" alt="" coords="12,229,207,256"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="22,155,196,181"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="5,80,213,107"/>
+<area shape="rect" id="node6" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="36,5,183,32"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="webdriver::TouchCommand" name="webdriver::TouchCommand">
+<area shape="rect" id="node6" href="$classwebdriver_1_1_touch_click_command.html" title="webdriver::TouchClickCommand" alt="" coords="1157,5,1369,32"/>
+<area shape="rect" id="node7" href="$classwebdriver_1_1_touch_double_click_command.html" title="webdriver::TouchDoubleClick\lCommand" alt="" coords="1166,57,1359,98"/>
+<area shape="rect" id="node8" href="$classwebdriver_1_1_touch_down_command.html" title="webdriver::TouchDownCommand" alt="" coords="1155,123,1371,149"/>
+<area shape="rect" id="node9" href="$classwebdriver_1_1_touch_flick_command.html" title="webdriver::TouchFlickCommand" alt="" coords="1157,173,1368,200"/>
+<area shape="rect" id="node10" href="$classwebdriver_1_1_touch_long_click_command.html" title="webdriver::TouchLongClick\lCommand" alt="" coords="1173,225,1353,266"/>
+<area shape="rect" id="node11" href="$classwebdriver_1_1_touch_move_command.html" title="webdriver::TouchMoveCommand" alt="" coords="1155,291,1370,317"/>
+<area shape="rect" id="node12" href="$classwebdriver_1_1_touch_pinch_rotate_command.html" title="Rotate element using pinch rotate fingers motion events." alt="" coords="1165,342,1360,383"/>
+<area shape="rect" id="node13" href="$classwebdriver_1_1_touch_pinch_zoom_command.html" title="Rotate element using pinch zoom fingers motion events." alt="" coords="1169,407,1357,449"/>
+<area shape="rect" id="node14" href="$classwebdriver_1_1_touch_scroll_command.html" title="webdriver::TouchScrollCommand" alt="" coords="1155,473,1370,500"/>
+<area shape="rect" id="node15" href="$classwebdriver_1_1_touch_up_command.html" title="webdriver::TouchUpCommand" alt="" coords="1163,524,1362,551"/>
+<area shape="rect" id="node2" href="$classwebdriver_1_1_element_command.html" title="webdriver::ElementCommand" alt="" coords="680,261,875,288"/>
+<area shape="rect" id="node3" href="$classwebdriver_1_1_view_command.html" title="Handles commands that interact with current view." alt="" coords="457,261,631,288"/>
+<area shape="rect" id="node4" href="$classwebdriver_1_1_web_driver_command.html" title="webdriver::WebDriverCommand" alt="" coords="200,261,408,288"/>
+<area shape="rect" id="node5" href="$classwebdriver_1_1_command.html" title="webdriver::Command" alt="" coords="5,261,152,288"/>
+</map>
