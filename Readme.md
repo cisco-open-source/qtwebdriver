@@ -24,11 +24,11 @@ To build WD you need:
 * you can find builded libs and test app in out/bin/desktop/release
 
 # Where to start
-* Test application in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/page_wd_server.html   
-* [Doxygen](http://cisco-open-source.github.io/qtwebdriver/)  
+* Test application in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/html/page_wd_server.html   
+* [Doxygen](http://cisco-open-source.github.io/qtwebdriver/html)  
 * [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
 
 # License
 LGPLv2.1 
 
-For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/
+For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/html
