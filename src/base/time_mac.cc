@@ -6,13 +6,95 @@
 
 #include <CoreFoundation/CFDate.h>
 #include <CoreFoundation/CFTimeZone.h>
+#include <mach/mach.h>
 #include <mach/mach_time.h>
+#include <sys/sysctl.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <time.h>
 
 #include "base/basictypes.h"
 #include "base/logging.h"
+#include "base/mac/mach_logging.h"
 #include "base/mac/scoped_cftyperef.h"
+#include "base/mac/scoped_mach_port.h"
+
+namespace {
+
+uint64_t ComputeCurrentTicks() {
+#if defined(OS_IOS)
+  // On iOS mach_absolute_time stops while the device is sleeping. Instead use
+  // now - KERN_BOOTTIME to get a time difference that is not impacted by clock
+  // changes. KERN_BOOTTIME will be updated by the system whenever the system
+  // clock change.
+  struct timeval boottime;
+  int mib[2] = {CTL_KERN, KERN_BOOTTIME};
+  size_t size = sizeof(boottime);
+  int kr = sysctl(mib, arraysize(mib), &boottime, &size, NULL, 0);
+  DCHECK_EQ(KERN_SUCCESS, kr);
+  base::TimeDelta time_difference = base::Time::Now() -
+      (base::Time::FromTimeT(boottime.tv_sec) +
+       base::TimeDelta::FromMicroseconds(boottime.tv_usec));
+  return time_difference.InMicroseconds();
+#else
+  uint64_t absolute_micro;
+
+  static mach_timebase_info_data_t timebase_info;
+  if (timebase_info.denom == 0) {
+    // Zero-initialization of statics guarantees that denom will be 0 before
+    // calling mach_timebase_info.  mach_timebase_info will never set denom to
+    // 0 as that would be invalid, so the zero-check can be used to determine
+    // whether mach_timebase_info has already been called.  This is
+    // recommended by Apple's QA1398.
+    kern_return_t kr = mach_timebase_info(&timebase_info);
+    MACH_DCHECK(kr == KERN_SUCCESS, kr) << "mach_timebase_info";
+  }
+
+  // mach_absolute_time is it when it comes to ticks on the Mac.  Other calls
+  // with less precision (such as TickCount) just call through to
+  // mach_absolute_time.
+
+  // timebase_info converts absolute time tick units into nanoseconds.  Convert
+  // to microseconds up front to stave off overflows.
+  absolute_micro =
+      mach_absolute_time() / base::Time::kNanosecondsPerMicrosecond *
+      timebase_info.numer / timebase_info.denom;
+
+  // Don't bother with the rollover handling that the Windows version does.
+  // With numer and denom = 1 (the expected case), the 64-bit absolute time
+  // reported in nanoseconds is enough to last nearly 585 years.
+  return absolute_micro;
+#endif  // defined(OS_IOS)
+}
+
+uint64_t ComputeThreadTicks() {
+#if defined(OS_IOS)
+  NOTREACHED();
+  return 0;
+#else
+  base::mac::ScopedMachSendRight thread(mach_thread_self());
+  mach_msg_type_number_t thread_info_count = THREAD_BASIC_INFO_COUNT;
+  thread_basic_info_data_t thread_info_data;
+
+  if (thread.get() == MACH_PORT_NULL) {
+    DLOG(ERROR) << "Failed to get mach_thread_self()";
+    return 0;
+  }
+
+  kern_return_t kr = thread_info(
+      thread,
+      THREAD_BASIC_INFO,
+      reinterpret_cast<thread_info_t>(&thread_info_data),
+      &thread_info_count);
+  MACH_DCHECK(kr == KERN_SUCCESS, kr) << "thread_info";
+
+  return (thread_info_data.user_time.seconds *
+              base::Time::kMicrosecondsPerSecond) +
+         thread_info_data.user_time.microseconds;
+#endif  // defined(OS_IOS)
+}
+
+}  // namespace
 
 namespace base {
 
@@ -33,8 +115,6 @@ namespace base {
 //   irb(main):011:0> Time.at(-11644473600).getutc()
 //   => Mon Jan 01 00:00:00 UTC 1601
 static const int64 kWindowsEpochDeltaSeconds = GG_INT64_C(11644473600);
-static const int64 kWindowsEpochDeltaMilliseconds =
-    kWindowsEpochDeltaSeconds * Time::kMillisecondsPerSecond;
 
 // static
 const int64 Time::kWindowsEpochDeltaMicroseconds =
@@ -52,9 +132,11 @@ Time Time::Now() {
 
 // static
 Time Time::FromCFAbsoluteTime(CFAbsoluteTime t) {
+  COMPILE_ASSERT(std::numeric_limits<CFAbsoluteTime>::has_infinity,
+                 numeric_limits_infinity_is_undefined_when_not_has_infinity);
   if (t == 0)
     return Time();  // Consider 0 as a null Time.
-  if (t == std::numeric_limits<CFAbsoluteTime>::max())
+  if (t == std::numeric_limits<CFAbsoluteTime>::infinity())
     return Max();
   return Time(static_cast<int64>(
       (t + kCFAbsoluteTimeIntervalSince1970) * kMicrosecondsPerSecond) +
@@ -62,10 +144,12 @@ Time Time::FromCFAbsoluteTime(CFAbsoluteTime t) {
 }
 
 CFAbsoluteTime Time::ToCFAbsoluteTime() const {
+  COMPILE_ASSERT(std::numeric_limits<CFAbsoluteTime>::has_infinity,
+                 numeric_limits_infinity_is_undefined_when_not_has_infinity);
   if (is_null())
     return 0;  // Consider 0 as a null Time.
   if (is_max())
-    return std::numeric_limits<CFAbsoluteTime>::max();
+    return std::numeric_limits<CFAbsoluteTime>::infinity();
   return (static_cast<CFAbsoluteTime>(us_ - kWindowsEpochDeltaMicroseconds) /
       kMicrosecondsPerSecond) - kCFAbsoluteTimeIntervalSince1970;
 }
@@ -87,8 +171,8 @@ Time Time::FromExploded(bool is_local, const Exploded& exploded) {
   date.month = exploded.month;
   date.year = exploded.year;
 
-  base::mac::ScopedCFTypeRef<CFTimeZoneRef>
-      time_zone(is_local ? CFTimeZoneCopySystem() : NULL);
+  base::mac::ScopedCFTypeRef<CFTimeZoneRef> time_zone(
+      is_local ? CFTimeZoneCopySystem() : NULL);
   CFAbsoluteTime seconds = CFGregorianDateGetAbsoluteTime(date, time_zone) +
       kCFAbsoluteTimeIntervalSince1970;
   return Time(static_cast<int64>(seconds * kMicrosecondsPerSecond) +
@@ -105,8 +189,8 @@ void Time::Explode(bool is_local, Exploded* exploded) const {
                            kWindowsEpochDeltaSeconds -
                            kCFAbsoluteTimeIntervalSince1970;
 
-  base::mac::ScopedCFTypeRef<CFTimeZoneRef>
-      time_zone(is_local ? CFTimeZoneCopySystem() : NULL);
+  base::mac::ScopedCFTypeRef<CFTimeZoneRef> time_zone(
+      is_local ? CFTimeZoneCopySystem() : NULL);
   CFGregorianDate date = CFAbsoluteTimeGetGregorianDate(seconds, time_zone);
   // 1 = Monday, ..., 7 = Sunday.
   int cf_day_of_week = CFAbsoluteTimeGetDayOfWeek(seconds, time_zone);
@@ -131,43 +215,22 @@ void Time::Explode(bool is_local, Exploded* exploded) const {
 
 // static
 TimeTicks TimeTicks::Now() {
-  uint64_t absolute_micro;
-
-  static mach_timebase_info_data_t timebase_info;
-  if (timebase_info.denom == 0) {
-    // Zero-initialization of statics guarantees that denom will be 0 before
-    // calling mach_timebase_info.  mach_timebase_info will never set denom to
-    // 0 as that would be invalid, so the zero-check can be used to determine
-    // whether mach_timebase_info has already been called.  This is
-    // recommended by Apple's QA1398.
-    kern_return_t kr = mach_timebase_info(&timebase_info);
-    DCHECK_EQ(KERN_SUCCESS, kr);
-  }
-
-  // mach_absolute_time is it when it comes to ticks on the Mac.  Other calls
-  // with less precision (such as TickCount) just call through to
-  // mach_absolute_time.
-
-  // timebase_info converts absolute time tick units into nanoseconds.  Convert
-  // to microseconds up front to stave off overflows.
-  absolute_micro = mach_absolute_time() / Time::kNanosecondsPerMicrosecond *
-                   timebase_info.numer / timebase_info.denom;
-
-  // Don't bother with the rollover handling that the Windows version does.
-  // With numer and denom = 1 (the expected case), the 64-bit absolute time
-  // reported in nanoseconds is enough to last nearly 585 years.
-
-  return TimeTicks(absolute_micro);
+  return TimeTicks(ComputeCurrentTicks());
 }
 
 // static
-TimeTicks TimeTicks::HighResNow() {
-  return Now();
+bool TimeTicks::IsHighResolution() {
+  return true;
+}
+
+// static
+TimeTicks TimeTicks::ThreadNow() {
+  return TimeTicks(ComputeThreadTicks());
 }
 
 // static
 TimeTicks TimeTicks::NowFromSystemTraceTime() {
-  return HighResNow();
+  return Now();
 }
 
 }  // namespace base

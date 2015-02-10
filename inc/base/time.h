@@ -2,31 +2,38 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Time represents an absolute point in time, internally represented as
-// microseconds (s/1,000,000) since a platform-dependent epoch.  Each
-// platform's epoch, along with other system-dependent clock interface
-// routines, is defined in time_PLATFORM.cc.
+// Time represents an absolute point in coordinated universal time (UTC),
+// internally represented as microseconds (s/1,000,000) since the Windows epoch
+// (1601-01-01 00:00:00 UTC) (See http://crbug.com/14734).  System-dependent
+// clock interface routines are defined in time_PLATFORM.cc.
 //
 // TimeDelta represents a duration of time, internally represented in
 // microseconds.
 //
-// TimeTicks represents an abstract time that is always incrementing for use
-// in measuring time durations. It is internally represented in microseconds.
-// It can not be converted to a human-readable time, but is guaranteed not to
-// decrease (if the user changes the computer clock, Time::Now() may actually
-// decrease or jump).
+// TimeTicks represents an abstract time that is most of the time incrementing
+// for use in measuring time durations. It is internally represented in
+// microseconds.  It can not be converted to a human-readable time, but is
+// guaranteed not to decrease (if the user changes the computer clock,
+// Time::Now() may actually decrease or jump).  But note that TimeTicks may
+// "stand still", for example if the computer suspended.
 //
 // These classes are represented as only a 64-bit value, so they can be
 // efficiently passed by value.
+//
+// Definitions of operator<< are provided to make these types work with
+// DCHECK_EQ() and other log macros. For human-readable formatting, see
+// "base/i18n/time_formatting.h".
 
-#ifndef BASE_TIME_H_
-#define BASE_TIME_H_
+#ifndef BASE_TIME_TIME_H_
+#define BASE_TIME_TIME_H_
 
 #include <time.h>
 
-#include "base/atomicops.h"
+#include <iosfwd>
+
 #include "base/base_export.h"
 #include "base/basictypes.h"
+#include "build/build_config.h"
 
 #if defined(OS_MACOSX)
 #include <CoreFoundation/CoreFoundation.h>
@@ -35,7 +42,7 @@
 #endif
 
 #if defined(OS_POSIX)
-// For struct timeval.
+#include <unistd.h>
 #include <sys/time.h>
 #endif
 
@@ -60,11 +67,13 @@ class BASE_EXPORT TimeDelta {
   }
 
   // Converts units of time to TimeDeltas.
-  static TimeDelta FromDays(int64 days);
-  static TimeDelta FromHours(int64 hours);
-  static TimeDelta FromMinutes(int64 minutes);
+  static TimeDelta FromDays(int days);
+  static TimeDelta FromHours(int hours);
+  static TimeDelta FromMinutes(int minutes);
   static TimeDelta FromSeconds(int64 secs);
   static TimeDelta FromMilliseconds(int64 ms);
+  static TimeDelta FromSecondsD(double secs);
+  static TimeDelta FromMillisecondsD(double ms);
   static TimeDelta FromMicroseconds(int64 us);
 #if defined(OS_WIN)
   static TimeDelta FromQPCValue(LONGLONG qpc_value);
@@ -78,12 +87,31 @@ class BASE_EXPORT TimeDelta {
     return TimeDelta(delta);
   }
 
+  // Returns the maximum time delta, which should be greater than any reasonable
+  // time delta we might compare it to. Adding or subtracting the maximum time
+  // delta to a time or another time delta has an undefined result.
+  static TimeDelta Max();
+
   // Returns the internal numeric value of the TimeDelta object. Please don't
   // use this and do arithmetic on it, as it is more error prone than using the
   // provided operators.
   // For serializing, use FromInternalValue to reconstitute.
   int64 ToInternalValue() const {
     return delta_;
+  }
+
+  // Returns the magnitude (absolute value) of this TimeDelta.
+  TimeDelta magnitude() const {
+    // Some toolchains provide an incomplete C++11 implementation and lack an
+    // int64 overload for std::abs().  The following is a simple branchless
+    // implementation:
+    const int64 mask = delta_ >> (sizeof(delta_) * 8 - 1);
+    return TimeDelta((delta_ + mask) ^ mask);
+  }
+
+  // Returns true if the time delta is the maximum time delta.
+  bool is_max() const {
+    return delta_ == std::numeric_limits<int64>::max();
   }
 
 #if defined(OS_POSIX)
@@ -193,9 +221,12 @@ inline TimeDelta operator*(int64 a, TimeDelta td) {
   return TimeDelta(a * td.delta_);
 }
 
+// For logging use only.
+BASE_EXPORT std::ostream& operator<<(std::ostream& os, TimeDelta time_delta);
+
 // Time -----------------------------------------------------------------------
 
-// Represents a wall clock time.
+// Represents a wall clock time in UTC.
 class BASE_EXPORT Time {
  public:
   static const int64 kMillisecondsPerSecond = 1000;
@@ -210,6 +241,10 @@ class BASE_EXPORT Time {
   static const int64 kNanosecondsPerSecond = kNanosecondsPerMicrosecond *
                                              kMicrosecondsPerSecond;
 
+  // The representation of Jan 1, 1970 UTC in microseconds since the
+  // platform-dependent epoch.
+  static const int64 kTimeTToMicrosecondsOffset;
+
 #if !defined(OS_WIN)
   // On Mac & Linux, this value is the delta from the Windows epoch of 1601 to
   // the Posix delta of 1970. This is used for migrating between the old
@@ -217,6 +252,11 @@ class BASE_EXPORT Time {
   // this global header and put in the platform-specific ones when we remove the
   // migration code.
   static const int64 kWindowsEpochDeltaMicroseconds;
+#else
+  // To avoid overflow in QPC to Microseconds calculations, since we multiply
+  // by kMicrosecondsPerSecond, then the QPC value should not exceed
+  // (2^63 - 1) / 1E6. If it exceeds that threshold, we divide then multiply.
+  static const int64 kQPCOverflowThreshold = 0x8637BD05AF7;
 #endif
 
   // Represents an exploded time that can be formatted nicely. This is kind of
@@ -240,7 +280,7 @@ class BASE_EXPORT Time {
   };
 
   // Contains the NULL time. Use Time::Now() to get the current time.
-  explicit Time() : us_(0) {
+  Time() : us_(0) {
   }
 
   // Returns true if the time object has not been initialized.
@@ -285,11 +325,23 @@ class BASE_EXPORT Time {
   static Time FromDoubleT(double dt);
   double ToDoubleT() const;
 
+#if defined(OS_POSIX)
+  // Converts the timespec structure to time. MacOS X 10.8.3 (and tentatively,
+  // earlier versions) will have the |ts|'s tv_nsec component zeroed out,
+  // having a 1 second resolution, which agrees with
+  // https://developer.apple.com/legacy/library/#technotes/tn/tn1150.html#HFSPlusDates.
+  static Time FromTimeSpec(const timespec& ts);
+#endif
+
   // Converts to/from the Javascript convention for times, a number of
   // milliseconds since the epoch:
   // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Date/getTime.
   static Time FromJsTime(double ms_since_epoch);
   double ToJsTime() const;
+
+  // Converts to Java convention for times, a number of
+  // milliseconds since the epoch.
+  int64 ToJavaTime() const;
 
 #if defined(OS_POSIX)
   static Time FromTimeVal(struct timeval t);
@@ -310,13 +362,7 @@ class BASE_EXPORT Time {
   // treat it as static across all windows versions.
   static const int kMinLowResolutionThresholdMs = 16;
 
-  // Enable or disable Windows high resolution timer. If the high resolution
-  // timer is not enabled, calls to ActivateHighResolutionTimer will fail.
-  // When disabling the high resolution timer, this function will not cause
-  // the high resolution timer to be deactivated, but will prevent future
-  // activations.
-  // Must be called from the main thread.
-  // For more details see comments in time_win.cc.
+  // Enable or disable Windows high resolution timer.
   static void EnableHighResolutionTimer(bool enable);
 
   // Activates or deactivates the high resolution timer based on the |activate|
@@ -354,10 +400,17 @@ class BASE_EXPORT Time {
   // Converts a string representation of time to a Time object.
   // An example of a time string which is converted is as below:-
   // "Tue, 15 Nov 1994 12:45:26 GMT". If the timezone is not specified
-  // in the input string, we assume local time.
+  // in the input string, FromString assumes local time and FromUTCString
+  // assumes UTC. A timezone that cannot be parsed (e.g. "UTC" which is not
+  // specified in RFC822) is treated as if the timezone is not specified.
   // TODO(iyengar) Move the FromString/FromTimeT/ToTimeT/FromFileTime to
   // a new time converter class.
-  static bool FromString(const char* time_string, Time* parsed_time);
+  static bool FromString(const char* time_string, Time* parsed_time) {
+    return FromStringInternal(time_string, true, parsed_time);
+  }
+  static bool FromUTCString(const char* time_string, Time* parsed_time) {
+    return FromStringInternal(time_string, false, parsed_time);
+  }
 
   // For serializing, use FromInternalValue to reconstitute. Please don't use
   // this and do arithmetic on it, as it is more error prone than using the
@@ -441,19 +494,16 @@ class BASE_EXPORT Time {
   // |is_local = true| or UTC |is_local = false|.
   static Time FromExploded(bool is_local, const Exploded& exploded);
 
-  // The representation of Jan 1, 1970 UTC in microseconds since the
-  // platform-dependent epoch.
-  static const int64 kTimeTToMicrosecondsOffset;
-
-#if defined(OS_WIN)
-  // Indicates whether fast timers are usable right now.  For instance,
-  // when using battery power, we might elect to prevent high speed timers
-  // which would draw more power.
-  static bool high_resolution_timer_enabled_;
-  // Count of activations on the high resolution timer.  Only use in tests
-  // which are single threaded.
-  static int high_resolution_timer_activated_;
-#endif
+  // Converts a string representation of time to a Time object.
+  // An example of a time string which is converted is as below:-
+  // "Tue, 15 Nov 1994 12:45:26 GMT". If the timezone is not specified
+  // in the input string, local time |is_local = true| or
+  // UTC |is_local = false| is assumed. A timezone that cannot be parsed
+  // (e.g. "UTC" which is not specified in RFC822) is treated as if the
+  // timezone is not specified.
+  static bool FromStringInternal(const char* time_string,
+                                 bool is_local,
+                                 Time* parsed_time);
 
   // Time in microseconds in UTC.
   int64 us_;
@@ -462,32 +512,66 @@ class BASE_EXPORT Time {
 // Inline the TimeDelta factory methods, for fast TimeDelta construction.
 
 // static
-inline TimeDelta TimeDelta::FromDays(int64 days) {
+inline TimeDelta TimeDelta::FromDays(int days) {
+  // Preserve max to prevent overflow.
+  if (days == std::numeric_limits<int>::max())
+    return Max();
   return TimeDelta(days * Time::kMicrosecondsPerDay);
 }
 
 // static
-inline TimeDelta TimeDelta::FromHours(int64 hours) {
+inline TimeDelta TimeDelta::FromHours(int hours) {
+  // Preserve max to prevent overflow.
+  if (hours == std::numeric_limits<int>::max())
+    return Max();
   return TimeDelta(hours * Time::kMicrosecondsPerHour);
 }
 
 // static
-inline TimeDelta TimeDelta::FromMinutes(int64 minutes) {
+inline TimeDelta TimeDelta::FromMinutes(int minutes) {
+  // Preserve max to prevent overflow.
+  if (minutes == std::numeric_limits<int>::max())
+    return Max();
   return TimeDelta(minutes * Time::kMicrosecondsPerMinute);
 }
 
 // static
 inline TimeDelta TimeDelta::FromSeconds(int64 secs) {
+  // Preserve max to prevent overflow.
+  if (secs == std::numeric_limits<int64>::max())
+    return Max();
   return TimeDelta(secs * Time::kMicrosecondsPerSecond);
 }
 
 // static
 inline TimeDelta TimeDelta::FromMilliseconds(int64 ms) {
+  // Preserve max to prevent overflow.
+  if (ms == std::numeric_limits<int64>::max())
+    return Max();
   return TimeDelta(ms * Time::kMicrosecondsPerMillisecond);
 }
 
 // static
+inline TimeDelta TimeDelta::FromSecondsD(double secs) {
+  // Preserve max to prevent overflow.
+  if (secs == std::numeric_limits<double>::infinity())
+    return Max();
+  return TimeDelta(static_cast<int64>(secs * Time::kMicrosecondsPerSecond));
+}
+
+// static
+inline TimeDelta TimeDelta::FromMillisecondsD(double ms) {
+  // Preserve max to prevent overflow.
+  if (ms == std::numeric_limits<double>::infinity())
+    return Max();
+  return TimeDelta(static_cast<int64>(ms * Time::kMicrosecondsPerMillisecond));
+}
+
+// static
 inline TimeDelta TimeDelta::FromMicroseconds(int64 us) {
+  // Preserve max to prevent overflow.
+  if (us == std::numeric_limits<int64>::max())
+    return Max();
   return TimeDelta(us);
 }
 
@@ -495,40 +579,78 @@ inline Time TimeDelta::operator+(Time t) const {
   return Time(t.us_ + delta_);
 }
 
+// For logging use only.
+BASE_EXPORT std::ostream& operator<<(std::ostream& os, Time time);
+
 // TimeTicks ------------------------------------------------------------------
 
 class BASE_EXPORT TimeTicks {
  public:
+  // We define this even without OS_CHROMEOS for seccomp sandbox testing.
+#if defined(OS_LINUX)
+  // Force definition of the system trace clock; it is a chromeos-only api
+  // at the moment and surfacing it in the right place requires mucking
+  // with glibc et al.
+  static const clockid_t kClockSystemTrace = 11;
+#endif
+
   TimeTicks() : ticks_(0) {
   }
 
-  // Platform-dependent tick count representing "right now."
-  // The resolution of this clock is ~1-15ms.  Resolution varies depending
-  // on hardware/operating system configuration.
+  // Platform-dependent tick count representing "right now." When
+  // IsHighResolution() returns false, the resolution of the clock could be
+  // as coarse as ~15.6ms. Otherwise, the resolution should be no worse than one
+  // microsecond.
   static TimeTicks Now();
 
-  // Returns a platform-dependent high-resolution tick count. Implementation
-  // is hardware dependent and may or may not return sub-millisecond
-  // resolution.  THIS CALL IS GENERALLY MUCH MORE EXPENSIVE THAN Now() AND
-  // SHOULD ONLY BE USED WHEN IT IS REALLY NEEDED.
-  static TimeTicks HighResNow();
+  // Returns true if the high resolution clock is working on this system and
+  // Now() will return high resolution values. Note that, on systems where the
+  // high resolution clock works but is deemed inefficient, the low resolution
+  // clock will be used instead.
+  static bool IsHighResolution();
 
-  // Returns the current system trace time or, if none is defined, the current
-  // high-res time (i.e. HighResNow()). On systems where a global trace clock
-  // is defined, timestamping TraceEvents's with this value guarantees
-  // synchronization between events collected inside chrome and events
-  // collected outside (e.g. kernel, X server).
+  // Returns true if ThreadNow() is supported on this system.
+  static bool IsThreadNowSupported() {
+#if (defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
+    (defined(OS_MACOSX) && !defined(OS_IOS)) || defined(OS_ANDROID)
+    return true;
+#else
+    return false;
+#endif
+  }
+
+  // Returns thread-specific CPU-time on systems that support this feature.
+  // Needs to be guarded with a call to IsThreadNowSupported(). Use this timer
+  // to (approximately) measure how much time the calling thread spent doing
+  // actual work vs. being de-scheduled. May return bogus results if the thread
+  // migrates to another CPU between two calls.
+  //
+  // WARNING: The returned value might NOT have the same origin as Now(). Do not
+  // perform math between TimeTicks values returned by Now() and ThreadNow() and
+  // expect meaningful results.
+  // TODO(miu): Since the timeline of these values is different, the values
+  // should be of a different type.
+  static TimeTicks ThreadNow();
+
+  // Returns the current system trace time or, if not available on this
+  // platform, a high-resolution time value; or a low-resolution time value if
+  // neither are avalable. On systems where a global trace clock is defined,
+  // timestamping TraceEvents's with this value guarantees synchronization
+  // between events collected inside chrome and events collected outside
+  // (e.g. kernel, X server).
+  //
+  // WARNING: The returned value might NOT have the same origin as Now(). Do not
+  // perform math between TimeTicks values returned by Now() and
+  // NowFromSystemTraceTime() and expect meaningful results.
+  // TODO(miu): Since the timeline of these values is different, the values
+  // should be of a different type.
   static TimeTicks NowFromSystemTraceTime();
 
 #if defined(OS_WIN)
-  // Get the absolute value of QPC time drift. For testing.
-  static int64 GetQPCDriftMicroseconds();
-
+  // Translates an absolute QPC timestamp into a TimeTicks value. The returned
+  // value has the same origin as Now(). Do NOT attempt to use this if
+  // IsHighResolution() returns false.
   static TimeTicks FromQPCValue(LONGLONG qpc_value);
-
-  // Returns true if the high resolution clock is working on this system.
-  // This is only for testing.
-  static bool IsHighResClockWorking();
 #endif
 
   // Returns true if this object has not been initialized.
@@ -543,6 +665,14 @@ class BASE_EXPORT TimeTicks {
   static TimeTicks FromInternalValue(int64 ticks) {
     return TimeTicks(ticks);
   }
+
+  // Get the TimeTick value at the time of the UnixEpoch. This is useful when
+  // you need to relate the value of TimeTicks to a real time and date.
+  // Note: Upon first invocation, this function takes a snapshot of the realtime
+  // clock to establish a reference point.  This function will return the same
+  // value for the duration of the application, but will be different in future
+  // application runs.
+  static TimeTicks UnixEpoch();
 
   // Returns the internal numeric value of the TimeTicks object.
   // For serializing, use FromInternalValue to reconstitute.
@@ -619,6 +749,9 @@ inline TimeTicks TimeDelta::operator+(TimeTicks t) const {
   return TimeTicks(t.ticks_ + delta_);
 }
 
+// For logging use only.
+BASE_EXPORT std::ostream& operator<<(std::ostream& os, TimeTicks time_ticks);
+
 }  // namespace base
 
-#endif  // BASE_TIME_H_
+#endif  // BASE_TIME_TIME_H_
