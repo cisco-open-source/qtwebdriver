@@ -41,6 +41,7 @@ namespace webdriver {
 
 Session::Session()
     : session_log_(new InMemoryLog()),
+      session_perf_log_(new PerfLog()),
       logger_(kAllLogLevel),
       id_(GenerateRandomID()),
       current_view_id_(ViewId()),
@@ -295,6 +296,9 @@ Error* Session::Init(const base::DictionaryValue* desired_capabilities_dict,
         return error;
     }
     logger_.set_min_log_level(capabilities_.log_levels[LogType::kDriver]);
+    if (capabilities_.log_levels[LogType::kPerformance] != kOffLogLevel) {
+        session_perf_log_->set_min_log_level(capabilities_.log_levels[LogType::kPerformance]);
+    }
 
     error = life_cycle_actions_->PostInit(desired_capabilities_dict, required_capabilities_dict);
 
@@ -409,6 +413,24 @@ const Capabilities& Session::capabilities() const {
 base::ListValue* Session::GetLog() const {
     base::ListValue* ret_val = session_log_->entries_list()->DeepCopy();
     session_log_->clear_entries_list();
+    return ret_val;
+}
+
+void Session::AddPerfLogEntry(LogLevel level, const std::string& message) {
+    if (!session_perf_log_.get()) {
+        return;
+    }
+    base::Time time = base::Time::Now();
+    session_perf_log_->Log(level, time, message);
+}
+
+LogLevel Session::GetMinPerfLogLevel() const {
+    return session_perf_log_->min_log_level();
+}
+
+base::ListValue* Session::GetPerfLog() const {
+    base::ListValue* ret_val = session_perf_log_->entries_list()->DeepCopy();
+    session_perf_log_->clear_entries_list();
     return ret_val;
 }
 
