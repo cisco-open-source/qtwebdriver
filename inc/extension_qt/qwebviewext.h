@@ -9,6 +9,8 @@
 #include <QtWebKit/QtWebKit>
 #endif
 
+class QNetworkAccessManagerTracer;
+
 class QWebViewExt : public QWebView
 {
     Q_OBJECT
@@ -22,7 +24,8 @@ protected:
 
 private:
     void setWebInspectorProperty(QWebViewExt* view);
-    
+    void setNetworkAccessManagerTracer();
+    QNetworkAccessManagerTracer* manager_;
 };
 
 #endif // QWEBVIEWEXT_H

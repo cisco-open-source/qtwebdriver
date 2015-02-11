@@ -81,6 +81,8 @@
         'src/webdriver/extension_qt/web_view_util.cc',
         'src/webdriver/extension_qt/qwebkit_proxy.cc',
         'src/webdriver/extension_qt/qwebkit_proxy.h',
+        'inc/extension_qt/qnetwork_access_manager_tracer.h',
+        'src/webdriver/extension_qt/qnetwork_access_manager_tracer.cc',
         'src/webdriver/extension_qt/graphics_web_view_handle.cc',
         'src/webdriver/extension_qt/graphics_web_view_enumerator.cc',
         'src/webdriver/extension_qt/graphics_web_view_executor.cc',
@@ -88,6 +90,7 @@
         '<(INTERMEDIATE_DIR)/moc_web_view_visualizer.cc',
         '<(INTERMEDIATE_DIR)/moc_qwebviewext.cc',
         '<(INTERMEDIATE_DIR)/moc_qwebkit_proxy.cc',
+        '<(INTERMEDIATE_DIR)/moc_qnetwork_access_manager_tracer.cc',
         'src/third_party/webdriver/atoms.cc',
       ],
 
