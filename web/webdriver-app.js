@@ -786,6 +786,19 @@ WebDriverJsController.prototype.onScreenshot = function() {
   })
 };
 
+WebDriverJsController.prototype.onPageSource = function() {
+  this.updateDriver();
+  this.driver.getPageSource().then(function(src) {
+    //var str = vkbeautify.xml(src, 2); 
+	var str = src; 
+    //console.log("source: " + str);
+    //data = new Blob([str], {type: 'text/plain'});
+    //saveAs(data, 'pagesource.log');
+    var textarea = document.getElementsByName('textarea')[0];
+    textarea.innerHTML = str;	
+  })
+};
+
 WebDriverJsController.prototype.onLogs = function(type) {
   if (type === 'Logs')
     return;

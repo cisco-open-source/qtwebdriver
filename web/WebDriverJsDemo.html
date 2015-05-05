@@ -21,6 +21,7 @@
       .ui-keyboard-space {
         margin-top: -100px;
       }
+      textarea { width: 100%; border: 1px solid #333; padding: 4px; }
     </style>
 
     <!-- jQuery & jQuery UI + theme (required) -->
@@ -51,7 +52,7 @@
         <td>
           <input name="webPage" type="text" onchange="wd.onWebPageChange()" onkeyup="wd.onWebPageChange()"/>
           <input id="getButton" type="button" value="GET" onclick="wd.onGet()"/>
-          <input id="sourceButton" type="button" value="Source" disabled="true" onclick="wd.onSource()"/>
+          <input id="sourceButton" type="button" value="Visualize" disabled="true" onclick="wd.onSource()"/>
           <input id="screenshotButton" type="button" value="Screenshot" disabled="true" onclick="wd.onScreenshot()"/>
           <select id="logsSelect" onmouseup="wd.onLogs(this.options[this.selectedIndex].value)">
             <option>Logs</option>
@@ -136,5 +137,9 @@
       <input type="submit" value="Quit" onclick="wd.onQuit()"/>
       <span id="sessionIdLabel" style="color: gray; float:right;"></span>
     </div>
-  </body>
+    <div style="margin-top: 20px">
+     <input id="srcButton" type="button" value="Source" onclick="wd.onPageSource()"/><br>
+     <textarea name="textarea" rows="15"></textarea>   
+    </div>	
+  </body> 
 </html>
