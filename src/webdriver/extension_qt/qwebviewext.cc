@@ -1,5 +1,9 @@
 #include "extension_qt/qwebviewext.h"
 #include "webdriver_server.h"
+#include "webdriver_session_manager.h"
+#include "webdriver_session.h"
+#include "webdriver_logging.h"
+#include "extension_qt/qnetwork_access_manager_tracer.h"
 #include <QtCore/QVariant>
 #include <QtCore/QTime>
 #include <QtCore/QDebug>
@@ -14,16 +18,18 @@
 #endif
 
 QWebViewExt::QWebViewExt(QWidget *parent) :
-    QWebView(parent)
+    QWebView(parent), manager_(0)
 {
     setVisible(false);
     setWebInspectorProperty(this);
+    setNetworkAccessManagerTracer();
     connect(page(), SIGNAL(windowCloseRequested()), this, SLOT(close()));
     connect(this, SIGNAL(titleChanged(QString)), this, SLOT(setWindowTitle(QString)));
 }
 
 QWebViewExt::~QWebViewExt()
 {
+    delete manager_;
 }
 
 QWebView* QWebViewExt::createWindow(QWebPage::WebWindowType type)
@@ -56,3 +62,20 @@ void QWebViewExt::setWebInspectorProperty(QWebViewExt *view)
     }
 }
 
+void QWebViewExt::setNetworkAccessManagerTracer()
+{    
+    std::map<std::string, webdriver::Session*> sessionMap = webdriver::SessionManager::GetInstance()->GetSessions();
+    if (sessionMap.size() != 1)
+    {
+        webdriver::GlobalLogger::Log(webdriver::kWarningLogLevel, "Session should be initialized");
+        return;
+    }
+    webdriver::Session* session = sessionMap.begin()->second;
+    if (session->GetMinPerfLogLevel() == webdriver::kOffLogLevel)
+    {
+        webdriver::GlobalLogger::Log(webdriver::kInfoLogLevel, "Performance Log is disabled by defaul");
+        return;
+    }
+    manager_ = new QNetworkAccessManagerTracer(session, this->page());
+    this->page()->setNetworkAccessManager(manager_);
+}

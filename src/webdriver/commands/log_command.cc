@@ -45,6 +45,9 @@ void LogCommand::ExecutePost(Response* const response) {
     if (log_type.type() == LogType::kDriver) {
         response->SetValue(session_->GetLog());
     }
+    else if (log_type.type() == LogType::kPerformance) {
+        response->SetValue(session_->GetPerfLog());
+    }
     else if (log_type.type() == LogType::kBrowser) {
         Error* error = NULL;
 
@@ -85,6 +88,9 @@ void LogTypesCommand::ExecuteGet(Response* const response) {
     base::ListValue* logTypes_list = new base::ListValue();
     logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kDriver).ToString()));
     logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kBrowser).ToString()));
+    if (session_->GetMinPerfLogLevel() != kOffLogLevel) {
+        logTypes_list->Append(Value::CreateStringValue(LogType(LogType::kPerformance).ToString()));
+    }
     response->SetValue(logTypes_list);
 }
 

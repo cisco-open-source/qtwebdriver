@@ -100,7 +100,6 @@
 
     [ 'OS == "mac"', {
       'xcode_settings': {
-        'CODE_SIGN_IDENTITY': 'Developer ID Application: Mykola Tryshnivskyy (3QWMV2L87Z)',
         'SDKROOT': 'macosx10.8',
         'FRAMEWORK_SEARCH_PATHS': '<(QT_LIB_PATH)',
       },

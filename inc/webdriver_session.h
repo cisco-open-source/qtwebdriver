@@ -113,6 +113,14 @@ public:
     /// returned value.
     base::ListValue* GetLog() const;
 
+    void AddPerfLogEntry(LogLevel level, const std::string& message);
+
+    /// Return current minimum LogLevel for Performance Logging, by default kOffLogLevel.
+    LogLevel GetMinPerfLogLevel() const;
+
+    /// Returns a copy of the current performance log entries.
+    base::ListValue* GetPerfLog() const;
+
     /// Runs task in session's context
     /// @param task task to run
     void RunSessionTask(const base::Closure& task);
@@ -233,6 +241,7 @@ private:
         base::WaitableEvent* done_event);
 
     scoped_ptr<InMemoryLog> session_log_;
+    scoped_ptr<PerfLog> session_perf_log_;
     Logger logger_;
 
     // session id

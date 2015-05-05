@@ -137,7 +137,13 @@ int main(int argc, char *argv[])
 
     webdriver::ViewTransitionManager::SetURLTransitionAction(new webdriver::URLTransitionAction_CloseOldView());
 
+    /* Configure widget views */
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
+
+    /* 
+       Register view classes (here some test classes) that can be created by WebDriver. 
+       Creation can be triggered by client side request like wd.get("qtwidget://WindowTestWidget"); 
+    */
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
     widgetCreator->RegisterViewClass<ClickTestWidget>("ClickTestWidget");
@@ -165,18 +171,20 @@ int main(int argc, char *argv[])
 #endif //WD_ENABLE_PLAYER
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
+    /* Configure web views */
     webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
-
+  
+    /* Configure WebView support */
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WebViewEnumeratorImpl());
-
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWebViewCmdExecutorCreator());
 
+    /* Configure GraphicsWebView support */
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::GraphicsWebViewEnumeratorImpl());
-
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::GraphicsWebViewCmdExecutorCreator());
-
+  
+    /* Register som test classes */
     widgetCreator->RegisterViewClass<GraphicsWebViewTestWindows>("GraphicsWebViewTestWindows");
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
     widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
@@ -208,32 +216,32 @@ int main(int argc, char *argv[])
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
     
     #if (WD_TEST_ENABLE_WEB_VIEW == 1)
-    qmlRegisterType<QDeclarativeWebSettings>();
-    qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 0, "CiscoWebView");
-    qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
-    qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
-    qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
-    //webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
-    //webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
+    	qmlRegisterType<QDeclarativeWebSettings>();
+    	qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 0, "CiscoWebView");
+    	qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
+    	qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
+    	qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
+    	//webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
+    	//webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
 #endif
 #endif //QT_NO_QML
-
+    /* Add widget creator last so that it deos not conflict with webview creator (QWebView is a subclass of QWidget)*/
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
 
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
 
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
 	
-	CommandLine cmd_line(CommandLine::NO_PROGRAM);
+    CommandLine cmd_line(CommandLine::NO_PROGRAM);
 #if defined(OS_WIN)
     cmd_line.ParseFromString(::GetCommandLineW());
 #elif defined(OS_POSIX)
     cmd_line.InitFromArgv(argc, argv);
 #endif
 
-	// check if --help CL argument is present
+    // check if --help CL argument is present
     if (cmd_line.HasSwitch("help")) {
         PrintHelp();
         return 0;
@@ -266,21 +274,25 @@ int main(int argc, char *argv[])
 #endif //QT_VERSION
 #endif //OS_WIN
 
+    /* Parse command line */
     webdriver::Server* wd_server = webdriver::Server::GetInstance();
     if (0 != wd_server->Configure(cmd_line)) {
         std::cout << "Error while configuring WD server, exiting..." << std::endl;
         return 1;
     }
 
+    /* Example how to add a custom command */
     webdriver::RouteTable *routeTableWithShutdownCommand = new webdriver::RouteTable(wd_server->GetRouteTable());
     const char shutdownCommandRoute[] = "/-cisco-shutdown";
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(shutdownCommandRoute);
     routeTableWithShutdownCommand->Add<webdriver::ShutdownCommand>(webdriver::CommandRoutes::kShutdown);
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
+    /* Optional VNC an user input support */
     InitVNCClient();
     InitUInputClient();
 
+    /* Start webdriver */
     int startError = wd_server->Start();
     if (startError){
         std::cout << "Error while starting server, errorCode " << startError << std::endl;

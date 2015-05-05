@@ -71,7 +71,9 @@ bool LogType::FromString(const std::string& name, LogType* log_type) {
         *log_type = LogType(kDriver);
     } else if (name == "browser") {
         *log_type = LogType(kBrowser);
-    } else{
+    } else if (name == "performance") {
+        *log_type = LogType(kPerformance);
+    } else {
         return false;
     }
     return true;
@@ -89,6 +91,8 @@ std::string LogType::ToString() const {
             return "driver";
         case kBrowser:
             return "browser";
+        case kPerformance:
+            return "performance";
         default:
             return "unknown";
     };
@@ -278,6 +282,25 @@ const ListValue* InMemoryLog::entries_list() const {
 void InMemoryLog::clear_entries_list() {
     base::AutoLock auto_lock(entries_lock_);
     entries_list_.Clear();
+}
+
+PerfLog::PerfLog(): min_log_level_(kOffLogLevel) { }
+
+PerfLog::~PerfLog() { }
+
+void PerfLog::set_min_log_level(LogLevel level) {
+    min_log_level_= level;
+}
+
+LogLevel PerfLog::min_log_level() {
+    return min_log_level_;
+}
+
+void PerfLog::Log(LogLevel level, const base::Time &time, const std::string &message) {
+    if (level < min_log_level_) {
+        return;
+    }
+    InMemoryLog::Log(level, time, message);
 }
 
 Logger::Logger() : min_log_level_(kAllLogLevel) { }

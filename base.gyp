@@ -205,6 +205,8 @@
             'src/base/mac/foundation_util.mm',
             'src/base/mac/bundle_locations.mm',
             'src/base/mac/mac_logging.cc',
+            'src/base/mac/mach_logging.cc',
+            'src/base/mac/scoped_mach_port.cc',
             'src/base/threading/platform_thread_mac.mm',
             'src/base/time_mac.cc',
           ],

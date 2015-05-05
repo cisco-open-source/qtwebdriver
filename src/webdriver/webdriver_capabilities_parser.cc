@@ -67,6 +67,8 @@ Capabilities::Capabilities()
       caps(new DictionaryValue()) {
     log_levels[LogType::kDriver] = kAllLogLevel;
     log_levels[LogType::kBrowser] = kAllLogLevel;
+    // disabled by default
+    log_levels[LogType::kPerformance] = kOffLogLevel;
 }
 
 Capabilities::~Capabilities() { }

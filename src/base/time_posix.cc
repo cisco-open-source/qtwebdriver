@@ -4,14 +4,21 @@
 
 #include "base/time.h"
 
+#include <stdint.h>
 #include <sys/time.h>
 #include <time.h>
+#if defined(OS_ANDROID) && !defined(__LP64__)
+#include <time64.h>
+#endif
 #include <unistd.h>
 
 #include <limits>
+#include <ostream>
 
 #include "base/basictypes.h"
 #include "base/logging.h"
+#include "base/port.h"
+#include "build/build_config.h"
 
 #if defined(OS_ANDROID)
 #include "base/os_compat_android.h"
@@ -19,11 +26,90 @@
 #include "base/os_compat_nacl.h"
 #endif
 
-namespace base {
-
-#if defined(OS_ANDROID)
-#define _POSIX_MONOTONIC_CLOCK 1
+#if !defined(OS_MACOSX)
+#include "base/lazy_instance.h"
+#include "base/synchronization/lock.h"
 #endif
+
+namespace {
+
+#if !defined(OS_MACOSX)
+// This prevents a crash on traversing the environment global and looking up
+// the 'TZ' variable in libc. See: crbug.com/390567.
+base::LazyInstance<base::Lock>::Leaky
+    g_sys_time_to_time_struct_lock = LAZY_INSTANCE_INITIALIZER;
+
+// Define a system-specific SysTime that wraps either to a time_t or
+// a time64_t depending on the host system, and associated convertion.
+// See crbug.com/162007
+#if defined(OS_ANDROID) && !defined(__LP64__)
+typedef time64_t SysTime;
+
+SysTime SysTimeFromTimeStruct(struct tm* timestruct, bool is_local) {
+  base::AutoLock locked(g_sys_time_to_time_struct_lock.Get());
+  if (is_local)
+    return mktime64(timestruct);
+  else
+    return timegm64(timestruct);
+}
+
+void SysTimeToTimeStruct(SysTime t, struct tm* timestruct, bool is_local) {
+  base::AutoLock locked(g_sys_time_to_time_struct_lock.Get());
+  if (is_local)
+    localtime64_r(&t, timestruct);
+  else
+    gmtime64_r(&t, timestruct);
+}
+
+#else  // OS_ANDROID && !__LP64__
+typedef time_t SysTime;
+
+SysTime SysTimeFromTimeStruct(struct tm* timestruct, bool is_local) {
+  base::AutoLock locked(g_sys_time_to_time_struct_lock.Get());
+  if (is_local)
+    return mktime(timestruct);
+  else
+    return timegm(timestruct);
+}
+
+void SysTimeToTimeStruct(SysTime t, struct tm* timestruct, bool is_local) {
+  base::AutoLock locked(g_sys_time_to_time_struct_lock.Get());
+  if (is_local)
+    localtime_r(&t, timestruct);
+  else
+    gmtime_r(&t, timestruct);
+}
+#endif  // OS_ANDROID
+
+// Helper function to get results from clock_gettime() as TimeTicks object.
+// Minimum requirement is MONOTONIC_CLOCK to be supported on the system.
+// FreeBSD 6 has CLOCK_MONOTONIC but defines _POSIX_MONOTONIC_CLOCK to -1.
+#if (defined(OS_POSIX) &&                                               \
+     defined(_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0) || \
+    defined(OS_BSD) || defined(OS_ANDROID)
+base::TimeTicks ClockNow(clockid_t clk_id) {
+  uint64_t absolute_micro;
+
+  struct timespec ts;
+  if (clock_gettime(clk_id, &ts) != 0) {
+    NOTREACHED() << "clock_gettime(" << clk_id << ") failed.";
+    return base::TimeTicks();
+  }
+
+  absolute_micro =
+      (static_cast<int64>(ts.tv_sec) * base::Time::kMicrosecondsPerSecond) +
+      (static_cast<int64>(ts.tv_nsec / base::Time::kNanosecondsPerMicrosecond));
+
+  return base::TimeTicks::FromInternalValue(absolute_micro);
+}
+#else  // _POSIX_MONOTONIC_CLOCK
+#error No usable tick clock function on this platform.
+#endif  // _POSIX_MONOTONIC_CLOCK
+#endif  // !defined(OS_MACOSX)
+
+}  // namespace
+
+namespace base {
 
 struct timespec TimeDelta::ToTimeSpec() const {
   int64 microseconds = InMicroseconds();
@@ -52,8 +138,6 @@ struct timespec TimeDelta::ToTimeSpec() const {
 //   irb(main):011:0> Time.at(-11644473600).getutc()
 //   => Mon Jan 01 00:00:00 UTC 1601
 static const int64 kWindowsEpochDeltaSeconds = GG_INT64_C(11644473600);
-static const int64 kWindowsEpochDeltaMilliseconds =
-    kWindowsEpochDeltaSeconds * Time::kMillisecondsPerSecond;
 
 // static
 const int64 Time::kWindowsEpochDeltaMicroseconds =
@@ -70,7 +154,7 @@ Time Time::Now() {
   struct timezone tz = { 0, 0 };  // UTC
   if (gettimeofday(&tv, &tz) != 0) {
     DCHECK(0) << "Could not determine time of day";
-    LOG_ERRNO(ERROR) << "Call to gettimeofday failed.";
+    PLOG(ERROR) << "Call to gettimeofday failed.";
     // Return null instead of uninitialized |tv| value, which contains random
     // garbage data. This may result in the crash seen in crbug.com/147570.
     return Time();
@@ -95,7 +179,7 @@ void Time::Explode(bool is_local, Exploded* exploded) const {
   int64 microseconds = us_ - kWindowsEpochDeltaMicroseconds;
   // The following values are all rounded towards -infinity.
   int64 milliseconds;  // Milliseconds since epoch.
-  time_t seconds;  // Seconds since epoch.
+  SysTime seconds;  // Seconds since epoch.
   int millisecond;  // Exploded millisecond value (0-999).
   if (microseconds >= 0) {
     // Rounding towards -infinity <=> rounding towards 0, in this case.
@@ -115,10 +199,7 @@ void Time::Explode(bool is_local, Exploded* exploded) const {
   }
 
   struct tm timestruct;
-  if (is_local)
-    localtime_r(&seconds, &timestruct);
-  else
-    gmtime_r(&seconds, &timestruct);
+  SysTimeToTimeStruct(seconds, &timestruct, is_local);
 
   exploded->year         = timestruct.tm_year + 1900;
   exploded->month        = timestruct.tm_mon + 1;
@@ -147,13 +228,41 @@ Time Time::FromExploded(bool is_local, const Exploded& exploded) {
   timestruct.tm_zone   = NULL;  // not a POSIX field, so mktime/timegm ignore
 #endif
 
-  time_t seconds;
-  if (is_local)
-    seconds = mktime(&timestruct);
-  else
-    seconds = timegm(&timestruct);
 
   int64 milliseconds;
+  SysTime seconds;
+
+  // Certain exploded dates do not really exist due to daylight saving times,
+  // and this causes mktime() to return implementation-defined values when
+  // tm_isdst is set to -1. On Android, the function will return -1, while the
+  // C libraries of other platforms typically return a liberally-chosen value.
+  // Handling this requires the special code below.
+
+  // SysTimeFromTimeStruct() modifies the input structure, save current value.
+  struct tm timestruct0 = timestruct;
+
+  seconds = SysTimeFromTimeStruct(&timestruct, is_local);
+  if (seconds == -1) {
+    // Get the time values with tm_isdst == 0 and 1, then select the closest one
+    // to UTC 00:00:00 that isn't -1.
+    timestruct = timestruct0;
+    timestruct.tm_isdst = 0;
+    int64 seconds_isdst0 = SysTimeFromTimeStruct(&timestruct, is_local);
+
+    timestruct = timestruct0;
+    timestruct.tm_isdst = 1;
+    int64 seconds_isdst1 = SysTimeFromTimeStruct(&timestruct, is_local);
+
+    // seconds_isdst0 or seconds_isdst1 can be -1 for some timezones.
+    // E.g. "CLST" (Chile Summer Time) returns -1 for 'tm_isdt == 1'.
+    if (seconds_isdst0 < 0)
+      seconds = seconds_isdst1;
+    else if (seconds_isdst1 < 0)
+      seconds = seconds_isdst0;
+    else
+      seconds = std::min(seconds_isdst0, seconds_isdst1);
+  }
+
   // Handle overflow.  Clamping the range to what mktime and timegm might
   // return is the best that can be done here.  It's not ideal, but it's better
   // than failing here or ignoring the overflow case and treating each time
@@ -174,13 +283,20 @@ Time Time::FromExploded(bool is_local, const Exploded& exploded) {
     // When representing the most distant time in the future, add in an extra
     // 999ms to avoid the time being less than any other possible value that
     // this function can return.
+
+    // On Android, SysTime is int64, special care must be taken to avoid
+    // overflows.
+    const int64 min_seconds = (sizeof(SysTime) < sizeof(int64))
+                                  ? std::numeric_limits<SysTime>::min()
+                                  : std::numeric_limits<int32_t>::min();
+    const int64 max_seconds = (sizeof(SysTime) < sizeof(int64))
+                                  ? std::numeric_limits<SysTime>::max()
+                                  : std::numeric_limits<int32_t>::max();
     if (exploded.year < 1969) {
-      milliseconds = std::numeric_limits<time_t>::min() *
-                     kMillisecondsPerSecond;
+      milliseconds = min_seconds * kMillisecondsPerSecond;
     } else {
-      milliseconds = (std::numeric_limits<time_t>::max() *
-                      kMillisecondsPerSecond) +
-                     kMillisecondsPerSecond - 1;
+      milliseconds = max_seconds * kMillisecondsPerSecond;
+      milliseconds += (kMillisecondsPerSecond - 1);
     }
   } else {
     milliseconds = seconds * kMillisecondsPerSecond + exploded.millisecond;
@@ -192,19 +308,37 @@ Time Time::FromExploded(bool is_local, const Exploded& exploded) {
 }
 
 // TimeTicks ------------------------------------------------------------------
-// FreeBSD 6 has CLOCK_MONOLITHIC but defines _POSIX_MONOTONIC_CLOCK to -1.
-#if (defined(OS_POSIX) && !defined(OS_NACL) &&                          \
-     defined(_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0) || \
-     defined(OS_BSD) || defined(OS_ANDROID)
-
 // static
 TimeTicks TimeTicks::Now() {
+  return ClockNow(CLOCK_MONOTONIC);
+}
+
+// static
+bool TimeTicks::IsHighResolution() {
+  return true;
+}
+
+// static
+TimeTicks TimeTicks::ThreadNow() {
+#if (defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
+    defined(OS_ANDROID)
+  return ClockNow(CLOCK_THREAD_CPUTIME_ID);
+#else
+  NOTREACHED();
+  return TimeTicks();
+#endif
+}
+
+// Use the Chrome OS specific system-wide clock.
+#if defined(OS_CHROMEOS)
+// static
+TimeTicks TimeTicks::NowFromSystemTraceTime() {
   uint64_t absolute_micro;
 
   struct timespec ts;
-  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) {
-    NOTREACHED() << "clock_gettime(CLOCK_MONOTONIC) failed.";
-    return TimeTicks();
+  if (clock_gettime(kClockSystemTrace, &ts) != 0) {
+    // NB: fall-back for a chrome os build running on linux
+    return Now();
   }
 
   absolute_micro =
@@ -214,55 +348,14 @@ TimeTicks TimeTicks::Now() {
   return TimeTicks(absolute_micro);
 }
 
-#elif defined(OS_NACL)
-
-TimeTicks TimeTicks::Now() {
-  // Sadly, Native Client does not have _POSIX_TIMERS enabled in sys/features.h
-  // Apparently NaCl only has CLOCK_REALTIME:
-  // http://code.google.com/p/nativeclient/issues/detail?id=1159
-  return TimeTicks(clock());
-}
-
-#else  // _POSIX_MONOTONIC_CLOCK
-#error No usable tick clock function on this platform.
-#endif  // _POSIX_MONOTONIC_CLOCK
+#else  // !defined(OS_CHROMEOS)
 
 // static
-TimeTicks TimeTicks::HighResNow() {
+TimeTicks TimeTicks::NowFromSystemTraceTime() {
   return Now();
 }
 
-#if defined(OS_CHROMEOS)
-// Force definition of the system trace clock; it is a chromeos-only api
-// at the moment and surfacing it in the right place requires mucking
-// with glibc et al.
-#define CLOCK_SYSTEM_TRACE 11
-
-// static
-TimeTicks TimeTicks::NowFromSystemTraceTime() {
-  uint64_t absolute_micro;
-
-  struct timespec ts;
-  if (clock_gettime(CLOCK_SYSTEM_TRACE, &ts) != 0) {
-    // NB: fall-back for a chrome os build running on linux
-    return HighResNow();
-  }
-
-  absolute_micro =
-      (static_cast<int64>(ts.tv_sec) * Time::kMicrosecondsPerSecond) +
-      (static_cast<int64>(ts.tv_nsec) / Time::kNanosecondsPerMicrosecond);
-
-  return TimeTicks(absolute_micro);
-}
-
-#else // !defined(OS_CHROMEOS)
-
-// static
-TimeTicks TimeTicks::NowFromSystemTraceTime() {
-  return HighResNow();
-}
-
-#endif // defined(OS_CHROMEOS)
+#endif  // defined(OS_CHROMEOS)
 
 #endif  // !OS_MACOSX
 

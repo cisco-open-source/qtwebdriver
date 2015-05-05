@@ -42,6 +42,7 @@ public:
         kInvalid = -1,  /// invalid type
         kDriver,        /// driver
         kBrowser,       /// browser (console.log)
+        kPerformance,   /// performance
         kNum            /// number of sources
     };
 
@@ -160,6 +161,43 @@ private:
     base::Lock entries_lock_;
 
     DISALLOW_COPY_AND_ASSIGN(InMemoryLog);
+};
+
+/// Performance log handler.<br>
+/// <b>Limitation:</b> currently we can collect Performance Logs only for QWebViewExt.<br>
+/// If you need receive perf logs for other QWebViews or their subclasses,
+/// you should change the network access manager before the QWebPage has used it
+/// (in other cases the results of doing this are undefined) :
+/// @code
+/// QWebView* view = new QWebView;;
+/// QNetworkAccessManager*  manager = new QNetworkAccessManagerTracer(session, view->page());
+/// view->page()->setNetworkAccessManager(manager);
+/// @endcode
+/// before the first call to the page. After that you can connect to the window.
+/// <p>In other case you can change manager in constructor custom webviews like QWebViewExt.
+/// Then you can register and use it as usually :
+/// @code
+/// webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
+/// webCreator->RegisterViewClass<CustomWebView>("CustomWebView");
+/// webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
+/// @endcode
+/// <p>If your CustomWebView class is overriding createWindow method of QWebView,
+/// you should ensure that new windows will use needed network access manager with logs support.
+
+class PerfLog : public InMemoryLog {
+public:
+    PerfLog();
+    virtual ~PerfLog();
+    virtual void Log(LogLevel level, const base::Time& time,
+                   const std::string& message) OVERRIDE;
+
+    void set_min_log_level(LogLevel level);
+    LogLevel min_log_level();
+
+private:
+    LogLevel min_log_level_;
+
+    DISALLOW_COPY_AND_ASSIGN(PerfLog);
 };
 
 /// Forwards logging messages to added logs.
