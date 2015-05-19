@@ -34,7 +34,7 @@ const Qt::Key QKeyConverter::kSpecialWebDriverKeys[] = {
     Qt::Key_Tab,
     Qt::Key_Clear,
     Qt::Key_Return,
-    Qt::Key_Return,
+    Qt::Key_Enter,
     Qt::Key_Shift,
     Qt::Key_Control,
     Qt::Key_Menu,
@@ -242,7 +242,7 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
                 return false;
             }
 
-            if (key_code == Qt::Key_Return || key_code == Qt::Key_Space ||
+            if (key_code == Qt::Key_Return || key_code == Qt::Key_Enter || key_code == Qt::Key_Space ||
                     key_code == Qt::Key_Asterisk || key_code == Qt::Key_Plus ||
                     key_code == Qt::Key_Comma || key_code == Qt::Key_Minus ||
                     key_code == Qt::Key_Period || key_code == Qt::Key_Slash ||
