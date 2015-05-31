@@ -110,6 +110,9 @@
             'src/webdriver/extension_qt/quick2_view_enumerator.cc',
             'src/webdriver/extension_qt/quick2_view_executor.cc',
             'src/webdriver/extension_qt/qml_view_util.cc',
+            'src/webdriver/extension_qt/qml_objname_util.h',
+            'src/webdriver/extension_qt/qml_objname_util.cc',
+            '<(INTERMEDIATE_DIR)/moc_qml_objname_util.cc',
           ],
         } , {
 

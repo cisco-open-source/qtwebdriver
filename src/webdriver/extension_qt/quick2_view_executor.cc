@@ -29,6 +29,7 @@
 #include "webdriver_util.h"
 #include "q_key_converter.h"
 #include "qml_view_util.h"
+#include "qml_objname_util.h"
 
 #include "extension_qt/event_dispatcher.h"
 #include "extension_qt/wd_event_dispatcher.h"
@@ -40,6 +41,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QTimer>
 #include <QtGui/QGuiApplication>
+#include <QtQml/QQmlContext>
 #include <QtQml/QQmlExpression>
 #include <QtQml/QQmlEngine>
 #include <QtGui/QStyleHints>
@@ -889,7 +891,16 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         script.c_str(),
         args_as_json.c_str());
 
-    QQmlExpression expr(view->rootContext(), view, jscript.c_str());
+    QQuickItem *rootItem = qobject_cast<QQuickItem*>(view->contentItem());
+    QQmlContext *rootContext = view->rootContext();
+    QVariant p = rootContext->contextProperty("ObjectNameUtils");
+
+    if (p.isNull()) {
+        ObjectNameUtils* objn = new ObjectNameUtils(rootItem);
+        rootContext->setContextProperty("ObjectNameUtils", objn);
+    }
+
+    QQmlExpression expr(rootContext, view, jscript.c_str());
     QVariant result = expr.evaluate();
     if (expr.hasError()) {
         *error = new Error(kJavaScriptError, expr.error().toString().toStdString());
