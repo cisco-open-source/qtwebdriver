@@ -891,11 +891,11 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         script.c_str(),
         args_as_json.c_str());
 
-    QQuickItem *rootItem = qobject_cast<QQuickItem*>(view->contentItem());
     QQmlContext *rootContext = view->rootContext();
     QVariant p = rootContext->contextProperty("ObjectNameUtils");
 
     if (p.isNull()) {
+        QQuickItem *rootItem = qobject_cast<QQuickItem*>(view->contentItem());
         ObjectNameUtils* objn = new ObjectNameUtils(rootItem);
         rootContext->setContextProperty("ObjectNameUtils", objn);
     }
