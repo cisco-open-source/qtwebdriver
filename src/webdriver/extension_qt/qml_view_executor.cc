@@ -31,6 +31,7 @@
 #include "extension_qt/widget_element_handle.h"
 #include "extension_qt/widget_view_handle.h"
 #include "qml_view_util.h"
+#include "qml_objname_util.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QDebug>
@@ -39,6 +40,7 @@
 
 #include <QtDeclarative/QDeclarativeExpression>
 #include <QtDeclarative/QDeclarativeEngine>
+#include <QtDeclarative/QDeclarativeContext>
 
 #include "third_party/pugixml/pugixml.hpp"
 
@@ -791,7 +793,16 @@ void QQmlViewCmdExecutor::ExecuteScript(const std::string& script, const base::L
         script.c_str(),
         args_as_json.c_str());
 
-    QDeclarativeExpression expr(view->engine()->rootContext(), view->rootObject(), jscript.c_str());
+    QDeclarativeContext *rootContext = view->rootContext();
+    QVariant p = rootContext->contextProperty("ObjectNameUtils");
+
+    if (p.isNull()) {
+        QDeclarativeItem *rootItem = qobject_cast<QDeclarativeItem*>(view->rootObject());
+        ObjectNameUtils* objn = new ObjectNameUtils(rootItem);
+        rootContext->setContextProperty("ObjectNameUtils", objn);
+    }
+
+    QDeclarativeExpression expr(rootContext, view->rootObject(), jscript.c_str());
     QVariant result = expr.evaluate();
     if (expr.hasError()) {
         *error = new Error(kJavaScriptError, expr.error().toString().toStdString());

@@ -22,7 +22,7 @@ else
 fi
 if [ -z $mode ];
 then
-  modes="release_dbg release"
+  modes="release"
 else
   modes=$mode
 fi

@@ -22,8 +22,12 @@
 
 #include <string>
 #include <QtCore/QDebug>
-#include <QtQuick/QQuickItem>
 #include "common_util.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtQuick/QQuickItem>
+#else
+#include <QtDeclarative/QDeclarativeItem>
+#endif
 
 namespace webdriver {
 
@@ -32,16 +36,36 @@ class ObjectNameUtils
 {
     Q_OBJECT
 public:
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     ObjectNameUtils(QQuickItem *root);
+#else
+    ObjectNameUtils(QDeclarativeItem *root);
+#endif
     ~ObjectNameUtils();
     Q_INVOKABLE QObject *findChild(const QString& name);
 protected:
-    QQuickItem* root_;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    QQuickItem *root_;
 
-    QObject * findChild(const QQuickItem* item, const QString& name) {
+    QObject *findChild(QQuickItem *item, const QString& name) {
+        if (name == item->objectName())
+            return item;
+
         QList<QQuickItem*> childs = item->childItems();
 
         foreach(QQuickItem *child, childs) {
+#else
+    QDeclarativeItem *root_;
+
+    QObject *findChild(QDeclarativeItem *item, const QString& name) {
+        if (name == item->objectName())
+            return item;
+
+        QList<QGraphicsItem*> childs = item->childItems();
+
+        foreach(QGraphicsItem *gchild, childs) {
+            QDeclarativeItem *child = qobject_cast<QDeclarativeItem*>(gchild);
+#endif
             if (!child) continue;
             if (name == child->objectName())
                return child;

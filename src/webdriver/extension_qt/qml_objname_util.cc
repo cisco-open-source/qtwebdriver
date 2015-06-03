@@ -23,7 +23,11 @@
 
 namespace webdriver {
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 ObjectNameUtils::ObjectNameUtils(QQuickItem *root) : root_(root) {}
+#else
+ObjectNameUtils::ObjectNameUtils(QDeclarativeItem *root) : root_(root) {}
+#endif
 ObjectNameUtils::~ObjectNameUtils() {}
 
 QObject *ObjectNameUtils::findChild(const QString& name) {
