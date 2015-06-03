@@ -529,22 +529,10 @@ void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::st
 
     if (propertyValue.isValid()) {
         // convert QVariant to base::Value
-        switch (propertyValue.type()) {
-        case QVariant::Bool:
-            val = Value::CreateBooleanValue(propertyValue.toBool());
-            break;
-        case QVariant::Int:
-            val = Value::CreateIntegerValue(propertyValue.toInt());
-            break;
-        case QVariant::Double:
-            val = Value::CreateDoubleValue(propertyValue.toDouble());
-            break;
-        default:
-            if (propertyValue.canConvert<QString>()) {
-                val = Value::CreateStringValue(propertyValue.toString().toStdString());    
-            } else {
-                session_->logger().Log(kWarningLogLevel, "cant handle proprty type.");
-            }
+        if (propertyValue.canConvert<QString>()) {
+            val = Value::CreateStringValue(propertyValue.toString().toStdString());
+        } else {
+            session_->logger().Log(kWarningLogLevel, "cant handle proprty type.");
         }
     } else {
         session_->logger().Log(kWarningLogLevel, "property not found.");
