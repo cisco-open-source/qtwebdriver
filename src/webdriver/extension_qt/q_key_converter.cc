@@ -170,7 +170,8 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
 
     //static_cast<Qt::KeyboardModifier>(modifiers)
     Qt::KeyboardModifiers sticky_modifiers(*modifiers);
-    for (size_t i = 0; i < keys.size(); ++i) {
+
+    for (size_t i = 0, size = keys.size(); i < size; ++i) {
         char16 key = keys[i];
 
         if (key == kWebDriverNullKey) {
@@ -287,6 +288,14 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
             }
         }
 
+	bool autoPress = false, autoRelease = false;
+
+        if (i < size - 1 && key == keys[i + 1]) 
+            autoRelease = true;
+
+        if (i > 0 && key == keys[i - 1]) 
+            autoPress = true;
+
         // Create the key events.
         bool necessary_modifiers[3];
         for (int i = 0; i < 3; ++i) {
@@ -295,24 +304,24 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
                 !(sticky_modifiers & kModifiers[i].mask);
             if (necessary_modifiers[i]) {
                 key_events.push_back(
-                    QKeyEvent(QEvent::KeyPress, kModifiers[i].key_code, sticky_modifiers));
+                    QKeyEvent(QEvent::KeyPress, kModifiers[i].key_code, sticky_modifiers, QString::null, autoPress));
             }
         }
 
         if (unmodified_text.length() || modified_text.length()) {
-            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, unmodified_text.c_str()));      
-            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, unmodified_text.c_str()));      
+            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, unmodified_text.c_str(), autoPress));
+            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, unmodified_text.c_str(), autoRelease));      
         }
         else
         {
-            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers));
-            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers));
+            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, QString::null, autoPress));
+            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, QString::null, autoRelease));
         }
 
         for (int i = 2; i > -1; --i) {
             if (necessary_modifiers[i]) {
                 key_events.push_back(
-                    QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers));
+                    QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers, QString::null, autoRelease));
             }
         }
     }
