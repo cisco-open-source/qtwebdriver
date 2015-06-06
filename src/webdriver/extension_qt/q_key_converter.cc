@@ -304,7 +304,7 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
                 !(sticky_modifiers & kModifiers[i].mask);
             if (necessary_modifiers[i]) {
                 key_events.push_back(
-                    QKeyEvent(QEvent::KeyPress, kModifiers[i].key_code, sticky_modifiers, QString(), autoPress));
+                    QKeyEvent(QEvent::KeyPress, kModifiers[i].key_code, sticky_modifiers, QString::null, autoPress));
             }
         }
 
@@ -314,14 +314,14 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
         }
         else
         {
-            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, QString(), autoPress));
-            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, QString(), autoRelease));
+            key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, QString::null, autoPress));
+            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, QString::null, autoRelease));
         }
 
         for (int i = 2; i > -1; --i) {
             if (necessary_modifiers[i]) {
                 key_events.push_back(
-                    QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers, QString(), autoRelease));
+                    QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers, QString::null, autoRelease));
             }
         }
     }
