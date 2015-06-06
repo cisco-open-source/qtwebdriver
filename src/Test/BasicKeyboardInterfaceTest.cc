@@ -74,7 +74,6 @@ void BasicKeyboardInterfaceTestWidget::setResultModifier(const QString &str) {
 }
 
 void LEdit::keyPressEvent(QKeyEvent *pe) {
-qDebug() << "keypress k  " << pe->key() << " auto  " << pe->isAutoRepeat()<< " mod " << pe->modifiers();
     emit keyDown();
     currentText += pe->text();
     setText(currentText);
@@ -87,7 +86,6 @@ qDebug() << "keypress k  " << pe->key() << " auto  " << pe->isAutoRepeat()<< " m
 }
 
 void LEdit::keyReleaseEvent(QKeyEvent *pe) {
-qDebug() << "keyprel k  " << pe->key() << " auto  " << pe->isAutoRepeat() << " mod " << pe->modifiers();
     emit keyUp();
     if (pe->modifiers() & Qt::ShiftModifier)
         emit keyModifier(QString::fromStdString("Shift"));
