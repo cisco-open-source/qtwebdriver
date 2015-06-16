@@ -119,8 +119,8 @@ bool QKeyConverter::KeyCodeFromSpecialWebDriverKey(char16 key, Qt::Key* key_code
         *key_code = kSpecialWebDriverKeys[index];
     else {
         // Key_Escape = 0x01000000. Offset from this for undefined keys
-        int qtIndex = static_cast<int>(Qt::Key_Escape); 
-        *key_code =  static_cast<Qt::Key>(qtIndex + index);
+        int qtValue = 0x01000000 + index; 
+        *key_code =  static_cast<Qt::Key>(qtValue);
     }
     return is_special_key;
 }
