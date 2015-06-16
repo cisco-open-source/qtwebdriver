@@ -117,6 +117,11 @@ bool QKeyConverter::KeyCodeFromSpecialWebDriverKey(char16 key, Qt::Key* key_code
         index < static_cast<int>(arraysize(kSpecialWebDriverKeys));
     if (is_special_key)
         *key_code = kSpecialWebDriverKeys[index];
+    else {
+        // Key_Escape = 0x01000000. Offset from this for undefined keys
+        int qtIndex = static_cast<int>(Qt::Key_Escape); 
+        *key_code =  static_cast<Qt::Key>(qtIndex + index);
+    }
     return is_special_key;
 }
 
@@ -265,8 +270,6 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
 //                    all_modifiers | webdriver_modifiers);
             }
         } else {
-            QKeySequence tmp_keysq = QKeySequence::fromString(QString(key), QKeySequence::NativeText);
-            key_code = static_cast<Qt::Key>(tmp_keysq[0]);
             Qt::KeyboardModifiers necessary_modifiers(0);
 //            ConvertCharToKeyCode(key, &key_code, &necessary_modifiers);
             all_modifiers |= necessary_modifiers;
