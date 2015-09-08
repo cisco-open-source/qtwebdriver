@@ -299,6 +299,14 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
         if (i > 0 && key == keys[i - 1]) 
             autoPress = true;
 
+	bool sendRelease;
+#if WD_ENABLE_ONE_KEYRELEASE 
+        // Send only last key release
+        sendRelease = !autoRelease;
+ #else
+        // Send key release in all cases
+        sendRelease = true;
+#endif
         // Create the key events.
         bool necessary_modifiers[3];
         for (int i = 0; i < 3; ++i) {
@@ -313,18 +321,25 @@ bool QKeyConverter::ConvertKeysToWebKeyEvents(const string16& client_keys,
 
         if (unmodified_text.length() || modified_text.length()) {
             key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, unmodified_text.c_str(), autoPress));
-            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, unmodified_text.c_str(), autoRelease));      
+            if (sendRelease) {
+                key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, unmodified_text.c_str(), autoRelease));      
+            }
         }
         else
         {
             key_events.push_back(QKeyEvent(QEvent::KeyPress, key_code, all_modifiers, QString::null, autoPress));
-            key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, QString::null, autoRelease));
+            if (sendRelease) {
+                key_events.push_back(QKeyEvent(QEvent::KeyRelease, key_code, all_modifiers, QString::null, autoRelease));
+            }
         }
 
-        for (int i = 2; i > -1; --i) {
-            if (necessary_modifiers[i]) {
-                key_events.push_back(
-                    QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers, QString::null, autoRelease));
+        
+        if (sendRelease) {
+            for (int i = 2; i > -1; --i) {
+                if (necessary_modifiers[i]) {
+                    key_events.push_back(
+                        QKeyEvent(QEvent::KeyRelease, kModifiers[i].key_code, sticky_modifiers, QString::null, autoRelease));
+                }
             }
         }
     }

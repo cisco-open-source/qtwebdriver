@@ -131,6 +131,10 @@
 
     [ '<(WD_CONFIG_PLAYER) == 1', {
      'defines': [ 'WD_ENABLE_PLAYER=1' ],
-    } ]
+    }],
+
+    [ '<(WD_CONFIG_ONE_KEYRELEASE) == 1', {
+     'defines': [ 'WD_ENABLE_ONE_KEYRELEASE=1' ],
+    }]
   ],
 }
