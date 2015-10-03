@@ -1,6 +1,11 @@
 # Synopsis
-QtWebDriver (QtWD) is a library based on Google ChromeDriver and intended for automated testing.  
-At the moment, you can use it to test many kinds of Qt application - QWidget, QwebView and QQuick1 (Qt4) or QQuick2 (Qt5) based applications.  
+QtWebDriver is a WebDriver implementation for Qt.
+
+It can be used to perform automated Selenium testing of applications based on:
+* QtWebkit
+* QWidgets
+* QQuick1 (Qt4) or QQuick2 (Qt5)  
+
 If you hadn't used Selenium for automated testing, you may also find this links helpful:
 * http://code.google.com/p/selenium/w/list
 * http://docs.seleniumhq.org/  
