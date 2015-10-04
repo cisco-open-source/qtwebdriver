@@ -15,11 +15,9 @@ If you hadn't used Selenium for automated testing, you may also find this links 
 * Release notes and pre-built binaries are in the Releases section: https://github.com/cisco-open-source/qtwebdriver/releases
 
 # Other links
-* An example how to customize QtWebDriver in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/html/page_wd_server.html   
+* An example how to customize QtWebDriver in `src/Test/main.cc`   
 * [Doxygen](http://cisco-open-source.github.io/qtwebdriver/html)  
 * [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
 
 # License
-LGPLv2.1 
-
-For more info see out Doxygen documentation on http://cisco-open-source.github.io/qtwebdriver/html
+LGPLv2.1
