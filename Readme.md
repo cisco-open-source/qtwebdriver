@@ -11,9 +11,10 @@ If you hadn't used Selenium for automated testing, you may also find this links 
 * http://docs.seleniumhq.org/  
 
 # Build and run
-The build instructions are detailed in the wiki: https://github.com/cisco-open-source/qtwebdriver/wiki/Build-And-Run
+* The build instructions are detailed in the wiki: https://github.com/cisco-open-source/qtwebdriver/wiki/Build-And-Run
+* Release notes and pre-built binaries are in the Releases section: https://github.com/cisco-open-source/qtwebdriver/releases
 
-# Links
+# Other links
 * An example how to customize QtWebDriver in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/html/page_wd_server.html   
 * [Doxygen](http://cisco-open-source.github.io/qtwebdriver/html)  
 * [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
