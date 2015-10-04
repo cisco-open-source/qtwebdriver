@@ -11,25 +11,10 @@ If you hadn't used Selenium for automated testing, you may also find this links 
 * http://docs.seleniumhq.org/  
 
 # Build and run
-To build WD you need:
-* Install Qt (4 or 5)
-* Create wd.gypi file, our current wd.gypi looks like: 
-```
-{
-  'variables': {
-    'QT5': '1', # change to '1' for enabling Qt5, '0' for Qt4
-    'QT_BIN_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/bin/',
-    'QT_INC_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/include/',
-    'QT_LIB_PATH': '/home/username/Qt5.2.1/5.2.1/gcc/lib/',
-  },
-}
+The build instructions are detailed in the wiki: https://github.com/cisco-open-source/qtwebdriver/wiki/Build-And-Run
 
-```
-* run *build.sh* for basic build(output is in out folder)
-* you can find builded libs and test app in out/bin/desktop/release
-
-# Where to start
-* Test application in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/html/page_wd_server.html   
+# Links
+* An example how to customize QtWebDriver in `src/Test/main.cc` and in docs http://cisco-open-source.github.io/qtwebdriver/html/page_wd_server.html   
 * [Doxygen](http://cisco-open-source.github.io/qtwebdriver/html)  
 * [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
 
