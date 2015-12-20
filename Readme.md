@@ -18,6 +18,7 @@ If you hadn't used Selenium for automated testing, you may also find this links 
 * An example how to customize QtWebDriver in `src/Test/main.cc`   
 * [Doxygen](http://cisco-open-source.github.io/qtwebdriver/html)  
 * [Wiki](https://github.com/cisco-open-source/qtwebdriver/wiki)  
+* Mailing list: qtwebdriver-users@external.cisco.com
 
 # License
 LGPLv2.1
