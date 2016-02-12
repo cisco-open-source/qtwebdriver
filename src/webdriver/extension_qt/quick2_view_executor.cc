@@ -768,6 +768,13 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
 
     view->engine()->clearComponentCache();
 
+    QQmlContext *rootContext = view->rootContext();
+    QVariant pWin = rootContext->contextProperty("QmlWindow");
+
+    if (pWin.isNull()) {
+        rootContext->setContextProperty("QmlWindow", view);
+    }
+
     if (sync) {
         QEventLoop loop;
         QObject::connect(view, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
@@ -887,6 +894,7 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         ObjectNameUtils* objn = new ObjectNameUtils(rootItem);
         rootContext->setContextProperty("ObjectNameUtils", objn);
     }
+
 
     QQmlExpression expr(rootContext, view, jscript.c_str());
     QVariant result = expr.evaluate();
