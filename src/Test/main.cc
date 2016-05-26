@@ -35,6 +35,7 @@
 
 #include <iostream>
 
+#ifndef QT_NO_SAMPLES
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -60,7 +61,8 @@
 #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include "VideoTest.h"
 extern std::string testDataFolder;
-#endif //WD_ENABLE_PLAYER
+#endif // WD_ENABLE_PLAYER
+#endif // QT_NO_SAMPLES
 
 #include "base/at_exit.h"
 #include "webdriver_server.h"
@@ -95,12 +97,15 @@ extern std::string testDataFolder;
 #include "extension_qt/qwebviewext.h"
 #include "extension_qt/graphics_web_view_executor.h"
 #include "extension_qt/graphics_web_view_enumerator.h"
+
+#ifndef QT_NO_SAMPLES
 #include "GraphicsWebViewTest.h"
 #include "WindowWithEmbeddedViewTest.h"
 #include "WidgetAndWebViewTest.h"
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
 #endif //QT_VERSION
+#endif // QT_NO_SAMPLES
 #endif //WD_TEST_ENABLE_WEB_VIEW
 
 #include "extension_qt/q_view_runner.h"
@@ -112,15 +117,23 @@ extern std::string testDataFolder;
 #include "extension_qt/vnc_event_dispatcher.h"
 #include "extension_qt/uinput_event_dispatcher.h"
 
+#ifndef QT_NO_VNC
 #include "extension_qt/vncclient.h"
+#endif // QT_NO_VNC
+#ifndef QT_NO_UINPUT
 #include "extension_qt/uinput_manager.h"
+#endif // QT_NO_UINPUT
 #include "webdriver_switches.h"
 
 void setQtSettings();
 void PrintVersion();
 void PrintHelp();
+#ifndef QT_NO_VNC
 void InitVNCClient();
+#endif // QT_NO_VNC
+#ifndef QT_NO_UINPUT
 void InitUInputClient();
+#endif  // QT_NO_UINPUT
 
 int main(int argc, char *argv[])
 {
@@ -145,6 +158,7 @@ int main(int argc, char *argv[])
        Creation can be triggered by client side request like wd.get("qtwidget://WindowTestWidget"); 
     */
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
+#ifndef QT_NO_SAMPLES
     widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
     widgetCreator->RegisterViewClass<ClickTestWidget>("ClickTestWidget");
     widgetCreator->RegisterViewClass<ElementAttributeTestWidget>("ElementAttributeTestWidget");
@@ -169,6 +183,7 @@ int main(int argc, char *argv[])
 #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
 #endif //WD_ENABLE_PLAYER
+#endif // QT_NO_SAMPLES
 
 #if (WD_TEST_ENABLE_WEB_VIEW == 1)
     /* Configure web views */
@@ -184,6 +199,7 @@ int main(int argc, char *argv[])
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::GraphicsWebViewEnumeratorImpl());
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::GraphicsWebViewCmdExecutorCreator());
   
+#ifndef QT_NO_SAMPLES
     /* Register som test classes */
     widgetCreator->RegisterViewClass<GraphicsWebViewTestWindows>("GraphicsWebViewTestWindows");
     widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
@@ -193,6 +209,7 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
 #endif // QT_VERSION
+#endif // QT_NO_SAMPLES
 #endif // WD_TEST_ENABLE_WEB_VIEW
 
 #ifndef QT_NO_QML
@@ -253,6 +270,7 @@ int main(int argc, char *argv[])
       return 0;
     }
 
+#ifndef QT_NO_SAMPLES
 #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // check if --test_data_folder CL argument is present
     std::string testDataFolderSwitch = "test_data_folder";
@@ -264,7 +282,8 @@ int main(int argc, char *argv[])
     }
 
     std::cout << "Using "<< testDataFolder << " as test data folder" << std::endl;
-#endif //WD_ENABLE_PLAYER
+#endif // WD_ENABLE_PLAYER
+#endif // QT_NO_SAMPLES
 
 #if defined(OS_WIN)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -324,6 +343,7 @@ void setQtSettings() {
 #endif    
 }
 
+#ifndef QT_NO_VNC
 void InitVNCClient() {
     // start VNC module
     CommandLine cmdLine = webdriver::Server::GetInstance()->GetCommandLine();
@@ -349,7 +369,9 @@ void InitVNCClient() {
         WDEventDispatcher::getInstance()->add(new VNCEventDispatcher(client));
     }
 }
+#endif // QT_NO_VNC
 
+#ifndef QT_NO_UINPUT
 void InitUInputClient() {
     // start user input device
 #ifdef OS_LINUX
@@ -366,6 +388,7 @@ void InitUInputClient() {
     }
 #endif // OS_LINUX
 }
+#endif // QT_NO_UINPUT
 
 void PrintVersion() {
     std::cout <<webdriver::VersionInfo::CreateVersionString()<< std::endl;
