@@ -197,6 +197,9 @@
       'standalone_static_library': 1,
 
       'sources': [
+        'src/Test/Headers.h',
+        'src/Test/Samples.h',
+        'src/Test/Setup.cc',
         'src/Test/ClickTest.cc',
         'src/Test/ClickTest.h',
         '<(INTERMEDIATE_DIR)/moc_ClickTest.cc',
@@ -290,10 +293,11 @@
         'test_widgets',
       ],
 
-      'defines': [ 'WD_TEST_ENABLE_WEB_VIEW=1' ],
+      'defines': [ 'WD_ENABLE_WEB_VIEW=1' ],
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
         'src/Test/WindowWithEmbeddedViewTest.cc',
         'src/Test/WindowWithEmbeddedViewTest.h',
@@ -367,6 +371,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -394,6 +399,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -425,7 +431,8 @@
       ],
       
       'sources': [
-        'src/Test/main.cc',
+         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -457,6 +464,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -485,6 +493,7 @@
       
       'sources': [
         'src/Test/main.cc',
+        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 	
