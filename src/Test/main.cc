@@ -16,7 +16,10 @@
 ** $CISCO_END_LICENSE$
 **
 ****************************************************************************/
-
+/**
+ * This can be used as a template to insert QtWebDriver in an application code
+ * QtWebdriver shoud be started in the same process as the QApplication
+ */
 #include "Headers.h"
 
 void setQtSettings();
@@ -51,7 +54,11 @@ int main(int argc, char *argv[])
       return 0;
     }
 
-    /* Start webdriver */
+    // Application specific code
+    // ....
+    // ....
+    
+    // Start webdriver
     int startError = wd_setup(argc, argv);
     if (startError){
         std::cout << "Error while starting server, errorCode " << startError << std::endl;
