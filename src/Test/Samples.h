@@ -52,3 +52,7 @@ extern std::string testDataFolder;
 #include "WindowWithSeparatedDeclarativeAndWebViewsTest.h"
 #endif //QT_VERSION
 #endif //WD_ENABLE_WEB_VIEW
+
+int wd_samples_setup(webdriver::ViewCreator* widgetCreator, 
+	webdriver::ViewCreator* webCreator, 
+	webdriver::ViewCreator* qmlCreator);
