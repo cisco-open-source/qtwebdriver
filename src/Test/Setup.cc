@@ -40,42 +40,17 @@ int wd_setup(int argc, char *argv[])
 
     /* Configure widget views */
     webdriver::ViewCreator* widgetCreator = new webdriver::QWidgetViewCreator();
-
+    webdriver::ViewCreator* webCreator = NULL;
+    webdriver::ViewCreator* qmlCreator =  NULL;
     /* 
        Register view classes (here some test classes) that can be created by WebDriver. 
        Creation can be triggered by client side request like wd.get("qtwidget://WindowTestWidget"); 
     */
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
-#ifndef QT_NO_SAMPLES
-    widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
-    widgetCreator->RegisterViewClass<ClickTestWidget>("ClickTestWidget");
-    widgetCreator->RegisterViewClass<ElementAttributeTestWidget>("ElementAttributeTestWidget");
-    widgetCreator->RegisterViewClass<FindingTestWidget>("FindingTestWidget");
-    widgetCreator->RegisterViewClass<CoordinatesTestWidget>("CoordinatesTestWidget");
-    widgetCreator->RegisterViewClass<ClickScrollingTestWidget>("ClickScrollingTestWidget");
-    widgetCreator->RegisterViewClass<ElementSelectingTestWidget>("ElementSelectingTestWidget");
-    widgetCreator->RegisterViewClass<TypingTestWidget>("TypingTestWidget");
-    widgetCreator->RegisterViewClass<BasicKeyboardInterfaceTestWidget>("BasicKeyboardInterfaceTestWidget");
-    widgetCreator->RegisterViewClass<TextHandlingTestWidget>("TextHandlingTestWidget");
-    widgetCreator->RegisterViewClass<FormHandlingTestWidget>("FormHandlingTestWidget");
-    widgetCreator->RegisterViewClass<XPathElementFindingTestWidget>("XPathElementFindingTestWidget");
-    widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
-    widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
-    widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
-    widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
-    widgetCreator->RegisterViewClass<MenuTestWidget>("MenuTestWidget");
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-    widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
-#endif
-
-#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
-#endif //WD_ENABLE_PLAYER
-#endif // QT_NO_SAMPLES
-
+    
 #if (WD_ENABLE_WEB_VIEW == 1)
     /* Configure web views */
-    webdriver::ViewCreator* webCreator = new webdriver::QWebViewCreator();
+    webCreator = new webdriver::QWebViewCreator();
     webCreator->RegisterViewClass<QWebViewExt>("QWebViewExt");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(webCreator);
   
@@ -85,39 +60,23 @@ int wd_setup(int argc, char *argv[])
 
     /* Configure GraphicsWebView support */
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::GraphicsWebViewEnumeratorImpl());
-    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::GraphicsWebViewCmdExecutorCreator());
-  
-#ifndef QT_NO_SAMPLES
-    /* Register som test classes */
-    widgetCreator->RegisterViewClass<GraphicsWebViewTestWindows>("GraphicsWebViewTestWindows");
-    widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
-    widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
-
-
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-    widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
-#endif // QT_VERSION
-#endif // QT_NO_SAMPLES
+    webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::GraphicsWebViewCmdExecutorCreator());  
 #endif // WD_ENABLE_WEB_VIEW
 
 #ifndef QT_NO_QML
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // Quick2 extension
-    webdriver::ViewCreator* qmlCreator = new webdriver::Quick2ViewCreator();
+    qmlCreator = new webdriver::Quick2ViewCreator();
     qmlCreator->RegisterViewClass<QQuickView>("QQuickView");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
-
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::Quick2ViewEnumeratorImpl());
-
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::Quick2ViewCmdExecutorCreator());
 #else
     // Quick1 extension
-    webdriver::ViewCreator* qmlCreator = new webdriver::QQmlViewCreator();
+    qmlCreator = new webdriver::QQmlViewCreator();
     qmlCreator->RegisterViewClass<QDeclarativeView>("QDeclarativeView");
     webdriver::ViewFactory::GetInstance()->AddViewCreator(qmlCreator);
-
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlViewEnumeratorImpl());
-
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QQmlViewCmdExecutorCreator());
     
     #if (WD_ENABLE_WEB_VIEW == 1)
@@ -126,17 +85,13 @@ int wd_setup(int argc, char *argv[])
     	qmlRegisterType<QDeclarativeWebView>("CiscoQtWebKit", 1, 1, "CiscoWebView");
     	qmlRegisterRevision<QDeclarativeWebView, 0>("CiscoQtWebKit", 1, 0);
     	qmlRegisterRevision<QDeclarativeWebView, 1>("CiscoQtWebKit", 1, 1);
-    	//webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::QmlWebViewEnumeratorImpl());
-    	//webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QmlWebViewCmdExecutorCreator());
     #endif
 
 #endif
 #endif //QT_NO_QML
     /* Add widget creator last so that it deos not conflict with webview creator (QWebView is a subclass of QWidget)*/
     webdriver::ViewFactory::GetInstance()->AddViewCreator(widgetCreator);
-
     webdriver::ViewEnumerator::AddViewEnumeratorImpl(new webdriver::WidgetViewEnumeratorImpl());
-
     webdriver::ViewCmdExecutorFactory::GetInstance()->AddViewCmdExecutorCreator(new webdriver::QWidgetViewCmdExecutorCreator());
 	
     CommandLine cmd_line(CommandLine::NO_PROGRAM);
@@ -147,18 +102,7 @@ int wd_setup(int argc, char *argv[])
 #endif
 
 #ifndef QT_NO_SAMPLES
-#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-    // check if --test_data_folder CL argument is present
-    std::string testDataFolderSwitch = "test_data_folder";
-
-    if (cmd_line.HasSwitch(testDataFolderSwitch)) {
-      testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
-    } else {
-      testDataFolder = "./";
-    }
-
-    std::cout << "Using "<< testDataFolder << " as test data folder" << std::endl;
-#endif // WD_ENABLE_PLAYER
+    wd_samples_setup(widgetCreator, webCreator, qmlCreator);
 #endif // QT_NO_SAMPLES
 
 #if defined(OS_WIN)
@@ -184,9 +128,13 @@ int wd_setup(int argc, char *argv[])
     wd_server->SetRouteTable(routeTableWithShutdownCommand);
 
     /* Optional VNC an user input support */
+#ifndef QT_NO_VNC
     InitVNCClient();
+#endif // QT_NO_VNC
+#ifndef QT_NO_UINPUT
     InitUInputClient();
-
+#endif // QT_NO_UINPUT
+    
     /* Start webdriver */
     int startError = wd_server->Start();
     if (startError){
@@ -243,3 +191,62 @@ void InitUInputClient() {
 #endif // OS_LINUX
 }
 #endif // QT_NO_UINPUT
+
+#ifndef QT_NO_SAMPLES
+int wd_samples_setup(webdriver::ViewCreator* widgetCreator,
+    webdriver::ViewCreator* webCreator,
+    webdriver::ViewCreator* qmlCreator)
+{
+    if(widgetCreator != NULL)
+    {
+        widgetCreator->RegisterViewClass<WindowTestWidget>("WindowTestWidget");
+        widgetCreator->RegisterViewClass<ClickTestWidget>("ClickTestWidget");
+        widgetCreator->RegisterViewClass<ElementAttributeTestWidget>("ElementAttributeTestWidget");
+        widgetCreator->RegisterViewClass<FindingTestWidget>("FindingTestWidget");
+        widgetCreator->RegisterViewClass<CoordinatesTestWidget>("CoordinatesTestWidget");
+        widgetCreator->RegisterViewClass<ClickScrollingTestWidget>("ClickScrollingTestWidget");
+        widgetCreator->RegisterViewClass<ElementSelectingTestWidget>("ElementSelectingTestWidget");
+        widgetCreator->RegisterViewClass<TypingTestWidget>("TypingTestWidget");
+        widgetCreator->RegisterViewClass<BasicKeyboardInterfaceTestWidget>("BasicKeyboardInterfaceTestWidget");
+        widgetCreator->RegisterViewClass<TextHandlingTestWidget>("TextHandlingTestWidget");
+        widgetCreator->RegisterViewClass<FormHandlingTestWidget>("FormHandlingTestWidget");
+        widgetCreator->RegisterViewClass<XPathElementFindingTestWidget>("XPathElementFindingTestWidget");
+        widgetCreator->RegisterViewClass<StaleElementReferenceTestWidget>("StaleElementReferenceTestWidget");
+        widgetCreator->RegisterViewClass<VisibilityTestWidget>("VisibilityTestWidget");
+        widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
+        widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
+        widgetCreator->RegisterViewClass<MenuTestWidget>("MenuTestWidget");
+    #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
+    #endif
+
+    #if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        widgetCreator->RegisterViewClass<VideoTestWidget>("VideoTestWidget");
+    #endif //WD_ENABLE_PLAYER
+
+    #if (WD_ENABLE_WEB_VIEW == 1)
+        /* Register som test classes */
+        widgetCreator->RegisterViewClass<GraphicsWebViewTestWindows>("GraphicsWebViewTestWindows");
+        widgetCreator->RegisterViewClass<WindowWithEmbeddedViewTestWidget>("WindowWithEmbeddedViewTestWidget");
+        widgetCreator->RegisterViewClass<WidgetAndWebViewTestWindows>("WidgetAndWebViewTestWindows");
+
+    #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+        widgetCreator->RegisterViewClass<WindowWithSeparatedDeclarativeAndWebViewsTestWidget>("WindowWithSeparatedDeclarativeAndWebViewsTestWidget");
+    #endif // QT_VERSION
+    #endif // WD_ENABLE_WEB_VIEW
+    }
+#if (1 == WD_ENABLE_PLAYER) && (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    // check if --test_data_folder CL argument is present
+    std::string testDataFolderSwitch = "test_data_folder";
+
+    if (cmd_line.HasSwitch(testDataFolderSwitch)) {
+      testDataFolder = cmd_line.GetSwitchValueASCII(testDataFolderSwitch);
+    } else {
+      testDataFolder = "./";
+    }
+
+    std::cout << "Using "<< testDataFolder << " as test data folder" << std::endl;
+#endif // WD_ENABLE_PLAYER
+    return 0;
+}
+#endif // QT_NO_SAMPLES
