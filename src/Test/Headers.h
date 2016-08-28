@@ -78,12 +78,8 @@
 #include "extension_qt/vnc_event_dispatcher.h"
 #include "extension_qt/uinput_event_dispatcher.h"
 
-#ifndef QT_NO_VNC
 #include "extension_qt/vncclient.h"
-#endif // QT_NO_VNC
-#ifndef QT_NO_UINPUT
 #include "extension_qt/uinput_manager.h"
-#endif // QT_NO_UINPUT
 #include "webdriver_switches.h"
 
 int wd_setup(int argc, char *argv[]);

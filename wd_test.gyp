@@ -199,7 +199,6 @@
       'sources': [
         'src/Test/Headers.h',
         'src/Test/Samples.h',
-        'src/Test/Setup.cc',
         'src/Test/ClickTest.cc',
         'src/Test/ClickTest.h',
         '<(INTERMEDIATE_DIR)/moc_ClickTest.cc',
@@ -297,7 +296,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
         'src/Test/WindowWithEmbeddedViewTest.cc',
         'src/Test/WindowWithEmbeddedViewTest.h',
@@ -371,7 +369,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -399,7 +396,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -432,7 +428,6 @@
       
       'sources': [
          'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -464,7 +459,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 
@@ -493,7 +487,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/Setup.cc',
         'src/Test/shutdown_command.cc',
       ],
 	
