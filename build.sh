@@ -4,7 +4,7 @@ platform=$2
 mode=$3
 qt_dir=$4
 
-current_dir=`pwd`
+root_dir=`pwd`
 if [ -z $output_gen ];
 then
   output_gen=`pwd`/out
@@ -39,11 +39,11 @@ for platform in $platforms
 do
   for mode in $modes
   do
-    cd $current_dir
+    cd $root_dir
 
     OUTPUT_DIR=${output_gen}/$platform/$mode
-    OUTPUT_DIR_OUT=${output_gen}/$platform/$mode/Default
-    OUTPUT_BIN_DIR=${output_gen}/bin/$platform/$mode
+    OUTPUT_DIR_OUT=${OUTPUT_DIR}/Default
+    DIST_DIR=${output_gen}/dist/$platform/$mode
 
     python $GYP --depth . -G output_dir=. -D platform=$platform -D mode=$mode -D ROOT_PATH=${base_output_gen} -D QT_DIR=${qt_dir} --generator-output=${output_gen}/$platform/$mode wd.gyp
     [ $? -ne 0 ] && exit 1
@@ -51,19 +51,22 @@ do
     [ $? -ne 0 ] && echo "**** ERROR: Can't access to $OUTPUT_DIR" && exit 1
     make
     [ $? -ne 0 ] && exit 1
-    mkdir -p ${output_gen}/bin/$platform/$mode/
-    [ $? -ne 0 ] && echo "**** ERROR: Can't create $OUTPUT_BIN_DIR" && exit 1
+    mkdir -p ${DIST_DIR}/{bin,libs,h}
+    [ $? -ne 0 ] && echo "**** ERROR: Can't create $DIST_DIR" && exit 1
 
     # copy libraries
-    for file in $OUT_STATIC_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/$file $OUTPUT_BIN_DIR 2>/dev/null; done
-    for file in $OUT_SHARED_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/lib.target/$file $OUTPUT_BIN_DIR 2>/dev/null; done
+    for file in $OUT_STATIC_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/$file $DIST_DIR/libs 2>/dev/null; done
+    for file in $OUT_SHARED_LIB_FILES; do cp -f $OUTPUT_DIR_OUT/lib.target/$file $DIST_DIR/libs 2>/dev/null; done
+
+    # copy headers
+    cp -rf $root_dir/inc/* $DIST_DIR/h 2>/dev/null;
 
     # copy test binaries
     for file in $OUT_BIN_FILES
     do
       if [ -f $OUTPUT_DIR_OUT/$file ]
       then
-        cp -f $OUTPUT_DIR_OUT/$file $OUTPUT_BIN_DIR 2>/dev/null
+        cp -f $OUTPUT_DIR_OUT/$file $DIST_DIR/bin 2>/dev/null
       fi
     done
     

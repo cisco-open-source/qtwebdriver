@@ -213,7 +213,7 @@ int wd_setup(int argc, char *argv[])
 #endif
 
 #ifndef QT_NO_SAMPLES
-    wd_samples_setup(widgetCreator, webCreator, qmlCreator);
+    wd_samples_setup(widgetCreator, webCreator, qmlCreator, cmd_line);
 #endif // QT_NO_SAMPLES
 
 #if defined(OS_WIN)
@@ -288,7 +288,8 @@ int wd_setup(int argc, char *argv[])
 #ifndef QT_NO_SAMPLES
 int wd_samples_setup(webdriver::ViewCreator* widgetCreator,
     webdriver::ViewCreator* webCreator,
-    webdriver::ViewCreator* qmlCreator)
+    webdriver::ViewCreator* qmlCreator,
+    CommandLine &cmd_line)
 {
     if(widgetCreator != NULL)
     {
