@@ -55,4 +55,5 @@ extern std::string testDataFolder;
 
 int wd_samples_setup(webdriver::ViewCreator* widgetCreator, 
 	webdriver::ViewCreator* webCreator, 
-	webdriver::ViewCreator* qmlCreator);
+	webdriver::ViewCreator* qmlCreator,
+	CommandLine &cmd_line);
