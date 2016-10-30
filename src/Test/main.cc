@@ -156,6 +156,7 @@ int wd_setup(int argc, char *argv[])
     /* 
        Register view classes (here some test classes) that can be created by WebDriver. 
        Creation can be triggered by client side request like wd.get("qtwidget://WindowTestWidget"); 
+       See https://github.com/cisco-open-source/qtwebdriver/wiki/Hybridity-And-View-Management
     */
     widgetCreator->RegisterViewClass<QWidget>("QWidget");
     
@@ -213,6 +214,7 @@ int wd_setup(int argc, char *argv[])
 #endif
 
 #ifndef QT_NO_SAMPLES
+    /* optional samples setup */
     wd_samples_setup(widgetCreator, webCreator, qmlCreator, cmd_line);
 #endif // QT_NO_SAMPLES
 
@@ -286,6 +288,13 @@ int wd_setup(int argc, char *argv[])
 }
 
 #ifndef QT_NO_SAMPLES
+
+/*
+This step is optional.
+This method registers some native apps to Webdriver. 
+This wil enable WD to create these apps when queried with qtwidget://<widgetclass>
+See: https://github.com/cisco-open-source/qtwebdriver/wiki/Hybridity-And-View-Management
+*/
 int wd_samples_setup(webdriver::ViewCreator* widgetCreator,
     webdriver::ViewCreator* webCreator,
     webdriver::ViewCreator* qmlCreator,
