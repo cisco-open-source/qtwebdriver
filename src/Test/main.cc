@@ -28,6 +28,7 @@ void PrintHelp();
 
 int main(int argc, char *argv[])
 {
+    // Application specific code
     base::AtExitManager exit;
     QApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
@@ -42,21 +43,14 @@ int main(int argc, char *argv[])
     cmd_line.InitFromArgv(argc, argv);
 #endif
 
-    // check if --help CL argument is present
     if (cmd_line.HasSwitch("help")) {
         PrintHelp();
         return 0;
     }
-
-    // check if --version CL argument is present
     if (cmd_line.HasSwitch("version")) {
       PrintVersion();
       return 0;
     }
-
-    // Application specific code
-    // ....
-    // ....
     
     // Start webdriver
     int startError = wd_setup(argc, argv);
