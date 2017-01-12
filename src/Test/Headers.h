@@ -88,6 +88,9 @@
 
 int wd_setup(int argc, char *argv[])
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("utf8"));
+#endif
     webdriver::ViewRunner::RegisterCustomRunner<webdriver::QViewRunner>();
 
     webdriver::SessionLifeCycleActions::RegisterCustomLifeCycleActions<webdriver::QSessionLifeCycleActions>();
