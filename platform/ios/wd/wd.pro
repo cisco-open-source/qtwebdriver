@@ -5,7 +5,7 @@ QTPLUGIN += qtaudio_coreaudio qtmedia_audioengine qavfmediaplayer qavfcamera
 CONFIG += mobility
 
 SOURCES += \
-    ../../../src/Test/shutdown_command.cc \
+    ../../../src/webdriver/extension_qt/shutdown_command.cc \
     ../../../src/Test/main.cc \
     ../../../src/Test/XPathElementFindingTest.cc \
     ../../../src/Test/WindowTest.cc \
@@ -29,7 +29,7 @@ SOURCES += \
     ../../../src/Test/VideoTest.cc
 
 HEADERS += \
-    ../../../src/Test/shutdown_command.h \
+    ../../../inc/commands/shutdown_command.h \
     ../../../src/Test/XPathElementFindingTest.h \
     ../../../src/Test/WindowTest.h \
     ../../../src/Test/VisibilityTest.h \

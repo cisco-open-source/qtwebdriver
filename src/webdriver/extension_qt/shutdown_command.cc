@@ -17,7 +17,7 @@
 **
 ****************************************************************************/
 
-#include "shutdown_command.h"
+#include "commands/shutdown_command.h"
 #include <iostream>
 #include "webdriver_server.h"
 

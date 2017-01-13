@@ -296,7 +296,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
         'src/Test/WindowWithEmbeddedViewTest.cc',
         'src/Test/WindowWithEmbeddedViewTest.h',
         '<(INTERMEDIATE_DIR)/moc_WindowWithEmbeddedViewTest.cc',
@@ -369,7 +368,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [
@@ -396,7 +394,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [
@@ -428,7 +425,6 @@
       
       'sources': [
          'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [
@@ -459,7 +455,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
       ],
 
       'conditions': [
@@ -487,7 +482,6 @@
       
       'sources': [
         'src/Test/main.cc',
-        'src/Test/shutdown_command.cc',
       ],
 	
       'conditions': [

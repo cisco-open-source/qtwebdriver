@@ -43,7 +43,7 @@
 #include "webdriver_view_transitions.h"
 #include "versioninfo.h"
 #include "webdriver_route_table.h"
-#include "shutdown_command.h"
+#include "commands/shutdown_command.h"
 #include "webdriver_route_patterns.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
