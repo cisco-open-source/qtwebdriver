@@ -16,6 +16,10 @@
 ** $CISCO_END_LICENSE$
 **
 ****************************************************************************/
+
+#ifndef WD_SETUP_H
+#define WD_SETUP_H
+
 #include <QtCore/QObject>
 #include <QtCore/QTextCodec>
 
@@ -234,3 +238,4 @@ int wd_setup(int argc, char *argv[])
 
     return startError;
 }
+#endif // WD_SETUP_H

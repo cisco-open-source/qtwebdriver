@@ -17,6 +17,9 @@
 **
 ****************************************************************************/
 
+#ifndef SAMPLES_SETUP_H
+#define SAMPLES_SETUP_H
+
 #include "WindowTest.h"
 #include "ClickTest.h"
 #include "ElementAttributeTest.h"
@@ -110,3 +113,4 @@ int wd_samples_setup(webdriver::ViewCreator* widgetCreator,
 #endif // WD_ENABLE_PLAYER
     return 0;
 }
+#endif // SAMPLES_SETUP_H
