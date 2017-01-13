@@ -51,7 +51,7 @@ do
     [ $? -ne 0 ] && echo "**** ERROR: Can't access to $OUTPUT_DIR" && exit 1
     make
     [ $? -ne 0 ] && exit 1
-    mkdir -p ${DIST_DIR}/{bin,libs,h}
+    mkdir -p ${DIST_DIR}/{bin,libs,h,Test}
     [ $? -ne 0 ] && echo "**** ERROR: Can't create $DIST_DIR" && exit 1
 
     # copy libraries
@@ -60,6 +60,7 @@ do
 
     # copy headers
     cp -rf $root_dir/inc/* $DIST_DIR/h 2>/dev/null;
+    cp -rf $root_dir/src/Test $DIST_DIR 2>/dev/null;
 
     # copy test binaries
     for file in $OUT_BIN_FILES
