@@ -94,7 +94,7 @@ QWindow* QQmlViewUtil::getQWindowView(Session* session, const ViewId& viewId) {
     return qobject_cast<QWindow*>(qViewHandle->get());
 }
 
-QQuickView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
+QQuickWindow* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     ViewHandle* viewHandle =  session->GetViewHandle(viewId);
     if (NULL == viewHandle) 
         return NULL;
@@ -103,8 +103,68 @@ QQuickView* QQmlViewUtil::getQMLView(Session* session, const ViewId& viewId) {
     if (NULL == qViewHandle)
         return NULL;
 
-    return qobject_cast<QQuickView*>(qViewHandle->get());
+    return qobject_cast<QQuickWindow*>(qViewHandle->get());
 }
+
+QQmlEngine* QQmlViewUtil::getQMLEngine(QQuickWindow* qquickWindow) {
+    QQuickView* pView = qobject_cast<QQuickView*>(qquickWindow);
+
+    if (pView != NULL)
+        return pView->engine();
+
+    QQuickWindow* pWin = qobject_cast<QQuickWindow*>(qquickWindow);
+ 
+    if (pView != NULL) {
+        QQuickItem* item =  pWin->contentItem();
+        return  QQmlEngine::contextForObject(item)->engine();
+    }
+
+    return NULL;
+}
+
+void QQmlViewUtil::setSource(const QUrl &url, bool sync, QQuickWindow* qquickWindow) {
+    QQuickView* pView = qobject_cast<QQuickView*>(qquickWindow);
+
+    if (pView != NULL) {
+        if (sync) {
+            QEventLoop loop;
+            QObject::connect(pView, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
+            pView->setSource(url);
+
+            if (QQuickView::Loading == pView->status()) {
+                loop.exec();
+            }
+        } else {
+            pView->setSource(url);
+        }
+    }
+    else {
+        // TODO async / sync mode
+        QQmlEngine* engine = QQmlViewUtil::getQMLEngine(qquickWindow);
+        QQmlApplicationEngine* appEngine = qobject_cast<QQmlApplicationEngine*>(engine);
+
+        if (appEngine != NULL) {
+            appEngine->load(url);
+        }
+    }
+}
+
+const QUrl QQmlViewUtil::getSource(QQuickWindow* qquickWindow) {
+    QQuickView* pView = qobject_cast<QQuickView*>(qquickWindow);
+
+    if (pView != NULL) {
+        return pView->source();
+    }
+
+    QQmlEngine* engine = QQmlViewUtil::getQMLEngine(qquickWindow);
+    QQmlApplicationEngine* appEngine = qobject_cast<QQmlApplicationEngine*>(engine);
+
+    if (appEngine != NULL) {
+        return appEngine->baseUrl();
+    }
+    return QUrl();
+}
+
 #else
 void QQmlViewUtil::removeInternalSuffixes(QString& str) {
     str.remove(QRegExp(QLatin1String("_QMLTYPE_\\d+")));

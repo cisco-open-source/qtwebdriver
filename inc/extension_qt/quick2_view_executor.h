@@ -26,6 +26,7 @@
 #include <QtCore/QXmlStreamWriter>
 #include <QtQuick/QQuickView>
 #include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
 
 namespace webdriver {
 
@@ -137,15 +138,15 @@ public:
     virtual void IsOnline(bool*, Error** error) NOT_SUPPORTED_IMPL;
 
 protected:
-    QQuickView* getView(const ViewId& viewId, Error** error);
+    QQuickWindow* getView(const ViewId& viewId, Error** error);
     typedef QHash<QString, QQuickItem*> XMLElementMap;    
 
     QQuickItem* getElement(const ElementId &element, Error** error);
-    QQuickItem* getFocusItem(QQuickView* view);
+    QQuickItem* getFocusItem(QQuickWindow* view);
     bool FilterElement(const QQuickItem* item, const std::string& locator, const std::string& query);
     void FindElementsByXpath(QQuickItem* parent, const std::string &query, std::vector<ElementId>* elements, Error **error);
     void FindElements(QQuickItem* parent, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error);
-    void moveMouseInternal(QQuickView* view, QPointF& point);
+    void moveMouseInternal(QQuickWindow* view, QPointF& point);
     
 private:
     DISALLOW_COPY_AND_ASSIGN(Quick2ViewCmdExecutor);

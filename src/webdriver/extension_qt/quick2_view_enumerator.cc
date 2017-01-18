@@ -29,6 +29,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickView>
+#include <QtQuick/QQuickWindow>
 
 namespace webdriver {
 
@@ -37,13 +38,23 @@ void Quick2ViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
 
     foreach(QWindow* pWindow, QGuiApplication::allWindows())
     {
+        session->logger().Log(kInfoLogLevel,
+                       "Quick2ViewEnumerator found new view ");
         if (!pWindow->isVisible()) continue;
+        session->logger().Log(kInfoLogLevel,
+                       "Quick2ViewEnumerator found new view visible ");
 
-        QQuickView* pView = qobject_cast<QQuickView*>(pWindow);
+        QQuickWindow* pView = qobject_cast<QQuickWindow*>(pWindow);
         if (pView != NULL) {
+            session->logger().Log(kInfoLogLevel,
+                       "Quick2ViewEnumerator found new view QQuickWindow ");
+
             ViewHandlePtr handle(new QWindowViewHandle(pView));
             ViewId viewId = session->GetViewForHandle(handle);
             if (!viewId.is_valid()) {
+                session->logger().Log(kInfoLogLevel,
+                        "Quick2ViewEnumerator found new view is_valid");
+
                 if (session->AddNewView(handle, &viewId))  {
                     session->logger().Log(kInfoLogLevel,
                         "Quick2ViewEnumerator found new view("+viewId.id()+")");
