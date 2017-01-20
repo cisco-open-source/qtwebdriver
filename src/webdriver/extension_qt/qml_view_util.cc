@@ -122,7 +122,7 @@ QQmlEngine* QQmlViewUtil::getQMLEngine(QQuickWindow* qquickWindow) {
     return NULL;
 }
 
-void QQmlViewUtil::setSource(const QUrl &url, bool sync, QQuickWindow* qquickWindow) {
+void QQmlViewUtil::setSource(const Logger& logger, const QUrl &url, bool sync, QQuickWindow* qquickWindow) {
     QQuickView* pView = qobject_cast<QQuickView*>(qquickWindow);
 
     if (pView != NULL) {
@@ -134,8 +134,14 @@ void QQmlViewUtil::setSource(const QUrl &url, bool sync, QQuickWindow* qquickWin
             if (QQuickView::Loading == pView->status()) {
                 loop.exec();
             }
+
+            if (QQuickView::Ready != pView->status()) {
+                logger.Log(kWarningLogLevel, "QML sync load, smth wrong. View is not in READY state.");
+            }
+
         } else {
             pView->setSource(url);
+            logger.Log(kFineLogLevel, "QML async load - ");
         }
     }
     else {

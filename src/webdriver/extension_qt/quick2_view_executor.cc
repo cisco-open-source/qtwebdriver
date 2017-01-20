@@ -776,7 +776,7 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
         rootContext->setContextProperty("QmlWindow", view);
     }
 
-    QQmlViewUtil::setSource(address, sync, view);
+    QQmlViewUtil::setSource(session_->logger(), address, sync, view);
 }
 
 void Quick2ViewCmdExecutor::GetURL(std::string* url, Error** error) {
