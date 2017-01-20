@@ -112,14 +112,9 @@ QQmlEngine* QQmlViewUtil::getQMLEngine(QQuickWindow* qquickWindow) {
     if (pView != NULL)
         return pView->engine();
 
-    QQuickWindow* pWin = qobject_cast<QQuickWindow*>(qquickWindow);
- 
-    if (pView != NULL) {
-        QQuickItem* item =  pWin->contentItem();
-        return  QQmlEngine::contextForObject(item)->engine();
-    }
+    QQmlContext *rootContext = QQmlEngine::contextForObject(qquickWindow->contentItem());
 
-    return NULL;
+    return rootContext->engine();
 }
 
 void QQmlViewUtil::setSource(const Logger& logger, const QUrl &url, bool sync, QQuickWindow* qquickWindow) {
