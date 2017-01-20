@@ -164,7 +164,7 @@ int wd_setup(int argc, char *argv[])
 #elif defined(OS_POSIX)
     cmd_line.InitFromArgv(argc, argv);
 #endif
-cmd_line.AppendSwitch("verbose");
+
 #ifndef QT_NO_SAMPLES
     /* optional samples setup */
     wd_samples_setup(widgetCreator, webCreator, qmlCreator, cmd_line);
