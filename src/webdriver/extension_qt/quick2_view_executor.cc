@@ -57,7 +57,7 @@ Quick2ViewCmdExecutorCreator::Quick2ViewCmdExecutorCreator()
 	: ViewCmdExecutorCreator() { }
 
 ViewCmdExecutor* Quick2ViewCmdExecutorCreator::CreateExecutor(Session* session, ViewId viewId) const {
-    QQuickView* pView = QQmlViewUtil::getQMLView(session, viewId);
+    QQuickWindow* pView = QQmlViewUtil::getQMLView(session, viewId);
 
     if (NULL != pView) {
         session->logger().Log(kFineLogLevel, "Quick2 executor for view("+viewId.id()+")");
@@ -68,7 +68,7 @@ ViewCmdExecutor* Quick2ViewCmdExecutorCreator::CreateExecutor(Session* session, 
 }
 
 bool Quick2ViewCmdExecutorCreator::CanHandleView(Session* session, ViewId viewId, ViewType* viewType) const {
-    QQuickView* pView = QQmlViewUtil::getQMLView(session, viewId);
+    QQuickWindow* pView = QQmlViewUtil::getQMLView(session, viewId);
 
     if (NULL != pView) {
         if (NULL != viewType) *viewType = QML_VIEW_TYPE;
@@ -88,8 +88,8 @@ Quick2ViewCmdExecutor::Quick2ViewCmdExecutor(Session* session, ViewId viewId)
 
 Quick2ViewCmdExecutor::~Quick2ViewCmdExecutor() {}
 
-QQuickView* Quick2ViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
-    QQuickView* pView = QQmlViewUtil::getQMLView(session_, viewId);
+QQuickWindow* Quick2ViewCmdExecutor::getView(const ViewId& viewId, Error** error) {
+    QQuickWindow* pView = QQmlViewUtil::getQMLView(session_, viewId);
 
     if (NULL == pView) {
         session_->logger().Log(kWarningLogLevel, "checkView - no such qml view("+viewId.id()+")");
@@ -127,7 +127,7 @@ void Quick2ViewCmdExecutor::CanHandleUrl(const std::string& url, bool* can, Erro
 }
 
 void Quick2ViewCmdExecutor::GetSource(std::string* source, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -148,7 +148,7 @@ void Quick2ViewCmdExecutor::GetSource(std::string* source, Error** error) {
 }
 
 void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& keys, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -189,7 +189,7 @@ void Quick2ViewCmdExecutor::SendKeys(const ElementId& element, const string16& k
 }
 
 void Quick2ViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -229,7 +229,7 @@ void Quick2ViewCmdExecutor::SendKeys(const string16& keys, Error** error) {
 }
 
 void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -261,7 +261,7 @@ void Quick2ViewCmdExecutor::MouseDoubleClick(Error** error) {
 }
 
 void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -285,7 +285,7 @@ void Quick2ViewCmdExecutor::MouseButtonUp(Error** error) {
 }
 
 void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -309,7 +309,7 @@ void Quick2ViewCmdExecutor::MouseButtonDown(Error** error) {
 }
 
 void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -343,7 +343,7 @@ void Quick2ViewCmdExecutor::MouseClick(MouseButton button, Error** error) {
 }
 
 void Quick2ViewCmdExecutor::MouseWheel(const int delta, Error **error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -372,7 +372,7 @@ void Quick2ViewCmdExecutor::MouseWheel(const int delta, Error **error) {
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -394,7 +394,7 @@ void Quick2ViewCmdExecutor::MouseMove(const int x_offset, const int y_offset, Er
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, const int y_offset, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -416,7 +416,7 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, int x_offset, co
 }
 
 void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -437,7 +437,7 @@ void Quick2ViewCmdExecutor::MouseMove(const ElementId& element, Error** error) {
     session_->set_mouse_position(Point(scenePoint.x(), scenePoint.y()));
 }
 
-void Quick2ViewCmdExecutor::moveMouseInternal(QQuickView* view, QPointF& point) {
+void Quick2ViewCmdExecutor::moveMouseInternal(QQuickWindow* view, QPointF& point) {
     QPoint startViewPos = QCommonUtil::ConvertPointToQPoint(session_->get_mouse_position());
     QPointF targetScreenPos(view->x() + point.x(), view->y() + point.y());
 
@@ -467,7 +467,7 @@ void Quick2ViewCmdExecutor::moveMouseInternal(QQuickView* view, QPointF& point) 
 }
 
 void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -509,7 +509,7 @@ void Quick2ViewCmdExecutor::ClickElement(const ElementId& element, Error** error
 }
 
 void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::string& key, base::Value** value, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -547,7 +547,7 @@ void Quick2ViewCmdExecutor::GetAttribute(const ElementId& element, const std::st
 }
 
 void Quick2ViewCmdExecutor::ClearElement(const ElementId& element, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -578,7 +578,7 @@ void Quick2ViewCmdExecutor::ClearElement(const ElementId& element, Error** error
 }
 
 void Quick2ViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ignore_opacity, bool* is_displayed, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -590,7 +590,7 @@ void Quick2ViewCmdExecutor::IsElementDisplayed(const ElementId& element, bool ig
 }
 
 void Quick2ViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_enabled, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -602,7 +602,7 @@ void Quick2ViewCmdExecutor::IsElementEnabled(const ElementId& element, bool* is_
 }
 
 void Quick2ViewCmdExecutor::ElementEquals(const ElementId& element1, const ElementId& element2, bool* is_equal, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -618,7 +618,7 @@ void Quick2ViewCmdExecutor::ElementEquals(const ElementId& element1, const Eleme
 }
 
 void Quick2ViewCmdExecutor::GetElementLocation(const ElementId& element, Point* location, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -632,7 +632,7 @@ void Quick2ViewCmdExecutor::GetElementLocation(const ElementId& element, Point* 
 }
 
 void Quick2ViewCmdExecutor::GetElementLocationInView(const ElementId& element, Point* location, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -647,7 +647,7 @@ void Quick2ViewCmdExecutor::GetElementLocationInView(const ElementId& element, P
 }
 
 void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::string* tag_name, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -662,7 +662,7 @@ void Quick2ViewCmdExecutor::GetElementTagName(const ElementId& element, std::str
 }
 
 void Quick2ViewCmdExecutor::GetElementSize(const ElementId& element, Size* size, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -674,7 +674,7 @@ void Quick2ViewCmdExecutor::GetElementSize(const ElementId& element, Size* size,
 }
 
 void Quick2ViewCmdExecutor::GetElementText(const ElementId& element, std::string* element_text, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -696,7 +696,7 @@ void Quick2ViewCmdExecutor::GetElementText(const ElementId& element, std::string
 }
 
 void Quick2ViewCmdExecutor::FindElements(const ElementId& root_element, const std::string& locator, const std::string& query, std::vector<ElementId>* elements, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -740,7 +740,7 @@ void Quick2ViewCmdExecutor::FindElements(QQuickItem* parent, const std::string& 
 }
 
 void Quick2ViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -758,7 +758,7 @@ void Quick2ViewCmdExecutor::ActiveElement(ElementId* element, Error** error) {
 }
 
 void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -766,46 +766,29 @@ void Quick2ViewCmdExecutor::NavigateToURL(const std::string& url, bool sync, Err
 
     QUrl address(QString(url.c_str()));
 
-    view->engine()->clearComponentCache();
+    QQmlEngine* engine = QQmlViewUtil::getQMLEngine(view);
+    engine->clearComponentCache();
 
-    QQmlContext *rootContext = view->rootContext();
+    QQmlContext *rootContext = engine->rootContext();
     QVariant pWin = rootContext->contextProperty("QmlWindow");
 
     if (pWin.isNull()) {
         rootContext->setContextProperty("QmlWindow", view);
     }
 
-    if (sync) {
-        QEventLoop loop;
-        QObject::connect(view, SIGNAL(statusChanged(QQuickView::Status)),&loop,SLOT(quit()));
-        view->setSource(address);
-
-        if (QQuickView::Loading == view->status()) {
-            loop.exec();
-        }
-
-        if (QQuickView::Ready != view->status()) {
-            session_->logger().Log(kWarningLogLevel, "QML sync load, smth wrong. View is not in READY state.");
-        }
-
-        session_->logger().Log(kFineLogLevel, "QML sync load - " + url);
-    } else {
-        view->setSource(address);
-
-        session_->logger().Log(kFineLogLevel, "QML async load - " + url);
-    }
+    QQmlViewUtil::setSource(session_->logger(), address, sync, view);
 }
 
 void Quick2ViewCmdExecutor::GetURL(std::string* url, Error** error) {
-	QQuickView* view = getView(view_id_, error);
+	QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
-    *url = view->source().toString().toStdString();
+    *url = QQmlViewUtil::getSource(view).toString().toStdString();
 }
 
 void Quick2ViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
     
@@ -835,7 +818,7 @@ void Quick2ViewCmdExecutor::GetScreenShot(std::string* png, Error** error) {
 }
 
 void Quick2ViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::string* png, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -874,7 +857,7 @@ void Quick2ViewCmdExecutor::GetElementScreenShot(const ElementId& element, std::
 }
 
 void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base::ListValue* const args, base::Value** value, Error** error) {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -886,7 +869,8 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
         script.c_str(),
         args_as_json.c_str());
 
-    QQmlContext *rootContext = view->rootContext();
+    QQmlEngine* engine = QQmlViewUtil::getQMLEngine(view);
+    QQmlContext *rootContext = engine->rootContext();
     QVariant p = rootContext->contextProperty("ObjectNameUtils");
 
     if (p.isNull()) {
@@ -940,7 +924,7 @@ void Quick2ViewCmdExecutor::ExecuteScript(const std::string& script, const base:
 
 void Quick2ViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState *state, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -986,7 +970,7 @@ void Quick2ViewCmdExecutor::GetPlayerState(const ElementId &element, PlayerState
 
 void Quick2ViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState state, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1019,7 +1003,7 @@ void Quick2ViewCmdExecutor::SetPlayerState(const ElementId &element, PlayerState
 
 void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *volume, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1049,7 +1033,7 @@ void Quick2ViewCmdExecutor::GetPlayerVolume(const ElementId &element, double *vo
 
 void Quick2ViewCmdExecutor::SetPlayerVolume(const ElementId &element, double volume, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1078,7 +1062,7 @@ void Quick2ViewCmdExecutor::SetPlayerVolume(const ElementId &element, double vol
 
 void Quick2ViewCmdExecutor::GetPlayingPosition(const ElementId &element, double *position, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1111,7 +1095,7 @@ void Quick2ViewCmdExecutor::GetPlayingPosition(const ElementId &element, double 
 
 void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double position, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1141,7 +1125,7 @@ void Quick2ViewCmdExecutor::SetPlayingPosition(const ElementId &element, double 
 
 void Quick2ViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1170,7 +1154,7 @@ void Quick2ViewCmdExecutor::SetMute(const ElementId &element, bool mute, Error *
 
 void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1198,7 +1182,7 @@ void Quick2ViewCmdExecutor::GetMute(const ElementId &element, bool *mute, Error 
 
 void Quick2ViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double speed, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1227,7 +1211,7 @@ void Quick2ViewCmdExecutor::SetPlaybackSpeed(const ElementId &element, double sp
 
 void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *speed, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1257,7 +1241,7 @@ void Quick2ViewCmdExecutor::GetPlaybackSpeed(const ElementId &element, double *s
 
 void Quick2ViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1291,7 +1275,7 @@ void Quick2ViewCmdExecutor::TouchClick(const ElementId& element, Error **error)
 
 void Quick2ViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1329,7 +1313,7 @@ void Quick2ViewCmdExecutor::TouchDoubleClick(const ElementId& element, Error **e
 
 void Quick2ViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1344,7 +1328,7 @@ void Quick2ViewCmdExecutor::TouchDown(const int &x, const int &y, Error **error)
 
 void Quick2ViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1359,7 +1343,7 @@ void Quick2ViewCmdExecutor::TouchUp(const int &x, const int &y, Error **error)
 
 void Quick2ViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1374,7 +1358,7 @@ void Quick2ViewCmdExecutor::TouchMove(const int &x, const int &y, Error **error)
 
 void Quick2ViewCmdExecutor::TouchLongClick(const ElementId& element, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1413,7 +1397,7 @@ void Quick2ViewCmdExecutor::TouchLongClick(const ElementId& element, Error **err
 
 void Quick2ViewCmdExecutor::TouchScroll(const ElementId &element, const int &xoffset, const int &yoffset, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1463,7 +1447,7 @@ void Quick2ViewCmdExecutor::TouchScroll(const ElementId &element, const int &xof
 
 void Quick2ViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoffset, const int &yoffset, const int &speed, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1521,7 +1505,7 @@ void Quick2ViewCmdExecutor::TouchFlick(const ElementId &element, const int &xoff
 
 void Quick2ViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int &angle, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1577,7 +1561,7 @@ void Quick2ViewCmdExecutor::TouchPinchRotate(const ElementId &element, const int
 
 void Quick2ViewCmdExecutor::TouchPinchZoom(const ElementId &element, const double &scale, Error **error)
 {
-    QQuickView* view = getView(view_id_, error);
+    QQuickWindow* view = getView(view_id_, error);
     if (NULL == view)
         return;
 
@@ -1643,7 +1627,7 @@ void Quick2ViewCmdExecutor::TouchPinchZoom(const ElementId &element, const doubl
     QGuiApplication::processEvents();
 }
 
-QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickView* view) {
+QQuickItem* Quick2ViewCmdExecutor::getFocusItem(QQuickWindow* view) {
     QQuickItem* pFocusItem = view->activeFocusItem();
     if (NULL != pFocusItem) return pFocusItem;
 

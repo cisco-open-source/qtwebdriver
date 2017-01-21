@@ -25,11 +25,14 @@
 #include <QtCore/QDebug>
 
 #include "common_util.h"
+#include "webdriver_logging.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 class QWindow;
 class QQuickView;
 #include <QtQuick/QQuickItem>
+#include <QtQml/QQmlContext>
+#include <QtQml/QQmlApplicationEngine>
 #else
 class QDeclarativeView;
 #include <QtDeclarative/QDeclarativeItem>
@@ -49,7 +52,10 @@ public:
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     static QWindow* getQWindowView(Session* session, const ViewId& viewId);
-    static QQuickView* getQMLView(Session* session, const ViewId& viewId);
+    static QQuickWindow* getQMLView(Session* session, const ViewId& viewId);
+    static QQmlEngine* getQMLEngine(QQuickWindow* qquickWindow);
+    static void setSource(const Logger& logger, const QUrl &url, bool sync, QQuickWindow* qquickWindow);
+    static const QUrl getSource(QQuickWindow* qquickWindow);
 #else    
     static QDeclarativeView* getQMLView(Session* session, const ViewId& viewId);
 #endif

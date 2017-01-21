@@ -29,6 +29,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickView>
+#include <QtQuick/QQuickWindow>
 
 namespace webdriver {
 
@@ -39,7 +40,7 @@ void Quick2ViewEnumeratorImpl::EnumerateViews(Session* session, std::set<ViewId>
     {
         if (!pWindow->isVisible()) continue;
 
-        QQuickView* pView = qobject_cast<QQuickView*>(pWindow);
+        QQuickWindow* pView = qobject_cast<QQuickWindow*>(pWindow);
         if (pView != NULL) {
             ViewHandlePtr handle(new QWindowViewHandle(pView));
             ViewId viewId = session->GetViewForHandle(handle);
