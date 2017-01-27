@@ -10,10 +10,13 @@ LABEL vendor="Cisco Systems"
 LABEL license="LGPLv2.1"
 LABEL version="1.3.3"
 
+# Args
+ARG QPA_PLATFORM
+
 #Env
 ENV QTDIR "/opt/Qt5.4.2/5.4/gcc_64"
 ENV QT_PLUGIN_PATH $QTDIR/plugins
-ENV QT_QPA_PLATFORM offscreen
+ENV QT_QPA_PLATFORM ${QPA_PLATFORM:-offscreen}
 ENV QT_QPA_FONTDIR /opt/Qt5.4.2/5.4/Src/qtbase/lib/fonts
 WORKDIR /opt
 
