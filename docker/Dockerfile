@@ -23,9 +23,9 @@ WORKDIR /opt
 # Build
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
     && sudo apt-get update && sudo apt-get install -y \
-        git g++ gyp xvfb libicu-dev libegl1-mesa-dev libgles2-mesa-dev \
-    && git clone --verbose --progress https://github.com/cisco-open-source/qtwebdriver \
-    && cd qtwebdriver \
+        g++ gyp xvfb libicu-dev libegl1-mesa-dev libgles2-mesa-dev \
+    && wget https://github.com/cisco-open-source/qtwebdriver/archive/WD_1.X_dev.zip \
+    && unzip WD_1.X_dev.zip && mv qtwebdriver-WD_1.X_dev qtwebdriver && cd qtwebdriver \
     && cp ./qt5_sample_config.gypi ./wd.gypi \
     && sed -i "s@\/home\/hekra01\/qt@$QTDIR@g" wd.gypi \
     && ./build.sh
