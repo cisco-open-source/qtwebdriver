@@ -1,17 +1,16 @@
 # Dockerfile to build a Webdriver for QT5
 # Check port mapping when running the container
 # e.g:
+# $ docker build --rm=true --no-cache -t latest:latest docker/
 # $ docker run -ti --rm -p 9531:9517 latest:latest --verbose
 
 FROM  alexzaporozhets/ubuntu-qt5.4.2
-#FROM icsinc/qt5.5.0-x64
-#FROM ubuntu:trusty
 MAINTAINER Hugues Ekra <hekra@cisco.com>
 LABEL vendor="Cisco Systems"
 LABEL license="LGPLv2.1"
 LABEL version="1.3.3"
 
-#ENV QTDIR /opt/qt55
+#Env
 ENV QTDIR "/opt/Qt5.4.2/5.4/gcc_64"
 ENV QT_PLUGIN_PATH $QTDIR/plugins
 ENV QT_QPA_PLATFORM offscreen
