@@ -2,6 +2,7 @@
   'variables': {
     'QT5': '1',
     'WD_CONFIG_QWIDGET_BASE': '1',
+# If Qt >= 5.6 set 'WD_CONFIG_WEBKIT' : '0'
     'WD_CONFIG_WEBKIT': '1',
     'WD_CONFIG_QUICK': '1',
     'WD_CONFIG_PLAYER': '0',
