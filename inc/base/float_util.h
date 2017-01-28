@@ -7,6 +7,7 @@
 
 #include "build/build_config.h"
 
+#include <cmath>
 #include <float.h>
 #include <math.h>
 
@@ -15,7 +16,7 @@ namespace base {
 template <typename Float>
 inline bool IsFinite(const Float& number) {
 #if defined(OS_POSIX)
-  return isfinite(number) != 0;
+  return std::isfinite(number) != 0;
 #elif defined(OS_WIN)
   return _finite(number) != 0;
 #endif
