@@ -56,9 +56,13 @@
 
         ['platform == "desktop"', {
           'dependencies': [
-            'wd_test.gyp:test_WD_hybrid',
             'wd_test.gyp:test_WD_hybrid_noWebkit',
           ],
+          'conditions': [
+            ['<(WD_CONFIG_WEBKIT) == 1', {
+              'dependencies': ['wd_test.gyp:test_WD_hybrid']
+            } ],
+          ]
         } ],
 
         ['platform == "desktop" and OS == "linux"', {

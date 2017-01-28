@@ -80,6 +80,7 @@
         'src/webdriver/extension_qt/web_view_visualizer.cc',
         'src/webdriver/extension_qt/qwebviewext.cc',
         'src/webdriver/extension_qt/web_view_util.cc',
+        'src/webdriver/extension_qt/web_view_util.h',
         'src/webdriver/extension_qt/qwebkit_proxy.cc',
         'src/webdriver/extension_qt/qwebkit_proxy.h',
         'inc/extension_qt/qnetwork_access_manager_tracer.h',
