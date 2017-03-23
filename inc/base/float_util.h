@@ -25,7 +25,7 @@ inline bool IsFinite(const Float& number) {
 template <typename Float>
 inline bool IsNaN(const Float& number) {
 #if defined(OS_POSIX)
-  return isnan(number) != 0;
+  return std::isnan(number) != 0;
 #elif defined(OS_WIN)
   return _isnan(number) != 0;
 #endif
