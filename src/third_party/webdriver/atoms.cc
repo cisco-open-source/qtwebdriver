@@ -2984,7 +2984,7 @@ const char* const IS_ELEMENT_CLICKABLE[] = {
     "ckable:a};b&&(d.message=b);return d}var a=h.ownerDocument.elementFromPo",
     "int(d.x,d.y);if(a==h)return g(!0);var l=\"(\"+d.x+\", \"+d.y+\")\";if(n",
     "ull==a)return g(!1,\"Element is not clickable at point \"+l);var b=a.ou",
-    "terHTML;if(a.hasChildNodes())var m=a.innerHTML,n=b.length-m.length-(\"<",
+    "terHTML;if(a.hasChildNodes()&&b)var m=a.innerHTML,n=b.length-m.length-(\"<",
     "/\"+a.tagName+\">\").length,b=b.substring(0,n)+\"...\"+b.substring(n+m.",
     "length);for(a=a.parentNode;a;){if(a==h)return g(!0,\"Element's descenda",
     "nt would receive the click. Consider clicking the descendant instead. D",
