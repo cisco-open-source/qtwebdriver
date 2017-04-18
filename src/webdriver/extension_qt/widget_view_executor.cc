@@ -499,7 +499,7 @@ void QWidgetViewCmdExecutor::ClickElement(const ElementId& element, Error** erro
             return;
         }
 
-        action->trigger();
+        QMetaObject::invokeMethod(action, "trigger", Qt::QueuedConnection);
 
         return;
     }
