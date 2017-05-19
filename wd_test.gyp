@@ -279,7 +279,7 @@
     }, {
       'target_name': 'test_WD_hybrid',
       'type': 'executable',
-      
+
       'product_name': 'WebDriver',
 
       'dependencies': [
@@ -287,13 +287,11 @@
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
         'wd_ext_qt.gyp:WebDriver_extension_qt_web',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_web',
         'test_widgets',
       ],
 
       'defines': [ 'WD_ENABLE_WEB_VIEW=1' ],
-      
+
       'sources': [
         'src/Test/main.cc',
         'src/Test/WindowWithEmbeddedViewTest.cc',
@@ -308,12 +306,26 @@
       ],
 
       'conditions': [
+        ['<(WD_CONFIG_QUICK) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick', 'wd_ext_qt.gyp:WebDriver_extension_qt_quick_web'],
+
+          'conditions': [
+            [ 'OS == "linux"', {
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared'],
+            } ],
+          ],
+        }, {
+          'defines': [
+             'QT_NO_QML',
+           ],
+        } ],
+
       	[ '<(WD_BUILD_MONGOOSE) == 0', {
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
         } ],
-       
+
         [ '<(QT5) == 1', {
           'conditions': [
             ['OS=="linux"', {
@@ -362,15 +374,28 @@
         'base.gyp:chromium_base',
         'wd_core.gyp:WebDriver_core',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
-      
+
       'sources': [
         'src/Test/main.cc',
       ],
 
       'conditions': [
+        ['<(WD_CONFIG_QUICK) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick'],
+
+          'conditions': [
+            [ 'OS == "linux"', {
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared'],
+            } ],
+          ],
+        } , {
+          'defines': [
+             'QT_NO_QML',
+           ],
+        }],
+
         [ '<(WD_BUILD_MONGOOSE) == 0', {
           'sources': [
             'src/third_party/mongoose/mongoose.c',
@@ -388,15 +413,29 @@
         'base.gyp:chromium_base_shared',
         'wd_core.gyp:WebDriver_core_shared',
         'wd_ext_qt.gyp:WebDriver_extension_qt_base_shared',
-        'wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared',
         'test_widgets',
       ],
-      
+
       'sources': [
         'src/Test/main.cc',
       ],
 
       'conditions': [
+        ['<(WD_CONFIG_QUICK) == 1', {
+          'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick'],
+
+          'conditions': [
+            [ 'OS == "linux"', {
+              'dependencies': ['wd_ext_qt.gyp:WebDriver_extension_qt_quick_shared'],
+            } ],
+          ],
+        }, {
+          'defines': [
+             'QT_NO_QML',
+           ],
+        }
+        ],
+
         [ '<(WD_BUILD_MONGOOSE) == 0', {
           'sources': [
             'src/third_party/mongoose/mongoose.c',
@@ -418,11 +457,11 @@
       ],
       'libraries': [
         '-lQt5Multimedia',
-        '-lQt5MultimediaWidgets', 
+        '-lQt5MultimediaWidgets',
         '-lQt5Quick',
         '-lQt5Qml',
       ],
-      
+
       'sources': [
          'src/Test/main.cc',
       ],
@@ -449,10 +488,10 @@
         'test_widgets',
       ],
 
-      'defines': [ 
+      'defines': [
          'QT_NO_QML',
        ],
-      
+
       'sources': [
         'src/Test/main.cc',
       ],
@@ -479,18 +518,19 @@
         'wd_ext_qt.gyp:WebDriver_extension_qt_quick',
         'test_widgets',
       ],
-      
+
       'sources': [
         'src/Test/main.cc',
       ],
-	
+
       'conditions': [
+
         [ '<(WD_BUILD_MONGOOSE) == 0', {
           'sources': [
             'src/third_party/mongoose/mongoose.c',
           ],
         } ],
       ],
-    },	
+    },
   ],
 }
