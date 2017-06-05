@@ -24,7 +24,7 @@ extern "C" {
 }
 #define BASE_WIN_GET_CALLER _ReturnAddress()
 #elif defined(COMPILER_GCC)
-#define BASE_WIN_GET_CALLER __builtin_extract_return_addr(\\
+#define BASE_WIN_GET_CALLER __builtin_extract_return_addr(\
     __builtin_return_address(0))
 #endif
 
