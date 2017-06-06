@@ -13,7 +13,6 @@
     # TODO: review include_dirs
     'include_dirs': [
       'inc/',
-      '<(APP_INC_PATH)',
       '<(QT_INC_PATH)',
       '<(INTERMEDIATE_DIR)',
     ],
@@ -23,7 +22,6 @@
         'conditions': [
           ['OS=="linux"', {
             'libraries': [
-              '-l<(APP_LIB_PATH)/AppLib',
               '-L<(QT_LIB_PATH)',
               '-lQt5Network',
               '-lQt5Widgets',

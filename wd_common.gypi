@@ -11,8 +11,6 @@
     'QT_BIN_PATH%': '/usr/lib/qt4/bin',
     'QT_INC_PATH%': '/usr/include',
     'QT_LIB_PATH%': '/usr/lib',
-    'APP_INC_PATH%': '/app/usr/include',
-    'APP_LIB_PATH%': '/app/usr/lib',
     'MONGOOSE_INC_PATH%': 'src/third_party/mongoose',
 
     'conditions': [
