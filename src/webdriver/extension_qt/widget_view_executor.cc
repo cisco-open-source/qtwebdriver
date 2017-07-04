@@ -54,6 +54,9 @@
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QTreeWidgetItem>
+#include <QtWidgets/QTabWidget>
 #if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
@@ -74,6 +77,9 @@
 #include <QtGui/QProgressBar>
 #include <QtGui/QListView>
 #include <QtGui/QAction>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QTabWidget>
 #endif
 
 #include "third_party/pugixml/pugixml.hpp"
@@ -841,6 +847,32 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
         }
         *element_text = list.join("\n").toStdString();
         return;
+    }
+
+    QTreeWidget * tree = qobject_cast<QTreeWidget*>(pElement);
+    if (NULL != tree) {
+        QTreeWidgetItem * currentItem = tree->currentItem();
+        // if NULL, then no item is currently selected in the tree
+        if(NULL != currentItem) {
+            QStringList list;
+            for( int col = 0; col < currentItem->columnCount(); ++col ) 
+            {
+                list.append(currentItem->text(col));
+            }
+            *element_text = list.join("\n").toStdString();
+            return;
+        }
+    }
+    
+    QTabWidget * tabWidget = qobject_cast<QTabWidget*>(pElement);
+    if (NULL != tabWidget) {
+        int currentIndex = tabWidget->currentIndex();
+        // if currentIndex == -1, then it means that there is no current widget (it's the default value)
+        if (currentIndex != -1) {
+            QString currentTabText = tabWidget->tabText(currentIndex);
+            *element_text = currentTabText.toStdString();
+            return;
+        }
     }
 
     QVariant textValue = pElement->property("text");
