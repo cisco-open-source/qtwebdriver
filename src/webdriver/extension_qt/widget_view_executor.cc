@@ -57,6 +57,10 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGraphicsItem>
+#include <QtWidgets/QGraphicsSimpleTextItem>
+#include <QtWidgets/QGraphicsTextItem>
 #if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
@@ -80,6 +84,10 @@
 #include <QtGui/QTreeWidget>
 #include <QtGui/QTreeWidgetItem>
 #include <QtGui/QTabWidget>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QGraphicsSimpleTextItem>
+#include <QtGui/QGraphicsTextItem>
 #endif
 
 #include "third_party/pugixml/pugixml.hpp"
@@ -873,6 +881,27 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
             *element_text = currentTabText.toStdString();
             return;
         }
+    }
+
+    QGraphicsView * graphicsView = qobject_cast<QGraphicsView*>(pElement);
+    if (NULL != graphicsView) {
+        QStringList list;
+        foreach(QGraphicsItem * item, graphicsView->items()) {
+            QGraphicsSimpleTextItem * simpleTextItem = qgraphicsitem_cast<QGraphicsSimpleTextItem*>(item);
+            if (NULL != simpleTextItem) {
+                list.append(simpleTextItem->text());
+                continue;
+            }
+
+            QGraphicsTextItem * textItem = qgraphicsitem_cast<QGraphicsTextItem*>(item);
+            if (NULL != textItem) {
+                list.append(textItem->toPlainText());
+                continue;
+            }
+        }
+
+        *element_text = list.join("\n").toStdString();
+        return;
     }
 
     QVariant textValue = pElement->property("text");
