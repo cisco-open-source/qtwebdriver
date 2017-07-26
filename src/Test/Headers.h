@@ -160,7 +160,9 @@ int wd_setup(int argc, char *argv[])
     
     CommandLine cmd_line(CommandLine::NO_PROGRAM);
 #if defined(OS_WIN)
-    cmd_line.ParseFromString(::GetCommandLineW());
+    for (int var = 0; var < argc; ++var) {
+        cmd_line.AppendSwitch(argv[var]);
+    }
 #elif defined(OS_POSIX)
     cmd_line.InitFromArgv(argc, argv);
 #endif
