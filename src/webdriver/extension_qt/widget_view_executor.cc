@@ -841,7 +841,12 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
 
     QTextEdit *pText = qobject_cast<QTextEdit*>(pElement);
     if (NULL != pText) {
-        *element_text = pText->toPlainText().toStdString();
+	QVariant te = pText->property( "te" );
+	if ( te.isValid()) {
+	    *element_text = te.toString().toStdString();
+	} else {
+	    *element_text = pText->toPlainText().toStdString();
+	}
         return;
     }
 
