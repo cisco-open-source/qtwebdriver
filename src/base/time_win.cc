@@ -48,7 +48,7 @@ using base::TimeDelta;
 using base::TimeTicks;
 
 // C++11 type name replaced by similar
-typedef size_t uint32_t;
+//typedef size_t uint32_t;
 
 namespace {
 
