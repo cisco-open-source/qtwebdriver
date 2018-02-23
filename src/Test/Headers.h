@@ -46,6 +46,11 @@
 #include "commands/shutdown_command.h"
 #include "webdriver_route_patterns.h"
 
+#if defined(OS_WIN)
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS 1
+#define HAVE_STRUCT_TIMESPEC 1
+#endif
+
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     // headers for Quick2 extension
     #include "extension_qt/quick2_view_creator.h"
@@ -160,7 +165,9 @@ int wd_setup(int argc, char *argv[])
     
     CommandLine cmd_line(CommandLine::NO_PROGRAM);
 #if defined(OS_WIN)
-    cmd_line.ParseFromString(::GetCommandLineW());
+    for (int var = 0; var < argc; ++var) {
+        cmd_line.AppendSwitch(argv[var]);
+    }
 #elif defined(OS_POSIX)
     cmd_line.InitFromArgv(argc, argv);
 #endif
