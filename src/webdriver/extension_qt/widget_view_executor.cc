@@ -61,6 +61,7 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsSimpleTextItem>
 #include <QtWidgets/QGraphicsTextItem>
+#include <QtGui/5.6.2/QtGui/qpa/qwindowsysteminterface.h>
 #if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
@@ -214,9 +215,21 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
         return;
     }
 
+    QWindow *window = QGuiApplication::focusWindow();
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(pWidget, &(*it));
+        QKeyEvent * key_event = &( *it );
+#if !defined(Q_OS_OSX)
+        // FIXME: Include OS X in this code path by passing the key event through
+        // QPlatformInputContext::filterEvent().
+        if( key_event->type() == QEvent::KeyPress && window ) {
+            if( QWindowSystemInterface::handleShortcutEvent( window, key_event->timestamp(), key_event->key(), key_event->modifiers(),
+                                                             key_event->nativeScanCode(), key_event->nativeVirtualKey(), key_event->nativeModifiers(), key_event->text(), key_event->isAutoRepeat(), key_event->count() ) )
+                return;
+        }
+#endif
+
+        qApp->sendEvent(pWidget, key_event);
         ++it;
     }
 }
