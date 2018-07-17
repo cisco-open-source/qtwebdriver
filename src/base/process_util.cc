@@ -56,6 +56,18 @@ bool ProcessIterator::IncludeEntry() {
   return !filter_ || filter_->Includes(entry_);
 }
 
+ProcessIterator::ProcessIterator(const ProcessFilter* filter)
+{
+
+}
+
+ProcessIterator::~ProcessIterator()
+{}
+bool ProcessIterator::CheckForNextProcess()
+{
+    return false;
+}
+
 NamedProcessIterator::NamedProcessIterator(
     const FilePath::StringType& executable_name,
     const ProcessFilter* filter) : ProcessIterator(filter),
@@ -73,7 +85,16 @@ NamedProcessIterator::NamedProcessIterator(
 #endif
 }
 
+bool NamedProcessIterator::IncludeEntry() {
+    return false;
+}
+
 NamedProcessIterator::~NamedProcessIterator() {
+}
+
+bool KillProcessById(ProcessId process_id, int exit_code, bool wait)
+{
+    return false;
 }
 
 }  // namespace base

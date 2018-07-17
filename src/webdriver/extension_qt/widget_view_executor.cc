@@ -61,7 +61,7 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsSimpleTextItem>
 #include <QtWidgets/QGraphicsTextItem>
-#include <QtGui/5.6.2/QtGui/qpa/qwindowsysteminterface.h>
+#include <QtGui/5.9.6/QtGui/qpa/qwindowsysteminterface.h>
 #if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
