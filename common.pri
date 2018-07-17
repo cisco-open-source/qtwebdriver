@@ -1,11 +1,3 @@
-#INCLUDEPATH = $$SRC_DIR $$INC_DIR
-
-#DESTDIR = $${BUILD_DIR}/bin
-#CONFIG += c++11
-
-#CONFIG(release) {
-#	DEFINES += NDEBUG
-#}
 
 !win* {
 	QMAKE_CFLAGS += -Wall -W -Wno-unused-parameter -fPIC
@@ -27,6 +19,7 @@ linux* {
 
 win* {
 	DEFINES += _WIN32 OS_WIN NOMINMAX _CRT_RAND_S WIN32 _UNICODE _WINSOCKAPI_
+    DEFINES += _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
 }
 
 android {
