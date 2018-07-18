@@ -7,6 +7,8 @@ INCLUDEPATH += $$PWD/src/Test
 
 DEFINES += QT_NO_SAMPLES
 
+system(cd $$PWD && python generate_wdversion.py)
+
 include(common.pri)
 
 INC_DIR=$$PWD/inc
