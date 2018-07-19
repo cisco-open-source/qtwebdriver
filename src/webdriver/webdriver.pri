@@ -1,5 +1,5 @@
 
-linx*{
+linux*{
     LIBS+= -ldl
 }
 

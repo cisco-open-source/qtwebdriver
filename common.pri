@@ -15,7 +15,6 @@ macx {
 
 linux* {
 	DEFINES += __STDC_FORMAT_MACROS OS_POSIX
-	LIBS += -ldl
 }
 
 win* {
