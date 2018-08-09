@@ -63,9 +63,9 @@
 #include <QtWidgets/QGraphicsTextItem>
 #if (QT_VERSION == QT_VERSION_CHECK(5, 9, 6))
 #include <QtGui/5.9.6/QtGui/qpa/qwindowsysteminterface.h>
-#else if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+#elif (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
 #include <QtGui/5.11.1/QtGui/qpa/qwindowsysteminterface.h>
-#else if (QT_VERSION == QT_VERSION_CHECK(5, 12, 0))
+#else
 #include <QtGui/5.12.0/QtGui/qpa/qwindowsysteminterface.h>
 #endif  
 #if (1 == WD_ENABLE_PLAYER)
