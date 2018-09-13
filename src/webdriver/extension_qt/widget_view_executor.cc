@@ -53,6 +53,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
+#include <QtWidgets/QTableView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTreeWidgetItem>
@@ -894,6 +895,25 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
             *element_text = list.join("\n").toStdString();
             return;
         }
+    }
+	
+	QTableView *tableView = qobject_cast<QTableView*>(pElement);
+    if (NULL != listView)
+    {
+		QAbstractItemModel *model = tableView->model();
+		if (NULL != model)
+		{
+			QStringList rows;
+			for (int row = 0; row < model->rowCount(); ++row)
+			{
+				QStringList items;
+				for (int col = 0; col < model->columnCount(); ++col)
+					items.append(model->index(row, col).data().toString());
+				rows.append(items.join("\t"));
+			}
+			*element_text = rows.join("\n").toStdString();
+		}
+        return;
     }
     
     QTabWidget * tabWidget = qobject_cast<QTabWidget*>(pElement);
