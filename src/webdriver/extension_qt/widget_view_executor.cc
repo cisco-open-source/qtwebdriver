@@ -53,6 +53,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QListView>
+#include <QtWidgets/QTableView>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QTreeWidgetItem>
@@ -61,6 +62,13 @@
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsSimpleTextItem>
 #include <QtWidgets/QGraphicsTextItem>
+#if (QT_VERSION == QT_VERSION_CHECK(5, 9, 6))
+#include <QtGui/5.9.6/QtGui/qpa/qwindowsysteminterface.h>
+#elif (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+#include <QtGui/5.11.1/QtGui/qpa/qwindowsysteminterface.h>
+#else
+#include <QtGui/5.12.0/QtGui/qpa/qwindowsysteminterface.h>
+#endif  
 #if (1 == WD_ENABLE_PLAYER)
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QtMultimedia/QMediaPlayer>
@@ -214,9 +222,21 @@ void QWidgetViewCmdExecutor::SendKeys(const ElementId& element, const string16& 
         return;
     }
 
+    QWindow *window = QGuiApplication::focusWindow();
     std::vector<QKeyEvent>::iterator it = key_events.begin();
     while (it != key_events.end()) {
-        qApp->sendEvent(pWidget, &(*it));
+        QKeyEvent * key_event = &( *it );
+#if !defined(Q_OS_OSX)
+        // FIXME: Include OS X in this code path by passing the key event through
+        // QPlatformInputContext::filterEvent().
+        if( key_event->type() == QEvent::KeyPress && window ) {
+            if( QWindowSystemInterface::handleShortcutEvent( window, key_event->timestamp(), key_event->key(), key_event->modifiers(),
+                                                             key_event->nativeScanCode(), key_event->nativeVirtualKey(), key_event->nativeModifiers(), key_event->text(), key_event->isAutoRepeat(), key_event->count() ) )
+                return;
+        }
+#endif
+
+        qApp->sendEvent(pWidget, key_event);
         ++it;
     }
 }
@@ -841,7 +861,12 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
 
     QTextEdit *pText = qobject_cast<QTextEdit*>(pElement);
     if (NULL != pText) {
-        *element_text = pText->toPlainText().toStdString();
+	QVariant mxliff = pText->property( "mxliff" );
+	if ( mxliff.isValid()) {
+	    *element_text = mxliff.toString().toStdString();
+	} else {
+	    *element_text = pText->toPlainText().toStdString();
+	}
         return;
     }
 
@@ -870,6 +895,25 @@ void QWidgetViewCmdExecutor::GetElementText(const ElementId& element, std::strin
             *element_text = list.join("\n").toStdString();
             return;
         }
+    }
+	
+	QTableView *tableView = qobject_cast<QTableView*>(pElement);
+    if (NULL != listView)
+    {
+		QAbstractItemModel *model = tableView->model();
+		if (NULL != model)
+		{
+			QStringList rows;
+			for (int row = 0; row < model->rowCount(); ++row)
+			{
+				QStringList items;
+				for (int col = 0; col < model->columnCount(); ++col)
+					items.append(model->index(row, col).data().toString());
+				rows.append(items.join("\t"));
+			}
+			*element_text = rows.join("\n").toStdString();
+		}
+        return;
     }
     
     QTabWidget * tabWidget = qobject_cast<QTabWidget*>(pElement);
