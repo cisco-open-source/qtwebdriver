@@ -139,17 +139,16 @@ void QWidgetXmlSerializer::addWidget(QObject* widget) {
 
 QString QWidgetXmlSerializer::getElementName(const QObject* object) const {
     QString elementName = object->metaObject()->className();
-    if( supportedClasses_.empty() == false ) {
-        const QMetaObject* metaObject = object->metaObject();
-        while( !supportedClasses_.contains( metaObject->className() ) &&
-               metaObject->superClass() != NULL ) {
-            metaObject = metaObject->superClass();
-        }
-        if( supportedClasses_.contains( metaObject->className() ) )
-            elementName = metaObject->className();
-    }
+    if (supportedClasses_.empty())
+        return elementName;
 
-    elementName = elementName.replace( QStringLiteral( "::" ), QStringLiteral( ":" ) );
+    const QMetaObject* metaObject = object->metaObject();
+    while (!supportedClasses_.contains(metaObject->className()) &&
+           metaObject->superClass() != NULL) {
+        metaObject = metaObject->superClass();
+    }
+    if (supportedClasses_.contains(metaObject->className()))
+        elementName = metaObject->className();
 
     return elementName;
 }

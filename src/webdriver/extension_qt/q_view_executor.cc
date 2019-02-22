@@ -218,8 +218,6 @@ void QViewCmdExecutor::SwitchTo(Error** error) {
     if (NULL == view)
         return;
 
-    QApplication::setActiveWindow( view );
-
     session_->set_current_view(view_id_);
 
     session_->logger().Log(kInfoLogLevel, "SwitchTo - set current view ("+view_id_.id()+")");
