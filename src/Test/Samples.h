@@ -37,6 +37,7 @@
 #include "BasicMouseInterfaceTest.h"
 #include "TouchTest.h"
 #include "MenuTest.h"
+#include "calculator.h"
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #include "WindowWithDeclarativeViewTest.h"
@@ -80,6 +81,7 @@ int wd_samples_setup(webdriver::ViewCreator* widgetCreator,
         widgetCreator->RegisterViewClass<BasicMouseInterfaceTestWidget>("BasicMouseInterfaceTestWidget");
         widgetCreator->RegisterViewClass<TouchTestWidget>("TouchTestWidget");
         widgetCreator->RegisterViewClass<MenuTestWidget>("MenuTestWidget");
+        widgetCreator->RegisterViewClass<Calculator>("Calculator");
     #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         widgetCreator->RegisterViewClass<WindowWithDeclarativeViewTestWidget>("WindowWithDeclarativeViewTestWidget");
     #endif
