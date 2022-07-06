@@ -501,9 +501,9 @@ void Session::UpdateViews(const std::set<ViewId>& views) {
     ViewsMap::iterator it;
     ViewId vi;
 
-    for (it = views_.begin(); it != views_.end(); ++it) {
+    for (it = views_.begin(); it != views_.end();) {
         vi = ViewId(it->first);
-		
+	 ++it;	
         if (vi.is_valid() && 0 == views.count(vi)) {
             // invalidate handle
             RemoveView(vi);
